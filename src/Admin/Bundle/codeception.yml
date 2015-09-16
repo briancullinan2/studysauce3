@@ -1,0 +1,19 @@
+namespace: Admin\Bundle\Tests
+actor: Tester
+paths:
+    tests: Tests
+    output: Resources/public/results
+    log: Resources/public/results
+    data: Resourses/public/results
+    helpers: Tests/_support
+settings:
+    bootstrap: _bootstrap.php
+    colors: false
+    memory_limit: 1024M
+modules:
+    config:
+        Db:
+            dsn: 'sqlite:%kernel.root_dir%/data.sqlite'
+            user: 'root'
+            password: '~'
+            dump: tests/_data/dump.sql

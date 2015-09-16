@@ -1,0 +1,24 @@
+imports:
+    - { resource: config.yml }
+
+parameters:
+    defer_all_emails: "studymarketing@mailinator.com"
+
+
+doctrine:
+    dbal:
+        driver:   "pdo_mysql"
+        host:     "localhost"
+        dbname:   "studysauce"
+        user:     "study"
+        password: "itekIO^#(1234"
+
+services:
+    pdo:
+        class: Doctrine\DBAL\Driver\PDOConnection
+        arguments:
+            - "mysql:host=localhost;port=3306;dbname=studysauce"
+            - study
+            - itekIO^#(1234
+        calls:
+            - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION

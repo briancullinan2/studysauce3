@@ -1,0 +1,1475 @@
+
+#right-panel,
+#left-panel
+{
+    display: block;
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-bottom: 30px;
+    transition: width linear .15s;
+    box-sizing: border-box;
+    z-index: 1900;
+}
+
+#right-panel,
+#left-panel,
+#right-panel.expanded,
+#left-panel.expanded
+{
+    width: 220px;
+    white-space: normal;
+    padding-top: 50px;
+}
+
+#right-panel.expanded h3,
+#left-panel.expanded h3,
+#right-panel.expanded .main-menu {
+    display:block;
+}
+
+#left-panel.expanded a:not([href]) span,
+#left-panel.expanded .navbar-toggle,
+#left-panel a[href="#expand"],
+#left-panel.expanded a[href="#expand"],
+#right-panel.expanded a:not([href]) span,
+#right-panel.expanded .navbar-toggle,
+#right-panel a[href="#expand"],
+#right-panel.expanded a[href="#expand"]
+{
+    display:none;
+}
+
+#left-panel.collapsed a[href="#expand"],
+#right-panel.collapsed a[href="#expand"]
+{
+    display:block;
+}
+
+#left-panel.expanded a:not([href]),
+#right-panel.expanded a:not([href])
+{
+    padding-left:15px;
+}
+
+#left-panel nav,
+#left-panel.expanded nav,
+#left-panel:not(.collapsed) nav,
+#right-panel nav,
+#right-panel.expanded nav,
+#right-panel:not(.collapsed) nav
+{
+    overflow-x:hidden;
+    overflow-y:auto;
+    height: 100%;
+    width: 100%;
+}
+
+#left-panel a[href="#collapse"],
+#right-panel a[href="#collapse"]
+{
+    position:absolute;
+    display:block;
+    height:45px;
+    width:70px;
+    left:0;
+    top:-6px;
+    background:url(../images/menu_new_compressed.png) no-repeat left -102px transparent;
+    font-size:14px;
+    color:#555555;
+    font-weight: bold;
+    padding-top:12px;
+    padding-left:35px;
+    z-index:10;
+}
+
+#right-panel.expanded .main-menu a[href="#collapse"]:hover
+{
+    border:0;
+    background-color:transparent;
+    padding-left:0;
+}
+
+#left-panel.expanded .main-menu a[href="#collapse"]:hover
+{
+    border:0;
+    background-color:transparent;
+    padding-left: 35px;
+}
+
+.main-menu li.complete {
+    text-decoration: line-through;
+}
+
+#left-panel a[href="#collapse"]
+{
+    right:0;
+    left:auto;
+}
+
+#right-panel a[href="#collapse"]
+{
+    padding-right:35px;
+    padding-left:0;
+    text-align: right;
+    background-position: right -202px;
+}
+
+#left-panel a[href="#collapse"]:hover
+{
+    color:#0099BB;
+    background-position: left -402px;
+    background-color: #DDDDDD;
+}
+
+#right-panel a[href="#collapse"]:hover
+{
+    color:#0099BB;
+    background-position: right -502px;
+    background-color: #DDDDDD;
+}
+
+#left-panel
+{
+    border-right: 1px solid #555;
+}
+
+#right-panel h3,
+#left-panel h3
+{
+    border-bottom:3px solid #555555;
+    margin:0;
+    padding:5px 15px;
+}
+
+#right-panel h3
+{
+    text-align: right;
+}
+
+#right-panel
+{
+    right: 0;
+    left:auto;
+    border-left: 1px solid #555;
+}
+
+#right-panel ul,
+#left-panel ul
+{
+    list-style: none none;
+    padding: 0;
+    margin: 0;
+}
+
+
+.main-menu li
+{
+    margin: 0;
+    padding: 0;
+    width: 220px;
+    text-align: left;
+    position: relative;
+    background: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.main-menu li.coming
+{
+    padding-left:45px;
+}
+
+.main-menu li.like-us a
+{
+    background:none;
+}
+
+.main-menu a.skrollable-after,
+.main-menu a
+{
+    display:block;
+    padding:10px 0 10px 50px;
+    position:relative;
+    letter-spacing: -1px;
+}
+
+.main-menu a
+{
+    color:inherit;
+}
+
+.main-menu a span
+{
+    line-height: 40px;
+    text-align: center;
+    padding: 0;
+    display: block;
+    overflow: hidden;
+    vertical-align: middle;
+    height: 40px;
+    width: 50px;
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    left: 0;
+}
+
+#left-panel .main-menu a span
+{
+    text-align: center;
+    left:10px;
+    font-size: 30px;
+    width:30px;
+}
+
+#right-panel .main-menu a span
+{
+    background: url(../images/menu_new_compressed.png) no-repeat left -605px transparent;
+}
+
+#right-panel .main-menu a:hover span,
+#right-panel .main-menu a:focus span,
+#right-panel .main-menu a:active span,
+#right-panel .main-menu a.active span
+{
+    background: url(../images/menu_new_compressed.png) no-repeat left -705px transparent;
+}
+
+#right-panel .main-menu a[href*="/home"] span
+{
+    background-position: left -4905px;
+}
+
+#right-panel .main-menu a[href*="/home"]:hover span,
+#right-panel .main-menu a[href*="/home"]:focus span,
+#right-panel .main-menu a[href*="/home"]:active span,
+#right-panel .main-menu a[href*="/home"].active span {
+    background-position: left -5005px;
+}
+
+#right-panel .main-menu a[href*="/userlist"] span
+{
+    background-position: left -4905px;
+}
+
+#right-panel .main-menu a[href*="/userlist"]:hover span,
+#right-panel .main-menu a[href*="/userlist"]:focus span,
+#right-panel .main-menu a[href*="/userlist"]:active span,
+#right-panel .main-menu a[href*="/userlist"].active span {
+    background-position: left -5005px;
+}
+
+#right-panel .main-menu a[href*="/deadlines"] span
+{
+    background-position: left -8605px;
+}
+
+#right-panel .main-menu a[href*="/deadlines"]:hover span,
+#right-panel .main-menu a[href*="/deadlines"]:focus span,
+#right-panel .main-menu a[href*="/deadlines"]:active span,
+#right-panel .main-menu a[href*="/deadlines"].active span {
+    background-position: left -8705px;
+}
+
+#right-panel .main-menu a[href*="/checkin"] span
+{
+    background-position: left -1005px;
+}
+
+#right-panel .main-menu a[href*="/checkin"]:hover span,
+#right-panel .main-menu a[href*="/checkin"]:focus span,
+#right-panel .main-menu a[href*="/checkin"]:active span,
+#right-panel .main-menu a[href*="/checkin"].active span {
+    background-position: left -1105px;
+}
+
+#right-panel .main-menu a[href*="/metrics"] span
+{
+    background-position: left -1205px;
+}
+
+#right-panel .main-menu a[href*="/metrics"]:hover span,
+#right-panel .main-menu a[href*="/metrics"]:focus span,
+#right-panel .main-menu a[href*="/metrics"]:active span,
+#right-panel .main-menu a[href*="/metrics"].active span {
+    background-position: left -1305px;
+}
+
+#right-panel .main-menu a[href*="/plan"] span
+{
+    background-position: left -4205px;
+}
+
+#right-panel .main-menu a[href*="/plan"]:hover span,
+#right-panel .main-menu a[href*="/plan"]:focus span,
+#right-panel .main-menu a[href*="/plan"]:active span,
+#right-panel .main-menu a[href*="/plan"].active span {
+    background-position: left -4305px;
+}
+
+#right-panel .main-menu a[href*="/partner"] span
+{
+    background-position: left -1605px;
+}
+
+#right-panel .main-menu a[href*="/partner"]:hover span,
+#right-panel .main-menu a[href*="/partner"]:focus span,
+#right-panel .main-menu a[href*="/partner"]:active span,
+#right-panel .main-menu a[href*="/partner"].active span {
+    background-position: left -1705px;
+}
+
+#right-panel .main-menu a[href*="/import"] span
+{
+    background-position: left -1605px;
+}
+
+#right-panel .main-menu a[href*="/import"]:hover span,
+#right-panel .main-menu a[href*="/import"]:focus span,
+#right-panel .main-menu a[href*="/import"]:active span,
+#right-panel .main-menu a[href*="/import"].active span {
+    background-position: left -1705px;
+}
+
+#right-panel .main-menu a[href*="/profile"] span
+{
+    background-position: left -1805px;
+}
+
+#right-panel .main-menu a[href*="/profile"]:hover span,
+#right-panel .main-menu a[href*="/profile"]:focus span,
+#right-panel .main-menu a[href*="/profile"]:active span,
+#right-panel .main-menu a[href*="/profile"].active span {
+    background-position: left -1905px;
+}
+
+#right-panel .main-menu a[href*="/tips"] span
+{
+    background-position: left -2005px;
+}
+
+#right-panel .main-menu a[href*="/tips"]:hover span,
+#right-panel .main-menu a[href*="/tips"]:focus span,
+#right-panel .main-menu a[href*="/tips"]:active span,
+#right-panel .main-menu a[href*="/tips"].active span {
+    background-position: left -2105px;
+}
+
+#right-panel .main-menu a[href*="/premium"] span
+{
+    background-position: left -2205px;
+}
+
+#right-panel .main-menu a[href*="/premium"]:hover span,
+#right-panel .main-menu a[href*="/premium"]:focus span,
+#right-panel .main-menu a[href*="/premium"]:active span,
+#right-panel .main-menu a[href*="/premium"].active span {
+    background-position: left -2305px;
+}
+
+#right-panel .main-menu a[href*="/account"] span
+{
+    background-position: left -2405px;
+}
+
+#right-panel .main-menu a[href*="/account"]:hover span,
+#right-panel .main-menu a[href*="/account"]:focus span,
+#right-panel .main-menu a[href*="/account"]:active span,
+#right-panel .main-menu a[href*="/account"].active span {
+    background-position: left -2505px;
+}
+
+#right-panel .main-menu a[href*="/schedule"] span
+{
+    background-position: left -2605px;
+}
+
+#right-panel .main-menu a[href*="/schedule"]:hover span,
+#right-panel .main-menu a[href*="/schedule"]:focus span,
+#right-panel .main-menu a[href*="/schedule"]:active span,
+#right-panel .main-menu a[href*="/schedule"].active span {
+    background-position: left -2705px;
+}
+
+#right-panel .main-menu a[href*="/calculator"] span
+{
+    background-position: left -3605px;
+}
+
+#right-panel .main-menu a[href*="/calculator"]:hover span,
+#right-panel .main-menu a[href*="/calculator"]:focus span,
+#right-panel .main-menu a[href*="/calculator"]:active span,
+#right-panel .main-menu a[href*="/calculator"].active span {
+    background-position: left -3705px;
+}
+
+#right-panel .main-menu a[href*="#midterm"] span
+{
+    background-position: left -3805px;
+}
+
+#right-panel .main-menu a[href*="#midterm"]:hover span,
+#right-panel .main-menu a[href*="#midterm"]:focus span,
+#right-panel .main-menu a[href*="#midterm"]:active span,
+#right-panel .main-menu a[href*="#midterm"].active span {
+    background-position: left -3905px;
+}
+
+#right-panel .main-menu a[href*="#quizlet"] span
+{
+    background-position: left -4005px;
+}
+
+#right-panel .main-menu a[href*="#quizlet"]:hover span,
+#right-panel .main-menu a[href*="#quizlet"]:focus span,
+#right-panel .main-menu a[href*="#quizlet"]:active span,
+#right-panel .main-menu a[href*="#quizlet"].active span {
+    background-position: left -4105px;
+}
+
+#right-panel .main-menu a[href*="#drive"] span
+{
+    background-position: left -4205px;
+}
+
+#right-panel .main-menu a[href*="#drive"]:hover span,
+#right-panel .main-menu a[href*="#drive"]:focus span,
+#right-panel .main-menu a[href*="#drive"]:active span,
+#right-panel .main-menu a[href*="#drive"].active span {
+    background-position: left -4305px;
+}
+
+#right-panel .main-menu a[href*="/notes"] span
+{
+    background-position: left -4405px;
+}
+
+#right-panel .main-menu a[href*="/notes"]:hover span,
+#right-panel .main-menu a[href*="/notes"]:focus span,
+#right-panel .main-menu a[href*="/notes"]:active span,
+#right-panel .main-menu a[href*="/notes"].active span {
+    background-position: left -4505px;
+}
+
+#right-panel .main-menu a[href*="#blackboard"] span
+{
+    background-position: left -4605px;
+}
+
+#right-panel .main-menu a[href*="#blackboard"]:hover span,
+#right-panel .main-menu a[href*="#blackboard"]:focus span,
+#right-panel .main-menu a[href*="#blackboard"]:active span,
+#right-panel .main-menu a[href*="#blackboard"].active span {
+    background-position: left -4705px;
+}
+
+.pane-content a[href*="/home"]:not(.more),
+.pane-content a[href*="/goals"]:not(.more),
+.pane-content a[href*="/deadlines"]:not(.more),
+.pane-content a[href*="/checkin"]:not(.more),
+.pane-content a[href*="/metrics"]:not(.more),
+.pane-content a[href*="/plan"]:not(.more),
+.pane-content a[href*="/partner"]:not(.more),
+.pane-content a[href*="/tips"]:not(.more),
+.pane-content a[href*="/premium"]:not(.more),
+.pane-content a[href*="/account"]:not(.more),
+.pane-content a[href*="/schedule"]:not(.more),
+.pane-content a[href*="#grade-scale"]:not(.more),
+.pane-content a[href*="#manage-terms"]:not(.more),
+.pane-content a[href*="/calculator"]:not(.more),
+#login a[href*="/reset"]:not(.more)
+{
+    padding-left:30px;
+    position:relative;
+}
+
+.pane-content a[href*="/home"]:not(.more):before,
+.pane-content a[href*="/goals"]:not(.more):before,
+.pane-content a[href*="/deadlines"]:not(.more):before,
+.pane-content a[href*="/checkin"]:not(.more):before,
+.pane-content a[href*="/metrics"]:not(.more):before,
+.pane-content a[href*="/plan"]:not(.more):before,
+.pane-content a[href*="/partner"]:not(.more):before,
+.pane-content a[href*="/tips"]:not(.more):before,
+.pane-content a[href*="/premium"]:not(.more):before,
+.pane-content a[href*="/account"]:not(.more):before,
+.pane-content a[href*="/schedule"]:not(.more):before,
+.pane-content a[href*="#grade-scale"]:not(.more):before,
+.pane-content a[href*="#manage-terms"]:not(.more):before,
+.pane-content a[href*="/calculator"]:not(.more):before,
+#login a[href*="/reset"]:not(.more):before
+{
+    background: url(../images/menu_new_half.png) no-repeat left -302px transparent;
+    content: " ";
+    display:block;
+    height:25px;
+    width:25px;
+    margin-top:-12px;
+    position:absolute;
+    left:2px;
+    top:50%;
+}
+
+#login a[href*="/reset"]:not(.more):before
+{
+    background-position: left -3902px;
+}
+
+#login a[href*="/reset"]:not(.more):hover:before,
+#login a[href*="/reset"]:not(.more):focus:before,
+#login a[href*="/reset"]:not(.more):active:before,
+#login a[href*="/reset"].active:not(.more):before
+{
+    background-position: left -3952px;
+}
+
+.pane-content a[href*="#grade-scale"]:not(.more):before
+{
+    background-position: left -4202px;
+}
+
+.pane-content a[href*="#grade-scale"]:not(.more):hover:before,
+.pane-content a[href*="#grade-scale"]:not(.more):focus:before,
+.pane-content a[href*="#grade-scale"]:not(.more):active:before,
+.pane-content a[href*="#grade-scale"].active:not(.more):before
+{
+    background-position: left -4252px;
+}
+
+.pane-content a[href*="/home"]:not(.more):before
+{
+    background-position: left -2452px;
+}
+
+.pane-content a[href*="/home"]:not(.more):hover:before,
+.pane-content a[href*="/home"]:not(.more):focus:before,
+.pane-content a[href*="/home"]:not(.more):active:before,
+.pane-content a[href*="/home"].active:not(.more):before
+{
+    background-position: left -2502px;
+}
+
+.pane-content a[href*="/calculator"]:not(.more):before
+{
+    background-position: left -1802px;
+}
+
+.pane-content a[href*="/calculator"]:not(.more):hover:before,
+.pane-content a[href*="/calculator"]:not(.more):focus:before,
+.pane-content a[href*="/calculator"]:not(.more):active:before,
+.pane-content a[href*="/calculator"].active:not(.more):before
+{
+    background-position: left -1852px;
+}
+
+.pane-content a[href*="/goals"]:not(.more):before
+{
+    background-position: left -302px;
+}
+
+.pane-content a[href*="/goals"]:not(.more):hover:before,
+.pane-content a[href*="/goals"]:not(.more):focus:before,
+.pane-content a[href*="/goals"]:not(.more):active:before,
+.pane-content a[href*="/goals"].active:not(.more):before
+{
+    background-position: left -352px;
+}
+
+.pane-content a[href*="/deadlines"]:not(.more):before
+{
+    background-position: left -4302px;
+}
+
+.pane-content a[href*="/deadlines"]:not(.more):hover:before,
+.pane-content a[href*="/deadlines"]:not(.more):focus:before,
+.pane-content a[href*="/deadlines"]:not(.more):active:before,
+.pane-content a[href*="/deadlines"].active:not(.more):before {
+    background-position: left -4352px;
+}
+
+.pane-content a[href*="/checkin"]:not(.more):before
+{
+    background-position: left -502px;
+}
+
+.pane-content a[href*="/checkin"]:not(.more):hover:before,
+.pane-content a[href*="/checkin"]:not(.more):focus:before,
+.pane-content a[href*="/checkin"]:not(.more):active:before,
+.pane-content a[href*="/checkin"].active:not(.more):before {
+    background-position: left -552px;
+}
+
+.pane-content a[href*="/metrics"]:not(.more):before
+{
+    background-position: left -602px;
+}
+
+.pane-content a[href*="/metrics"]:not(.more):hover:before,
+.pane-content a[href*="/metrics"]:not(.more):focus:before,
+.pane-content a[href*="/metrics"]:not(.more):active:before,
+.pane-content a[href*="/metrics"].active:not(.more):before {
+    background-position: left -652px;
+}
+
+.pane-content a[href*="/plan"]:not(.more):before
+{
+    background-position: left -702px;
+}
+
+.pane-content a[href*="/plan"]:not(.more):hover:before,
+.pane-content a[href*="/plan"]:not(.more):focus:before,
+.pane-content a[href*="/plan"]:not(.more):active:before,
+.pane-content a[href*="/plan"].active:not(.more):before {
+    background-position: left -752px;
+}
+
+.pane-content a[href*="/partner"]:not(.more):before
+{
+    background-position: left -802px;
+}
+
+.pane-content a[href*="/partner"]:not(.more):hover:before,
+.pane-content a[href*="/partner"]:not(.more):focus:before,
+.pane-content a[href*="/partner"]:not(.more):active:before,
+.pane-content a[href*="/partner"].active:not(.more):before {
+    background-position: left -852px;
+}
+
+.pane-content a[href*="/tips"]:not(.more):before
+{
+    background-position: left -1002px;
+}
+
+.pane-content a[href*="/tips"]:not(.more):hover:before,
+.pane-content a[href*="/tips"]:not(.more):focus:before,
+.pane-content a[href*="/tips"]:not(.more):active:before,
+.pane-content a[href*="/tips"].active:not(.more):before {
+    background-position: left -1052px;
+}
+
+.pane-content a[href*="/premium"]:not(.more):before
+{
+    background-position: left -1102px;
+}
+
+.pane-content a[href*="/premium"]:not(.more):hover:before,
+.pane-content a[href*="/premium"]:not(.more):focus:before,
+.pane-content a[href*="/premium"]:not(.more):active:before,
+.pane-content a[href*="/premium"].active:not(.more):before {
+    background-position: left -1152px;
+}
+
+.pane-content a[href*="/account"]:not(.more):before
+{
+    background-position: left -1202px;
+}
+
+.pane-content a[href*="/account"]:not(.more):hover:before,
+.pane-content a[href*="/account"]:not(.more):focus:before,
+.pane-content a[href*="/account"]:not(.more):active:before,
+.pane-content a[href*="/account"].active:not(.more):before {
+    background-position: left -1252px;
+}
+
+.pane-content a[href*="#manage-terms"]:not(.more):before,
+.pane-content a[href*="/schedule"]:not(.more):before
+{
+    background-position: left -1302px;
+}
+
+.pane-content a[href*="#manage-terms"]:not(.more):hover:before,
+.pane-content a[href*="#manage-terms"]:not(.more):focus:before,
+.pane-content a[href*="#manage-terms"]:not(.more):active:before,
+.pane-content a[href*="#manage-terms"].active:not(.more):before,
+.pane-content a[href*="/schedule"]:not(.more):hover:before,
+.pane-content a[href*="/schedule"]:not(.more):focus:before,
+.pane-content a[href*="/schedule"]:not(.more):active:before,
+.pane-content a[href*="/schedule"].active:not(.more):before {
+    background-position: left -1352px;
+}
+
+.pane-content a[href*="/course1lesson1"]:not(.more),
+.pane-content a[href*="/course1lesson2"]:not(.more),
+.pane-content a[href*="/course1lesson3"]:not(.more),
+.pane-content a[href*="/course1lesson4"]:not(.more),
+.pane-content a[href*="/course1lesson5"]:not(.more),
+.pane-content a[href*="/course1lesson6"]:not(.more),
+.pane-content a[href*="/course1lesson7"]:not(.more),
+.pane-content a[href*="/course2lesson1"]:not(.more),
+.pane-content a[href*="/course2lesson2"]:not(.more),
+.pane-content a[href*="/course2lesson3"]:not(.more),
+.pane-content a[href*="/course2lesson4"]:not(.more),
+.pane-content a[href*="/course2lesson5"]:not(.more),
+.pane-content a[href*="/course3lesson1"]:not(.more),
+.pane-content a[href*="/course3lesson2"]:not(.more),
+.pane-content a[href*="/course3lesson3"]:not(.more),
+.pane-content a[href*="/course3lesson4"]:not(.more),
+.pane-content a[href*="/course3lesson5"]:not(.more)
+{
+    padding-left: 30px;
+    position: relative;
+}
+
+.pane-content a[href*="/course1lesson1"]:not(.more):before,
+.pane-content a[href*="/course1lesson2"]:not(.more):before,
+.pane-content a[href*="/course1lesson3"]:not(.more):before,
+.pane-content a[href*="/course1lesson4"]:not(.more):before,
+.pane-content a[href*="/course1lesson5"]:not(.more):before,
+.pane-content a[href*="/course1lesson6"]:not(.more):before,
+.pane-content a[href*="/course1lesson7"]:not(.more):before,
+.pane-content a[href*="/course2lesson1"]:not(.more):before,
+.pane-content a[href*="/course2lesson2"]:not(.more):before,
+.pane-content a[href*="/course2lesson3"]:not(.more):before,
+.pane-content a[href*="/course2lesson4"]:not(.more):before,
+.pane-content a[href*="/course2lesson5"]:not(.more):before,
+.pane-content a[href*="/course3lesson1"]:not(.more):before,
+.pane-content a[href*="/course3lesson2"]:not(.more):before,
+.pane-content a[href*="/course3lesson3"]:not(.more):before,
+.pane-content a[href*="/course3lesson4"]:not(.more):before,
+.pane-content a[href*="/course3lesson5"]:not(.more):before
+{
+    content: "1-1";
+    display: block;
+    height: 25px;
+    width: 25px;
+    margin-top: -12px;
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    color: #555;
+    font-weight: bold;
+    letter-spacing: -2px;
+    font-size: 14px;
+    vertical-align: middle;
+    line-height: 25px;
+}
+
+.pane-content a[href*="/course1lesson2"]:not(.more):before
+{
+    content: "1-2"
+}
+
+.pane-content a[href*="/course1lesson3"]:not(.more):before
+{
+    content: "1-3"
+}
+
+.pane-content a[href*="/course1lesson4"]:not(.more):before
+{
+    content: "1-4"
+}
+
+.pane-content a[href*="/course1lesson5"]:not(.more):before
+{
+    content: "1-5"
+}
+
+.pane-content a[href*="/course1lesson6"]:not(.more):before
+{
+    content: "1-6"
+}
+
+.pane-content a[href*="/course1lesson7"]:not(.more):before
+{
+    content: "1-7"
+}
+
+.pane-content a[href*="/course2lesson1"]:not(.more):before
+{
+    content: "2-1"
+}
+
+.pane-content a[href*="/course2lesson2"]:not(.more):before
+{
+    content: "2-2"
+}
+
+.pane-content a[href*="/course2lesson3"]:not(.more):before
+{
+    content: "2-3"
+}
+
+.pane-content a[href*="/course2lesson4"]:not(.more):before
+{
+    content: "2-4"
+}
+
+.pane-content a[href*="/course2lesson5"]:not(.more):before
+{
+    content: "2-5"
+}
+
+.pane-content a[href*="/course3lesson1"]:not(.more):before
+{
+    content: "3-1"
+}
+
+.pane-content a[href*="/course3lesson2"]:not(.more):before
+{
+    content: "3-2"
+}
+
+.pane-content a[href*="/course3lesson3"]:not(.more):before
+{
+    content: "3-3"
+}
+
+.pane-content a[href*="/course3lesson4"]:not(.more):before
+{
+    content: "3-4"
+}
+
+.pane-content a[href*="/course3lesson5"]:not(.more):before
+{
+    content: "3-5"
+}
+
+a[href*="/redirect/google"]
+{
+    width:180px;
+    border-bottom-color:#DD4433;
+    color: #ffffff;
+    background:url("../images/menu_new_compressed.png") no-repeat left -5502px #DD4433;
+    padding-left:60px;
+    position:relative;
+}
+
+a[href*="/redirect/google"]:hover,
+a[href*="/redirect/google"]:active,
+a[href*="/redirect/google"]:focus {
+    background-color: #992211;
+    border-bottom-color: #771100;
+}
+
+a[href*="/redirect/gcal"]
+{
+    width:180px;
+    border-bottom-color:#DD4433;
+    color: #ffffff;
+    background:url("../images/menu_new_compressed.png") no-repeat left -9202px #DD4433;
+    padding-left:60px;
+    position:relative;
+}
+
+a[href*="/redirect/gcal"]:hover,
+a[href*="/redirect/gcal"]:active,
+a[href*="/redirect/gcal"]:focus {
+    background-color: #992211;
+    border-bottom-color: #771100;
+}
+
+a[href*="evernote"]
+{
+    width:180px;
+    border-bottom-color:#77CC44;
+    color: #ffffff;
+    background:url("../images/menu_new_compressed.png") no-repeat left -7102px #77CC44;
+    padding-left:60px;
+    position:relative;
+}
+
+a[href*="evernote"]:hover,
+a[href*="evernote"]:active,
+a[href*="evernote"]:focus {
+    background-color: #559922;
+    border-bottom-color: #447711;
+}
+
+a[href*="/redirect/facebook"]
+{
+    width:180px;
+    border-bottom-color:#5577AA;
+    color: #ffffff;
+    background:url("../images/menu_new_compressed.png") no-repeat left -5402px #5577AA;
+    padding-left:60px;
+    position:relative;
+}
+
+a[href*="/redirect/facebook"]:hover,
+a[href*="/redirect/facebook"]:active,
+a[href*="/redirect/facebook"]:focus
+{
+    background-color:#446699;
+    border-bottom-color: #224477;
+}
+
+.main-menu a:hover,
+.main-menu a:focus,
+.main-menu a:active,
+.main-menu a.active,
+#left-panel.expanded .main-menu a:hover,
+#left-panel.expanded .main-menu a:focus,
+#left-panel.expanded .main-menu a:active,
+#left-panel.expanded .main-menu a.active,
+#right-panel.expanded .main-menu a:hover,
+#right-panel.expanded .main-menu a:focus,
+#right-panel.expanded .main-menu a:active,
+#right-panel.expanded .main-menu a.active
+{
+    padding-left:45px;
+    background-color:#DDDDDD;
+    border-left:5px solid #0099BB;
+    transition:background-color ease-in-out .15s, color ease-in-out .15s;
+    color: #0099BB;
+    font-weight: bold;
+}
+
+/*
+.main-menu a.active
+{
+    background-color: #ffffff;
+}
+*/
+
+.main-menu a:hover span,
+.main-menu a:focus span,
+.main-menu a:active span,
+.main-menu a.active span {
+    left:-5px;
+}
+
+#left-panel.expanded .main-menu a:hover span,
+#left-panel.expanded .main-menu a:focus span,
+#left-panel.expanded .main-menu a:active span,
+#left-panel.expanded .main-menu a.active span,
+#left-panel .main-menu a:hover span,
+#left-panel .main-menu a:focus span,
+#left-panel .main-menu a:active span,
+#left-panel .main-menu a.active span {
+    color:#0099BB;
+    left:5px;
+}
+
+#left-panel .main-menu a:hover:not([href]),
+#left-panel .main-menu a:focus:not([href]),
+#left-panel .main-menu a:active:not([href]),
+#left-panel .main-menu a.active:not([href]),
+#left-panel .main-menu a:hover:not([href]) span,
+#left-panel .main-menu a:focus:not([href]) span,
+#left-panel .main-menu a:active:not([href]) span,
+#left-panel .main-menu a.active:not([href]) span
+{
+    color:inherit;
+    cursor: pointer;
+}
+
+#left-panel .main-menu a:not([href]) span,
+#left-panel.expanded .main-menu a:not([href]) span
+{
+    display:none;
+}
+
+#left-panel .main-menu a:not([href]),
+#left-panel.expanded .main-menu a:not([href])
+{
+    padding-left:15px;
+}
+
+#left-panel .main-menu a:hover:not([href]),
+#left-panel.expanded .main-menu a:hover:not([href])
+{
+    padding-left:10px;
+}
+
+#right-panel a.selected + ul
+{
+    overflow: visible;
+    max-height:500px;
+}
+
+#right-panel.collapsed,
+#left-panel.collapsed
+{
+    width:50px;
+    white-space: nowrap;
+    padding-top:100px;
+}
+
+#right-panel .navbar-toggle
+{
+    transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+    transform-origin: left bottom;
+    -webkit-transform-origin: left bottom;
+    -moz-transform-origin: left bottom;
+    -ms-transform-origin: left bottom;
+    -o-transform-origin: left bottom;
+    height:40px;
+    line-height: 100%;
+    vertical-align: top;
+    background: url("../images/menu_new_compressed.png") no-repeat 50% 10px transparent;
+    padding:2px 5px 12px 5px;
+    margin-top:20px;
+    width:auto;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#right-panel a[href="#expand"]
+{
+    color:#555555;
+    text-align: right;
+}
+
+#right-panel a[href="#expand"]:hover
+{
+    color:#0099BB;
+}
+
+#right-panel a[href="#expand"]:hover .navbar-toggle
+{
+    background-position: 50% -290px;
+}
+
+#left-panel .navbar-toggle
+{
+    margin-top:60px;
+}
+
+.navbar-toggle
+{
+    display:inline-block;
+    float:none;
+    padding: 5px;
+    width:100%;
+    margin:0;
+}
+
+.navbar-toggle .icon-bar+.icon-bar {
+    margin-top: 4px;
+}
+
+.navbar-toggle .icon-bar {
+    display: block;
+    width: auto;
+    height: 4px;
+    border-radius: 4px;
+    background-color:#555555;
+}
+
+#left-panel a[href="#expand"]:hover .icon-bar
+{
+    background-color:#0099BB;
+}
+
+#left-panel a[href="#expand"],
+#right-panel a[href="#expand"]
+{
+    display:none;
+    position:absolute;
+    z-index: 0;
+    top:0;
+    height:100%;
+    width:100%;
+    left:0;
+}
+
+#left-panel.collapsed a[href="#expand"],
+#right-panel.collapsed a[href="#expand"]
+{
+    display:block;
+}
+
+#left-panel.collapsed a[href="#collapse"],
+#right-panel.collapsed a[href="#collapse"]
+{
+    display:none;
+}
+
+#right-panel.collapsed h3,
+#left-panel.collapsed h3,
+#right-panel.collapsed .main-menu
+{
+    display:none;
+}
+
+#left-panel.collapsed a[href="#expand"],
+#right-panel.collapsed a[href="#expand"]
+{
+    display:block;
+}
+
+#left-panel .main-menu a:hover:not([href]),
+#left-panel .main-menu a:focus:not([href]),
+#left-panel .main-menu a:active:not([href]),
+#left-panel .main-menu a.active:not([href]),
+#right-panel .main-menu a:hover:not([href]),
+#right-panel .main-menu a:focus:not([href]),
+#right-panel .main-menu a:active:not([href]),
+#right-panel .main-menu a.active:not([href])
+{
+    padding-left:10px;
+}
+
+#left-panel.collapsed .main-menu a:hover,
+#left-panel.collapsed .main-menu a:focus,
+#left-panel.collapsed .main-menu a:active,
+#left-panel.collapsed .main-menu a.active
+{
+    border:0;
+}
+
+#left-panel.collapsed .main-menu a:hover span,
+#left-panel.collapsed .main-menu a:focus span,
+#left-panel.collapsed .main-menu a:active span,
+#left-panel.collapsed .main-menu a.active span
+{
+    left:10px;
+}
+
+#left-panel.collapsed nav,
+#right-panel.collapsed nav
+{
+    overflow: hidden;
+}
+
+#left-panel.collapsed .main-menu a:not([href]) span
+{
+    display:block;
+}
+
+#left-panel.collapsed .main-menu a:not([href])
+{
+    padding-left:50px;
+}
+
+#left-panel.collapsed .main-menu a:hover,
+#left-panel.collapsed .main-menu a:focus,
+#left-panel.collapsed .main-menu a:active,
+#left-panel.collapsed .main-menu a.active
+{
+    padding-left:50px;
+}
+
+#left-panel.collapsed .main-menu li.coming
+{
+    padding-left:50px;
+}
+
+@media all and (max-width: 1300px), (max-height: 700px)
+{
+    #left-panel,
+    #right-panel {
+        width:40px;
+        white-space: nowrap;
+        padding-top:100px;
+    }
+
+    #left-panel a[href="#expand"],
+    #right-panel a[href="#expand"],
+    #left-panel.expanded a[href="#collapse"],
+    #right-panel.expanded a[href="#collapse"]
+    {
+        display:block;
+    }
+
+    #left-panel a[href="#collapse"],
+    #right-panel a[href="#collapse"]
+    {
+        display:none;
+    }
+
+    #right-panel h3, #left-panel h3,
+    #right-panel .main-menu
+    {
+        display:none;
+    }
+
+    #left-panel .main-menu a:not([href]) span
+    {
+        display:block;
+    }
+
+    #left-panel .main-menu a:not([href]),
+    #left-panel .main-menu a:hover:not([href])
+    {
+        padding-left:50px;
+    }
+
+    #left-panel.expanded .main-menu a:hover:not([href]),
+    #right-panel.expanded .main-menu a:hover:not([href])
+    {
+        padding-left:10px;
+    }
+
+    .main-menu a:hover,
+    .main-menu a:focus,
+    .main-menu a:active,
+    .main-menu a.active
+    {
+        border:0;
+    }
+
+    #left-panel .main-menu a:hover span,
+    #left-panel .main-menu a:focus span,
+    #left-panel .main-menu a:active span,
+    #left-panel .main-menu a.active span
+    {
+        left:5px;
+    }
+
+    #left-panel nav,
+    #left-panel:not(.expanded) nav,
+    #right-panel nav,
+    #right-panel:not(.expanded) nav
+    {
+        overflow: hidden;
+    }
+}
+
+@media all and (max-width:700px), all and (max-height:700px) {
+
+    #left-panel nav,
+    #left-panel.expanded nav,
+    #left-panel:not(.collapsed) nav,
+    #right-panel nav,
+    #right-panel.expanded nav,
+    #right-panel:not(.collapsed) nav {
+        overflow-y: visible;
+    }
+
+    #right-panel.expanded, #left-panel.expanded
+    {
+        position:absolute;
+        height: auto;
+        min-height: 100%;
+    }
+}
+
+@media all and (max-width: 700px) {
+
+    #left-panel.expanded a[href="#collapse"],
+    #right-panel.expanded a[href="#collapse"],
+    #left-panel a[href="#collapse"],
+    #right-panel a[href="#collapse"]
+    {
+        display:none;
+    }
+
+    #left-panel .navbar-toggle .icon-bar
+    {
+        display:none;
+    }
+
+    #left-panel .navbar-toggle {
+        background: url("../images/menu_new_compressed.png") no-repeat 50% -7412px transparent;
+        padding: 2px 5px 12px 5px;
+        height: 40px;
+    }
+
+    body.left-menu #left-panel.expanded .navbar-toggle
+    {
+        left:220px;
+    }
+    body.right-menu #right-panel.expanded .navbar-toggle
+    {
+        right:220px;
+    }
+
+    body.right-menu #left-panel a[href="#expand"], body.left-menu #right-panel a[href="#expand"]
+    {
+        display:none;
+    }
+
+    body.left-menu #left-panel.expanded .navbar-toggle, body.right-menu #right-panel.expanded .navbar-toggle,
+    body.left-menu #left-panel a[href="#expand"], body.right-menu #right-panel a[href="#expand"]
+    {
+        display:inline-block;
+    }
+
+    #right-panel .main-menu a[href*="/home"] span
+    {
+        background-position: left -5605px;
+    }
+
+    #right-panel .main-menu a[href*="/userlist"] span
+    {
+        background-position: left -5605px;
+    }
+
+    #right-panel .main-menu a[href*="/goals"] span
+    {
+        background-position: left -5705px;
+    }
+
+    #right-panel .main-menu a[href*="/schedule"] span
+    {
+        background-position: left -6605px;
+    }
+
+    #right-panel .main-menu a[href*="/checkin"] span
+    {
+        background-position: left -5905px;
+    }
+
+    #right-panel .main-menu a[href*="/metrics"] span
+    {
+        background-position: left -6005px;
+    }
+
+    #right-panel .main-menu a[href*="/deadlines"] span
+    {
+        background-position: left -8805px;
+    }
+
+    #right-panel .main-menu a[href*="/partner"] span
+    {
+        background-position: left -6205px;
+    }
+
+    #right-panel .main-menu a[href*="/import"] span
+    {
+        background-position: left -6205px;
+    }
+
+    #right-panel .main-menu a[href*="/plan"] span
+    {
+        background-position: left -7005px;
+    }
+
+    #right-panel .main-menu a[href*="/profile"] span
+    {
+        background-position: left -5205px;
+    }
+
+    #right-panel .main-menu a[href*="/premium"] span
+    {
+        background-position: left -6405px;
+    }
+
+    #right-panel .main-menu a[href*="/account"] span
+    {
+        background-position: left -6505px;
+    }
+
+    #right-panel .main-menu a[href*="#midterm"] span
+    {
+        background-position: left -6805px;
+    }
+
+    #right-panel .main-menu a[href*="/calculator"] span
+    {
+        background-position: left -6705px;
+    }
+
+    #right-panel .main-menu a[href*="#quizlet"] span
+    {
+        background-position: left -6905px;
+    }
+
+    #right-panel .main-menu a[href*="#drive"] span
+    {
+        background-position: left -7005px;
+    }
+
+    #right-panel .main-menu a[href*="/notes"] span
+    {
+        background-position: left -7105px;
+    }
+
+    #right-panel .main-menu a[href*="#blackboard"] span
+    {
+        background-position: left -7205px;
+    }
+
+    #right-panel h3, #left-panel h3
+    {
+        border-bottom-color:#FFFFFF;
+    }
+
+    .main-menu a:hover,
+    .main-menu a:focus,
+    .main-menu a:active,
+    .main-menu a.active,
+    #left-panel.expanded .main-menu a:hover,
+    #left-panel.expanded .main-menu a:focus,
+    #left-panel.expanded .main-menu a:active,
+    #left-panel.expanded .main-menu a.active,
+    #right-panel.expanded .main-menu a:hover,
+    #right-panel.expanded .main-menu a:focus,
+    #right-panel.expanded .main-menu a:active,
+    #right-panel.expanded .main-menu a.active
+    {
+        background-color:#333333;
+    }
+
+    #left-panel,
+    #right-panel,
+    #left-panel.collapsed,
+    #right-panel.collapsed
+    {
+        padding-top:0;
+        width:0;
+        z-index: 2100;
+    }
+
+    #left-panel,          #right-panel,
+    #left-panel.expanded, #right-panel.expanded
+    {
+        padding-top:0;
+        background:#555 none;
+        color:#ffffff;
+        border-color:transparent;
+    }
+
+    #left-panel .navbar-toggle
+    {
+        width:40px;
+        left:-5px;
+        transition: left linear .15s;
+        position: fixed;
+    }
+
+    #right-panel .navbar-toggle
+    {
+        width:40px;
+        transition: right linear .15s;
+        position: fixed;
+        right:-5px;
+    }
+
+    #left-panel .navbar-toggle
+    {
+        margin-top:10px;
+    }
+
+    #right-panel a[href="#expand"],
+    #right-panel.collapsed a[href="#expand"]
+    {
+        left: auto;
+        right:17px;
+    }
+
+    #right-panel .navbar-toggle
+    {
+        overflow:hidden;
+        color:transparent;
+        top:0;
+        transform: none;
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        -o-transform: none;
+        filter: none;
+        transform-origin: left bottom;
+        -webkit-transform-origin: left bottom;
+        -moz-transform-origin: left bottom;
+        -ms-transform-origin: left bottom;
+        -o-transform-origin: left bottom;
+        margin-top: 0;
+        background-position: 50% -7500px;
+    }
+
+    #right-panel a[href="#expand"]:hover .navbar-toggle
+    {
+        background-position: 50% -7500px;
+    }
+}

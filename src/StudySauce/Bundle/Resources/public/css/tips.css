@@ -1,0 +1,190 @@
+
+#tips .grid_6 {
+    width: 50%;
+    margin: 0 -2px;
+    padding: 0;
+    display:inline-block;
+    vertical-align: top;
+}
+
+#tips .grid_6:nth-child(even)
+{
+    padding-right:20px;
+    clear: left;
+}
+
+#tips .grid_6:nth-child(odd)
+{
+    padding-left:20px;
+    clear: right;
+}
+
+#tips-strategy .grid_6 div,
+#tips-env .grid_6 div,
+#tips-time .grid_6 div {
+    padding-left: 72px;
+    position: relative;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(1) h4 {
+    background-position: left -892px;
+}
+
+#tips-strategy h4,
+#tips-env h4,
+#tips-time h4,
+#tips h4 {
+    min-height: 72px;
+    margin-bottom: -40px;
+    padding-bottom: 50px;
+    margin-left: -72px;
+    padding-left: 72px;
+    background: url(../images/tips_icons_64.png) no-repeat left top transparent;
+}
+
+#tips-time .grid_6:nth-of-type(1) div:nth-of-type(2) h4
+{
+    background-position: left -124px;
+}
+
+#tips-time .grid_6:nth-of-type(1) div:nth-of-type(3) h4
+{
+    background-position: left -252px;
+}
+
+#tips-time .grid_6:nth-of-type(1) div:nth-of-type(4) h4
+{
+    background-position: left -380px;
+}
+
+#tips-time .grid_6:nth-of-type(2) div:nth-of-type(1) h4
+{
+    background-position: left -508px;
+}
+
+#tips-time .grid_6:nth-of-type(2) div:nth-of-type(2) h4
+{
+    background-position: left -636px;
+}
+
+#tips-time .grid_6:nth-of-type(2) div:nth-of-type(3) h4
+{
+    background-position: left -764px;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(1) h4
+{
+    background-position: left -892px;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(2) h4
+{
+    background-position: left -1020px;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(3) h4
+{
+    background-position: left -1148px;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(4) h4
+{
+    background-position: left -1276px;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(5) h4
+{
+    background-position: left -1404px;
+}
+
+#tips-env .grid_6:nth-of-type(1) div:nth-of-type(6) h4
+{
+    background-position: left -1532px;
+}
+
+#tips-env .grid_6:nth-of-type(2) div:nth-of-type(1) h4
+{
+    background-position: left -1660px;
+}
+
+#tips-env .grid_6:nth-of-type(2) div:nth-of-type(2) h4
+{
+    background-position: left -1788px;
+}
+
+#tips-env .grid_6:nth-of-type(2) div:nth-of-type(3) h4
+{
+    background-position: left -1916px;
+}
+
+#tips-env .grid_6:nth-of-type(2) div:nth-of-type(4) h4
+{
+    background-position: left -2044px;
+}
+
+#tips-env .grid_6:nth-of-type(2) div:nth-of-type(5) h4
+{
+    background-position: left -2172px;
+}
+
+#tips-strategy .grid_6:nth-of-type(1) div:nth-of-type(1) h4
+{
+    background-position: left -2300px;
+}
+
+#tips-strategy .grid_6:nth-of-type(1) div:nth-of-type(2) h4
+{
+    background-position: left -2428px;
+}
+
+#tips-strategy .grid_6:nth-of-type(1) div:nth-of-type(3) h4
+{
+    background-position: left -2556px;
+}
+
+#tips-strategy .grid_6:nth-of-type(1) div:nth-of-type(4) h4
+{
+    background-position: left -2684px;
+}
+
+#tips-strategy .grid_6:nth-of-type(2) div:nth-of-type(1) h4
+{
+    background-position: left -2812px;
+}
+
+#tips-strategy .grid_6:nth-of-type(2) div:nth-of-type(2) h4
+{
+    background-position: left -2940px;
+}
+
+#tips-strategy .grid_6:nth-of-type(2) div:nth-of-type(3) h4
+{
+    background-position: left -3068px;
+}
+
+#tips-strategy .grid_6:nth-of-type(2) div:nth-of-type(4) h4
+{
+    background-position: left -3196px;
+}
+
+@media all and (max-width:1000px)
+{
+    #tips .grid_6 {
+        width: auto;
+        display:block;
+    }
+}
+
+@media all and (max-width:700px)
+{
+    #tips ul
+    {
+        margin-top:-10px;
+        margin-right:-10px;
+    }
+
+    .nav-tabs>li
+    {
+        margin-bottom:2px;
+    }
+}

@@ -1,0 +1,486 @@
+
+.modal-content
+{
+    border: none;
+    border-radius: 10px;
+}
+
+.modal
+{
+    height: 100%;
+    width: 100%;
+    display:none;
+}
+
+.dialog-tracker
+{
+    list-style: none;
+    font-size: 40px;
+    position:absolute;
+    bottom:20px;
+    left:20px;
+    z-index: 9;
+    padding:0;
+    margin:0;
+}
+
+.dialog-tracker li
+{
+    list-style: none;
+    display: inline-block;
+    margin:10px;
+    vertical-align: middle;
+}
+
+#partner-advice-1 .dialog-tracker li:first-child,
+#partner-advice-2 .dialog-tracker li:nth-child(2),
+#partner-advice-3 .dialog-tracker li:nth-child(3),
+#partner-advice-4 .dialog-tracker li:nth-child(4)
+{
+    font-size: 60px;
+    color: #0099BB;
+}
+
+#add-study-hours .modal-body label input,
+#add-study-hours .modal-body label select,
+#add-study-hours .modal-body label span
+{
+    width:50%;
+    display:inline-block;
+    margin:0 -2px;
+    padding: 0 2px;
+}
+
+#calc-empty .close,
+#checkin-empty .close,
+#profile-upgrade .close,
+#plan-upgrade .close,
+#metrics-empty .close,
+#plan-empty-schedule .close
+{
+    display:none;
+}
+
+#account-options .social-login
+{
+    text-align: center;
+}
+
+#account-options .social-login a:nth-of-type(even)
+{
+    margin-left: 100px;
+    vertical-align: middle;
+}
+
+#account-options .social-login a:nth-of-type(odd)
+{
+    margin-right: 100px;
+    vertical-align: middle;
+}
+
+#account-options .signup-or
+{
+    display:inline-block;
+    width: 200px;
+    margin: 0 -102px 20px -102px;
+    vertical-align: middle;
+    border-bottom: 2px solid #ccc;
+    text-align: center;
+    clear: both;
+}
+
+#account-options .signup-or span {
+    background: url("../images/noise_darkgray.png") repeat scroll 0 0 #111111;
+    border-radius: 4px 4px 4px 4px;
+    color: #CCCCCC;
+    font-style: italic;
+    padding: 3px 20px;
+    position: relative;
+    text-transform: uppercase;
+    top: 12px;
+}
+
+#bookmark .modal-body
+{
+    padding-top:50px;
+    padding-bottom:50px;
+    text-align: center;
+}
+
+#schedule-demo .first-name,
+#schedule-demo .last-name,
+#student-invite .first-name,
+#student-invite .last-name,
+#student-invite .your-first,
+#student-invite .your-last,
+#bill-parents .first-name,
+#bill-parents .last-name,
+#bill-parents .your-first,
+#bill-parents .your-last
+{
+    width:50%;
+    margin:0 -2px;
+    padding: 0 2px;
+    display:inline-block;
+}
+
+#schedule-demo.invalid-only.first-required .first-name input,
+#schedule-demo.invalid-only.last-required .last-name input,
+#schedule-demo.invalid-only.email-required .email input,
+#schedule-demo.invalid-only.company-required .company input,
+#schedule-demo.invalid-only.phone-required .phone input,
+#contact-support.invalid-only.name-required .name input,
+#contact-support.invalid-only.email-required .email input,
+#contact-support.invalid-only.message-required .message textarea,
+#bill-parents.invalid-only.first-required .first-name input,
+#bill-parents.invalid-only.last-required .last-name input,
+#bill-parents.invalid-only.email-required .email input,
+#bill-parents.invalid-only.your-first-required .your-first input,
+#bill-parents.invalid-only.your-last-required .your-last input,
+#bill-parents.invalid-only.your-email-required .your-email input,
+#add-study-hours.invalid-only.class-required .class-name select,
+#add-study-hours.invalid-only.date-required .date input,
+#add-study-hours.invalid-only.time-required .time select
+{
+    border-bottom:3px solid #CC0000;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#contact-support .invalid-only {
+    display:none;
+    clear: both;
+    position: relative;
+    padding: 2px 3px;
+    border: 2px solid #CC0000;
+    color:#660000;
+    border-radius: 5px;
+}
+
+#contact-support.invalid-only .invalid-only
+{
+    display:inline-block;
+}
+
+#deadlines-empty .close,
+#unsupported .close
+{
+    display: none;
+}
+
+#unsupported .modal-body
+{
+    text-align: center;
+}
+
+#unsupported .modal-body a
+{
+    display:inline-block;
+    height: 128px;
+    width: 128px;
+    background: url(../images/menu_icons_128.png) no-repeat left -6016px transparent;
+    vertical-align: bottom;
+}
+
+#unsupported .modal-body a[href*="chrome"]
+{
+    background-position: left -6144px;
+}
+
+#unsupported .modal-body a[href*="safari"]
+{
+    background-position: left -6272px;
+}
+
+#unsupported .modal-body a[href*="microsoft"]
+{
+    background-position: left -6400px;
+    position:relative;
+}
+
+/*
+#unsupported .modal-body a[href*="microsoft"]:after
+{
+    content: "Click to upgrade";
+    padding-top: 70px;
+    line-height: 0px;
+    height: auto;
+    width: 128px;
+    display: block;
+    background: url(../images/menu_icons_128.png) no-repeat left -6556px transparent;
+    position: absolute;
+    top: 100%;
+}
+*/
+
+#sds-messages .mobile-only
+{
+    display:none;
+}
+
+#bookmark
+{
+    top: auto;
+    margin-top: 70px;
+    transform: none;
+    bottom:0;
+    position:fixed;
+}
+
+body.left-menu #bookmark,
+body.right-menu #bookmark
+{
+    position:absolute;
+}
+
+#bookmark i.arrow
+{
+    position:absolute;
+    display:block;
+    right:0;
+    left:auto;
+    top:0;
+    bottom:auto;
+    margin-left:0;
+    width:50px;
+    height:50px;
+    background:url(../images/menu_new_compressed.png) no-repeat 0 -7600px transparent;
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
+    -moz-transform-origin: center center;
+    -ms-transform-origin: center center;
+    -o-transform-origin: center center;
+}
+
+#bookmark p ~ i.arrow
+{
+    margin-left:-25px;
+    top:auto;
+    bottom:0;
+    left:50%;
+    right:auto;
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
+    -moz-transform-origin: center center;
+    -ms-transform-origin: center center;
+    -o-transform-origin: center center;
+}
+
+.modal-dialog
+{
+    width:600px;
+    margin-left:auto;
+    margin-right:auto;
+    max-width: 100%;
+}
+
+.modal .modal-header
+{
+    background-color: #0099BB;
+    border-radius: 10px 10px 0 0;
+    border-bottom: none;
+    color: #fff;
+    padding-right:30px;
+    font-family: 'Rufina',serif;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.modal .modal-header + .modal-footer
+{
+    padding-top:15px;
+}
+
+.modal .modal-header a
+{
+    color:#ffffff;
+}
+
+.modal-footer
+{
+    border:0;
+    padding-top:0;
+}
+
+.modal.in .modal-dialog {
+    top:50%;
+}
+
+.modal.in .modal-dialog .modal-content
+{
+    margin-top:-50%;
+}
+
+.modal-header .close
+{
+    color:#FFF;
+    opacity: .9;
+    font-size: 40px;
+    line-height: 30px;
+    height: 30px;
+    position:relative;
+    top:-15px;
+    right:-25px;
+}
+
+.close:hover, .close:focus
+{
+    color:#FFF;
+    opacity: 1;
+}
+
+.dialog
+{
+    z-index: 99;
+    margin: -275px auto 0;
+    max-width: 650px;
+    padding: 20px;
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #DDDDDD;
+    box-shadow: 0 0 20px rgba(0,0,0,.75);
+    border-radius: 10px;
+    position: relative;
+    text-align: left;
+    display: none;
+}
+
+.dialog > *:first-child
+{
+    margin-top:0;
+}
+
+.dialog > *:last-child
+{
+    margin-bottom:0;
+}
+
+#claim textarea
+{
+    height: 12em;
+}
+
+#claim label.input
+{
+    padding:0 2px;
+    width:50%;
+    margin:0 -2px;
+    display:inline-block;
+    vertical-align: top;
+}
+
+#claim .plupload
+{
+    width:50%;
+}
+
+@media all and (max-width:1000px)
+{
+    body.modal-open
+    {
+        padding: 0 !important;
+    }
+}
+
+@media all and (max-width:700px), all and (max-height:700px) {
+
+    body.modal-open
+    {
+        height: 100%;
+        overflow: visible;
+    }
+
+    .modal-open .modal
+    {
+        overflow-y:visible;
+        height: auto;
+        position:absolute;
+        bottom:auto;
+        transition: left linear .15s;
+    }
+
+    body.modal-open .footer
+    {
+        display:none;
+    }
+
+    body.modal-open .panel-pane,
+    body.modal-open .pane-content
+    {
+        max-height: 100%;
+        overflow:hidden;
+    }
+
+    .modal.in .modal-dialog {
+        top: auto;
+        margin-top: 70px;
+        transform:none;
+    }
+
+    .modal.in .modal-dialog .modal-content
+    {
+        margin-top:0;
+    }
+}
+
+@media all and (max-width:700px)
+{
+
+    #account-options .signup-or,
+    #account-options .social-login a:nth-of-type(even),
+    #account-options .social-login a:nth-of-type(odd)
+    {
+        margin-left:auto;
+        margin-right:auto;
+    }
+    #account-options .social-login > div,
+    #account-options .social-login > a
+    {
+        display:block;
+    }
+
+    .left-menu.modal-open .modal
+    {
+        left:220px;
+        position:fixed;
+    }
+
+    .right-menu.modal-open .modal
+    {
+        left:-220px;
+        position:fixed;
+    }
+
+    #sds-messages .full-only
+    {
+        display:none;
+    }
+
+    #sds-messages .mobile-only
+    {
+        display:block;
+    }
+
+    .modal.in .modal-dialog
+    {
+        margin-top: 60px;
+        margin-left:10px;
+        margin-right:10px;
+        width:auto;
+    }
+
+    #unsupported a[href*="firefox"]
+    {
+        display:none;
+    }
+}

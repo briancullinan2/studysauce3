@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graphic version="2.0" xmlns="http://ns.adobe.com/fxg/2008" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:fc="http://ns.adobe.com/flashcatalyst/2009"  viewHeight= "5600" viewWidth= "50">
+	<Library>
+	</Library>
+
+	<Group d:userLabel="Selection">
+		<Group d:userLabel="Group_1">
+			<Path winding="evenOdd" data="M 13 1623 C 13 1620 15 1618 17 1618 C 20 1618 22 1620 22 1623 C 22 1625 20 1627 17 1627 C 15 1627 13 1625 13 1623 Z " blendMode="normal" alpha="1" d:userLabel="Ellipse">
+				<fill>
+					<SolidColor color="#555555"/>
+				</fill>
+			</Path>
+			<Path winding="evenOdd" data="M 27 1617 C 27 1614 29 1612 31 1612 C 34 1612 36 1614 36 1617 C 36 1619 34 1621 31 1621 C 29 1621 27 1619 27 1617 Z " blendMode="normal" alpha="1" d:userLabel="Ellipse">
+				<fill>
+					<SolidColor color="#555555"/>
+				</fill>
+			</Path>
+			<Path winding="evenOdd" data="M 10 1630 C 10 1630 10 1635 10 1635 C 10 1636 11 1637 13 1637 C 13 1637 22 1637 22 1637 C 24 1637 25 1636 25 1635 C 25 1635 25 1630 25 1630 C 25 1628 24 1627 22 1627 C 22 1627 22 1627 22 1627 L 17 1632 L 13 1627 C 13 1627 13 1627 13 1627 C 11 1627 10 1628 10 1630 Z " blendMode="normal" alpha="1">
+				<fill>
+					<SolidColor color="#555555"/>
+				</fill>
+			</Path>
+			<Path winding="evenOdd" data="M 31 1626 C 31 1626 26 1621 26 1621 C 25 1621 23 1622 23 1625 C 23 1625 23 1625 23 1625 L 26 1628 C 26 1628 26 1637 26 1637 C 26 1637 26 1637 26 1637 C 26 1637 37 1637 37 1637 C 39 1637 40 1635 40 1633 C 40 1633 40 1625 40 1625 C 40 1622 39 1621 37 1621 C 37 1621 37 1621 37 1621 L 31 1626 Z " blendMode="normal" alpha="1">
+				<fill>
+					<SolidColor color="#555555"/>
+				</fill>
+			</Path>
+		</Group>
+	</Group>
+</Graphic>

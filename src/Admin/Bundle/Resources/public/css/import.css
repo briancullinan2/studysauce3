@@ -1,0 +1,50 @@
+
+#import .import-row {
+    clear: both;
+    display: block;
+    vertical-align: top;
+    position: relative;
+    white-space: nowrap;
+}
+
+.import-row > *
+{
+    width:33.33%
+}
+
+.master .import-row > *
+{
+    width:20%;
+    display:inline-block;
+    vertical-align: bottom;
+}
+
+.import-row label > span
+{
+    display:none;
+}
+
+.import-row:first-of-type label > span
+{
+    display:block;
+}
+
+#import .import-users
+{
+    width:50%;
+    display:inline-block;
+    margin: 0 -2px;
+    padding-right: 5px;
+    padding-left: 2px;
+    vertical-align: bottom;
+}
+
+#user-preview
+{
+    min-height: 8em;
+    width:50%;
+    display:inline-block;
+    margin-left: -4px;
+    vertical-align: bottom;
+}
+

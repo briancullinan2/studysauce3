@@ -1,0 +1,132 @@
+.vis.timeline .item.box
+{
+    text-align: left;
+    font-size: 10px;
+    line-height: 90%;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding:1px;
+    background-color: #eee;
+    border:1px solid #555;
+}
+
+div.timeline-navigation
+{
+    bottom:auto !important;
+    top: 0;
+    right: 0 !important;
+}
+
+.vis.timeline.root
+{
+    min-height: 600px;
+}
+
+.vis.timeline.root,
+.vis.timeline .vispanel.center,
+.vis.timeline .vispanel.left,
+.vis.timeline .vispanel.right,
+.vis.timeline .vispanel.top,
+.vis.timeline .vispanel.bottom
+{
+    border: none;
+}
+
+#activity .range .input + div,
+#activity .range .input + div {
+    position: absolute;
+    z-index: 100;
+}
+
+#activity .ui-datepicker > a {
+    display: block;
+    text-align: left;
+    padding-left: 10px;
+}
+
+#activity .search {
+    display:inline-block;
+    width:100%;
+    margin-right:-300px;
+    padding-right:300px;
+}
+
+#activity .range {
+    display: inline-block;
+    width: 300px;
+    margin: 0 -4px;
+    padding: 0 2px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.vis.timeline .item.line,
+.vis.timeline .item.dot
+{
+    border-color: #555;
+    pointer-events: none;
+}
+
+.vis.timeline .item.box a
+{
+    font-weight: normal;
+    color: #555;
+    display:inline-block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vis.timeline .item.box a ~ *
+{
+    display:none;
+}
+
+.vis.timeline .item.box a:first-child {
+    display: inline-block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.vis.timeline .item.box.selected a ~ *,
+.vis.timeline .item.box:hover a ~ *
+{
+    display:inline-block;
+}
+
+.vis.timeline .item.line.related-user,
+.vis.timeline .item.dot.related-user,
+.vis.timeline .item.box.related-user
+{
+    border-color: #F90;
+    z-index: 2;
+}
+
+.vis.timeline .item.box.related-session,
+.vis.timeline .item.box.related-user
+{
+    box-shadow: 0 0 3px rgba(0,0,0,.75);
+}
+
+.vis.timeline .item.line.related-session,
+.vis.timeline .item.dot.related-session,
+.vis.timeline .item.box.related-session
+{
+    border-color: #0be;
+    z-index: 2;
+}
+
+.vis.timeline .item.dot.selected,
+.vis.timeline .item.line.selected,
+.vis.timeline .item.box.selected {
+    border-color: #FC0;
+    background-color: #FF8;
+    z-index: 2;
+}
+
+.vis.timeline .item.box.related-hover
+{
+    z-index: 3;
+    max-width: none;
+}

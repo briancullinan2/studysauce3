@@ -1,0 +1,597 @@
+
+.dashboard-home
+{
+    /* background: url(../images/grunge.png) repeat fixed 0 0 #555555; */
+    background: #555555;
+}
+
+.dashboard-home.adviser .panel-pane[id^="uid-"]
+{
+    padding-top:0;
+}
+
+.dashboard-home.adviser .panel-pane .panel-pane
+{
+    display:block;
+    padding-left:0;
+    padding-right:0;
+}
+
+.dashboard-home .player-wrapper iframe.yt-state-1,
+.dashboard-home iframe.yt-state-1
+{
+    padding: 50px 50px 0 50px;
+}
+
+.dashboard-home a[href*="/plan/download"]
+{
+    display:none;
+}
+
+.dashboard-home.download-plan a[href*="/plan/download"]
+{
+    display:inline-block;
+    margin-top:-3px;
+    margin-left: 10px;
+}
+
+.dashboard-home a[href="#yt-pause"]
+{
+    padding-top:70px;
+    padding-right:70px;
+}
+
+.dashboard-home .footer
+{
+    padding: 0 240px 20px 240px;
+}
+
+#error404 .pane-content
+{
+    text-align: center;
+}
+
+.dashboard-home.adviser .pane-content .nav-tabs>li>a
+{
+    border-radius: 0;
+}
+
+.dashboard-home.adviser .pane-content .nav-tabs>li:last-child>a
+{
+    margin-right:0;
+    border-radius: 0 5px 0 0;
+}
+
+.panel-pane
+{
+    display:none;
+    margin:0 auto;
+    max-width: none;
+    width: 100%;
+    padding:70px 240px 20px 240px;
+    box-sizing: border-box;
+    position:relative;
+}
+
+.adviser .panel-pane,
+.admin .panel-pane
+{
+    padding-left:20px;
+    padding-right:70px;
+}
+
+.admin aside + .panel-pane,
+.admin .header-wrapper ~ .panel-pane:nth-of-type(2),
+.admin .tipsy ~ .panel-pane:nth-of-type(3)
+{
+    display:inline-block;
+    width:auto;
+    max-width: none;
+}
+
+aside + .panel-pane,
+.header-wrapper ~ .panel-pane:nth-of-type(2),
+.tipsy ~ .panel-pane:nth-of-type(3)
+{
+    display:block;
+}
+
+.pane-content
+{
+    min-height: 500px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,.5);
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.pane-content h4,
+.pane-content h2
+{
+    margin-top:0;
+}
+
+.pane-content h2
+{
+    margin-bottom:20px;
+}
+
+/*
+.big-add:active,
+.big-add:focus,
+.big-add:hover
+{
+    color:#555555;
+}
+*/
+
+.big-add:active span,
+.big-add:focus span,
+.big-add:hover span
+{
+    color:#00CCEE;
+}
+
+.big-add
+{
+    position: relative;
+    z-index: 0;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, .5);
+    border-bottom: 0;
+    color: #555555;
+    font-size: 22px;
+    font-weight: 700;
+    display: inline-block;
+    float: left;
+    margin-top: 20px;
+    padding-left:40px;
+}
+
+.big-add span
+{
+    line-height: 20px;
+    border-radius: 100%;
+    display: inline-block;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left:0;
+    margin-top:-10px;
+    font-size: 50px;
+    vertical-align: middle;
+}
+
+.import-row > *,
+.session-row > *,
+#schedule header > *,
+.class-row > *,
+#deadlines header > *,
+.deadline-row > *
+{
+    vertical-align: top;
+    display:inline-block;
+    margin:0 -2px;
+    padding: 5px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.grade-row > * label,
+.session-row > * label,
+#schedule header > * label,
+.class-row > * label,
+#deadlines header > * label,
+.deadline-row > * label
+{
+    margin-top:0;
+    margin-bottom:0;
+}
+
+#what-if .class-row .class-name span,
+#calculator .class-row .class-name i,
+.deadline-row .class-name i,
+.deadlines-widget .deadline-row i,
+#metrics ol span,
+#metrics .class-name span,
+.class-row .class-name i,
+#plan .class-name span,
+.plan-widget .class-name span
+{
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    border: 3px solid #555555;
+    border-radius: 100%;
+    text-align: center;
+    font-size: 0;
+    color: #555555;
+    line-height: 15px;
+    margin: -5px 10px -5px 0;
+    vertical-align: middle;
+}
+
+.class-row,
+.deadline-row,
+.session-row
+{
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.class-row:hover:not(.selected):not(.edit),
+.session-row:hover:not(.selected),
+.deadline-row:hover:not(.selected):not(.edit) {
+    box-shadow: 0 1px 4px rgba(255,255,255,.25);
+    border-top: 1px solid #DDDDDD;
+    border-bottom: 1px solid #DDDDDD;
+    background-color: rgba(255,255,255,.50);
+}
+
+a[href="#edit-grade"],
+a[href="#edit-class"],
+a[href="#goal-edit"],
+a[href="#edit-deadline"] {
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../images/menu_new_half.png) no-repeat left -1552px transparent;
+    vertical-align: middle;
+}
+
+a[href="#edit-grade"]:hover,
+a[href="#edit-class"]:hover,
+a[href="#goal-edit"]:hover,
+a[href="#edit-deadline"]:hover
+{
+    background-position: left -1602px;
+}
+
+.social-login a[href*="#remove-"],
+a[href="#delete-notebook"],
+a[href="#remove-grade"],
+a[href="#remove-class"],
+a[href="#remove-deadline"] {
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../images/menu_new_half.png) no-repeat left -1652px transparent;
+    vertical-align: middle;
+}
+
+.social-login a[href*="#remove-"]:hover,
+a[href="#delete-notebook"]:hover,
+a[href="#remove-grade"]:hover,
+a[href="#remove-class"]:hover,
+a[href="#remove-deadline"]:hover
+{
+    background-position: left -1702px;
+}
+
+.fc-event.class0,
+.class0 {
+    background-color: #FF1100;
+}
+
+.fc-event.class1,
+.class1
+{
+    background-color:#FF9900;
+}
+
+.fc-event.class2,
+.class2
+{
+    background-color:#FFDD00;
+}
+
+.fc-event.class3,
+.class3
+{
+    background-color:#BBEE00;
+}
+
+.fc-event.class4,
+.class4
+{
+    background-color:#33DD00;
+}
+
+.fc-event.class5,
+.class5
+{
+    background-color:#009999;
+}
+
+.fc-event.class6,
+.class6
+{
+    background-color:#1133AA;
+}
+
+.fc-event.class7,
+.class7
+{
+    background-color:#6611AA;
+}
+
+.fc-event.class8,
+.class8
+{
+    background-color:#BB0088;
+}
+
+.fc-event.class9,
+.class9
+{
+    background-color:#FF5500;
+}
+
+.fc-event.class10,
+.class10
+{
+    background-color:#3366AA;
+}
+
+.fc-event.class11,
+.class11
+{
+    background-color:#EE5588;
+}
+
+.plupload
+{
+    padding:0 2px;
+    margin:0 -2px;
+    display:inline-block;
+    vertical-align: top;
+    overflow: hidden;
+    text-align: center;
+    position:relative;
+}
+
+.plupload .plup-select
+{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    font-weight: bold;
+    color:#555555;
+    z-index: 10;
+    padding-top:40%;
+}
+
+.plupload input
+{
+    font-size: 999px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    color:transparent;
+    background:transparent;
+    top:0;
+    left:0;
+}
+
+.plup-filelist
+{
+    padding-bottom:100%;
+    position:relative;
+}
+
+.plupload video,
+.plupload img
+{
+    margin: 0 auto;
+    display:block;
+    position:absolute;
+    min-width:100%;
+    max-width: none;
+    height: 100%;
+}
+
+.plupload video
+{
+    max-width:100%;
+}
+
+.uploaded .plup-select,
+.uploaded .moxie-shim
+{
+    display: none;
+}
+
+/*
+.adviser [id^="uid-"] .nav-tabs
+{
+    display:none;
+}
+*/
+@media print
+{
+    .header-wrapper,
+    .footer,
+    .highlighted-link,
+    #left-panel, #right-panel
+    {
+        display:none;
+    }
+
+    body
+    {
+        background: transparent;
+    }
+
+}
+
+@media all and (max-width: 1300px)
+{
+    .panel-pane
+    {
+        padding-left:70px;
+        padding-right:70px;
+    }
+
+    .adviser .panel-pane,
+    .admin .panel-pane
+    {
+        padding-left:20px;
+        padding-right:70px;
+    }
+
+    .dashboard-home .footer
+    {
+        padding-bottom:20px;
+        padding-left:70px;
+        padding-right:70px;
+        margin:0 auto;
+        width: 900px;
+    }
+}
+
+@media all and (max-width: 1000px) {
+
+    .tipsy
+    {
+        top:auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        position: fixed;
+        width:auto !important;
+        padding:0;
+        display:none !important;
+    }
+
+    .tipsy-arrow
+    {
+        display:none !important;
+    }
+
+    .tipsy.focus .tipsy-inner
+    {
+        overflow: visible;
+        white-space: normal;
+    }
+
+    .tipsy .tipsy-inner
+    {
+        max-width: none;
+        border:0;
+        box-shadow: none;
+        white-space: nowrap;
+        overflow:hidden;
+        text-overflow: ellipsis;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        padding-left:20px;
+    }
+
+    .tipsy .tipsy-inner:before
+    {
+        content: "?";
+        color:#FFF;
+        position:absolute;
+        display:block;
+        left:7px;
+    }
+
+    .adviser .panel-pane,
+    .admin .panel-pane
+    {
+        padding-left: 20px;
+        padding-right: 70px;
+        max-width: none;
+    }
+
+    .panel-pane {
+        padding-left: 70px;
+        padding-right: 70px;
+        max-width: none;
+    }
+
+    .dashboard-home .footer
+    {
+        padding-left:70px;
+        padding-right:70px;
+        max-width: 100%;
+    }
+}
+
+@media all and (min-height: 700px) {
+    .panel-pane {
+        padding-top: 70px;
+        padding-bottom: 20px;
+    }
+}
+
+@media all and (min-width: 1000px) {
+    .panel-pane {
+        padding-bottom: 20px;
+    }
+}
+
+@media all and (max-width: 700px)
+{
+    body.left-menu .panel-pane,
+    body.right-menu .panel-pane
+    {
+        position: fixed;
+    }
+
+    body.left-menu .footer,
+    body.right-menu .footer
+    {
+        display:none;
+    }
+
+    .dashboard-home .player-wrapper iframe.yt-state-1,
+    .dashboard-home iframe.yt-state-1
+    {
+        padding: 50px 0 0;
+    }
+
+    .dashboard-home a[href="#yt-pause"]
+    {
+        padding-right: 20px;
+    }
+
+    .adviser .panel-pane,
+    .admin .panel-pane,
+    .panel-pane {
+        padding: 50px 0 40px 0;
+        width: 100%;
+        transition: left linear .15s;
+        left:0;
+    }
+
+    body.left-menu .panel-pane
+    {
+        left:220px;
+    }
+
+    body.right-menu .panel-pane
+    {
+        left:-220px;
+    }
+
+    .dashboard-home .footer
+    {
+        padding-left:10px;
+        padding-right:10px;
+        padding-bottom:10px;
+    }
+
+    .pane-content
+    {
+        padding:10px 15px;
+        border-radius: 0;
+    }
+
+}
+

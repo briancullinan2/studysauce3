@@ -1,0 +1,14 @@
+/.idea
+/app/cache/dev
+/app/cache/prod
+/web/bundles
+Thumbs.db
+/src/StudySauce/Bundle/Entity/*.php~
+/app/logs
+/src/Course1/Bundle/Entity/*.php~
+/src/StudySauce/Bundle/Resources/public/js/fullcalendar-2.1-beta
+/vendor/composer/b2da05ea/symfony-symfony-f077a23
+/vendor/composer/bc22d080/symfony-symfony-f077a23
+/src/Course2/Bundle/Entity/*.php~
+/src/Course3/Bundle/Entity/*.php~
+/app/cache/test

@@ -1,0 +1,181 @@
+
+#select-status
+{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 35px;
+    background-color: white;
+    border: 2px solid #555555;
+    z-index: 100;
+}
+
+#select-status a
+{
+    display:block;
+}
+
+#select-status span,
+#userlist tr td:first-child span
+{
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    border: 3px solid #555555;
+    border-radius: 100%;
+    text-align: center;
+    font-weight: 700;
+    color: #555555;
+    line-height: 15px;
+    margin: -3px 0;
+    vertical-align: top;
+    background-color:#33DD00;
+}
+
+#select-status span
+{
+    margin: 5px;
+}
+
+#select-status a[href="#yellow"] span,
+#userlist tr.status_yellow td:first-child span
+{
+    background-color:#FFDD00;
+}
+
+#select-status a[href="#red"] span,
+#userlist tr.status_red td:first-child span
+{
+    background-color:#FF1100;
+}
+
+#userlist th.filtered select
+{
+    border:3px solid #FF9900;
+    padding-top:0;
+}
+
+#userlist td
+{
+    padding: 5px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    table-layout: fixed;
+}
+
+#userlist td.empty
+{
+    white-space: normal;
+}
+
+#userlist table
+{
+    table-layout: fixed;
+    width:100%;
+}
+
+#userlist table th
+{
+    background:transparent;
+    position: relative;
+    overflow: hidden;
+    padding:5px;
+}
+
+#userlist th.filtered:after
+{
+    border-top: 3px solid #FF9900;
+    border-bottom: 3px solid #FF9900;
+    border-right: 3px solid #FF9900;
+    height: 24px;
+}
+
+#userlist th:nth-child(4),
+#userlist td:nth-child(4),
+#userlist th:nth-child(2),
+#userlist td:nth-child(2),
+#userlist th:nth-child(1),
+#userlist td:nth-child(1),
+#userlist th:nth-child(6),
+#userlist td:nth-child(6),
+#userlist th:nth-child(7),
+#userlist td:nth-child(7),
+#userlist th:nth-child(8),
+#userlist td:nth-child(8),
+#userlist th:nth-child(9),
+#userlist td:nth-child(9)
+{
+    text-align: center;
+    width: 10%;
+}
+
+#userlist th:nth-child(3),
+#userlist td:nth-child(3),
+#userlist th:nth-child(5),
+#userlist td:nth-child(5)
+{
+    width: 20%;
+}
+
+#userlist .master th:nth-child(4),
+#userlist .master td:nth-child(4),
+#userlist .master th:nth-child(2),
+#userlist .master td:nth-child(2),
+#userlist .master th:nth-child(1),
+#userlist .master td:nth-child(1),
+#userlist .master th:nth-child(7),
+#userlist .master td:nth-child(7),
+#userlist .master th:nth-child(8),
+#userlist .master td:nth-child(8),
+#userlist .master th:nth-child(9),
+#userlist .master td:nth-child(9)
+{
+    width: 8%;
+}
+
+#userlist .master th:nth-child(3),
+#userlist .master td:nth-child(3),
+#userlist .master th:nth-child(5),
+#userlist .master td:nth-child(5),
+#userlist .master th:nth-child(6),
+#userlist .master td:nth-child(6)
+{
+    width: 17.33%;
+}
+
+@media all and (max-width:1000px)
+{
+    #userlist table th:nth-child(9),
+    #userlist table td:nth-child(9),
+    #userlist table th:nth-child(8),
+    #userlist table td:nth-child(8),
+    #userlist table th:nth-child(7),
+    #userlist table td:nth-child(7),
+    #userlist table th:nth-child(5),
+    #userlist table td:nth-child(5),
+    #userlist table th:nth-child(2),
+    #userlist table td:nth-child(2)
+    {
+        display:none;
+    }
+}
+
+@media all and (max-width:700px)
+{
+
+    #userlist td
+    {
+        padding: 10px;
+    }
+}
+
+
+@media all and (max-width:500px)
+{
+    #userlist table th:nth-child(1),
+    #userlist table td:nth-child(1)
+    {
+        display:none;
+    }
+}

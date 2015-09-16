@@ -1,0 +1,191 @@
+
+
+
+
+#signup #payment-pane,
+#signup #billing-pane
+{
+    max-width: 800px;
+    display:inline-block;
+    vertical-align: top;
+    margin: 0 -4px 10px;
+}
+
+#signup #billing-pane
+{
+    margin: 0 auto;
+    display:block;
+}
+
+#signup #payment-pane
+{
+    float:right;
+    clear:right;
+    display: none;
+}
+
+#signup .invalid-only,
+#signup .form-actions .error
+{
+    clear: both;
+    position: relative;
+    padding: 2px 3px;
+    border: 2px solid #CC0000;
+    color:#660000;
+    border-radius: 5px;
+}
+
+#signup label span
+{
+    width: 30%;
+    display:inline-block;
+}
+
+#signup label input,
+#signup label select
+{
+    width: 70%;
+    display:inline-block;
+}
+
+#signup .invalid-only
+{
+    display:none;
+}
+
+#signup.invalid-only .invalid-only
+{
+    display:inline-block;
+}
+
+#payment-pane .cc-number img {
+    float: right;
+    border-radius: 1px;
+}
+
+#signup.invalid-only.organization-required .organization input,
+#signup.invalid-only.first-required .first-name input,
+#signup.invalid-only.last-required .last-name input,
+#signup.invalid-only.street-required input[name="street1"],
+#signup.invalid-only.city-required .city input,
+#signup.invalid-only.zip-required .zip input,
+#signup.invalid-only.state-required select[name="state"],
+#signup.invalid-only.country-required select[name="country"],
+#signup.invalid-only.title-required .title input,
+#signup.invalid-only.email-required .email input,
+#signup.invalid-only.phone-required .phone input,
+#signup.invalid-only.students-required .students input,
+#signup.invalid-only.payment-required .payment select,
+#signup.invalid-only.cc-number-required .cc-number input,
+#signup.invalid-only.cc-ccv-required input[name="cc-ccv"]
+{
+    border-bottom:3px solid #CC0000;
+}
+
+#payment-pane .product-option
+{
+    margin-right: -110px;
+    padding-right: 100px;
+    width: 100%;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#payment-pane .product-option + img
+{
+    vertical-align: middle;
+}
+
+#billing-pane a[href="#show-coupon"],
+#billing-pane a[href="#show-gift"]
+{
+    display: block;
+    margin-right: auto;
+    max-width: 350px;
+}
+
+#signup .form-actions
+{
+    max-width: 800px;
+    margin: 20px auto 0 auto;
+    padding:0;
+    vertical-align: top;
+}
+
+
+#payment-pane .cc-number
+{
+    position: relative;
+}
+
+#payment-pane .cc-number .cards
+{
+    display: inline-block;
+    vertical-align: bottom;
+    height: 28px;
+    padding: 3px 5px;
+    border-radius: 2px;
+    width: 160px;
+    opacity: .5;
+    position:absolute;
+    right:0;
+    bottom:0;
+    pointer-events:none;
+}
+
+#payment-pane .cc-number input:focus ~ .cards {
+    opacity: .9;
+}
+
+#payment-pane .cc-number input
+{
+    padding-right: 160px;
+}
+
+
+@media all and (max-width:700px)
+{
+    #signup label span,
+    #signup label input,
+    #signup label select
+    {
+        display:block;
+        width: 100%;
+        margin: 0;
+    }
+
+    #signup .form-actions
+    {
+        width:auto;
+        margin:0;
+        padding:0;
+        display:block;
+    }
+
+    #payment-pane .cc-number .cards,
+    #payment-pane .cc-number input:focus ~ .cards
+    {
+        display:none;
+    }
+
+    #payment-pane .cc-number input
+    {
+        padding-right:5px;
+    }
+
+    .page-cart-checkout #payment-pane
+    {
+        margin-left:-10px;
+        margin-right:-1px;
+    }
+
+    #signup #payment-pane,
+    #signup #billing-pane
+    {
+        width: auto;
+        float:none;
+        clear:both;
+        height:auto;
+    }
+}
+

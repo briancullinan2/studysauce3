@@ -1,0 +1,14 @@
+.landing-home .banner
+{
+    background: url("../images/Stanford_blur.jpg") no-repeat fixed 50% 0 #00749F;
+    background-size: auto 120%;
+    z-index: 1;
+    position: relative;
+}
+
+.landing-home .banner h2
+{
+    color:#FFFFFF;
+    text-align:center;
+    margin:40px 20px;
+}

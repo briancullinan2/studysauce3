@@ -1,0 +1,11 @@
+
+.deadline-row .reminder
+{
+    white-space: normal;
+}
+
+.deadline-row .reminder label.checkbox
+{
+    width:50%;
+    text-align: left;
+}

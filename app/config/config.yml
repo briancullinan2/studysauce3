@@ -1,0 +1,238 @@
+imports:
+    - { resource: security.yml }
+    - { resource: "@StudySauceBundle/Resources/config/assets.php" }
+
+parameters:
+    authorize_test_mode: true
+    defer_all_emails: "studymarketing@mailinator.com"
+
+services:
+    pdo:
+        class: Doctrine\DBAL\Driver\PDOConnection
+        arguments:
+            - "sqlite:%kernel.root_dir%/data.sqlite"
+            - root
+            - ~
+        calls:
+            - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
+
+    security.authentication.rememberme.services.persistent.main:
+        alias: security.authentication.rememberme.services.simplehash.main
+
+    session.handler.pdo:
+        class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        arguments: ["@pdo", {db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time}]
+
+    my_user_provider:
+        class: StudySauce\Bundle\Security\UserProvider
+        #this is the place where the properties are passed to the UserProvider - see config.yml
+        arguments: [@fos_user.user_manager, @service_container, @security.encoder_factory, {facebook: facebook_id, google: google_id, evernote: evernote_id, gcal: gcal_id}]
+
+    studysauce.drupal_encoder:
+        class: StudySauce\Bundle\DependencyInjection\DrupalPasswordEncoder
+
+    sinclude:
+        class: StudySauce\Bundle\DependencyInjection\SIncludeFragmentRenderer
+        arguments: ["@service_container", "@uri_signer", "", "@http_kernel", "@event_dispatcher"]
+        calls:
+            - [setFragmentPath, ["/_fragment"]]
+        tags:
+            - {name: "kernel.fragment_renderer"}
+
+    security.authentication.listener.anonymous:
+        class: StudySauce\Bundle\EventListener\AnonymousAuthenticationListener
+        tags:
+            - {name: monolog.logger, channel: security}
+        arguments: ["@security.context", "", "@?logger", "@service_container"]
+
+    kernel.listener.redirect:
+        class: StudySauce\Bundle\EventListener\RedirectListener
+        tags:
+            - {name: kernel.event_subscriber}
+        arguments: [@templating, @service_container]
+
+    torchandlaurel.user_register:
+        class: TorchAndLaurel\Bundle\EventListener\OrgEmailNotifier
+        tags:
+            - {name: kernel.event_subscriber}
+        arguments: [@service_container, @templating, @mailer]
+
+    studysauce.invite_listener:
+        class: StudySauce\Bundle\EventListener\InviteListener
+        tags:
+            - {name: kernel.event_subscriber}
+        arguments: [@service_container]
+
+    kernel.listener.tracker:
+        class: StudySauce\Bundle\EventListener\PageTracker
+        tags:
+            - {name: kernel.event_subscriber}
+        arguments: ["@service_container", "@doctrine.orm.entity_manager", "@session", "@security.context"]
+
+    hwi_oauth.abstract_resource_owner.evernote:
+        class: StudySauce\Bundle\Security\EvernoteResourceOwner
+        parent: hwi_oauth.abstract_resource_owner.oauth1
+
+framework:
+    #esi:             ~
+    #translator:      { fallback: "%locale%" }
+    secret:          "021747d7aac1e078b0df5d2d8dd9d7abe4b90fa2"
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    templating:
+        engines: ['twig', 'php']
+        hinclude_default_template: "StudySauceBundle:Shared:hinclude.html.php"
+        #assets_version: SomeVersionScheme
+    default_locale:  "en"
+    trusted_hosts:   ~
+    trusted_proxies: ~
+    session:
+        # handler_id set to null will use default session handler from php.ini
+        handler_id:  session.handler.pdo
+        cookie_lifetime:       3600
+    fragments:       ~
+    http_method_override: true
+#    fragments: { path: /_fragment }
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    globals:
+        ga_tracking: UA-xxxxx-x
+
+# Assetic Configuration
+assetic:
+    debug:          %kernel.debug%
+    #read_from:      "%kernel.root_dir%/../web"
+    write_to:       "%kernel.root_dir%/../web"
+    use_controller: false
+    bundles:        [ "StudySauceBundle", "Course1Bundle", "TorchAndLaurelBundle", "Course2Bundle", "Course3Bundle", "AdminBundle" ]
+    #output: "/Symfony/web/app_dev.php/*"
+    #java: /usr/bin/java
+    #variables:
+    #        env:      [dev, prod]
+    filters:
+        cssrewrite: ~
+        #closure:
+        #    jar: "%kernel.root_dir%/Resources/java/compiler.jar"
+        #yui_css:
+        #    jar: "%kernel.root_dir%/Resources/java/yuicompressor-2.4.7.jar"
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver: pdo_sqlite
+        path: "%kernel.root_dir%/data.sqlite"
+        charset: UTF8
+        # if using pdo_sqlite as your database driver, add the path in parameters.yml
+        # e.g. database_path: "%kernel.root_dir%/data/data.db3"
+        # path:     "%database_path%"
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        auto_mapping: true
+        mappings:
+            FOSUserBundle: ~
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: smtp
+    encryption: ssl
+    auth_mode: login
+    host:      smtp.gmail.com
+    username:  brian@studysauce.com
+    password:  Da1ddy23
+    spool: { type: db }
+
+fos_user:
+    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
+    firewall_name: main
+    user_class: StudySauce\Bundle\Entity\User
+    group:
+        group_class: StudySauce\Bundle\Entity\Group
+
+#    template:
+#        engine: php
+
+white_october_swift_mailer_db:
+    entity_class: StudySauce\Bundle\Entity\Mail
+    keep_sent_messages: true
+
+hwi_oauth:
+    target_path_parameter: _target
+    firewall_name: main
+    connect:
+        account_connector: my_user_provider
+        confirmation: false
+    fosub:
+        username_iterations: 30
+        properties:
+            # these properties will be used/redefined later in the custom FOSUBUserProvider service.
+            facebook: facebook_id
+            google: google_id
+            evernote: evernote_id,
+            gcal: gcal_id
+
+    resource_owners:
+        facebook:
+            type:                facebook
+            client_id:           210014889174404
+            client_secret:       ef5a650eb52cbcea0d8b8e03d2877b9d
+            scope:               email,public_profile
+            user_response_class: StudySauce\Bundle\Security\PathUserResponse
+            # options:
+            #    display: popup #dialog is optimized for popup window
+            paths:
+                realname:  ["first_name", "last_name"]
+                last: last_name
+                first: first_name
+        google:
+            type:                google
+            client_id:           648236823314.apps.googleusercontent.com
+            client_secret:       ViH13EFLjELlf3vUCeSY81G8
+            scope:               "email profile"
+            user_response_class: StudySauce\Bundle\Security\PathUserResponse
+            paths:
+                realname:  ["given_name", "family_name"]
+                last: family_name
+                first: given_name
+
+        gcal:
+            type:                google
+            options:
+                access_type:         offline
+                approval_prompt: force
+            client_id:           648236823314.apps.googleusercontent.com
+            client_secret:       ViH13EFLjELlf3vUCeSY81G8
+            scope:               "email profile https://www.googleapis.com/auth/calendar"
+            user_response_class: StudySauce\Bundle\Security\PathUserResponse
+            paths:
+                realname:  ["given_name", "family_name"]
+                last: family_name
+                first: given_name
+
+        evernote:
+            type:                evernote
+            client_id:           bjcullinan
+            client_secret:       cd8e3ff10d842747
+            realm:               "evernote.com"
+            user_response_class: StudySauce\Bundle\Security\PathUserResponse
+            paths:
+                identifier: id
+                nickname:   username
+                realname:   name
+
+    http_client:
+        timeout:       5 # Time in seconds, after library will shutdown request, by default: 5
+        verify_peer:   false # Setting allowing you to turn off SSL verification, by default: true
+        ignore_errors: false # Setting allowing you to easier debug request errors, by default: true
+        max_redirects: 1 # Number of HTTP redirection request after which library will shutdown request,
+
+
+
+

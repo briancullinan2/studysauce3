@@ -1,0 +1,53 @@
+imports:
+    - { resource: config.yml }
+
+parameters:
+    authorize_test_mode: false
+    defer_all_emails: false
+
+doctrine:
+    dbal:
+        driver:   "pdo_mysql"
+        host:     "studysauce2.cjucxx5pvknl.us-west-2.rds.amazonaws.com"
+        dbname:   "studysauce"
+        user:     "study"
+        password: "itekIO^#(1234"
+
+services:
+    pdo:
+        class: Doctrine\DBAL\Driver\PDOConnection
+        arguments:
+            - "mysql:host=studysauce2.cjucxx5pvknl.us-west-2.rds.amazonaws.com;port=3306;dbname=studysauce"
+            - "study"
+            - "itekIO^#(1234"
+        calls:
+            - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+        console:
+            type:  console
+
+swiftmailer:
+    transport: smtp
+    encryption: ssl
+    auth_mode: login
+    host:      smtp.sendgrid.net
+    username:  Study Sauce
+    password:  2StudyBetter#
+    spool:     { type: db }
+
+hwi_oauth:
+    resource_owners:
+        evernote:
+            request_token_url: https://www.evernote.com/oauth
+            authorization_url: https://www.evernote.com/OAuth.action
+            access_token_url: https://www.evernote.com/oauth

@@ -1,0 +1,326 @@
+#register .pane-content
+{
+    text-align: center;
+}
+
+#login .pane-content
+{
+    text-align: center;
+    padding-bottom: 40px;
+}
+
+#login label span {
+    margin-left: -100%;
+    width: 100%;
+    display: inline-block;
+}
+
+.signup-or {
+    border-bottom: 2px solid #ccc;
+    text-align: center;
+    margin-bottom: 20px;
+    clear: both;
+}
+
+.signup-or span {
+    background: url("../images/noise_darkgray.png") repeat scroll 0 0 #111111;
+    border-radius: 4px 4px 4px 4px;
+    color: #CCCCCC;
+    font-style: italic;
+    padding: 3px 20px;
+    position: relative;
+    text-transform: uppercase;
+    top: 12px;
+}
+
+a[href="#sign-in-with-email"]
+{
+    display:block;
+    margin:10px auto;
+}
+
+#login .social-login
+{
+    display: inline-block;
+    margin: 0 -2px;
+    padding: 100px 140px 0 2px;
+    vertical-align: middle;
+    text-align: center;
+    width:40%;
+}
+
+#login .social-login a
+{
+    display:block;
+    margin-left:auto;
+    margin-bottom:10px;
+    width: 180px;
+}
+
+#login .social-login a:last-of-type
+{
+    margin-bottom: 0;
+}
+
+#login .signup-or
+{
+    display:inline-block;
+    width: 200px;
+    margin: 0 -102px 20px -102px;
+    vertical-align: middle;
+    padding-top:100px;
+}
+
+#register form
+{
+    max-width: 600px;
+    margin:0 auto;
+    padding-top: 100px;
+}
+
+#login form
+{
+    margin:0 -2px;
+    padding: 100px 2px 0 140px;
+    display:inline-block;
+    width:50%;
+    vertical-align: middle;
+}
+
+#account .social-login label span,
+#account .type label span,
+#account .password label span,
+#account .new-password label span,
+#account .confirm-password label span,
+#account .email label span,
+#account .first-name label span,
+#account .last-name label span
+{
+    width:100%;
+    display:inline-block;
+    margin-right:-50%;
+    padding-right:50%;
+}
+
+#account .social-login label input,
+#account .password label input,
+#account .new-password label input,
+#account .confirm-password label input,
+#account .email label input,
+#account .first-name label input,
+#account .last-name label input
+{
+    width:50%;
+    display:inline-block;
+    margin:0 -4px;
+}
+
+#register .first-name,
+#register .last-name
+{
+    margin: 0 -2px;
+    padding-right: 2px;
+    width: 50%;
+    max-width: 300px;
+    display:inline-block;
+}
+
+#register .first-name label,
+#register .last-name label
+{
+    margin-bottom:0;
+}
+
+#register .last-name
+{
+    padding-right:0;
+    padding-left:2px;
+}
+
+#register .email,
+#register .password,
+#login .email,
+#login .password
+{
+    width: auto;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+#account .password,
+#account .new-password,
+#account .confirm-password
+{
+    visibility:hidden;
+}
+
+#account .highlighted-link
+{
+    margin-top: 20px;
+}
+
+#account .edit-icons
+{
+    text-align: left;
+}
+
+#account .highlighted-link > *,
+#account .edit-icons > *
+{
+    vertical-align: bottom;
+}
+
+#account a[href*="/reset"],
+#account a[href="#edit-password"],
+#account a[href="#edit-account"],
+#account a[href="#cancel-confirm"]
+{
+    display:inline-block;
+    margin-right:40px;
+    text-align: center;
+}
+
+#account [value="#save-account"]
+{
+    display: none;
+}
+
+#login .form-actions .error,
+#register .form-actions .error,
+#account .form-actions .error,
+#account .invalid-only,
+#login .invalid-only,
+#register .invalid-only
+{
+    clear: both;
+    position: relative;
+    padding: 2px 3px;
+    border: 2px solid #CC0000;
+    color:#660000;
+    border-radius: 5px;
+}
+
+#login .invalid-only,
+#account .invalid-only,
+#register .invalid-only
+{
+    display:none;
+}
+
+#login.invalid-only .invalid-only,
+#account.invalid-only .invalid-only,
+#register.invalid-only .invalid-only
+{
+    display:inline-block;
+}
+
+#account.invalid-only.password-required .password input,
+#account.invalid-only.new-password-required .new-password input,
+#account.invalid-only.first-required .first-name input,
+#account.invalid-only.last-required .last-name input,
+#account.invalid-only.email-required .email input,
+#account.invalid-only.confirm-required .confirm-password input,
+#login.invalid-only.email-required .email input,
+#login.invalid-only.password-required .password input,
+#register.invalid-only.first-required .first-name input,
+#register.invalid-only.last-required .last-name input,
+#register.invalid-only.email-required .email input,
+#register.invalid-only.password-required .password input
+{
+    border-bottom:3px solid #CC0000;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#register .form-actions a[href*="/logout"],
+#login .form-actions a[href*="/logout"] {
+    max-width: 280px;
+    float:left;
+    text-align: center;
+}
+
+#login .form-actions a[href*="/reset"] {
+    position:absolute;
+    left:10px;
+    bottom:10px;
+}
+
+#reset.reset-sent form,
+#reset .reset-sent-message
+{
+    display:none;
+}
+
+#reset.reset-sent .reset-sent-message
+{
+    display:block;
+}
+
+@media all and (max-width: 1000px)
+{
+
+    #login .social-login a
+    {
+        margin-right:auto;
+    }
+
+    #login form,
+    #login .signup-or,
+    #login .social-login {
+        display: block;
+        width: auto;
+        padding: 40px 0 0;
+    }
+
+}
+
+@media all and (max-width: 700px)
+{
+
+    #account a[href*="/premium"]
+    {
+        display:block;
+        margin: 10px auto;
+        max-width: 130px;
+    }
+
+    #register form
+    {
+        padding-top: 40px;
+    }
+
+    #register .first-name, #register .last-name
+    {
+        margin:0;
+        width:100%;
+        padding:0;
+        max-width: none;
+    }
+
+    #account .social-login label span,
+    #account .password label span,
+    #account .new-password label span,
+    #account .confirm-password label span,
+    #account .email label span,
+    #account .first-name label span,
+    #account .last-name label span
+    {
+        display:block;
+        width:auto;
+        padding:0;
+        margin: 0;
+    }
+
+    #account .password label input,
+    #account .new-password label input,
+    #account .confirm-password label input,
+    #account .email label input,
+    #account .first-name label input,
+    #account .last-name label input
+    {
+        width:100%;
+        margin: 0;
+    }
+}
+
+

@@ -1,0 +1,35 @@
+# Codeception Test Suite Configuration
+
+# suite for acceptance tests.
+# perform tests in browser using the WebDriver or PhpBrowser.
+# If you need both WebDriver and PHPBrowser tests - create a separate suite.
+
+class_name: AcceptanceTester
+modules:
+    enabled:
+#        - PhpBrowser
+        - AcceptanceHelper
+        - WebDriver
+        - Symfony2
+        - Filesystem
+        - Asserts
+#        - Doctrine2
+    config:
+#        PhpBrowser:
+#            url: 'http://localhost/myapp/'
+        WebDriver:
+            window_size: 1280x1024
+            url: 'http://localhost/Symfony/web/app_dev.php/'
+            browser: 'chrome'
+            wait: 0
+            host: 71.36.230.3
+            clear_cookies: false
+            capabilities:
+                chromeOptions:
+                    args: ["--mute-audio"]
+                webStorageEnabled: true
+                phantomjs.page.settings.userAgent: "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36"
+        Symfony2:
+            app_path: '../../../app'
+            var_path: '../../../app'
+            environment: 'dev'

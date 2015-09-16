@@ -1,0 +1,126 @@
+.landing-home .features h1
+{
+    margin-top:30px;
+}
+
+.features
+{
+    background-color: #fff;
+}
+
+.features .two-column-guide .grid_6
+{
+    width: 50%;
+    margin: 0 -2px;
+    display:inline-block;
+    vertical-align: top;
+    padding:0 20px;
+}
+
+.features .two-column-guide .grid_6 div
+{
+    padding-left: 72px;
+    position: relative;
+}
+
+.features .two-column-guide .grid_6 h3
+{
+    min-height: 72px;
+    margin-bottom: -40px;
+    padding-bottom: 50px;
+    margin-left: -72px;
+    padding-left: 72px;
+    background: url(../images/tips_icons_64.png) no-repeat left top transparent;
+}
+
+.features .two-column-guide
+{
+    margin:0 auto;
+    max-width: 960px;
+    padding: 0 20px;
+}
+
+.features .two-column-guide .grid_6:nth-of-type(1) div:nth-of-type(1) h3
+{
+    background-position: left -3722px;
+}
+
+.features .two-column-guide .grid_6:nth-of-type(1) div:nth-of-type(2) h3
+{
+    background-position: left -772px;
+}
+
+.features .two-column-guide .grid_6:nth-of-type(1) div:nth-of-type(3) h3
+{
+    background-position: left -1412px;
+}
+
+.features .two-column-guide .grid_6:nth-of-type(2) div:nth-of-type(1) h3
+{
+    background-position: left -3584px;
+}
+
+.features .two-column-guide .grid_6:nth-of-type(2) div:nth-of-type(2) h3
+{
+    background-position: left -3333px;
+}
+
+.features .two-column-guide .grid_6:nth-of-type(2) div:nth-of-type(3) h3
+{
+    background-position: left -3080px;
+}
+
+.support-box
+{
+    padding: 40px 20px;
+    text-align: center;
+    clear: both;
+    display: block;
+    background-color: #fff;
+}
+
+.support-box a
+{
+    display: inline-block;
+    text-align: center;
+}
+
+.support-box h3
+{
+    margin: 0 auto;
+    max-width: 960px;
+    text-align: center;
+}
+
+.support-box h3 img
+{
+    margin-top: -10px;
+    margin-right: 10px;
+    float: left;
+    display: inline-block;
+}
+
+.support-box > .highlighted-link
+{
+    margin: 0 auto;
+    max-width: 960px;
+}
+
+@media all and (max-width: 700px)
+{
+    .features .two-column-guide .grid_6
+    {
+        width:auto;
+        display:block;
+    }
+
+    .features .two-column-guide
+    {
+        padding:0 10px;
+    }
+
+    .features .two-column-guide .grid_6
+    {
+        padding: 0;
+    }
+}

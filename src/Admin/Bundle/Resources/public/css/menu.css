@@ -1,0 +1,75 @@
+
+#right-panel .main-menu a[href*="/command"] span
+{
+    background-position: left -4905px;
+}
+
+#right-panel .main-menu a[href*="/command"]:hover span,
+#right-panel .main-menu a[href*="/command"]:focus span,
+#right-panel .main-menu a[href*="/command"]:active span,
+#right-panel .main-menu a[href*="/command"].active span {
+    background-position: left -5005px;
+}
+
+#right-panel .main-menu a[href*="/emails"] span
+{
+    background-position: left -8205px;
+}
+
+#right-panel .main-menu a[href*="/emails"]:hover span,
+#right-panel .main-menu a[href*="/emails"]:focus span,
+#right-panel .main-menu a[href*="/emails"]:active span,
+#right-panel .main-menu a[href*="/emails"].active span {
+    background-position: left -8305px;
+}
+
+#right-panel .main-menu a[href*="/activity"] span {
+    background-position: left -1205px;
+}
+
+#right-panel .main-menu a[href*="/activity"]:hover span,
+#right-panel .main-menu a[href*="/activity"]:focus span,
+#right-panel .main-menu a[href*="/activity"]:active span,
+#right-panel .main-menu a[href*="/activity"].active span {
+    background-position: left -1305px;
+}
+
+#right-panel .main-menu a[href*="/results"] span {
+    background-position: left -805px;
+}
+
+#right-panel .main-menu a[href*="/results"]:hover span,
+#right-panel .main-menu a[href*="/results"]:focus span,
+#right-panel .main-menu a[href*="/results"]:active span,
+#right-panel .main-menu a[href*="/results"].active span {
+    background-position: left -905px;
+}
+
+@media all and (max-width: 700px ) {
+
+    #right-panel .main-menu a[href*="/command"] span
+    {
+        background-position: left -5605px;
+    }
+
+    #right-panel .main-menu a[href*="/emails"] span
+    {
+        background-position: left -9405px;
+    }
+
+    #right-panel .main-menu a[href*="/validation"] span
+    {
+        background-position: left -5705px;
+    }
+
+    #right-panel .main-menu a[href*="/activity"] span
+    {
+        background-position: left -6005px;
+    }
+
+    #right-panel .main-menu a[href*="/results"] span
+    {
+        background-position: left -5805px;
+    }
+
+}

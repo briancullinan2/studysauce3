@@ -1,0 +1,92 @@
+.footer
+{
+    background: none;
+    color: #EEEEEE;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px 0;
+    position: static;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.landing-home .footer
+{
+    background: url(../images/noise_darkgray.png) repeat top left #111111;
+}
+
+.footer > *
+{
+    vertical-align: middle;
+}
+
+.footer ul.menu
+{
+    margin: 0;
+    padding: 0 10px;
+    display: inline;
+}
+
+.footer ul.menu li
+{
+    display: inline;
+    list-style-type: none;
+    margin: 0;
+    padding: 0 5px;
+    white-space: nowrap;
+}
+
+.footer li a
+{
+    color: #EEEEEE;
+}
+
+.footer li a:hover,
+.footer li a:focus,
+.footer li a:active
+{
+    color: #FFFFFF;
+}
+
+.footer .facebook-like
+{
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+}
+
+.footer a[href*="facebook"],
+.footer a[href*="google"],
+.footer a[href*="twitter"]
+{
+    background: url(../images/social_sprites_v2.png) no-repeat 0 0 transparent;
+    background-size: 25px auto;
+    height: 27px;
+    width: 27px;
+    display: inline-block;
+    line-height: 35px;
+    vertical-align: top;
+}
+
+.footer a[href*="google"]
+{
+    background-position: 0 -52px;
+}
+
+.footer a[href*="twitter"] {
+    background-position: 0 -105px;
+}
+
+.footer iframe
+{
+    border:none;
+    overflow:hidden;
+    vertical-align: middle;
+    margin-top:1px;
+}

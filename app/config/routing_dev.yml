@@ -1,0 +1,11 @@
+_main:
+    resource: routing.yml
+
+
+# AcmeDemoBundle routes (to be removed)
+#_acme_demo:
+#    resource: "@AcmeDemoBundle/Resources/config/routing.php"
+
+#hwi_oauth_redirect:
+#    resource: "@HWIOAuthBundle/Resources/config/routing/connect.xml"
+#    prefix:   /connect

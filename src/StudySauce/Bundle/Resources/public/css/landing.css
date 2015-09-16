@@ -1,0 +1,288 @@
+
+.landing-home.partners .price-wrapper h1
+{
+    max-width: 1100px;
+    margin:0 auto;
+    color: #f90;
+}
+
+.landing-home.partners .price-wrapper
+{
+    padding: 40px 0 0;
+}
+
+.landing-home.partners .features-content
+{
+    max-width: 1100px;
+    margin:40px auto 0;
+}
+
+.landing-home.partners .feature-block.first-block,
+.landing-home.partners .middle-block-wrapper,
+.landing-home.partners .feature-block.third-block
+{
+    display: inline-block;
+    vertical-align: bottom;
+    width: 30%;
+    margin: 0 -3px;
+}
+
+.landing-home.partners .middle-block-wrapper
+{
+    width:40%;
+    padding: 0 3px;
+}
+
+.landing-home.partners .feature-block
+{
+    position: relative;
+    background: url("../images/noise.png") repeat scroll 0 0 #888;
+    color: #FFFFFF;
+}
+
+.landing-home.partners .feature-block.second-block
+{
+    margin:0 18px;
+    padding-bottom:100px;
+}
+
+.landing-home.partners .feature-block .feature-image-container
+{
+    margin: 0 auto;
+    width: 100%;
+    height: 96px;
+    position: relative;
+}
+
+.landing-home.partners .feature-block .feature-image
+{
+    width: auto;
+    height: 96px;
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: 50% 0;
+    margin:10px;
+}
+
+.landing-home.partners .feature-block.second-block .feature-image
+{
+    background-image: url(../images/dashboard.png);
+}
+
+.landing-home.partners .feature-block.first-block .feature-image
+{
+    background-image: url(../images/incentives.png);
+}
+
+.landing-home.partners .feature-block.third-block .feature-image
+{
+    background-image: url(../images/plan_background.png);
+}
+
+.landing-home.partners .feature-block ul
+{
+    list-style: none;
+    margin:0;
+    padding:15px;
+}
+
+.landing-home.partners .feature-block li
+{
+    list-style: none;
+    margin: 15px 0;
+    padding: 0;
+    text-align: left;
+}
+
+.landing-home.partners .feature-block h2
+{
+    color: #ffffff;
+    border-bottom: 4px solid #555;
+    padding:10px;
+    margin:0;
+    text-align: center;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+.landing-home.partners .second-block a.features-cta
+{
+    padding: 8px;
+    width: auto;
+    position: absolute;
+    bottom: 25px;
+    left: -15px;
+    display: block;
+    background-color: #FF9900;
+    color: #333333;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    right: -15px;
+}
+
+.landing-home.partners .second-block a.features-cta:hover
+{
+    background-color: #EF7E00;
+}
+
+.landing-home.partners .second-block a.features-cta:before
+{
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: -15px;
+    left: 0;
+    border-bottom: 15px solid #993300;
+    border-left: 15px solid transparent;
+    border-right: 0 solid transparent;
+    content: "";
+}
+
+.landing-home.partners .second-block a.features-cta:after
+{
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: -15px;
+    right: 0;
+    border-bottom: 15px solid #993300;
+    border-left: 0 solid transparent;
+    border-right: 15px solid transparent;
+    content: "";
+}
+
+.landing-home .did-you-know h2
+{
+    padding-left:260px;
+    margin-top:0;
+}
+
+.landing-home .did-you-know .two,
+.landing-home .did-you-know .one {
+    display:inline-block;
+    vertical-align: top;
+    text-align: left;
+}
+
+.landing-home .did-you-know .one {
+    margin-left:-170px;
+    padding-left:220px;
+    width: 60%;
+}
+
+.landing-home .did-you-know .two {
+    padding-left:20px;
+    width: 40%;
+}
+
+.landing-home .did-you-know .two h3,
+.landing-home .did-you-know .one h3 {
+    padding-left:50px;
+    position: relative;
+    text-align: left;
+}
+
+.landing-home .did-you-know .two h3 span,
+.landing-home .did-you-know .one h3 span {
+    position: absolute;
+    top:0;
+    left:0;
+    font-size: 56px;
+}
+
+.landing-home .did-you-know .two .more,
+.landing-home .did-you-know .one .more {
+    margin-left:50px;
+}
+
+.landing-home .did-you-know
+{
+    box-shadow: 0 -10px 10px rgba(0,0,0,.5);
+    background: url("../images/noise_white.png") repeat scroll 0 0 #ffffff;
+    padding:30px 0 50px 0;
+    text-align: center;
+}
+
+.landing-home .did-you-know > div
+{
+    max-width: 900px;
+    margin:0 auto;
+    padding:0;
+}
+
+.landing-home .did-you-know p.small,
+.landing-home .did-you-know h1
+{
+    padding:0 0 20px 190px;
+}
+
+.landing-home .did-you-know small
+{
+    display:inline-block;
+    padding-top:15px;
+}
+
+.landing-home .did-you-know img {
+    float: left;
+    margin: 70px 0;
+}
+
+@media all and (max-width: 800px)
+{
+    .landing-home .did-you-know img
+    {
+        margin:100px 0;
+    }
+}
+
+@media all and (max-width: 700px)
+{
+    .landing-home .did-you-know img
+    {
+        display:none;
+    }
+
+    .landing-home .did-you-know h2
+    {
+        padding-left:0;
+    }
+
+    .landing-home .did-you-know > div
+    {
+        padding:0 10px;
+    }
+
+    .landing-home .did-you-know .one,
+    .landing-home .did-you-know .two
+    {
+        margin:0 -2px;
+        padding: 0 2px;
+        width: 50%;
+    }
+
+}
+
+@media all and (max-width: 600px)
+{
+
+    .landing-home .did-you-know .one,
+    .landing-home .did-you-know .two
+    {
+        margin:0;
+        padding:0;
+        width: 100%;
+    }
+
+    .landing-home .did-you-know div:nth-of-type(2)
+    {
+        position:relative;
+        top:55px;
+    }
+
+    .landing-home .did-you-know div:nth-of-type(3)
+    {
+        position:relative;
+        top:-50px;
+    }
+}

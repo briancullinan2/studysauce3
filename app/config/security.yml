@@ -1,0 +1,105 @@
+security:
+    access_denied_url: /denied
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+        FOS\UserBundle\Model\UserInterface: sha512
+        drupal_encoder:
+            id: studysauce.drupal_encoder
+
+    role_hierarchy:
+        ROLE_GUEST:       [ROLE_GUEST]
+        ROLE_ADMIN:       [ROLE_ADMIN, ROLE_USER]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username_email
+
+    firewalls:
+        main:
+            pattern: ^/
+            form_login:
+                username_parameter: "email"
+                password_parameter: "pass"
+                intention: "account_login"
+                csrf_parameter: "csrf_token"
+                provider: fos_userbundle
+                csrf_provider: form.csrf_provider
+                remember_me: true
+                failure_path: "/login"
+                login_path: "/login"
+                check_path: "/authenticate"
+                default_target_path: /home
+            logout:
+                path: /logout
+                target: /
+                invalidate_session: true
+                delete_cookies: [PHPSESSID, REMEMBERME]
+            anonymous:    true
+            remember_me:
+                key:      "%kernel.secret%"
+                lifetime: 31536000 # 365 days in seconds
+                path:     /
+                domain:   ~ # Defaults to the current domain from $_SERVER
+                always_remember_me: true
+                user_provider: fos_userbundle
+            oauth:
+                remember_me: true
+                resource_owners:
+                    facebook:           "/login/facebook/"
+                    google:             "/login/google/"
+                    evernote:           "/login/evernote/"
+                    gcal:               "/login/gcal/"
+                login_path:        /login
+                use_forward:       false
+                failure_path:      /login
+                default_target_path: /home
+                provider: fos_userbundle
+                oauth_user_provider:
+                    service: my_user_provider
+            switch_user: { role: ROLE_ADMIN, parameter: _switch_user }
+
+    access_control:
+        # anonymous pages
+        - { path: ^$,                       roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/$,                      roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/signup,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/denied,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/_visit,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/_fragment,              roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/refund,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/about,                  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/contact,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/privacy,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/terms,                  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/checkout,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/thanks,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/cron,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        # landing pages
+        - { path: ^/parents,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/students,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/partners,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/scholars,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/torchandlaurel,         roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/torchandlaurelparents,  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        # authentication pages
+        - { path: ^/plan/pdf/,              roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/redirect,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/connect,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/logout,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/authenticate,           roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/login,                  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/register,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/account/create,         roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/torchandlaurelregister, roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/reset,                  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        # protected pages
+        - { path: ^/userlist,               roles: [ROLE_MASTER_ADVISER, ROLE_ADVISER, ROLE_PARTNER] }
+        - { path: ^/import,                 roles: [ROLE_MASTER_ADVISER, ROLE_ADVISER, ROLE_PARTNER, ROLE_ADMIN] }
+        - { path: ^/command,                role: ROLE_ADMIN }
+        - { path: ^/emails,                 role: ROLE_ADMIN }
+        - { path: ^/validation,             role: ROLE_ADMIN }
+        - { path: ^/activity,               role: ROLE_ADMIN }
+        - { path: ^/home,                   role: ROLE_USER }
+        - { path: ^/,                       allow_if: "!has_role('ROLE_GUEST')" }
+        #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }

@@ -1,0 +1,82 @@
+#about a[href*="facebook"],
+#about a[href*="google"],
+#about a[href*="twitter"]
+{
+    background:url(../images/social_sprites_v2.png) no-repeat 0 0 transparent;
+    height:45px;
+    width:45px;
+    display:inline-block;
+    line-height: 55px;
+}
+
+#about a[href*="google"]
+{
+    background-position:0 -95px;
+}
+
+#about a[href*="twitter"]
+{
+    background-position:0 -190px;
+}
+
+#about a[href*="contact"]
+{
+    background-position:0 -381px;
+}
+
+#contact .centrify
+{
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+#about img {
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: auto;
+    height: 100%;
+    margin-right: -15%;
+    display: block;
+    max-width: none;
+    left: auto;
+}
+
+#about .rightify
+{
+    padding-left:50%;
+}
+
+#about .rightify > *
+{
+    text-align: center;
+}
+
+#about .rightify > p
+{
+    text-align: left;
+}
+
+@media all and (min-width:1600px)
+{
+    #about img
+    {
+        left:0;
+    }
+}
+
+@media all and (max-width:900px)
+{
+    #about img
+    {
+        display:none;
+    }
+
+    #about .rightify
+    {
+        display:block;
+        width:auto;
+        padding-left:0;
+
+    }
+}

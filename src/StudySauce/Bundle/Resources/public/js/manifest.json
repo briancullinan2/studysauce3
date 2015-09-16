@@ -1,0 +1,11 @@
+{
+    "name": "StudySauce",
+    "icons": [
+        {
+            "src": "/bundles/studysauce/images/studysauce-icon-300x300.png",
+            "sizes": "300x300",
+            "type": "image/png",
+            "density": "0.75"
+        }
+    ]
+}

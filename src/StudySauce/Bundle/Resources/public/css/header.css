@@ -1,0 +1,231 @@
+
+
+.header-wrapper
+{
+    position: fixed;
+    width: 100%;
+    left: 0;
+    z-index: 2000;
+    height: 50px;
+    top: 0;
+    white-space: nowrap;
+    border: none;
+    vertical-align: top;
+    margin-bottom:0;
+    border-radius: 0;
+    background: #0099BB;
+}
+
+.header-wrapper,
+#site-name a,
+#partner-message a
+{
+    color: #FFFFFF;
+}
+
+#site-name
+{
+    font-family: 'Ubuntu',Arial,sans-serif;
+    width: 50%;
+    display: inline-block;
+    clear: left;
+    text-align: left;
+    padding-left: 240px;
+    vertical-align: top;
+}
+
+#site-name a
+{
+    padding: 0;
+    display: inline-block;
+}
+
+#site-name a > span
+{
+    font-size: 42px;
+    line-height: 110%;
+    display:inline-block;
+    white-space: normal;
+}
+
+#site-name a > *
+{
+    vertical-align: top;
+}
+
+#site-name img
+{
+    width: 65px;
+    margin: 0 5px;
+    max-height: 48px;
+    max-width: 48px;
+}
+
+#partner-message
+{
+    margin:0 auto;
+    display: inline-block;
+    text-align: center;
+    position:absolute;
+    vertical-align: middle;
+}
+
+#partner-message a.more
+{
+    color:#222222;
+    text-decoration: none;
+    font-size: 16px;
+    padding:10px 15px;
+    margin-top:2px;
+}
+
+#partner-message > *
+{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+#partner-message img
+{
+    background-color: #EEEEEE;
+    min-height: 48px;
+}
+
+#partner-message > div.partner-icon
+{
+    border-radius: 100%;
+    overflow:hidden;
+    position:relative;
+    height:48px;
+    width:48px;
+}
+
+#partner-message a
+{
+    display: inline-block;
+    text-decoration: underline;
+}
+
+#welcome-message
+{
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+    left: auto;
+    padding-right: 240px;
+    vertical-align: middle;
+    line-height: 50px;
+}
+
+#welcome-message > * {
+    vertical-align: middle;
+}
+
+.header-wrapper a[href$="/logout"] {
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    background: url(../images/menu_new_compressed.png) no-repeat -10px -2810px;
+    overflow: hidden;
+    color: transparent;
+    margin-left: 10px;
+}
+
+@media all and (max-width:1300px)
+{
+    #site-name
+    {
+        padding-left:20px;
+    }
+
+    #welcome-message
+    {
+        padding-right:20px;
+    }
+
+    .header
+    {
+        margin:0 auto;
+        max-width: 900px;
+    }
+}
+
+@media all and (max-width: 1000px)
+{
+    #site-name
+    {
+        padding-left:60px;
+    }
+
+    #welcome-message
+    {
+        padding-right:60px;
+    }
+
+    #partner-message
+    {
+        display:none;
+    }
+}
+
+@media all and (max-width: 700px)
+{
+    #site-name
+    {
+        padding-left:40px;
+        padding-right:40px;
+        width:auto;
+        display:block;
+        text-align: center;
+    }
+
+    #welcome-message
+    {
+        display:none;
+    }
+
+    #partner-message
+    {
+        display:none;
+    }
+
+    #site-name a
+    {
+    }
+
+    #site-name img
+    {
+        max-height: 48px;
+        max-width: 48px;
+    }
+
+    .header-wrapper
+    {
+        height: 50px;
+        left:0;
+        transition: left linear .15s;
+    }
+
+    body.left-menu .header-wrapper
+    {
+        left:220px;
+    }
+
+    body.right-menu .header-wrapper
+    {
+        left:-220px;
+    }
+}
+
+@media all and (max-width: 500px) {
+
+    #site-name a > span
+    {
+        font-size: 38px;
+    }
+
+    #site-name img
+    {
+        display:none;
+    }
+}
