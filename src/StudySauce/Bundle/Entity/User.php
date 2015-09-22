@@ -2,16 +2,14 @@
 
 namespace StudySauce\Bundle\Entity;
 
-use Course1\Bundle\Course1Bundle;
-use Course1\Bundle\Entity\Course1;
-use Course2\Bundle\Course2Bundle;
-use Course2\Bundle\Entity\Course2;
-use Course3\Bundle\Course3Bundle;
-use Course3\Bundle\Entity\Course3;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\GroupInterface;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
+use StudySauce\Bundle\Entity\Deadline;
+use StudySauce\Bundle\Entity\File;
+use StudySauce\Bundle\Entity\Payment;
+use StudySauce\Bundle\Entity\Visit;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 
 /**
@@ -197,11 +195,11 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * @return PartnerInvite|User
+     * @return Invite|User
      */
     public function getPartnerOrAdviser()
     {
-        /** @var PartnerInvite $partner */
+        /** @var Invite $partner */
         $partner = $this->getPartnerInvites()->first();
         $advisers = array_values($this->getGroups()
                 ->map(function (Group $g) {return $g->getUsers()->filter(function (User $u) {
@@ -473,45 +471,12 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * Add schedules
-     *
-     * @param \StudySauce\Bundle\Entity\Schedule $schedules
-     * @return User
-     */
-    public function addSchedule(\StudySauce\Bundle\Entity\Schedule $schedules)
-    {
-        $this->schedules = new ArrayCollection(array_merge([$schedules], $this->schedules->toArray()));
-
-        return $this;
-    }
-
-    /**
-     * Remove schedules
-     *
-     * @param \StudySauce\Bundle\Entity\Schedule $schedules
-     */
-    public function removeSchedule(\StudySauce\Bundle\Entity\Schedule $schedules)
-    {
-        $this->schedules->removeElement($schedules);
-    }
-
-    /**
-     * Get schedules
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getSchedules()
-    {
-        return $this->schedules;
-    }
-
-    /**
      * Add payments
      *
-     * @param \StudySauce\Bundle\Entity\Payment $payments
+     * @param Payment $payments
      * @return User
      */
-    public function addPayment(\StudySauce\Bundle\Entity\Payment $payments)
+    public function addPayment(Payment $payments)
     {
         $this->payments[] = $payments;
 
@@ -521,9 +486,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove payments
      *
-     * @param \StudySauce\Bundle\Entity\Payment $payments
+     * @param Payment $payments
      */
-    public function removePayment(\StudySauce\Bundle\Entity\Payment $payments)
+    public function removePayment(Payment $payments)
     {
         $this->payments->removeElement($payments);
     }
@@ -541,10 +506,10 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Add visits
      *
-     * @param \StudySauce\Bundle\Entity\Visit $visits
+     * @param Visit $visits
      * @return User
      */
-    public function addVisit(\StudySauce\Bundle\Entity\Visit $visits)
+    public function addVisit(Visit $visits)
     {
         $this->visits[] = $visits;
 
@@ -554,9 +519,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove visits
      *
-     * @param \StudySauce\Bundle\Entity\Visit $visits
+     * @param Visit $visits
      */
-    public function removeVisit(\StudySauce\Bundle\Entity\Visit $visits)
+    public function removeVisit(Visit $visits)
     {
         $this->visits->removeElement($visits);
     }
@@ -572,177 +537,12 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * Add goals
-     *
-     * @param \StudySauce\Bundle\Entity\Goal $goals
-     * @return User
-     */
-    public function addGoal(\StudySauce\Bundle\Entity\Goal $goals)
-    {
-        $this->goals[] = $goals;
-
-        return $this;
-    }
-
-    /**
-     * Remove goals
-     *
-     * @param \StudySauce\Bundle\Entity\Goal $goals
-     */
-    public function removeGoal(\StudySauce\Bundle\Entity\Goal $goals)
-    {
-        $this->goals->removeElement($goals);
-    }
-
-    /**
-     * Get goals
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getGoals()
-    {
-        return $this->goals;
-    }
-
-    /**
-     * Add deadlines
-     *
-     * @param \StudySauce\Bundle\Entity\Deadline $deadlines
-     * @return User
-     */
-    public function addDeadline(\StudySauce\Bundle\Entity\Deadline $deadlines)
-    {
-        $this->deadlines[] = $deadlines;
-
-        return $this;
-    }
-
-    /**
-     * Remove deadlines
-     *
-     * @param \StudySauce\Bundle\Entity\Deadline $deadlines
-     */
-    public function removeDeadline(\StudySauce\Bundle\Entity\Deadline $deadlines)
-    {
-        $this->deadlines->removeElement($deadlines);
-    }
-
-    /**
-     * Get deadlines
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getDeadlines()
-    {
-        return $this->deadlines;
-    }
-
-    /**
-     * Add partnerInvites
-     *
-     * @param \StudySauce\Bundle\Entity\PartnerInvite $partnerInvites
-     * @return User
-     */
-    public function addPartnerInvite(\StudySauce\Bundle\Entity\PartnerInvite $partnerInvites)
-    {
-        $this->partnerInvites[] = $partnerInvites;
-
-        return $this;
-    }
-
-    /**
-     * Remove partnerInvites
-     *
-     * @param \StudySauce\Bundle\Entity\PartnerInvite $partnerInvites
-     */
-    public function removePartnerInvite(\StudySauce\Bundle\Entity\PartnerInvite $partnerInvites)
-    {
-        $this->partnerInvites->removeElement($partnerInvites);
-    }
-
-    /**
-     * Get partnerInvites
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getPartnerInvites()
-    {
-        return $this->partnerInvites;
-    }
-
-    /**
-     * Add parentInvites
-     *
-     * @param \StudySauce\Bundle\Entity\ParentInvite $parentInvites
-     * @return User
-     */
-    public function addParentInvite(\StudySauce\Bundle\Entity\ParentInvite $parentInvites)
-    {
-        $this->parentInvites[] = $parentInvites;
-
-        return $this;
-    }
-
-    /**
-     * Remove parentInvites
-     *
-     * @param \StudySauce\Bundle\Entity\ParentInvite $parentInvites
-     */
-    public function removeParentInvite(\StudySauce\Bundle\Entity\ParentInvite $parentInvites)
-    {
-        $this->parentInvites->removeElement($parentInvites);
-    }
-
-    /**
-     * Get parentInvites
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getParentInvites()
-    {
-        return $this->parentInvites;
-    }
-
-    /**
-     * Add studentInvites
-     *
-     * @param StudentInvite $studentInvites
-     * @return User
-     */
-    public function addStudentInvite(StudentInvite $studentInvites)
-    {
-        $this->studentInvites[] = $studentInvites;
-
-        return $this;
-    }
-
-    /**
-     * Remove studentInvites
-     *
-     * @param StudentInvite $studentInvites
-     */
-    public function removeStudentInvite(StudentInvite $studentInvites)
-    {
-        $this->studentInvites->removeElement($studentInvites);
-    }
-
-    /**
-     * Get studentInvites
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getStudentInvites()
-    {
-        return $this->studentInvites;
-    }
-
-    /**
      * Add files
      *
-     * @param \StudySauce\Bundle\Entity\File $files
+     * @param File $files
      * @return User
      */
-    public function addFile(\StudySauce\Bundle\Entity\File $files)
+    public function addFile(File $files)
     {
         $this->files[] = $files;
 
@@ -752,9 +552,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove files
      *
-     * @param \StudySauce\Bundle\Entity\File $files
+     * @param File $files
      */
-    public function removeFile(\StudySauce\Bundle\Entity\File $files)
+    public function removeFile(File $files)
     {
         $this->files->removeElement($files);
     }
@@ -770,45 +570,12 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * Add course1s
-     *
-     * @param \Course1\Bundle\Entity\Course1 $course1s
-     * @return User
-     */
-    public function addCourse1(\Course1\Bundle\Entity\Course1 $course1s)
-    {
-        $this->course1s[] = $course1s;
-
-        return $this;
-    }
-
-    /**
-     * Remove course1s
-     *
-     * @param \Course1\Bundle\Entity\Course1 $course1s
-     */
-    public function removeCourse1(\Course1\Bundle\Entity\Course1 $course1s)
-    {
-        $this->course1s->removeElement($course1s);
-    }
-
-    /**
-     * Get course1s
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCourse1s()
-    {
-        return $this->course1s;
-    }
-
-    /**
      * Set photo
      *
-     * @param \StudySauce\Bundle\Entity\File $photo
+     * @param File $photo
      * @return User
      */
-    public function setPhoto(\StudySauce\Bundle\Entity\File $photo = null)
+    public function setPhoto(File $photo = null)
     {
         $this->photo = $photo;
 
@@ -818,7 +585,7 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Get photo
      *
-     * @return \StudySauce\Bundle\Entity\File 
+     * @return File
      */
     public function getPhoto()
     {
@@ -856,270 +623,6 @@ class User extends BaseUser implements EncoderAwareInterface
     public function getGroups()
     {
         return $this->groups;
-    }
-
-    /**
-     * Add groupInvites
-     *
-     * @param \StudySauce\Bundle\Entity\GroupInvite $groupInvites
-     * @return User
-     */
-    public function addGroupInvite(\StudySauce\Bundle\Entity\GroupInvite $groupInvites)
-    {
-        $this->groupInvites[] = $groupInvites;
-
-        return $this;
-    }
-
-    /**
-     * Remove groupInvites
-     *
-     * @param \StudySauce\Bundle\Entity\GroupInvite $groupInvites
-     */
-    public function removeGroupInvite(\StudySauce\Bundle\Entity\GroupInvite $groupInvites)
-    {
-        $this->groupInvites->removeElement($groupInvites);
-    }
-
-    /**
-     * Get groupInvites
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getGroupInvites()
-    {
-        return $this->groupInvites;
-    }
-
-    /**
-     * Add invitedPartners
-     *
-     * @param \StudySauce\Bundle\Entity\PartnerInvite $invitedPartners
-     * @return User
-     */
-    public function addInvitedPartner(\StudySauce\Bundle\Entity\PartnerInvite $invitedPartners)
-    {
-        $this->invitedPartners[] = $invitedPartners;
-
-        return $this;
-    }
-
-    /**
-     * Remove invitedPartners
-     *
-     * @param \StudySauce\Bundle\Entity\PartnerInvite $invitedPartners
-     */
-    public function removeInvitedPartner(\StudySauce\Bundle\Entity\PartnerInvite $invitedPartners)
-    {
-        $this->invitedPartners->removeElement($invitedPartners);
-    }
-
-    /**
-     * Get invitedPartners
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getInvitedPartners()
-    {
-        return $this->invitedPartners;
-    }
-
-    /**
-     * Add invitedParents
-     *
-     * @param \StudySauce\Bundle\Entity\ParentInvite $invitedParents
-     * @return User
-     */
-    public function addInvitedParent(\StudySauce\Bundle\Entity\ParentInvite $invitedParents)
-    {
-        $this->invitedParents[] = $invitedParents;
-
-        return $this;
-    }
-
-    /**
-     * Remove invitedParents
-     *
-     * @param \StudySauce\Bundle\Entity\ParentInvite $invitedParents
-     */
-    public function removeInvitedParent(\StudySauce\Bundle\Entity\ParentInvite $invitedParents)
-    {
-        $this->invitedParents->removeElement($invitedParents);
-    }
-
-    /**
-     * Get invitedParents
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getInvitedParents()
-    {
-        return $this->invitedParents;
-    }
-
-    /**
-     * Add invitedStudents
-     *
-     * @param \StudySauce\Bundle\Entity\StudentInvite $invitedStudents
-     * @return User
-     */
-    public function addInvitedStudent(\StudySauce\Bundle\Entity\StudentInvite $invitedStudents)
-    {
-        $this->invitedStudents[] = $invitedStudents;
-
-        return $this;
-    }
-
-    /**
-     * Remove invitedStudents
-     *
-     * @param \StudySauce\Bundle\Entity\StudentInvite $invitedStudents
-     */
-    public function removeInvitedStudent(\StudySauce\Bundle\Entity\StudentInvite $invitedStudents)
-    {
-        $this->invitedStudents->removeElement($invitedStudents);
-    }
-
-    /**
-     * Get invitedStudents
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getInvitedStudents()
-    {
-        return $this->invitedStudents;
-    }
-
-    /**
-     * Add invitedGroups
-     *
-     * @param \StudySauce\Bundle\Entity\GroupInvite $invitedGroups
-     * @return User
-     */
-    public function addInvitedGroup(\StudySauce\Bundle\Entity\GroupInvite $invitedGroups)
-    {
-        $this->invitedGroups[] = $invitedGroups;
-
-        return $this;
-    }
-
-    /**
-     * Remove invitedGroups
-     *
-     * @param \StudySauce\Bundle\Entity\GroupInvite $invitedGroups
-     */
-    public function removeInvitedGroup(\StudySauce\Bundle\Entity\GroupInvite $invitedGroups)
-    {
-        $this->invitedGroups->removeElement($invitedGroups);
-    }
-
-    /**
-     * Get invitedGroups
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getInvitedGroups()
-    {
-        return $this->invitedGroups;
-    }
-
-    /**
-     * Add course2s
-     *
-     * @param \Course2\Bundle\Entity\Course2 $course2s
-     * @return User
-     */
-    public function addCourse2(\Course2\Bundle\Entity\Course2 $course2s)
-    {
-        $this->course2s[] = $course2s;
-
-        return $this;
-    }
-
-    /**
-     * Remove course2s
-     *
-     * @param \Course2\Bundle\Entity\Course2 $course2s
-     */
-    public function removeCourse2(\Course2\Bundle\Entity\Course2 $course2s)
-    {
-        $this->course2s->removeElement($course2s);
-    }
-
-    /**
-     * Get course2s
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCourse2s()
-    {
-        return $this->course2s;
-    }
-
-    /**
-     * Add course3s
-     *
-     * @param \Course3\Bundle\Entity\Course3 $course3s
-     * @return User
-     */
-    public function addCourse3(\Course3\Bundle\Entity\Course3 $course3s)
-    {
-        $this->course3s[] = $course3s;
-
-        return $this;
-    }
-
-    /**
-     * Remove course3s
-     *
-     * @param \Course3\Bundle\Entity\Course3 $course3s
-     */
-    public function removeCourse3(\Course3\Bundle\Entity\Course3 $course3s)
-    {
-        $this->course3s->removeElement($course3s);
-    }
-
-    /**
-     * Get course3s
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getCourse3s()
-    {
-        return $this->course3s;
-    }
-
-    /**
-     * Add messages
-     *
-     * @param \StudySauce\Bundle\Entity\ContactMessage $messages
-     * @return User
-     */
-    public function addMessage(\StudySauce\Bundle\Entity\ContactMessage $messages)
-    {
-        $this->messages[] = $messages;
-
-        return $this;
-    }
-
-    /**
-     * Remove messages
-     *
-     * @param \StudySauce\Bundle\Entity\ContactMessage $messages
-     */
-    public function removeMessage(\StudySauce\Bundle\Entity\ContactMessage $messages)
-    {
-        $this->messages->removeElement($messages);
-    }
-
-    /**
-     * Get messages
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getMessages()
-    {
-        return $this->messages;
     }
 
     /**
@@ -1166,39 +669,6 @@ class User extends BaseUser implements EncoderAwareInterface
     public function getEvernoteAccessToken()
     {
         return $this->evernote_access_token;
-    }
-
-    /**
-     * Add notes
-     *
-     * @param \StudySauce\Bundle\Entity\StudyNote $notes
-     * @return User
-     */
-    public function addNote(\StudySauce\Bundle\Entity\StudyNote $notes)
-    {
-        $this->notes[] = $notes;
-
-        return $this;
-    }
-
-    /**
-     * Remove notes
-     *
-     * @param \StudySauce\Bundle\Entity\StudyNote $notes
-     */
-    public function removeNote(\StudySauce\Bundle\Entity\StudyNote $notes)
-    {
-        $this->notes->removeElement($notes);
-    }
-
-    /**
-     * Get notes
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getNotes()
-    {
-        return $this->notes;
     }
 
     /**

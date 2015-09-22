@@ -9,7 +9,7 @@ $collection = new RouteCollection();
 $collection->add(
     'command_control',
     new Route(
-        '/cerego/{_format}',
+        '/cerebro/{_format}',
         ['_controller' => 'AdminBundle:Admin:index', '_format' => 'adviser'],
         ['_format' => DASHBOARD_VIEWS]
     )
@@ -18,7 +18,7 @@ $collection->add(
 $collection->add(
     'command_callback',
     new Route(
-        '/cerego/list',
+        '/cerebro/list',
         ['_controller' => 'AdminBundle:Admin:index', '_format' => 'tab'],
         [],
         [],
@@ -88,7 +88,7 @@ $collection->add(
 $collection->add(
     'remove_user',
     new Route(
-        '/cerego/remove/user',
+        '/cerebro/remove/user',
         ['_controller' => 'AdminBundle:Admin:removeUser', '_format' => 'tab'],
         [],
         [],
@@ -102,7 +102,7 @@ $collection->add(
 $collection->add(
     'cancel_user',
     new Route(
-        '/cerego/cancel/user',
+        '/cerebro/cancel/user',
         ['_controller' => 'AdminBundle:Admin:cancelUser', '_format' => 'tab'],
         [],
         [],
@@ -116,7 +116,7 @@ $collection->add(
 $collection->add(
     'save_user',
     new Route(
-        '/cerego/save/user',
+        '/cerebro/save/user',
         ['_controller' => 'AdminBundle:Admin:saveUser', '_format' => 'tab'],
         [],
         [],
@@ -130,7 +130,7 @@ $collection->add(
 $collection->add(
     'add_user',
     new Route(
-        '/cerego/add/user',
+        '/cerebro/add/user',
         ['_controller' => 'AdminBundle:Admin:addUser', '_format' => 'tab'],
         [],
         [],
@@ -144,7 +144,7 @@ $collection->add(
 $collection->add(
     'save_group',
     new Route(
-        '/cerego/save/group',
+        '/cerebro/save/group',
         ['_controller' => 'AdminBundle:Admin:saveGroup', '_format' => 'tab'],
         [],
         [],
@@ -158,7 +158,7 @@ $collection->add(
 $collection->add(
     'reset_user',
     new Route(
-        '/cerego/reset/user',
+        '/cerebro/reset/user',
         ['_controller' => 'AdminBundle:Admin:resetUser', '_format' => 'tab'],
         [],
         [],

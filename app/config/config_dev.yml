@@ -9,7 +9,7 @@ doctrine:
     dbal:
         driver:   "pdo_mysql"
         host:     "localhost"
-        dbname:   "studysauce"
+        dbname:   "studysauce3"
         user:     "study"
         password: "itekIO^#(1234"
 
