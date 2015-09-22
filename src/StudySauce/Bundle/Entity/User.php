@@ -46,12 +46,6 @@ class User extends BaseUser implements EncoderAwareInterface
     protected $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="Schedule", mappedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"term" = "DESC", "created" = "DESC"})
-     */
-    protected $schedules;
-
-    /**
      * @ORM\OneToMany(targetEntity="Payment", mappedBy="user")
      * @ORM\OrderBy({"created" = "DESC"})
      */
@@ -64,64 +58,22 @@ class User extends BaseUser implements EncoderAwareInterface
     protected $visits;
 
     /**
-     * @ORM\OneToMany(targetEntity="Goal", mappedBy="user", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Invite", mappedBy="user")
      * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $goals;
+    protected $invites;
 
     /**
-     * @ORM\OneToMany(targetEntity="Deadline", mappedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dueDate" = "ASC"})
-     */
-    protected $deadlines;
-
-    /**
-     * @ORM\OneToMany(targetEntity="PartnerInvite", mappedBy="user", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Invite", mappedBy="invitee")
      * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $partnerInvites;
+    protected $invitees;
 
     /**
-     * @ORM\OneToMany(targetEntity="ParentInvite", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="Pack", mappedBy="user")
      * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $parentInvites;
-
-    /**
-     * @ORM\OneToMany(targetEntity="StudentInvite", mappedBy="user")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $studentInvites;
-
-    /**
-     * @ORM\OneToMany(targetEntity="GroupInvite", mappedBy="user")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $groupInvites;
-
-    /**
-     * @ORM\OneToMany(targetEntity="PartnerInvite", mappedBy="partner")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $invitedPartners;
-
-    /**
-     * @ORM\OneToMany(targetEntity="ParentInvite", mappedBy="parent")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $invitedParents;
-
-    /**
-     * @ORM\OneToMany(targetEntity="StudentInvite", mappedBy="student")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $invitedStudents;
-
-    /**
-     * @ORM\OneToMany(targetEntity="GroupInvite", mappedBy="student")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $invitedGroups;
+    protected $packs;
 
     /**
      * @ORM\OneToMany(targetEntity="File", mappedBy="user")
@@ -130,34 +82,10 @@ class User extends BaseUser implements EncoderAwareInterface
     protected $files;
 
     /**
-     * @ORM\OneToMany(targetEntity="StudyNote", mappedBy="user", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Response", mappedBy="user")
      * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $notes;
-
-    /**
-     * @ORM\OneToMany(targetEntity="ContactMessage", mappedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $messages;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Course1\Bundle\Entity\Course1", mappedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $course1s;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Course2\Bundle\Entity\Course2", mappedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $course2s;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Course3\Bundle\Entity\Course3", mappedBy="user", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"created" = "DESC"})
-     */
-    protected $course3s;
+    protected $responses;
 
     /**
      * @ORM\Column(type="datetime", name="created")

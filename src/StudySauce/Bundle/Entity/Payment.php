@@ -25,9 +25,10 @@ class Payment
     protected $user;
 
     /**
-     * @ORM\Column(type="string", length=256, name="product")
+     * @ORM\ManyToOne(targetEntity="Pack", inversedBy="payments")
+     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id", nullable=true)
      */
-    protected $product;
+    protected $pack;
 
     /**
      * @ORM\Column(type="string", length=12, name="amount")
