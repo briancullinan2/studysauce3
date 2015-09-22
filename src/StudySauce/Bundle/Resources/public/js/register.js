@@ -134,21 +134,27 @@ jQuery(document).ready(function() {
         var account = jQuery('#reset');
         if(account.find('.form-actions').is('.invalid'))
             return;
+
+        account.find('.form-actions .error').remove();
         account.find('.form-actions').removeClass('valid').addClass('invalid');
         loadingAnimation($(this).find('[value="#reset-password"]'));
         jQuery.ajax({
             url:window.callbackPaths['password_reset'],
             type: 'POST',
-            dataType: 'text',
+            dataType: 'json',
             data: {
                 email: account.find('.email input').val().trim(),
                 token: account.find('input[name="token"]').val(),
                 newPass: account.find('.password input').val(),
                 csrf_token: account.find('input[name="csrf_token"]').val()
             },
-            success: function () {
+            success: function (data) {
                 account.find('.squiggle').stop().remove();
-                if(account.find('input[name="token"]').val() == '') {
+                account.find('input[name="csrf_token"]').val(data.csrf_token);
+                if(typeof data.error != 'undefined' && data.error != null) {
+                    account.find('.form-actions').prepend($('<span class="error">' + data.error + '</span>'));
+                }
+                else if (account.find('input[name="token"]').val() == '') {
                     account.addClass('reset-sent');
                 }
             },

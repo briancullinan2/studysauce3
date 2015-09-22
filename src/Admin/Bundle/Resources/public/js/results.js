@@ -10,11 +10,13 @@ $(document).ready(function () {
     function loadContent (data) {
         var admin = jQuery('#results'),
             content = $(data);
-        admin.find('table.results > tbody > tr').remove();
-        content.find('table.results > tbody > tr').appendTo(admin.find('table.results > tbody'));
-        admin.find('table.results > thead > tr > th').each(function (i) {
-            $(this).find('label:first-child > *:not(select):not(input)').remove();
-            content.find('.pane-content th').eq(i).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
+        admin.find('table.results').each(function (i) {
+            $(this).find('> tbody > tr').remove();
+            content.find('table.results').eq(i).find('> tbody > tr').appendTo($(this).find('> tbody'));
+            $(this).find('> thead > tr > th').each(function (j) {
+                $(this).find('label:first-child > *:not(select):not(input)').remove();
+                content.find('.pane-content th').eq(j).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
+            });
         });
         admin.find('#page-total').text(content.find('#page-total').text());
     }

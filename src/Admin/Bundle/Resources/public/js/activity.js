@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     var body = $('body'),
         processing = false,
-        timeLine;
+        timeLine, timelineInterval;
 
     body.on('click', 'a[href^="#search-"]', function (evt) {
         evt.preventDefault();
@@ -11,6 +11,7 @@ $(document).ready(function () {
     });
 
     body.on('show', '#activity', function () {
+        timelineInterval = setInterval(updateTimeline, 500);
         if($(this).is('.loaded'))
             return;
         $(this).addClass('loaded');
@@ -243,7 +244,10 @@ $(document).ready(function () {
             }
         })
     }
-    setInterval(updateTimeline, 500);
+
+    body.on('hide', '#activity', function () {
+        clearTimeout(timelineInterval);
+    });
 
     body.on('mouseover', '.vis.timeline .item.box', function () {
         $(this).addClass('related-hover');

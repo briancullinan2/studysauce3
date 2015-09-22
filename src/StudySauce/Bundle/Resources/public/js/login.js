@@ -48,6 +48,7 @@ jQuery(document).ready(function() {
             return;
         }
 
+        account.find('.form-actions .error').remove();
         account.find('.form-actions').removeClass('valid').addClass('invalid');
         loadingAnimation(account.find('[value="#user-login"]'));
 

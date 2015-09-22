@@ -14,6 +14,7 @@ use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -52,9 +53,7 @@ class InviteListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => ['onInviteAccept', 256],
-            KernelEvents::RESPONSE => ['onInviteResponse', -100],
-            SecurityEvents::INTERACTIVE_LOGIN => ['onLogin', -100],
+            KernelEvents::REQUEST => ['onInviteAccept', -100],
         ];
     }
 
@@ -115,19 +114,38 @@ class InviteListener implements EventSubscriberInterface
             if($user != null && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
                 self::setInviteRelationship($orm, $request, $user);
                 $userManager->updateUser($user);
+
+                // automatically log in user
+                $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+                $this->container->get('security.context')->setToken($token);
+                $session->set('_security_main',serialize($token));
+
+                $event->setResponse(new RedirectResponse($this->container->get('router')->generate('home')));
             }
-            /** @var SecurityContext $context */
-            $context = $this->container->get('security.context');
-            $context->setToken(null);
-            if(!empty($session))
-                $session->invalidate();
-            /** @var EncoderFactory $encoder_service */
-            $encoder_service = $this->container->get('security.encoder_factory');
-            /** @var PasswordEncoderInterface $encoder */
-            $user = $userManager->findUserByUsername('guest');
-            $encoder = $encoder_service->getEncoder($user);
-            $password = $encoder->encodePassword('guest', $user->getSalt());
-            $context->setToken(new UsernamePasswordToken($user, $password, 'main', $user->getRoles()));
+            // redirect back to page with a fresh session
+            elseif(null !== ($token = $this->container->get('security.context')->getToken()) && is_object($user = $token->getUser()) &&
+                !$user->hasRole('ROLE_GUEST')) {
+                // Logging user out.
+                $this->container->get('security.context')->setToken(null);
+                // Invalidating the session.
+                $request->getSession()->invalidate();
+                $response = new RedirectResponse($request->server->get('REQUEST_URI'));
+                // Clearing the cookies.
+                if (null !== $response) {
+                    foreach ([
+                                 'PHPSESSID',
+                                 'REMEMBERME',
+                             ] as $cookieName) {
+                        $response->headers->clearCookie($cookieName);
+                    }
+                }
+                $event->setResponse($response);
+            }
+            // just set up the session on guest or demo
+            else {
+                $setter = self::$autoLogoutUser[$request->get('_code')];
+                $setter($session);
+            }
         }
     }
 
@@ -250,49 +268,4 @@ class InviteListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param InteractiveLoginEvent $e
-     */
-    public function onLogin(InteractiveLoginEvent $e) {
-        return;
-        /** @var $orm EntityManager */
-        $orm = $this->container->get('doctrine')->getManager();
-        /** @var $request Request */
-        $request = $e->getRequest();
-        /** @var User $user */
-        $user = $e->getAuthenticationToken()->getUser();
-
-
-        if($user != null && !$user->hasRole('ROLE_GUEST')&& !$user->hasRole('ROLE_DEMO'))
-            self::setInviteRelationship($orm, $request, $user);
-
-    }
-
-
-    /**
-     * @param FilterResponseEvent $event
-     */
-    public function onInviteResponse(FilterResponseEvent $event)
-    {
-        /** @var Response $response */
-        $response = $event->getResponse();
-        /** @var Request $request */
-        $request = $event->getRequest();
-
-        if(isset(self::$autoLogoutUser[$request->get('_code')])) {
-            /** @var $userManager UserManager */
-            $userManager = $this->container->get('fos_user.user_manager');
-            $user = $userManager->findUserByUsername('guest');
-            /** @var LoginManager $loginManager */
-            $loginManager = $this->container->get('fos_user.security.login_manager');
-
-            $loginManager->loginUser('main', $user, $response);
-            $session = $request->getSession();
-            $setter = self::$autoLogoutUser[$request->get('_code')];
-            $setter($session);
-
-            // only do this once per landing
-            unset(self::$autoLogoutUser[$request->get('_code')]);
-        }
-    }
 }

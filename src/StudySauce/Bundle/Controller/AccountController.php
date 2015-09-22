@@ -2,30 +2,30 @@
 
 namespace StudySauce\Bundle\Controller;
 
-    use Doctrine\ORM\EntityManager;
-    use FOS\UserBundle\Doctrine\UserManager;
-    use FOS\UserBundle\Security\LoginManager;
-    use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider;
-    use HWI\Bundle\OAuthBundle\Templating\Helper\OAuthHelper;
-    use StudySauce\Bundle\Entity\Invite;
-    use StudySauce\Bundle\Entity\ParentInvite;
-    use StudySauce\Bundle\Entity\PartnerInvite;
-    use StudySauce\Bundle\Entity\User;
-    use StudySauce\Bundle\EventListener\InviteListener;
-    use StudySauce\Bundle\Security\UserProvider;
-    use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-    use Symfony\Component\HttpFoundation\JsonResponse;
-    use Symfony\Component\HttpFoundation\Request;
-    use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-    use Symfony\Component\Security\Core\Encoder\EncoderFactory;
-    use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-    use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
-    use Symfony\Component\Security\Core\SecurityContext;
+use Doctrine\ORM\EntityManager;
+use FOS\UserBundle\Doctrine\UserManager;
+use FOS\UserBundle\Security\LoginManager;
+use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider;
+use HWI\Bundle\OAuthBundle\Templating\Helper\OAuthHelper;
+use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\ParentInvite;
+use StudySauce\Bundle\Entity\PartnerInvite;
+use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\EventListener\InviteListener;
+use StudySauce\Bundle\Security\UserProvider;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\SecurityContext;
 
-    /**
-     * Class AccountController
-     * @package StudySauce\Bundle\Controller
-     */
+/**
+ * Class AccountController
+ * @package StudySauce\Bundle\Controller
+ */
 class AccountController extends Controller
 {
     /**
@@ -43,34 +43,40 @@ class AccountController extends Controller
         $services = [];
         /** @var OAuthHelper $oauth */
         $oauth = $this->get('hwi_oauth.templating.helper.oauth');
-        foreach($oauth->getResourceOwners() as $o) {
+        foreach ($oauth->getResourceOwners() as $o) {
             $services[$o] = $oauth->getLoginUrl($o);
         }
 
         $payment = $user->getPayments()->first();
-        if(empty($payment)) {
+        if (empty($payment)) {
             $partner = $user->getPartnerOrAdviser();
-            if($partner instanceof User)
+            if ($partner instanceof User) {
                 $payment = $partner->getPayments()->first();
-            elseif($partner instanceof PartnerInvite && !empty($partner->getPartner()))
+            } elseif ($partner instanceof PartnerInvite && !empty($partner->getPartner())) {
                 $payment = $partner->getPartner()->getPayments()->first();
+            }
         }
-        if(empty($payment)) {
+        if (empty($payment)) {
             /** @var ParentInvite $parent */
             $parent = $user->getParentInvites()->filter(
                 function (ParentInvite $p) {
                     return !empty($p->getParent());
-                })->first();
-            if(!empty($parent))
+                }
+            )->first();
+            if (!empty($parent)) {
                 $payment = $parent->getParent()->getPayments()->first();
+            }
         }
 
-        return $this->render('StudySauceBundle:Account:tab.html.php', [
+        return $this->render(
+            'StudySauceBundle:Account:tab.html.php',
+            [
                 'user' => $user,
                 'payment' => $payment,
                 'csrf_token' => $csrfToken,
                 'services' => $services
-            ]);
+            ]
+        );
     }
 
     /**
@@ -88,18 +94,15 @@ class AccountController extends Controller
         $user = $this->getUser();
         $user->setFirst($request->get('first'));
         $user->setLast($request->get('last'));
-        if(!empty($request->get('email')))
-        {
+        if (!empty($request->get('email'))) {
             // check password
             /** @var EncoderFactory $encoder_service */
             $encoder_service = $this->get('security.encoder_factory');
             /** @var MessageDigestPasswordEncoder $encoder */
             $encoder = $encoder_service->getEncoder($user);
             $encoded_pass = $encoder->encodePassword($request->get('pass'), $user->getSalt());
-            if($user->getPassword() == $encoded_pass)
-            {
-                if(!empty($request->get('newPass')))
-                {
+            if ($user->getPassword() == $encoded_pass) {
+                if (!empty($request->get('newPass'))) {
                     $password = $encoder->encodePassword($request->get('newPass'), $user->getSalt());
                     $user->setPassword($password);
                 }
@@ -108,17 +111,19 @@ class AccountController extends Controller
                 $userManager->updateCanonicalFields($user);
                 $orm->merge($user);
                 $orm->flush();
-            }
-            else
+            } else {
                 $error = 'Incorrect password';
+            }
         }
 
         $csrfToken = $this->has('form.csrf_provider')
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_update')
             : null;
         $response = ['csrf_token' => $csrfToken];
-        if(isset($error))
+        if (isset($error)) {
             $response['error'] = $error;
+        }
+
         return new JsonResponse($response);
     }
 
@@ -144,17 +149,18 @@ class AccountController extends Controller
         /** @var OAuthHelper $oauth */
         $oauth = $this->get('hwi_oauth.templating.helper.oauth');
         /** @var UserProvider $provider */
-        $provider =$this->get('my_user_provider');
-        foreach($oauth->getResourceOwners() as $o) {
-            if(!$provider->isConnectible($o))
+        $provider = $this->get('my_user_provider');
+        foreach ($oauth->getResourceOwners() as $o) {
+            if (!$provider->isConnectible($o)) {
                 continue;
+            }
             $services[$o] = $oauth->getLoginUrl($o);
         }
 
         /** @var Invite $invite */
         $invite = InviteListener::getInvite($orm, $request);
         $email = $request->get('email');
-        if(!empty($invite)) {
+        if (!empty($invite)) {
             $email = $invite->getEmail();
         }
 
@@ -164,13 +170,16 @@ class AccountController extends Controller
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_login')
             : null;
 
-        return $this->render('StudySauceBundle:Account:login.html.php', [
+        return $this->render(
+            'StudySauceBundle:Account:login.html.php',
+            [
                 'invite' => $invite,
                 'email' => $email,
                 'csrf_token' => $csrfToken,
                 'services' => $services,
                 'error' => $error
-            ]);
+            ]
+        );
     }
 
     /**
@@ -208,7 +217,7 @@ class AccountController extends Controller
         $services = [];
         /** @var OAuthHelper $oauth */
         $oauth = $this->get('hwi_oauth.templating.helper.oauth');
-        foreach($oauth->getResourceOwners() as $o) {
+        foreach ($oauth->getResourceOwners() as $o) {
             $services[$o] = $oauth->getLoginUrl($o);
         }
 
@@ -220,24 +229,30 @@ class AccountController extends Controller
         // always auto fill information for the person the invite was sent to
         $invite = InviteListener::getInvite($orm, $request);
 
-        if(!empty($invite)) {
-            return $this->render('StudySauceBundle:Account:register.html.php', [
+        if (!empty($invite)) {
+            return $this->render(
+                'StudySauceBundle:Account:register.html.php',
+                [
                     'invite' => $invite,
                     'email' => $invite->getEmail(),
                     'first' => $invite->getFirst(),
                     'last' => $invite->getLast(),
                     'csrf_token' => $csrfToken,
                     'services' => $services
-                ]);
+                ]
+            );
         }
 
-        return $this->render('StudySauceBundle:Account:register.html.php', [
+        return $this->render(
+            'StudySauceBundle:Account:register.html.php',
+            [
                 'email' => $request->get('email'),
                 'first' => $request->get('first'),
                 'last' => $request->get('last'),
                 'csrf_token' => $csrfToken,
                 'services' => $services
-            ]);
+            ]
+        );
     }
 
     /**
@@ -248,19 +263,15 @@ class AccountController extends Controller
     {
         /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
         $userManager = $this->get('fos_user.user_manager');
-        if(!empty($request->get('token'))) {
-            /** @var User $user */
-            $user = $userManager->findUserByConfirmationToken($request->get('token'));
-        }
-        else {
-            $user = $this->getUser();
-        }
 
         $csrfToken = $this->has('form.csrf_provider')
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_register')
             : null;
 
-        if (!empty($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO') && !empty($request->get('newPass'))) {
+        if (!empty($request->get('token'))
+            && !empty($user = $userManager->findUserByConfirmationToken($request->get('token')))
+            && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO') && !empty($request->get('newPass'))
+        ) {
 
             // change the password
             $encoder_service = $this->get('security.encoder_factory');
@@ -288,12 +299,14 @@ class AccountController extends Controller
             $loginManager->loginUser('main', $user, $response);
 
             return $response;
-        }
-        elseif(!empty($request->get('email'))) {
+        } elseif (!empty($request->get('email'))) {
             $user = $userManager->findUserByEmail($request->get('email'));
-             if(!empty($user)) {
+            if (!empty($user)) {
                 // send password reset email
-                if ($user->isPasswordRequestNonExpired($this->container->getParameter('fos_user.resetting.token_ttl'))) {
+                if ($user->isPasswordRequestNonExpired(
+                    $this->container->getParameter('fos_user.resetting.token_ttl')
+                )
+                ) {
                     // TODO: error?
                 }
 
@@ -308,15 +321,28 @@ class AccountController extends Controller
                 $emails->resetPasswordAction($user);
                 $user->setPasswordRequestedAt(new \DateTime());
                 $userManager->updateUser($user);
+            } else {
+                $error = 'No account found, please try an alternate email address.';
             }
         }
 
+        if (empty($user)) {
+            $user = $this->getUser();
+        }
 
-        return $this->render('StudySauceBundle:Account:reset.html.php', [
-                'token' => $request->get('token'),
-                'email' => $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO') ? $request->get('email') : $user->getEmail(),
-                'csrf_token' => $csrfToken
-            ]);
+        $templateVars = [
+            'token' => $request->get('token'),
+            'email' => $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO') ? $request->get(
+                'email'
+            ) : $user->getEmail(),
+            'error' => !empty($error) ? $error : null,
+            'csrf_token' => $csrfToken
+        ];
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse($templateVars);
+        }
+
+        return $this->render('StudySauceBundle:Account:reset.html.php', $templateVars);
     }
 
     /**
@@ -336,8 +362,7 @@ class AccountController extends Controller
         $csrfToken = $this->has('form.csrf_provider')
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_register')
             : null;
-        if($user == null)
-        {
+        if ($user == null) {
             // generate a new guest user in the database
             /** @var $user User */
             $user = $userManager->createUser();
@@ -361,7 +386,7 @@ class AccountController extends Controller
             list($route, $options) = HomeController::getUserRedirect($user);
             $response = $this->redirect($this->generateUrl($route, $options));
 
-            if($login) {
+            if ($login) {
                 $context = $this->get('security.context');
                 $token = new UsernamePasswordToken($user, $password, 'main', $user->getRoles());
                 $context->setToken($token);
@@ -373,7 +398,7 @@ class AccountController extends Controller
                 $loginManager->loginUser('main', $user, $response);
             }
 
-            if($email) {
+            if ($email) {
                 // send welcome email
                 $emails = new EmailsController();
                 $emails->setContainer($this->container);
@@ -389,9 +414,7 @@ class AccountController extends Controller
             }
 
             return $response;
-        }
-        else
-        {
+        } else {
             return new JsonResponse(['error' => true, 'csrf_token' => $csrfToken]);
         }
     }
@@ -406,15 +429,16 @@ class AccountController extends Controller
         $userManager = $this->get('fos_user.user_manager');
         /** @var User $user */
         $user = $this->getUser();
-        if($request->get('remove') == 'gcal') {
+        if ($request->get('remove') == 'gcal') {
             $user->setProperty('showConnected', false);
         }
-        $setter = 'set'.ucfirst($request->get('remove'));
-        $setter_id = $setter.'Id';
+        $setter = 'set' . ucfirst($request->get('remove'));
+        $setter_id = $setter . 'Id';
         $user->$setter_id('');
-        $setter_token = $setter.'AccessToken';
+        $setter_token = $setter . 'AccessToken';
         $user->$setter_token('');
         $userManager->updateUser($user);
+
         return $this->forward('StudySauceBundle:Account:index', ['_format' => 'tab']);
     }
 }

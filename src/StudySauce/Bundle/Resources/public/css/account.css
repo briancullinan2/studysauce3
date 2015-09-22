@@ -185,6 +185,7 @@ a[href="#sign-in-with-email"]
     display: none;
 }
 
+#reset .form-actions .error,
 #login .form-actions .error,
 #register .form-actions .error,
 #account .form-actions .error,
