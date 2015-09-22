@@ -25,6 +25,12 @@ class File
     protected $user;
 
     /**
+     * @ORM\OneToOne(targetEntity="Response", mappedBy="answer")
+     * @ORM\OrderBy({"created" = "DESC"})
+     */
+    protected $responses;
+
+    /**
      * @ORM\Column(type="string", length=256, name="filename")
      */
     protected $filename;
