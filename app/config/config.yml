@@ -51,12 +51,6 @@ services:
             - {name: kernel.event_subscriber}
         arguments: [@templating, @service_container]
 
-    torchandlaurel.user_register:
-        class: TorchAndLaurel\Bundle\EventListener\OrgEmailNotifier
-        tags:
-            - {name: kernel.event_subscriber}
-        arguments: [@service_container, @templating, @mailer]
-
     studysauce.invite_listener:
         class: StudySauce\Bundle\EventListener\InviteListener
         tags:
@@ -111,7 +105,7 @@ assetic:
     #read_from:      "%kernel.root_dir%/../web"
     write_to:       "%kernel.root_dir%/../web"
     use_controller: false
-    bundles:        [ "StudySauceBundle", "Course1Bundle", "TorchAndLaurelBundle", "Course2Bundle", "Course3Bundle", "AdminBundle" ]
+    bundles:        [ "StudySauceBundle", "AdminBundle" ]
     #output: "/Symfony/web/app_dev.php/*"
     #java: /usr/bin/java
     #variables:

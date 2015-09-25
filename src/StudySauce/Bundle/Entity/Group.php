@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\Group as BaseGroup;
 use FOS\UserBundle\Model\GroupInterface;
@@ -31,9 +32,16 @@ class Group extends BaseGroup implements GroupInterface
     protected $created;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="groups", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Pack", mappedBy="group", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $users;
+    protected $packs;
+
+    /**
+     * @ORM\OneToOne(targetEntity="File")
+     * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable = true)
+     */
+    protected $logo;
 
     /**
      * @ORM\PrePersist
@@ -99,13 +107,17 @@ class Group extends BaseGroup implements GroupInterface
     {
         return $this->created;
     }
+
     /**
      * Constructor
+     * @param null $name
+     * @param array $roles
      */
-    public function __construct()
-    {
-        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    public function __construct($name = null, $roles = array()) {
+        $this->users = new ArrayCollection();
+        $this->packs = new ArrayCollection();
         $this->roles = [];
+        parent::__construct($name, $roles);
     }
 
     /**
@@ -139,5 +151,61 @@ class Group extends BaseGroup implements GroupInterface
     public function getUsers()
     {
         return $this->users;
+    }
+
+    /**
+     * Add packs
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $packs
+     * @return Group
+     */
+    public function addPack(\StudySauce\Bundle\Entity\Pack $packs)
+    {
+        $this->packs[] = $packs;
+
+        return $this;
+    }
+
+    /**
+     * Remove packs
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $packs
+     */
+    public function removePack(\StudySauce\Bundle\Entity\Pack $packs)
+    {
+        $this->packs->removeElement($packs);
+    }
+
+    /**
+     * Get packs
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPacks()
+    {
+        return $this->packs;
+    }
+
+    /**
+     * Set logo
+     *
+     * @param \StudySauce\Bundle\Entity\File $logo
+     * @return Group
+     */
+    public function setLogo(\StudySauce\Bundle\Entity\File $logo = null)
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    /**
+     * Get logo
+     *
+     * @return \StudySauce\Bundle\Entity\File 
+     */
+    public function getLogo()
+    {
+        return $this->logo;
     }
 }

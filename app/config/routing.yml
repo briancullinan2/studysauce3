@@ -3,18 +3,6 @@
 _studysauce:
     resource: "@StudySauceBundle/Resources/config/routing.php"
 
-_course1:
-    resource: "@Course1Bundle/Resources/config/routing.php"
-
-_course2:
-    resource: "@Course2Bundle/Resources/config/routing.php"
-
-_course3:
-    resource: "@Course3Bundle/Resources/config/routing.php"
-
-_torchandlaurel:
-    resource: "@TorchAndLaurelBundle/Resources/config/routing.php"
-
 _admin:
     resource: "@AdminBundle/Resources/config/routing.php"
 

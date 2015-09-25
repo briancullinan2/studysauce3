@@ -739,4 +739,136 @@ class User extends BaseUser implements EncoderAwareInterface
     {
         return $this->lastVisit;
     }
+
+    /**
+     * Add invites
+     *
+     * @param \StudySauce\Bundle\Entity\Invite $invites
+     * @return User
+     */
+    public function addInvite(\StudySauce\Bundle\Entity\Invite $invites)
+    {
+        $this->invites[] = $invites;
+
+        return $this;
+    }
+
+    /**
+     * Remove invites
+     *
+     * @param \StudySauce\Bundle\Entity\Invite $invites
+     */
+    public function removeInvite(\StudySauce\Bundle\Entity\Invite $invites)
+    {
+        $this->invites->removeElement($invites);
+    }
+
+    /**
+     * Get invites
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getInvites()
+    {
+        return $this->invites;
+    }
+
+    /**
+     * Add invitees
+     *
+     * @param \StudySauce\Bundle\Entity\Invite $invitees
+     * @return User
+     */
+    public function addInvitee(\StudySauce\Bundle\Entity\Invite $invitees)
+    {
+        $this->invitees[] = $invitees;
+
+        return $this;
+    }
+
+    /**
+     * Remove invitees
+     *
+     * @param \StudySauce\Bundle\Entity\Invite $invitees
+     */
+    public function removeInvitee(\StudySauce\Bundle\Entity\Invite $invitees)
+    {
+        $this->invitees->removeElement($invitees);
+    }
+
+    /**
+     * Get invitees
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getInvitees()
+    {
+        return $this->invitees;
+    }
+
+    /**
+     * Add packs
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $packs
+     * @return User
+     */
+    public function addPack(\StudySauce\Bundle\Entity\Pack $packs)
+    {
+        $this->packs[] = $packs;
+
+        return $this;
+    }
+
+    /**
+     * Remove packs
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $packs
+     */
+    public function removePack(\StudySauce\Bundle\Entity\Pack $packs)
+    {
+        $this->packs->removeElement($packs);
+    }
+
+    /**
+     * Get packs
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPacks()
+    {
+        return $this->packs;
+    }
+
+    /**
+     * Add responses
+     *
+     * @param \StudySauce\Bundle\Entity\Response $responses
+     * @return User
+     */
+    public function addResponse(\StudySauce\Bundle\Entity\Response $responses)
+    {
+        $this->responses[] = $responses;
+
+        return $this;
+    }
+
+    /**
+     * Remove responses
+     *
+     * @param \StudySauce\Bundle\Entity\Response $responses
+     */
+    public function removeResponse(\StudySauce\Bundle\Entity\Response $responses)
+    {
+        $this->responses->removeElement($responses);
+    }
+
+    /**
+     * Get responses
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getResponses()
+    {
+        return $this->responses;
+    }
 }

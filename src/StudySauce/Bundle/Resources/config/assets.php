@@ -56,37 +56,6 @@ $container->loadFromExtension('assetic', [
                 'output' => 'bundles/studysauce/js/*.js',
             ],
         ],
-        'metrics_scripts' => [
-            'inputs' => [
-                '@StudySauceBundle/Resources/public/js/d3.v3.min.js',
-                '@StudySauceBundle/Resources/public/js/metrics.js'
-            ],
-            'filters' => [],
-            'options' => [
-                'output' => 'bundles/studysauce/js/*.js',
-            ],
-        ],
-        'checkin_scripts' => [
-            'inputs' => [
-                '@StudySauceBundle/Resources/public/js/jquery.fittext.js',
-                '@StudySauceBundle/Resources/public/js/checkin.js'
-            ],
-            'filters' => [],
-            'options' => [
-                'output' => 'bundles/studysauce/js/*.js',
-            ],
-        ],
-        'plan_scripts' => [
-            'inputs' => [
-                '@StudySauceBundle/Resources/public/js/moment.min.js',
-                '@StudySauceBundle/Resources/public/js/fullcalendar/fullcalendar.js',
-                '@StudySauceBundle/Resources/public/js/plan.js'
-            ],
-            'filters' => [],
-            'options' => [
-                'output' => 'bundles/studysauce/js/*.js',
-            ],
-        ]
     ],
 ]);
 

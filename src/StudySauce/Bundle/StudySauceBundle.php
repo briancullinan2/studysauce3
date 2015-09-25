@@ -15,6 +15,6 @@ class StudySauceBundle extends Bundle
     public function boot()
     {
         $kernel = $this->container->get('kernel');
-        self::$institutions_path = $kernel->locateResource('@StudySauceBundle/Resources/public/js/institutions.json');
+        //self::$institutions_path = $kernel->locateResource('@StudySauceBundle/Resources/public/js/institutions.json');
     }
 }

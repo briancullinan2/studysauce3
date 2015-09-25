@@ -363,4 +363,27 @@ class Coupon
     {
         return $this->payments;
     }
+
+    /**
+     * Set pack
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $pack
+     * @return Coupon
+     */
+    public function setPack(\StudySauce\Bundle\Entity\Pack $pack = null)
+    {
+        $this->pack = $pack;
+
+        return $this;
+    }
+
+    /**
+     * Get pack
+     *
+     * @return \StudySauce\Bundle\Entity\Pack 
+     */
+    public function getPack()
+    {
+        return $this->pack;
+    }
 }

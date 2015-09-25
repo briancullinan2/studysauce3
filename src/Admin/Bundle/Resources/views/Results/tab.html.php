@@ -15,15 +15,6 @@ $view['slots']->start('stylesheets'); ?>
 foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/results.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
 <?php endforeach;
-foreach ($view['assetic']->stylesheets(['@Course1Bundle/Resources/public/css/course1.css'],[],['output' => 'bundles/course1/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@Course2Bundle/Resources/public/css/course2.css'],[],['output' => 'bundles/course2/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@Course3Bundle/Resources/public/css/course3.css'],[],['output' => 'bundles/course3/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
 $view['slots']->stop();
 
 $view['slots']->start('javascripts'); ?>

@@ -21,11 +21,7 @@ class AppKernel extends Kernel
         $bundles[] = new FOS\UserBundle\FOSUserBundle();
         $bundles[] = new HWI\Bundle\OAuthBundle\HWIOAuthBundle();
         $bundles[] = new StudySauce\Bundle\StudySauceBundle();
-        $bundles[] = new Course1\Bundle\Course1Bundle();
-        $bundles[] = new Course2\Bundle\Course2Bundle();
-        $bundles[] = new Course3\Bundle\Course3Bundle();
         $bundles[] = new WhiteOctober\SwiftMailerDBBundle\WhiteOctoberSwiftMailerDBBundle();
-        $bundles[] = new TorchAndLaurel\Bundle\TorchAndLaurelBundle();
         $bundles[] = new Admin\Bundle\AdminBundle();
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {

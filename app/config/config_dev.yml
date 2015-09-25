@@ -10,15 +10,15 @@ doctrine:
         driver:   "pdo_mysql"
         host:     "localhost"
         dbname:   "studysauce3"
-        user:     "study"
+        user:     "study2"
         password: "itekIO^#(1234"
 
 services:
     pdo:
         class: Doctrine\DBAL\Driver\PDOConnection
         arguments:
-            - "mysql:host=localhost;port=3306;dbname=studysauce"
-            - study
+            - "mysql:host=localhost;port=3306;dbname=studysauce3"
+            - study2
             - itekIO^#(1234
         calls:
             - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION

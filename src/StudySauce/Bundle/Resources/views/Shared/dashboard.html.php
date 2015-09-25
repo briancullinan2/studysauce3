@@ -24,7 +24,6 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
     foreach ($view['assetic']->stylesheets(
         [
             '@StudySauceBundle/Resources/public/css/tipsy.css',
-            '@StudySauceBundle/Resources/public/css/pietimer.css',
             '@StudySauceBundle/Resources/public/css/header.css',
             '@StudySauceBundle/Resources/public/css/menu.css',
             '@StudySauceBundle/Resources/public/css/dashboard.css',

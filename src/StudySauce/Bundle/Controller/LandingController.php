@@ -2,11 +2,9 @@
 
 namespace StudySauce\Bundle\Controller;
 
-use Course1\Bundle\Entity\Course1;
-use Course2\Bundle\Entity\Course2;
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Command\CronSauceCommand;
-use StudySauce\Bundle\Entity\GroupInvite;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -37,9 +35,9 @@ class LandingController extends Controller
         if($route != '_welcome')
             return $this->redirect($this->generateUrl($route, $options));
 
-        /** @var GroupInvite $group */
+        /** @var Invite $group */
         // TODO: generalize this for other groups
-        $group = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy(['code' => $request->get('_code')]);
+        $group = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->get('_code')]);
         if(!empty($group) && $group->getGroup()->getName() == 'Torch And Laurel' ||
             ($session->has('organization') && $session->get('organization') == 'Torch And Laurel'))
         {
@@ -272,9 +270,9 @@ class LandingController extends Controller
         if(empty($session->get('parent')))
             $session->set('parent', true);
 
-        /** @var GroupInvite $group */
+        /** @var Invite $group */
         // TODO: generalize this for other groups
-        $group = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy(['code' => $request->get('_code')]);
+        $group = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->get('_code')]);
         if(!empty($group) && $group->getGroup()->getName() == 'Torch And Laurel' ||
             ($session->has('organization') && $session->get('organization') == 'Torch And Laurel'))
         {
@@ -294,9 +292,9 @@ class LandingController extends Controller
         $orm = $this->get('doctrine')->getManager();
         $session = $request->getSession();
 
-        /** @var GroupInvite $group */
+        /** @var Invite $group */
         // TODO: generalize this for other groups
-        $group = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy(['code' => $request->get('_code')]);
+        $group = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->get('_code')]);
         if(!empty($group) && $group->getGroup()->getName() == 'Torch And Laurel' ||
             ($session->has('organization') && $session->get('organization') == 'Torch And Laurel'))
         {

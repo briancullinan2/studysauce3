@@ -325,4 +325,50 @@ class Invite
     {
         return $this->student;
     }
+
+    /**
+     * Set pack
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $pack
+     * @return Invite
+     */
+    public function setPack(\StudySauce\Bundle\Entity\Pack $pack = null)
+    {
+        $this->pack = $pack;
+
+        return $this;
+    }
+
+    /**
+     * Get pack
+     *
+     * @return \StudySauce\Bundle\Entity\Pack 
+     */
+    public function getPack()
+    {
+        return $this->pack;
+    }
+
+    /**
+     * Set invitee
+     *
+     * @param \StudySauce\Bundle\Entity\User $invitee
+     * @return Invite
+     */
+    public function setInvitee(\StudySauce\Bundle\Entity\User $invitee = null)
+    {
+        $this->invitee = $invitee;
+
+        return $this;
+    }
+
+    /**
+     * Get invitee
+     *
+     * @return \StudySauce\Bundle\Entity\User 
+     */
+    public function getInvitee()
+    {
+        return $this->invitee;
+    }
 }

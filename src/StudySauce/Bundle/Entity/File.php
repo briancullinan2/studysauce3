@@ -25,10 +25,10 @@ class File
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="Response", mappedBy="answer")
+     * @ORM\OneToOne(targetEntity="Response", mappedBy="file", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $responses;
+    protected $response;
 
     /**
      * @ORM\Column(type="string", length=256, name="filename")
@@ -211,5 +211,51 @@ class File
     public function getFilename()
     {
         return $this->filename;
+    }
+
+    /**
+     * Set responses
+     *
+     * @param \StudySauce\Bundle\Entity\Response $responses
+     * @return File
+     */
+    public function setResponses(\StudySauce\Bundle\Entity\Response $responses = null)
+    {
+        $this->responses = $responses;
+
+        return $this;
+    }
+
+    /**
+     * Get responses
+     *
+     * @return \StudySauce\Bundle\Entity\Response 
+     */
+    public function getResponses()
+    {
+        return $this->responses;
+    }
+
+    /**
+     * Set response
+     *
+     * @param \StudySauce\Bundle\Entity\Response $response
+     * @return File
+     */
+    public function setResponse(\StudySauce\Bundle\Entity\Response $response = null)
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Get response
+     *
+     * @return \StudySauce\Bundle\Entity\Response 
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 }

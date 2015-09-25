@@ -4,39 +4,12 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets([
-        '@StudySauceBundle/Resources/public/css/clock.css',
-        '@StudySauceBundle/Resources/public/css/checkin.css'
-    ], [], ['output' => 'bundles/studysauce/css/*.css']) as $url):
-    ?><link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
-<?php endforeach;
 foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/home.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/deadlines.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/goals.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/plan.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/metrics.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url):?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
 <?php endforeach;
 $view['slots']->stop();
 
 $view['slots']->start('javascripts');
-foreach ($view['assetic']->javascripts(['@metrics_scripts'],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
-foreach ($view['assetic']->javascripts(['@checkin_scripts',],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
-foreach ($view['assetic']->javascripts(['@plan_scripts',],[],['output' => 'bundles/studysauce/js/*.js']) as $url):?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>

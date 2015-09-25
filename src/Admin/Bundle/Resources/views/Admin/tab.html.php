@@ -1,10 +1,4 @@
 <?php
-use Course1\Bundle\Course1Bundle;
-use Course1\Bundle\Entity\Course1;
-use Course2\Bundle\Course2Bundle;
-use Course2\Bundle\Entity\Course2;
-use Course3\Bundle\Course3Bundle;
-use Course3\Bundle\Entity\Course3;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use StudySauce\Bundle\Entity\Course;
