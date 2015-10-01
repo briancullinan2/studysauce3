@@ -68,72 +68,11 @@ class BuyController extends Controller
             $studentemail = '';
         }
         /** @var Invite $invite */
-        if(!empty($request->getSession()->get('parent')))
+        if(!empty($request->getSession()->get('invite')))
         {
-            /** @var ParentInvite $invite */
-            $invite = $orm->getRepository('StudySauceBundle:ParentInvite')->findOneBy(['code' => $request->getSession()->get('parent')]);
-            // set to true when landing anonymously so make sure it actually exists
-            if(!empty($invite)) {
+            $invite = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->getSession()->get('group')]);
+        }
 
-                if (empty($invite->getUser()) || $invite->getUser()->hasRole('ROLE_GUEST') || $invite->getUser()->hasRole('ROLE_DEMO')) {
-                    $studentfirst = $invite->getFromFirst();
-                    $studentlast = $invite->getFromLast();
-                    $studentemail = $invite->getFromEmail();
-                } else {
-                    $studentfirst = $invite->getUser()->getFirst();
-                    $studentlast = $invite->getUser()->getLast();
-                    $studentemail = $invite->getUser()->getEmail();
-                }
-            }
-        }
-        if(!empty($request->getSession()->get('partner')))
-        {
-            $invite = $orm->getRepository('StudySauceBundle:PartnerInvite')->findOneBy(['code' => $request->getSession()->get('partner')]);
-        }
-        if(!empty($request->getSession()->get('group')))
-        {
-            $invite = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy(['code' => $request->getSession()->get('group')]);
-        }
-        if(!empty($request->getSession()->get('student')))
-        {
-            $invite = $orm->getRepository('StudySauceBundle:StudentInvite')->findOneBy(['code' => $request->getSession()->get('student')]);
-        }
-        if(!$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO') && empty($studentfirst) && !empty($invite = $user->getInvitedPartners()->filter(
-                function (PartnerInvite $p) {return !$p->getUser()->hasRole('ROLE_PAID') &&
-                    !$p->getUser()->hasRole('ROLE_GUEST') && !$p->getUser()->hasRole('ROLE_DEMO');})->first())) {
-            $studentfirst = $invite->getUser()->getFirst();
-            $studentlast = $invite->getUser()->getLast();
-            $studentemail = $invite->getUser()->getEmail();
-        }
-        if(!$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO') && empty($studentfirst) && !empty($invite = $user->getInvitedParents()->filter(
-                function (ParentInvite $p) {return empty($p->getUser()) || !$p->getUser()->hasRole('ROLE_PAID');})->first())) {
-
-            if(empty($invite->getUser()) || $invite->getUser()->hasRole('ROLE_GUEST') || $invite->getUser()->hasRole('ROLE_DEMO')) {
-                $studentfirst = $invite->getFromFirst();
-                $studentlast = $invite->getFromLast();
-                $studentemail = $invite->getFromEmail();
-            }
-            else {
-                $studentfirst = $invite->getUser()->getFirst();
-                $studentlast = $invite->getUser()->getLast();
-                $studentemail = $invite->getUser()->getEmail();
-            }
-        }
-        if(!$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO') && empty($studentfirst) && !empty($invite = $user->getStudentInvites()->filter(
-                function (StudentInvite $p) {return empty($p->getUser()) || !$p->getUser()->hasRole('ROLE_PAID');})->first())) {
-
-            /** @var StudentInvite $invite */
-            if(empty($invite->getStudent()) || $invite->getStudent()->hasRole('ROLE_GUEST') || $invite->getStudent()->hasRole('ROLE_DEMO')) {
-                $studentfirst = $invite->getFirst();
-                $studentlast = $invite->getLast();
-                $studentemail = $invite->getEmail();
-            }
-            else {
-                $studentfirst = $invite->getStudent()->getFirst();
-                $studentlast = $invite->getStudent()->getLast();
-                $studentemail = $invite->getStudent()->getEmail();
-            }
-        }
         /** @var Invite $invite */
         if(!empty($invite))
         {
@@ -142,19 +81,8 @@ class BuyController extends Controller
             $email = $invite->getEmail();
         }
 
-        // set by invite dialogs when invited anonymously
-        if(!empty($request->getSession()->get('invite'))) {
-            /** @var StudentInvite $student */
-            $student = $orm->getRepository('StudySauceBundle:StudentInvite')->findOneBy(['code' => $request->getSession()->get('invite')]);
-            if(!empty($student)) {
-                $studentfirst = $student->getFirst();
-                $studentlast = $student->getLast();
-                $studentemail = $student->getEmail();
-                $first = $student->getFromFirst();
-                $last = $student->getFromLast();
-                $email = $student->getFromEmail();
-            }
-        }
+        // TODO: set by invite dialogs when invited anonymously
+
 
         // check for coupon
         $coupon = $this->getCoupon($request);
@@ -567,59 +495,4 @@ class BuyController extends Controller
         return new JsonResponse(true);
     }
 
-    public function packsAction(Request $request)
-    {
-        $joins = [];
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-        /** @var QueryBuilder $qb */
-        $qb = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p');
-        $packs = $qb->select('')
-            ->getQuery()
-            ->getResult();
-        return new JsonResponse(array_map(function (Pack $x) {
-            $group = $x->getGroup();
-
-            $creator = !empty($x->getGroup())
-                ? $x->getGroup()->getName()
-                : ($x->getUser()->getFirst() . ' ' . $x->getUser()->getLast());
-
-            $logo = !empty($group)
-                ? $group->getLogo()->getUrl()
-                : (!empty($x->getUser()->getPhoto())
-                ? $x->getUser()->getPhoto()->getUrl()
-                : '');
-            return [
-                'id' => $x->getId(),
-                'logo' => $logo,
-                'title' => $x->getTitle(),
-                'creator' => $creator,
-                'created' => $x->getCreated()->format('r'),
-                'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null
-            ];
-        }, $packs));
-    }
-
-    public function cardsAction(Request $request)
-    {
-        $joins = [];
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-        /** @var QueryBuilder $qb */
-        $qb = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c');
-        $packs = $qb->select('')
-            ->where('c.pack=:id')
-            ->setParameter('id', intval($request->get('pack')))
-            ->getQuery()
-            ->getResult();
-        return new JsonResponse(array_map(function (Card $x) {
-            return [
-                'id' => $x->getId(),
-                'content' => $x->getContent(),
-                'response' => $x->getResponseContent(),
-                'created' => $x->getCreated()->format('r'),
-                'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null
-            ];
-        }, $packs));
-    }
 }

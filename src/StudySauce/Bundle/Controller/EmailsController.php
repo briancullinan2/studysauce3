@@ -7,6 +7,7 @@ use StudySauce\Bundle\Entity\ContactMessage;
 use StudySauce\Bundle\Entity\Deadline;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\GroupInvite;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\ParentInvite;
 use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\Payment;
@@ -459,11 +460,11 @@ class EmailsController extends Controller
 
     /**
      * @param User $user
-     * @param GroupInvite $invite
+     * @param Invite $invite
      * @param Group $group
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function groupInviteAction(User $user = null, GroupInvite $invite = null, Group $group = null)
+    public function inviteAction(User $user = null, Invite $invite = null, Group $group = null)
     {
         /** @var $user User */
         if(empty($user))

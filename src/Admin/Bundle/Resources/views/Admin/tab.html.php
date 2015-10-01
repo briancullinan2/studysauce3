@@ -120,26 +120,6 @@ $view['slots']->start('body'); ?>
                     <option value="Y%">Y</option>
                     <option value="Z%">Z</option>
                 </select></label></th>
-        <th><label><span>Finished: <?php print $completed; ?></span><br/>
-                <select name="completed">
-                    <option value="">Completed</option>
-                    <option value="_ascending">Ascending (0-100)</option>
-                    <option value="_descending">Descending (100-0)</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="!1">Not 1</option>
-                    <option value="!2">Not 2</option>
-                    <option value="!3">Not 3</option>
-                    <option value="1,2">1 &amp; 2</option>
-                    <option value="1,3">1 &amp; 3</option>
-                    <option value="2,3">2 &amp; 3</option>
-                    <option value="!1,!2">Not 1 &amp; 2</option>
-                    <option value="!1,!3">Not 1 &amp; 3</option>
-                    <option value="!2,!3">Not 2 &amp; 3</option>
-                    <option value="1,2,3">Completed</option>
-                    <option value="!1,!2,!3">Not Completed</option>
-                </select></label></th>
         <th><label class="input"><span>Sign Ups: <?php print $signups; ?></span><br/>
                 <input type="text" name="created" value="" placeholder="All Sign Ups"/>
             </label>
@@ -152,129 +132,7 @@ $view['slots']->start('body'); ?>
                     <option value="yes">Y</option>
                     <option value="no">N</option>
                 </select></label></th>
-        <th><label><span>Goals: <?php print $goals; ?></span><br/>
-                <select name="hasGoals">
-                    <option value="">Goals</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span>Deadlines: <?php print $deadlines; ?></span><br/>
-                <select name="hasDeadlines">
-                    <option value="">Deadlines</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span>Schedules: <?php print $schedules; ?></span><br/>
-                <select name="hasSchedules">
-                    <option value="">Schedules</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span>Grades: <?php print $grades; ?></span><br/>
-                <select name="hasGrades">
-                    <option value="">Grades</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span>Partner: <?php print $partnerTotal; ?></span><br/>
-                <select name="hasPartners">
-                    <option value="">Partner</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span>Notes: <?php print $notes; ?></span><br/>
-                <select name="hasNotes">
-                    <option value="">Notes</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l1; ?></span><br/><select name="lesson1">
-                    <option value="">1-1</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l2; ?></span><br/><select name="lesson2">
-                    <option value="">1-2</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l3; ?></span><br/><select name="lesson3">
-                    <option value="">1-3</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l4; ?></span><br/><select name="lesson4">
-                    <option value="">1-4</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l5; ?></span><br/><select name="lesson5">
-                    <option value="">1-5</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l6; ?></span><br/><select name="lesson6">
-                    <option value="">1-6</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c1l7; ?></span><br/><select name="lesson7">
-                    <option value="">1-7</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c2l1; ?></span><br/><select name="lesson8">
-                    <option value="">2-1</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c2l2; ?></span><br/><select name="lesson9">
-                    <option value="">2-2</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c2l3; ?></span><br/><select name="lesson10">
-                    <option value="">2-3</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c2l4; ?></span><br/><select name="lesson11">
-                    <option value="">2-4</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c2l5; ?></span><br/><select name="lesson12">
-                    <option value="">2-5</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c3l1; ?></span><br/><select name="lesson13">
-                    <option value="">3-1</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c3l2; ?></span><br/><select name="lesson14">
-                    <option value="">3-2</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c3l3; ?></span><br/><select name="lesson15">
-                    <option value="">3-3</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c3l4; ?></span><br/><select name="lesson16">
-                    <option value="">3-4</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><?php print $c3l5; ?></span><br/><select name="lesson17">
-                    <option value="">3-5</option>
-                    <option value="yes">Y</option>
-                    <option value="no">N</option>
-                </select></label></th>
-        <th><label><span><a href="#all">All</a></span><br/><span><a href="#tools">Tools</a></span><br/><span><a
-                        href="#courses">Courses</a></span><br/><span>Actions</span><br/>
+        <th><label><span><a href="#all">All</a></span><br/><span><a href="#tools">Tools</a></span><br/><span>Actions</span><br/>
                 <select name="actions">
                     <option value="">Select All</option>
                     <option value="delete">Delete All</option>
@@ -346,55 +204,10 @@ $view['slots']->start('body'); ?>
                 <label class="input"><input type="text" name="email" value="<?php print $u->getEmail(); ?>"
                                             placeholder="Email"/></label>
             </td>
-            <td title="&lt;pre style='text-align:left; width:300px;'&gt;<?php print $view->escape(implode("\r\n", array_map(function ($i, $k) {return $k . ' = ' . print_r($i, true);}, $u->getProperties() ?: [], array_keys($u->getProperties() ?: [])))); ?>&lt;/pre&gt;"><?php print $u->getCompleted(); ?>%</td>
-            <td data-timestamp="<?php print $u->getCreated()->getTimestamp(); ?>"><?php print $u->getCreated()->format(
+            <td title="&lt;pre style='text-align:left; width:300px;'&gt;<?php print $view->escape(implode("\r\n", array_map(function ($i, $k) {return $k . ' = ' . print_r($i, true);}, $u->getProperties() ?: [], array_keys($u->getProperties() ?: [])))); ?>&lt;/pre&gt;" data-timestamp="<?php print $u->getCreated()->getTimestamp(); ?>"><?php print $u->getCreated()->format(
                     'j M y'
                 ); ?></td>
             <td><?php print ($u->hasRole('ROLE_PAID') ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getGoals()->count() > 0 ? 'Y' : 'N'); ?></td>
-            <td><?php print $u->getDeadlines()->count(); ?></td>
-            <td><?php print $u->getSchedules()->count(); ?></td>
-            <td><?php print array_sum($u->getSchedules()->map(function (Schedule $s) {
-                    return $s->getCourses()->filter(function (Course $c) {
-                        return $c->getGrades()->count() > 0;
-                    })->count();
-                })->toArray()); ?></td>
-            <td><?php print ($u->getPartnerInvites()->count() > 0 ? 'Y' : 'N'); ?></td>
-            <td><?php print (!empty($u->getEvernoteAccessToken()) ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson1() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson2() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson3() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson4() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson5() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson6() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse1s()->count() > 0
-                && $u->getCourse1s()->first()->getLesson7() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse2s()->count() > 0
-                && $u->getCourse2s()->first()->getLesson1() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse2s()->count() > 0
-                && $u->getCourse2s()->first()->getLesson2() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse2s()->count() > 0
-                && $u->getCourse2s()->first()->getLesson3() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse2s()->count() > 0
-                && $u->getCourse2s()->first()->getLesson4() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse2s()->count() > 0
-                && $u->getCourse2s()->first()->getLesson5() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse3s()->count() > 0
-                && $u->getCourse3s()->first()->getLesson1() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse3s()->count() > 0
-                && $u->getCourse3s()->first()->getLesson2() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse3s()->count() > 0
-                && $u->getCourse3s()->first()->getLesson3() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse3s()->count() > 0
-                && $u->getCourse3s()->first()->getLesson4() == 4 ? 'Y' : 'N'); ?></td>
-            <td><?php print ($u->getCourse3s()->count() > 0
-                && $u->getCourse3s()->first()->getLesson5() == 4 ? 'Y' : 'N'); ?></td>
             <td class="highlighted-link">
                 <a title="Send email" href="<?php print $view['router']->generate('emails'); ?>#<?php print $u->getEmail(); ?>"></a>
                 <a title="Masquerade"

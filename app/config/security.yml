@@ -91,6 +91,7 @@ security:
         - { path: ^/logout,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
         - { path: ^/authenticate,           roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
         - { path: ^/login,                  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
+        - { path: ^/invite,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
         - { path: ^/register,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
         - { path: ^/account/create,         roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
         - { path: ^/torchandlaurelregister, roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }

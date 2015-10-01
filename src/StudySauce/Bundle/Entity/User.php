@@ -6,9 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\GroupInterface;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
-use StudySauce\Bundle\Entity\Deadline;
 use StudySauce\Bundle\Entity\File;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Payment;
+use StudySauce\Bundle\Entity\Response;
+use StudySauce\Bundle\Entity\UserPack;
 use StudySauce\Bundle\Entity\Visit;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 
@@ -71,7 +73,13 @@ class User extends BaseUser implements EncoderAwareInterface
      * @ORM\OneToMany(targetEntity="Pack", mappedBy="user")
      * @ORM\OrderBy({"created" = "DESC"})
      */
-    protected $packs;
+    protected $authored;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserPack", mappedBy="user")
+     * @ORM\OrderBy({"created" = "DESC"})
+     */
+    protected $userPacks;
 
     /**
      * @ORM\OneToMany(targetEntity="File", mappedBy="user")
@@ -155,46 +163,6 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * @return float
-     */
-    public function getCompleted() {
-
-        /** @var Course1 $course1 */
-        $course1 = $this->getCourse1s()->slice(0, 1);
-        if(!empty($course1)) $course1 = $course1[0];
-        /** @var Course2 $course2 */
-        $course2 = $this->getCourse2s()->slice(0, 1);
-        if(!empty($course2)) $course2 = $course2[0];
-        /** @var Course3 $course3 */
-        $course3 = $this->getCourse3s()->slice(0, 1);
-        if(!empty($course3)) $course3 = $course3[0];
-        $completed = 0;
-        if (!empty($course1)) {
-            $completed += ($course1->getLesson1() === 4 ? 1 : 0) + ($course1->getLesson2() === 4 ? 1 : 0) +
-                ($course1->getLesson3() === 4 ? 1 : 0) + ($course1->getLesson4() === 4 ? 1 : 0) +
-                ($course1->getLesson5() === 4 ? 1 : 0) + ($course1->getLesson6() === 4 ? 1 : 0) +
-                ($course1->getLesson7() === 4 && !$this->hasRole('ROLE_PAID') ? 1 : 0);
-        }
-        if (!empty($course2)) {
-            $completed += ($course2->getLesson1() === 4 ? 1 : 0) + ($course2->getLesson2() === 4 ? 1 : 0) +
-                ($course2->getLesson3() === 4 ? 1 : 0) + ($course2->getLesson4() === 4 ? 1 : 0) +
-                ($course2->getLesson5() === 4 ? 1 : 0);
-        }
-        if (!empty($course3)) {
-            $completed += ($course3->getLesson1() === 4 ? 1 : 0) + ($course3->getLesson2() === 4 ? 1 : 0) +
-                ($course3->getLesson3() === 4 ? 1 : 0) + ($course3->getLesson4() === 4 ? 1 : 0) +
-                ($course3->getLesson5() === 4 ? 1 : 0);
-        }
-        $overall = round(
-            $completed * 100.0 / (Course1Bundle::COUNT_LEVEL
-                - ($this->hasRole('ROLE_PAID') ? 1 : 0)
-                + Course2Bundle::COUNT_LEVEL + Course3Bundle::COUNT_LEVEL)
-        );
-
-        return $overall;
-    }
-
-    /**
      * @return Invite|User
      */
     public function getPartnerOrAdviser()
@@ -221,7 +189,7 @@ class User extends BaseUser implements EncoderAwareInterface
      */
     public function getEncoderName() {
 
-        if($this->getSalt()[0] == '$' && $this->getSalt()[2] == '$') {
+        if(!empty($this->getSalt()) && $this->getSalt()[0] == '$' && $this->getSalt()[2] == '$') {
             return 'drupal_encoder';
         }
 
@@ -249,30 +217,59 @@ class User extends BaseUser implements EncoderAwareInterface
         return null;
     }
 
+    public function getUsers() {
+        $users = [];
+        foreach($this->userPacks->toArray() as $u) {
+            /** @var UserPack $u */
+            $users[] = $u->getUser();
+        }
+        return $users;
+    }
+
+    /**
+     * @return Pack[]
+     */
+    public function getPacks()
+    {
+        $packs = [];
+        foreach($this->getAuthored()->toArray() as $p) {
+            $packs[] = $p;
+        }
+        foreach($this->getUserPacks()->toArray() as $u) {
+            /** @var UserPack $u */
+            $packs[] = $u->getPack();
+        }
+        return $packs;
+    }
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->schedules = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->visits = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->goals = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->deadlines = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->files = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->course1s = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->course2s = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->course3s = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->messages = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->partnerInvites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->parentInvites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->studentInvites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->groupInvites = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->invitedParents = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->invitedPartners = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->invitedStudents = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->invitedGroups = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->schedules = new ArrayCollection();
+        $this->visits = new ArrayCollection();
+        $this->goals = new ArrayCollection();
+        $this->deadlines = new ArrayCollection();
+        $this->files = new ArrayCollection();
+        $this->course1s = new ArrayCollection();
+        $this->course2s = new ArrayCollection();
+        $this->course3s = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+        $this->messages = new ArrayCollection();
+        $this->payments = new ArrayCollection();
+        $this->partnerInvites = new ArrayCollection();
+        $this->parentInvites = new ArrayCollection();
+        $this->studentInvites = new ArrayCollection();
+        $this->invites = new ArrayCollection();
+        $this->responses = new ArrayCollection();
+        $this->invitees = new ArrayCollection();
+        $this->userPacks = new ArrayCollection();
+        $this->authored = new ArrayCollection();
+        $this->invitedParents = new ArrayCollection();
+        $this->invitedPartners = new ArrayCollection();
+        $this->invitedStudents = new ArrayCollection();
+        $this->invitedGroups = new ArrayCollection();
         parent::__construct();
     }
 
@@ -595,7 +592,7 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Add groups
      *
-     * @param \StudySauce\Bundle\Entity\Group $groups
+     * @param \StudySauce\Bundle\Entity\Group|GroupInterface $groups
      * @return User
      */
     public function addGroup(GroupInterface $groups)
@@ -608,7 +605,8 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove groups
      *
-     * @param \StudySauce\Bundle\Entity\Group $groups
+     * @param \StudySauce\Bundle\Entity\Group|GroupInterface $groups
+     * @return $this|\FOS\UserBundle\Model\GroupableInterface|void
      */
     public function removeGroup(GroupInterface $groups)
     {
@@ -743,10 +741,10 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Add invites
      *
-     * @param \StudySauce\Bundle\Entity\Invite $invites
+     * @param Invite $invites
      * @return User
      */
-    public function addInvite(\StudySauce\Bundle\Entity\Invite $invites)
+    public function addInvite(Invite $invites)
     {
         $this->invites[] = $invites;
 
@@ -756,9 +754,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove invites
      *
-     * @param \StudySauce\Bundle\Entity\Invite $invites
+     * @param Invite $invites
      */
-    public function removeInvite(\StudySauce\Bundle\Entity\Invite $invites)
+    public function removeInvite(Invite $invites)
     {
         $this->invites->removeElement($invites);
     }
@@ -776,10 +774,10 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Add invitees
      *
-     * @param \StudySauce\Bundle\Entity\Invite $invitees
+     * @param Invite $invitees
      * @return User
      */
-    public function addInvitee(\StudySauce\Bundle\Entity\Invite $invitees)
+    public function addInvitee(Invite $invitees)
     {
         $this->invitees[] = $invitees;
 
@@ -789,9 +787,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove invitees
      *
-     * @param \StudySauce\Bundle\Entity\Invite $invitees
+     * @param Invite $invitees
      */
-    public function removeInvitee(\StudySauce\Bundle\Entity\Invite $invitees)
+    public function removeInvitee(Invite $invitees)
     {
         $this->invitees->removeElement($invitees);
     }
@@ -807,45 +805,12 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * Add packs
-     *
-     * @param \StudySauce\Bundle\Entity\Pack $packs
-     * @return User
-     */
-    public function addPack(\StudySauce\Bundle\Entity\Pack $packs)
-    {
-        $this->packs[] = $packs;
-
-        return $this;
-    }
-
-    /**
-     * Remove packs
-     *
-     * @param \StudySauce\Bundle\Entity\Pack $packs
-     */
-    public function removePack(\StudySauce\Bundle\Entity\Pack $packs)
-    {
-        $this->packs->removeElement($packs);
-    }
-
-    /**
-     * Get packs
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getPacks()
-    {
-        return $this->packs;
-    }
-
-    /**
      * Add responses
      *
-     * @param \StudySauce\Bundle\Entity\Response $responses
+     * @param Response $responses
      * @return User
      */
-    public function addResponse(\StudySauce\Bundle\Entity\Response $responses)
+    public function addResponse(Response $responses)
     {
         $this->responses[] = $responses;
 
@@ -855,9 +820,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * Remove responses
      *
-     * @param \StudySauce\Bundle\Entity\Response $responses
+     * @param Response $responses
      */
-    public function removeResponse(\StudySauce\Bundle\Entity\Response $responses)
+    public function removeResponse(Response $responses)
     {
         $this->responses->removeElement($responses);
     }
@@ -870,5 +835,71 @@ class User extends BaseUser implements EncoderAwareInterface
     public function getResponses()
     {
         return $this->responses;
+    }
+
+    /**
+     * Add authored
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $authored
+     * @return User
+     */
+    public function addAuthored(\StudySauce\Bundle\Entity\Pack $authored)
+    {
+        $this->authored[] = $authored;
+
+        return $this;
+    }
+
+    /**
+     * Remove authored
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $authored
+     */
+    public function removeAuthored(\StudySauce\Bundle\Entity\Pack $authored)
+    {
+        $this->authored->removeElement($authored);
+    }
+
+    /**
+     * Get authored
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getAuthored()
+    {
+        return $this->authored;
+    }
+
+    /**
+     * Add userPacks
+     *
+     * @param UserPack $userPacks
+     * @return User
+     */
+    public function addUserPack(UserPack $userPacks)
+    {
+        $this->userPacks[] = $userPacks;
+
+        return $this;
+    }
+
+    /**
+     * Remove userPacks
+     *
+     * @param UserPack $userPacks
+     */
+    public function removeUserPack(UserPack $userPacks)
+    {
+        $this->userPacks->removeElement($userPacks);
+    }
+
+    /**
+     * Get userPacks
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserPacks()
+    {
+        return $this->userPacks;
     }
 }

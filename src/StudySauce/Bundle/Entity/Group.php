@@ -38,6 +38,11 @@ class Group extends BaseGroup implements GroupInterface
     protected $packs;
 
     /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="groups", fetch="EXTRA_LAZY")
+     */
+    protected $users;
+
+    /**
      * @ORM\OneToOne(targetEntity="File")
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable = true)
      */

@@ -73,41 +73,13 @@ class InviteListener implements EventSubscriberInterface
         $session = $request->getSession();
         /** @var $orm EntityManager */
         $orm = $this->container->get('doctrine')->getManager();
-        /** @var PartnerInvite $partner */
-        // TODO: merge with getInvite?
-        $partner = $orm->getRepository('StudySauceBundle:PartnerInvite')->findOneBy(['code' => $request->get('_code')]);
-        if(!empty($partner)) {
-            $invite = $partner;
-            self::$autoLogoutUser[$request->get('_code')] = function (Session $session) use ($request) {
-                $session->set('partner', $request->get('_code'));
-            };
-        }
-        /** @var ParentInvite $parent */
-        $parent = $orm->getRepository('StudySauceBundle:ParentInvite')->findOneBy(['code' => $request->get('_code')]);
-        if(!empty($parent)) {
-            $invite = $parent;
-            self::$autoLogoutUser[$request->get('_code')] = function (Session $session) use ($request) {
-                $session->set('parent', $request->get('_code'));
-            };
-        }
-        /** @var GroupInvite $group */
-        $group = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy(['code' => $request->get('_code')]);
-        if(!empty($group)) {
-            $invite = $group;
-            self::$autoLogoutUser[$request->get('_code')] = function (Session $session) use ($request) {
-                $session->set('group', $request->get('_code'));
-            };
-        }
-        /** @var StudentInvite $student */
-        $student = $orm->getRepository('StudySauceBundle:StudentInvite')->findOneBy(['code' => $request->get('_code')]);
-        if(!empty($student)) {
-            $invite = $student;
-            self::$autoLogoutUser[$request->get('_code')] = function (Session $session) use ($request) {
-                $session->set('student', $request->get('_code'));
-            };
-        }
+        /** @var Invite $group */
+        $invite = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->get('_code')]);
         /** @var Invite $invite */
         if(!empty($invite)) {
+            self::$autoLogoutUser[$request->get('_code')] = function (Session $session) use ($request) {
+                $session->set('invite', $request->get('_code'));
+            };
             // set associations if user already exists
             /** @var User $user */
             $user = $userManager->findUserByEmail($invite->getEmail());
@@ -153,38 +125,20 @@ class InviteListener implements EventSubscriberInterface
     /**
      * @param EntityManager $orm
      * @param Request $request
-     * @return \StudySauce\Bundle\Entity\GroupInvite|\StudySauce\Bundle\Entity\StudentInvite
+     * @return \StudySauce\Bundle\Entity\Invite
      */
     public static function getInvite(EntityManager $orm, Request $request)
     {
         if(!empty($request->get('_code'))) {
             $code = $request->get('_code');
         }
-        if(!empty($request->getSession()->get('partner'))) {
-            $code = $request->getSession()->get('partner');
-        }
-        if(!empty($request->getSession()->get('parent'))) {
-            $code = $request->getSession()->get('parent');
-        }
-        if(!empty($request->getSession()->get('student'))) {
-            $code = $request->getSession()->get('student');
-        }
-        if(!empty($request->getSession()->get('group'))) {
-            $code = $request->getSession()->get('group');
+        if(!empty($request->getSession()->get('invite'))) {
+            $code = $request->getSession()->get('invite');
         }
         if(isset($code)) {
-            /** @var PartnerInvite $partner */
-            $partner = $orm->getRepository('StudySauceBundle:PartnerInvite')->findOneBy(['code' => $code]);
-            if(!empty($partner)) return $partner;
-            /** @var ParentInvite $parent */
-            $parent = $orm->getRepository('StudySauceBundle:ParentInvite')->findOneBy(['code' => $code]);
-            if(!empty($parent)) return $parent;
-            /** @var GroupInvite $group */
-            $group = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy(['code' => $code]);
-            if(!empty($group)) return $group;
-            /** @var StudentInvite $student */
-            $student = $orm->getRepository('StudySauceBundle:StudentInvite')->findOneBy(['code' => $code]);
-            if(!empty($student)) return $student;
+            /** @var Invite $partner */
+            $invite = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $code]);
+            if(!empty($invite)) return $invite;
         }
         return null;
     }
@@ -202,61 +156,21 @@ class InviteListener implements EventSubscriberInterface
             $criteria = ['code' => $request->get('_code')];
         }
         if(!empty($request->getSession())) {
-            if (!empty($request->getSession()->get('partner'))) {
-                $user->addRole('ROLE_PARTNER');
-                $criteria = ['code' => $request->getSession()->get('partner')];
-            }
-            if (!empty($request->getSession()->get('parent'))) {
-                $user->addRole('ROLE_PARENT');
-                $criteria = ['code' => $request->getSession()->get('parent')];
-            }
-            if (!empty($request->getSession()->get('student'))) {
-                $criteria = ['code' => $request->getSession()->get('student')];
-            }
-            if (!empty($request->getSession()->get('group'))) {
-                $criteria = ['code' => $request->getSession()->get('group')];
+            if (!empty($request->getSession()->get('invite'))) {
+                $criteria = ['code' => $request->getSession()->get('invite')];
             }
         }
 
         if(isset($criteria)) {
-            /** @var PartnerInvite $partner */
-            $partner = $orm->getRepository('StudySauceBundle:PartnerInvite')->findOneBy($criteria);
-            if (!empty($partner)) {
-                $partner->setActivated(true);
-                $partner->setPartner($user);
-                $user->addInvitedPartner($partner);
-                $orm->merge($partner);
-            }
-            /** @var ParentInvite $parent */
-            $parent = $orm->getRepository('StudySauceBundle:ParentInvite')->findOneBy($criteria);
-            if (!empty($parent)) {
-                $parent->setActivated(true);
-                $parent->setParent($user);
-                $user->addInvitedParent($parent);
-                $orm->merge($parent);
-            }
-            /** @var GroupInvite $group */
-            $group = $orm->getRepository('StudySauceBundle:GroupInvite')->findOneBy($criteria);
-            if (!empty($group)) {
-                $group->setActivated(true);
-                $group->setStudent($user);
-                $user->addInvitedGroup($group);
-                if(!$user->hasGroup($group->getGroup()->getName()))
-                    $user->addGroup($group->getGroup());
-                $orm->merge($group);
-            }
-            /** @var StudentInvite $student */
-            $student = $orm->getRepository('StudySauceBundle:StudentInvite')->findOneBy($criteria);
-            if (!empty($student)) {
-                $student->setActivated(true);
-                $student->setStudent($user);
-                $user->addInvitedStudent($student);
-                if ($student->getUser()->hasRole('ROLE_PARENT') || $student->getUser()->hasRole('ROLE_PARTNER')) {
-                    if ($student->getUser()->hasRole('ROLE_PAID')) {
-                        $user->addRole('ROLE_PAID');
-                    }
-                }
-                $orm->merge($student);
+            /** @var Invite $invite */
+            $invite = $orm->getRepository('StudySauceBundle:Invite')->findOneBy($criteria);
+            if (!empty($invite)) {
+                $invite->setActivated(true);
+                $invite->setInvitee($user);
+                $user->addInvitee($invite);
+                if(!empty($invite->getGroup()) && !$user->hasGroup($invite->getGroup()->getName()))
+                    $user->addGroup($invite->getGroup());
+                $orm->merge($invite);
             }
         }
         // assign correct group to anonymous users

@@ -16,6 +16,7 @@ use StudySauce\Bundle\Security\UserProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
@@ -204,6 +205,23 @@ class AccountController extends Controller
         return $error;
     }
 
+    public function inviteAction(Request $request) {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+        // always auto fill information for the person the invite was sent to
+        /** @var Invite $invite */
+        $invite = InviteListener::getInvite($orm, $request);
+        if (!empty($invite)) {
+            return new JsonResponse([
+                'email' => $invite->getEmail(),
+                'first' => $invite->getFirst(),
+                'last' => $invite->getLast(),
+            ]);
+        }
+        else
+            throw new NotFoundHttpException();
+    }
+
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -225,8 +243,8 @@ class AccountController extends Controller
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_register')
             : null;
 
-        /** @var Invite $invite */
         // always auto fill information for the person the invite was sent to
+        /** @var Invite $invite */
         $invite = InviteListener::getInvite($orm, $request);
 
         if (!empty($invite)) {

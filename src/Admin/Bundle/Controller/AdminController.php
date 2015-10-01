@@ -323,20 +323,6 @@ class AdminController extends Controller
             if($field == 'created' || $field == 'lastLogin' || $field == 'lastVisit' || $field == 'last') {
                 $users = $users->orderBy('u.' . $field, $direction);
             }
-            if($field == 'completed') {
-                if(!in_array('c1', $joins)) {
-                    $users = $users
-                        ->leftJoin('u.course1s', 'c1')
-                        ->leftJoin('u.course2s', 'c2')
-                        ->leftJoin('u.course3s', 'c3');
-                }
-                $users = $users
-                    ->addOrderBy('c1.lesson1 + c1.lesson2 + c1.lesson3 + c1.lesson4 + c1.lesson5 + c1.lesson6 + c1.lesson7 + c2.lesson1 + c2.lesson2 + c2.lesson3 + c2.lesson4 + c2.lesson5 + c3.lesson1 + c3.lesson2 + c3.lesson3 + c3.lesson4 + c3.lesson5', $direction)
-                    ->addOrderBy('c1.lesson1 + c1.lesson2 + c1.lesson3 + c1.lesson4 + c1.lesson5 + c1.lesson6 + c1.lesson7', $direction)
-                    ->addOrderBy('c2.lesson1 + c2.lesson2 + c2.lesson3 + c2.lesson4 + c2.lesson5', $direction)
-                    ->addOrderBy('c3.lesson1 + c3.lesson2 + c3.lesson3 + c3.lesson4 + c3.lesson5', $direction);
-                $joins[] = 'c1';
-            }
         }
         else {
             $users = $users->orderBy('u.lastVisit', 'DESC');
@@ -420,160 +406,10 @@ class AdminController extends Controller
             $paid = $paid->leftJoin('u.groups', 'g');
         }
         $paid = $paid->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles LIKE \'%s:9:"ROLE_PAID"%\' OR g.id IN (' . self::$paidStr . ')')
+            ->andWhere('u.roles LIKE \'%s:9:"ROLE_PAID"%\'' . (!empty(self::$paidStr) ? ('OR g.id IN (' . self::$paidStr . ')') : ''))
             ->getQuery()
             ->getSingleScalarResult();
         /** @var int $paid */
-
-        /** @var QueryBuilder $completed */
-        $completed = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) {
-            $completed = $completed
-                ->leftJoin('u.course1s', 'c1')
-                ->leftJoin('u.course2s', 'c2')
-                ->leftJoin('u.course3s', 'c3');
-        }
-        $completed = $completed->select('COUNT(DISTINCT u.id)')
-            ->andWhere('c1.lesson1=4 AND c1.lesson2=4 AND c1.lesson3=4 AND c1.lesson4=4 AND c1.lesson5=4 AND c1.lesson6=4')
-            ->andWhere('c2.lesson1=4 AND c2.lesson2=4 AND c2.lesson3=4 AND c2.lesson4=4 AND c2.lesson5=4')
-            ->andWhere('c3.lesson1=4 AND c3.lesson2=4 AND c3.lesson3=4 AND c3.lesson4=4 AND c3.lesson5=4')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        /** @var QueryBuilder $c1l1 */
-        $c1l1 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l1 = $c1l1->leftJoin('u.course1s', 'c1'); }
-        $c1l1 = $c1l1->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson1=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c1l2 */
-        $c1l2 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l2 = $c1l2->leftJoin('u.course1s', 'c1'); }
-        $c1l2 = $c1l2->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson2=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c1l3 */
-        $c1l3 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l3 = $c1l3->leftJoin('u.course1s', 'c1'); }
-        $c1l3 = $c1l3->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson3=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c1l4 */
-        $c1l4 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l4 = $c1l4->leftJoin('u.course1s', 'c1'); }
-        $c1l4 = $c1l4->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson4=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c1l5 */
-        $c1l5 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l5 = $c1l5->leftJoin('u.course1s', 'c1'); }
-        $c1l5 = $c1l5->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson5=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c1l6 */
-        $c1l6 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l6 = $c1l6->leftJoin('u.course1s', 'c1'); }
-        $c1l6 = $c1l6->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson6=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c1l7 */
-        $c1l7 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c1l7 = $c1l7->leftJoin('u.course1s', 'c1'); }
-        $c1l7 = $c1l7->select('COUNT(DISTINCT u.id)')->andWhere('c1.lesson7=4')->getQuery()->getSingleScalarResult();
-
-        /** @var QueryBuilder $c2l1 */
-        $c2l1 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c2l1 = $c2l1->leftJoin('u.course2s', 'c2'); }
-        $c2l1 = $c2l1->select('COUNT(DISTINCT u.id)')->andWhere('c2.lesson1=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c2l2 */
-        $c2l2 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c2l2 = $c2l2->leftJoin('u.course2s', 'c2'); }
-        $c2l2 = $c2l2->select('COUNT(DISTINCT u.id)')->andWhere('c2.lesson2=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c2l3 */
-        $c2l3 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c2l3 = $c2l3->leftJoin('u.course2s', 'c2'); }
-        $c2l3 = $c2l3->select('COUNT(DISTINCT u.id)')->andWhere('c2.lesson3=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c2l4 */
-        $c2l4 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c2l4 = $c2l4->leftJoin('u.course2s', 'c2'); }
-        $c2l4 = $c2l4->select('COUNT(DISTINCT u.id)')->andWhere('c2.lesson4=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c2l5 */
-        $c2l5 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c2l5 = $c2l5->leftJoin('u.course2s', 'c2'); }
-        $c2l5 = $c2l5->select('COUNT(DISTINCT u.id)')->andWhere('c2.lesson5=4')->getQuery()->getSingleScalarResult();
-
-
-        /** @var QueryBuilder $c3l1 */
-        $c3l1 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c3l1 = $c3l1->leftJoin('u.course3s', 'c3'); }
-        $c3l1 = $c3l1->select('COUNT(DISTINCT u.id)')->andWhere('c3.lesson1=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c3l2 */
-        $c3l2 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c3l2 = $c3l2->leftJoin('u.course3s', 'c3'); }
-        $c3l2 = $c3l2->select('COUNT(DISTINCT u.id)')->andWhere('c3.lesson1=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c3l3 */
-        $c3l3 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c3l3 = $c3l3->leftJoin('u.course3s', 'c3'); }
-        $c3l3 = $c3l3->select('COUNT(DISTINCT u.id)')->andWhere('c3.lesson1=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c3l4 */
-        $c3l4 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c3l4 = $c3l4->leftJoin('u.course3s', 'c3'); }
-        $c3l4 = $c3l4->select('COUNT(DISTINCT u.id)')->andWhere('c3.lesson1=4')->getQuery()->getSingleScalarResult();
-        /** @var QueryBuilder $c3l5 */
-        $c3l5 = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('c1', $joins)) { $c3l5 = $c3l5->leftJoin('u.course3s', 'c3'); }
-        $c3l5 = $c3l5->select('COUNT(DISTINCT u.id)')->andWhere('c3.lesson1=4')->getQuery()->getSingleScalarResult();
-
-
-        /** @var QueryBuilder $goals */
-        $goals = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('goals', $joins)) {
-            $goals = $goals->leftJoin('u.goals', 'goals');
-        }
-        $goals = $goals->select('COUNT(DISTINCT u.id)')
-            ->andWhere('goals.id IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-
-        /** @var QueryBuilder $deadlines */
-        $deadlines = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('deadlines', $joins)) {
-            $deadlines = $deadlines->leftJoin('u.deadlines', 'deadlines');
-        }
-        $deadlines = $deadlines->select('COUNT(DISTINCT u.id)')
-            ->andWhere('deadlines.id IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        /** @var QueryBuilder $schedules */
-        $schedules = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('schedules', $joins)) {
-            $schedules = $schedules->leftJoin('u.schedules', 'schedules');
-        }
-        $schedules = $schedules->select('COUNT(DISTINCT u.id)')
-            ->andWhere('schedules.university IS NOT NULL AND schedules.university!=\'\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        /** @var QueryBuilder $grades */
-        $grades = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('schedules', $joins)) {
-            $grades = $grades->leftJoin('u.schedules', 'schedules');
-        }
-        if(!in_array('grades', $joins)) {
-            $grades = $grades->leftJoin('schedules.courses', 'courses');
-            $grades = $grades->leftJoin('courses.grades', 'grades');
-        }
-        $grades = $grades->select('COUNT(DISTINCT u.id)')
-            ->andWhere('grades.assignment IS NOT NULL AND grades.assignment!=\'\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        /** @var QueryBuilder $partnerTotal */
-        $partnerTotal = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('partners', $joins)) {
-            $partnerTotal = $partnerTotal->leftJoin('u.partnerInvites', 'partners');
-        }
-        $partnerTotal = $partnerTotal->select('COUNT(DISTINCT u.id)')
-            ->andWhere('partners.id IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        /** @var QueryBuilder $notes */
-        $notes = self::searchBuilder($orm, $request, $joins);
-        $notes = $notes->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.evernote_access_token IS NOT NULL AND u.evernote_access_token!=\'\'')
-            ->getQuery()
-            ->getSingleScalarResult();
 
         // get the groups for use in dropdown
         $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
@@ -590,31 +426,7 @@ class AdminController extends Controller
                 'students' => $students,
                 'torch' => $torch,
                 'csa' => $csa,
-                'completed' => $completed,
-                'goals' => $goals,
-                'deadlines' => $deadlines,
-                'schedules' => $schedules,
-                'grades' => $grades,
-                'partnerTotal' => $partnerTotal,
-                'notes' => $notes,
-                'total' => $total,
-                'c1l1' => $c1l1,
-                'c1l2' => $c1l2,
-                'c1l3' => $c1l3,
-                'c1l4' => $c1l4,
-                'c1l5' => $c1l5,
-                'c1l6' => $c1l6,
-                'c1l7' => $c1l7,
-                'c2l1' => $c2l1,
-                'c2l2' => $c2l2,
-                'c2l3' => $c2l3,
-                'c2l4' => $c2l4,
-                'c2l5' => $c2l5,
-                'c3l1' => $c3l1,
-                'c3l2' => $c3l2,
-                'c3l3' => $c3l3,
-                'c3l4' => $c3l4,
-                'c3l5' => $c3l5
+                'total' => $total
             ]);
     }
 

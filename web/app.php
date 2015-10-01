@@ -29,7 +29,8 @@ if (isset($_SERVER) &&
         Symfony\Component\Debug\Debug::enable();
         $kernel = new AppKernel('dev', true);
     }
-    else {
+    elseif(preg_match('/www\.studysauce\.com/', $_SERVER['HTTP_HOST']) ||
+        preg_match('/^studysauce\.com/', $_SERVER['HTTP_HOST'])) {
         $kernel = new AppKernel('prod', false);
     }
 }

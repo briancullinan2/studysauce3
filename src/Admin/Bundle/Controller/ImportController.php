@@ -6,8 +6,8 @@ namespace Admin\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
-use StudySauce\Bundle\Entity\Group;
-use StudySauce\Bundle\Entity\GroupInvite;
+use StudySauce\Bundle\Controller\EmailsController;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,8 +55,8 @@ class ImportController extends Controller
         $user = $this->getUser();
 
         $users = $request->get('users');
-        $existing = $user->getGroupInvites()->toArray();
-        $emails = new \StudySauce\Bundle\Controller\EmailsController();
+        $existing = $user->getInvites()->toArray();
+        $emails = new EmailsController();
         $emails->setContainer($this->container);
         foreach($users as $i => $u)
         {
@@ -92,7 +92,7 @@ class ImportController extends Controller
             // check if invite has already been sent
             foreach($existing as $j => $gi)
             {
-                /** @var GroupInvite $gi */
+                /** @var Invite $gi */
                 if(trim(strtolower($gi->getEmail())) == trim(strtolower($u['email']))) {
                     $invite = $gi;
                     break;
@@ -105,26 +105,26 @@ class ImportController extends Controller
 
             // save the invite
             if((!isset($invite) || $invite->getCreated() < date_sub(new \DateTime(), new \DateInterval('P1D'))) && !empty($group)) {
-                $invite = new GroupInvite();
+                $invite = new Invite();
                 $invite->setGroup($group);
                 $invite->setUser($user);
                 $invite->setFirst($u['first']);
                 $invite->setLast($u['last']);
                 $invite->setEmail(trim($u['email']));
                 $invite->setCode(md5(microtime()));
-                $user->addGroupInvite($invite);
+                $user->addInvite($invite);
                 $orm->persist($invite);
                 $orm->flush();
                 // don't send emails to existing users
                 if(empty($invitee)) {
-                    $emails->groupInviteAction($user, $invite);
+                    $emails->inviteAction($user, $invite);
                 }
             }
 
-            if(!empty($invitee)) {
-                $invite->setStudent($invitee);
+            if(isset($invite) && !empty($invitee)) {
+                $invite->setInvitee($invitee);
                 $invite->setActivated(true);
-                $invitee->addInvitedGroup($invite);
+                $invitee->addInvitee($invite);
                 if(!$invitee->hasGroup($group->getName()))
                     $invitee->addGroup($group);
                 $userManager->updateUser($invitee);

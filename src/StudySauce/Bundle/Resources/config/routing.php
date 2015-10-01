@@ -364,17 +364,24 @@ $collection->add(
     )
 );
 $collection->add(
+    'invite',
+    new Route(
+        '/invite/{_code}',
+        ['_controller' => 'StudySauceBundle:Account:invite']
+    )
+);
+$collection->add(
     'packs',
     new Route(
         '/packs',
-        ['_controller' => 'StudySauceBundle:Buy:packs']
+        ['_controller' => 'StudySauceBundle:Packs:list']
     )
 );
 $collection->add(
     'cards',
     new Route(
-        '/cards',
-        ['_controller' => 'StudySauceBundle:Buy:cards']
+        '/packs/download',
+        ['_controller' => 'StudySauceBundle:Packs:download']
     )
 );
 /*$collection->add('course', new Route('/course/{_course}/{_format}', array(            '_controller' => 'StudySauceBundle:Courses:Course{_course}:index',            '_format'     => 'dashboard'        )));$collection->add('default', new Route('/{_controller}'));$acmeHello = $loader->import('@StudySauceBundle/Resources/public/images/', 'directory');$acmeHello->addPrefix('/bundles/studysauce/images/');$collection->addCollection($acmeHello);*/

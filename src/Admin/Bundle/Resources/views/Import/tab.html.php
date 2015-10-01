@@ -1,9 +1,11 @@
 <?php
 
 use StudySauce\Bundle\Entity\Group;
-use StudySauce\Bundle\Entity\GroupInvite;
+use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/** @var User $user */
 $user = $app->getUser();
 
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
@@ -31,8 +33,8 @@ $view['slots']->start('body'); ?>
 
             <h3>3) Voila, you are connected.</h3>
             <hr/>
-            <?php foreach ($app->getUser()->getGroupInvites()->toArray() as $g) {
-                /** @var GroupInvite $g */
+            <?php foreach ($user->getInvites()->toArray() as $g) {
+                /** @var Invite $g */
                 ?>
                 <div class="import-row read-only invalid">
                     <label class="input first-name">
@@ -57,7 +59,6 @@ $view['slots']->start('body'); ?>
                                     <option value="<?php print $group->getId(); ?>" <?php print ($g->getGroup() == $group ? 'selected="selected"' : ''); ?>><?php print $group->getName(); ?></option>
                                 <?php } ?>
                             </select>
-                            <input type="text" placeholder="Adviser" value="<?php print $g->getGroup()->getName(); ?>"/>
                         </label>
                         <a href="<?php print $view['router']->generate('register', ['_code' => $g->getCode()], UrlGeneratorInterface::ABSOLUTE_URL); ?>">Register</a>
                     <?php } ?>

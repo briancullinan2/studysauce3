@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use StudySauce\Bundle\Entity\UserPack;
 
 /**
  * @ORM\Entity
@@ -29,6 +30,12 @@ class Pack
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserPack", mappedBy="pack")
+     * @ORM\OrderBy({"created" = "DESC"})
+     */
+    protected $userPacks;
 
     /** @ORM\Column(name="properties", type="array", nullable=true) */
     protected $properties = [];
@@ -115,6 +122,18 @@ class Pack
     }
 
     /**
+     * @return User[]
+     */
+    public function getUsers() {
+        $users = [];
+        foreach($this->userPacks->toArray() as $u) {
+            /** @var UserPack $u */
+            $users[] = $u->getUser();
+        }
+        return $users;
+    }
+
+    /**
      * @ORM\PrePersist
      */
     public function setCreatedValue()
@@ -128,6 +147,7 @@ class Pack
     public function __construct()
     {
         $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userPacks = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -516,5 +536,38 @@ class Pack
     public function getPrice()
     {
         return $this->price;
+    }
+
+    /**
+     * Add userPacks
+     *
+     * @param \StudySauce\Bundle\Entity\UserPack $userPacks
+     * @return Pack
+     */
+    public function addUserPack(\StudySauce\Bundle\Entity\UserPack $userPacks)
+    {
+        $this->userPacks[] = $userPacks;
+
+        return $this;
+    }
+
+    /**
+     * Remove userPacks
+     *
+     * @param \StudySauce\Bundle\Entity\UserPack $userPacks
+     */
+    public function removeUserPack(\StudySauce\Bundle\Entity\UserPack $userPacks)
+    {
+        $this->userPacks->removeElement($userPacks);
+    }
+
+    /**
+     * Get userPacks
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserPacks()
+    {
+        return $this->userPacks;
     }
 }
