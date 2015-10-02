@@ -6,7 +6,6 @@ namespace Admin\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
-use StudySauce\Bundle\Controller\EmailsController;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

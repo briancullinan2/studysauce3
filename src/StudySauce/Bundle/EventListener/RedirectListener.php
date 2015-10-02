@@ -5,11 +5,13 @@ namespace StudySauce\Bundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Controller\EmailsController;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -77,6 +79,9 @@ class RedirectListener implements EventSubscriberInterface
     {
         // provide the better way to display a enhanced error page only in prod environment, if you want
         $exception = $event->getException();
+
+
+        // try and reset the entity manager
         try {
             /** @var RegistryInterface $doc */
             $doc = $this->container->get('doctrine');
@@ -86,7 +91,6 @@ class RedirectListener implements EventSubscriberInterface
             $doc->resetManager();
         }
         catch(\Exception $x) {
-
         }
 
         try
@@ -98,7 +102,7 @@ class RedirectListener implements EventSubscriberInterface
         }
         catch(\Exception $x)
         {
-            // nothing more we can do here, hope it gets logged.
+            // nothing more we can do here, pray it gets logged.
         }
 
         // new Response object
@@ -122,23 +126,36 @@ class RedirectListener implements EventSubscriberInterface
             /** @var HttpException $exception */
             $response->setStatusCode($exception->getStatusCode());
             $response->headers->replace($exception->getHeaders());
-            if($this->templating->exists('StudySauceBundle:Exception:error' . $exception->getStatusCode() . '.html.php')) {
-                $response->setContent(
-                    $this->templating->render('StudySauceBundle:Exception:error' . $exception->getStatusCode() . '.html.php', ['exception' => $exception])
-                );
+            if(in_array('application/json', $request->getAcceptableContentTypes())) {
+                $response->setContent((new JsonResponse(['exception' => $exception->getMessage(), 'csrf_token' => $this->container->has('form.csrf_provider')
+                    ? $this->container->get('form.csrf_provider')->generateCsrfToken($request->get('_route'))
+                    : null]))->getContent());
+            }
+            else {
+                if ($this->templating->exists('StudySauceBundle:Exception:error' . $exception->getStatusCode() . '.html.php')) {
+                    $response->setContent(
+                        $this->templating->render('StudySauceBundle:Exception:error' . $exception->getStatusCode() . '.html.php', ['exception' => $exception])
+                    );
+                } else {
+                    $response->setContent(
+                        $this->templating->render('StudySauceBundle:Exception:error.html.php', ['exception' => $exception])
+                    );
+                }
+            }
+        }
+        else {
+            /** @var \Exception $exception */
+            $response->setStatusCode(500);
+            if(in_array('application/json', $request->getAcceptableContentTypes())) {
+                $response->setContent((new JsonResponse(['exception' => $exception->getMessage(), 'csrf_token' => $this->container->has('form.csrf_provider')
+                    ? $this->container->get('form.csrf_provider')->generateCsrfToken($request->get('_route'))
+                    : null]))->getContent());
             }
             else {
                 $response->setContent(
                     $this->templating->render('StudySauceBundle:Exception:error.html.php', ['exception' => $exception])
                 );
             }
-        }
-        else {
-            /** @var \Exception $exception */
-            $response->setContent(
-                $this->templating->render('StudySauceBundle:Exception:error.html.php', ['exception' => $exception])
-            );
-            $response->setStatusCode(500);
         }
 
         // set the new $response object to the $event
@@ -174,16 +191,16 @@ class RedirectListener implements EventSubscriberInterface
 
         // TODO: add social login redirect here
 
-        if ($request->isXmlHttpRequest() && $response->isRedirect()) {
-            $options = ['redirect' => $response->headers->get('Location')];
+        if (in_array('application/json', $request->getAcceptableContentTypes()) && $response->isRedirect()) {
+            /** @var Router $router */
+            $router = $this->container->get('router');
+            $options = ['redirect' => str_replace(trim($router->generate('_welcome', [], true), '/'), '', $response->headers->get('Location')), 'code' => $response->getStatusCode()];
             // repopulate the csrf token for login failures
-            if(strpos($response->headers->get('Location'), '/login'))
-            {
-                $csrfToken = $this->container->has('form.csrf_provider')
-                    ? $this->container->get('form.csrf_provider')->generateCsrfToken('account_login')
-                    : null;
-                $options['csrf_token'] = $csrfToken;
-            }
+            $route = $router->match($options['redirect'])['_route'];
+            $csrfToken = $this->container->has('form.csrf_provider')
+                ? $this->container->get('form.csrf_provider')->generateCsrfToken($route)
+                : null;
+            $options['csrf_token'] = $csrfToken;
             $response->setContent(json_encode($options));
             $response->setStatusCode(200);
             $response->headers->remove('Location');

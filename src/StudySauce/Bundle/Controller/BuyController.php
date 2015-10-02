@@ -17,6 +17,8 @@ use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 
@@ -162,7 +164,7 @@ class BuyController extends Controller
             }
             return $this->forward('StudySauceBundle:Buy:checkout', ['_format' => 'tab']);
         }
-        return new JsonResponse(['error' => 'Coupon not found.']);
+        throw new NotFoundHttpException('Coupon not found ' . $code);
     }
 
     /**
@@ -176,10 +178,6 @@ class BuyController extends Controller
         /** @var $userManager UserManager */
         $userManager = $this->get('fos_user.user_manager');
 
-        // find or create user from checkout form
-        /** @var $user \StudySauce\Bundle\Entity\User */
-        $user = $this->findAndCreateUser($request);
-
         $option = $request->get('reoccurs');
         // apply coupon if it exists
         $coupon = $this->getCoupon($request);
@@ -187,13 +185,10 @@ class BuyController extends Controller
 
         // create a new payment entity
         $payment = new Payment();
-        $payment->setUser($user);
-        $user->addPayment($payment);
         $payment->setAmount($options[$option]['price']);
         $payment->setFirst($request->get('first'));
         $payment->setLast($request->get('last'));
         $payment->setProduct($option);
-        $payment->setEmail($user->getEmail());
         if(!empty($coupon)) {
             $payment->setCoupon($coupon);
         }
@@ -263,48 +258,58 @@ class BuyController extends Controller
                 }
             }
 
-            if (isset($error)) {
-                $response = new JsonResponse(['error' => $error]);
-            }
-            // success
-            else {
-                // update paid status
-                $user->addRole('ROLE_PAID');
-                // set group for coupon is necessary
-                if(!empty($coupon) && !empty($coupon->getGroup()) && !$user->hasGroup($coupon->getGroup()->getName())) {
-                    $user->addGroup($coupon->getGroup());
-                }
-                $userManager->updateUser($user, false);
-                if($user->hasRole('ROLE_PARENT') || $user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER')) {
-                    $response = $this->redirect($this->generateUrl('thanks', ['_format' => 'funnel']));
-                }
-                // redirect to user area
-                else {
-                    list($route, $options) = HomeController::getUserRedirect($user);
-                    $response = $this->redirect($this->generateUrl($route, $options));
-                }
-            }
         } catch(\AuthorizeNetException $ex) {
-            $this->get('logger')->error('Authorize.Net payment failed');
-            $response = new JsonResponse(['error' => 'Could not process payment, please try again later.']);
+            throw new BadRequestHttpException($ex->getMessage(), $ex);
         }
 
-        $orm->persist($payment);
-        $orm->flush();
-        if($payment->getPayment() !== null) {
-            // send receipt
-            $address = $request->get('street1') .
-                (empty(trim($request->get('street2'))) ? '' : ("<br />" . $request->get('street2'))) . '<br />' .
-                $request->get('city') . ' ' . $request->get('state') . '<br />' .
-                $request->get('zip');
+        $user = $this->getUser();
+        $payment->setUser($user);
+        $user->addPayment($payment);
+        $payment->setEmail($user->getEmail());
 
-            $emails = new EmailsController();
-            $emails->setContainer($this->container);
-            $emails->invoiceAction($user, $payment, $address);
-
-            // send partner prepay emails if needed
-            $this->sendPartnerPrepay($user, $request);
+        if (isset($error)) {
+            $orm->persist($payment);
+            $orm->flush();
+            throw new BadRequestHttpException($error);
         }
+
+        // successful payment!
+
+        // find or create user from checkout form
+        /** @var $user \StudySauce\Bundle\Entity\User */
+        $user = $this->findAndCreateUser($request);
+        $payment->setUser($user);
+        $user->addPayment($payment);
+        $payment->setEmail($user->getEmail());
+
+        // update paid status
+        $user->addRole('ROLE_PAID');
+        // set group for coupon is necessary
+        if(!empty($coupon) && !empty($coupon->getGroup()) && !$user->hasGroup($coupon->getGroup()->getName())) {
+            $user->addGroup($coupon->getGroup());
+        }
+        $userManager->updateUser($user);
+        if($user->hasRole('ROLE_PARENT') || $user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER')) {
+            $response = $this->redirect($this->generateUrl('thanks', ['_format' => 'funnel']));
+        }
+        // redirect to user area
+        else {
+            list($route, $options) = HomeController::getUserRedirect($user);
+            $response = $this->redirect($this->generateUrl($route, $options));
+        }
+
+        // send receipt
+        $address = $request->get('street1') .
+            (empty(trim($request->get('street2'))) ? '' : ("<br />" . $request->get('street2'))) . '<br />' .
+            $request->get('city') . ' ' . $request->get('state') . '<br />' .
+            $request->get('zip');
+
+        $emails = new EmailsController();
+        $emails->setContainer($this->container);
+        $emails->invoiceAction($user, $payment, $address);
+
+        // send partner prepay emails if needed
+        $this->sendPartnerPrepay($user, $request);
 
         $loginManager = $this->get('fos_user.security.login_manager');
         $loginManager->loginUser('main', $user, $response);
@@ -392,8 +397,8 @@ class BuyController extends Controller
         {
             /** @var User $inviteUser */
             $inviteUser = $userManager->findUserByEmail($request->get('invite')['email']);
-            /** @var StudentInvite $invite */
-            $invite = new StudentInvite();
+            /** @var Invite $invite */
+            $invite = new Invite();
             $invite->setUser($user); // might be guest here
             $invite->setFirst($request->get('invite')['first']);
             $invite->setLast($request->get('invite')['last']);

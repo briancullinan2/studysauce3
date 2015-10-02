@@ -183,7 +183,7 @@ $collection->add(
         '',
         [],
         [],
-        'request.isXmlHttpRequest()'
+        'request.isXmlHttpRequest()||request.getMethod()=="POST"'
     )
 );
 $collection->add(
@@ -219,7 +219,7 @@ $collection->add(
         '',
         [],
         [],
-        'request.isXmlHttpRequest()'
+        'request.isXmlHttpRequest()||request.getMethod()=="POST"'
     )
 );
 $collection->add(
@@ -232,7 +232,7 @@ $collection->add(
         '',
         [],
         [],
-        'request.isXmlHttpRequest() || request.isMethod("POST")'
+        'request.isXmlHttpRequest() || request.getMethod()=="POST"'
     )
 );
 $collection->add(
@@ -361,13 +361,6 @@ $collection->add(
         [],
         [],
         'request.isXmlHttpRequest()'
-    )
-);
-$collection->add(
-    'invite',
-    new Route(
-        '/invite/{_code}',
-        ['_controller' => 'StudySauceBundle:Account:invite']
     )
 );
 $collection->add(

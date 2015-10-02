@@ -1,13 +1,9 @@
 <?php
-use StudySauce\Bundle\Entity\Invite;
-use StudySauce\Bundle\Entity\ParentInvite;
-use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 
 /** @var $view TimedPhpEngine */
 /** @var $user User */
-/** @var Invite $invite */
 
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 

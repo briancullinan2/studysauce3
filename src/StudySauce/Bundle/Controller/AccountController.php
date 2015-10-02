@@ -5,17 +5,17 @@ namespace StudySauce\Bundle\Controller;
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
 use FOS\UserBundle\Security\LoginManager;
-use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider;
 use HWI\Bundle\OAuthBundle\Templating\Helper\OAuthHelper;
 use StudySauce\Bundle\Entity\Invite;
-use StudySauce\Bundle\Entity\ParentInvite;
-use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\EventListener\InviteListener;
 use StudySauce\Bundle\Security\UserProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
@@ -113,19 +113,13 @@ class AccountController extends Controller
                 $orm->merge($user);
                 $orm->flush();
             } else {
-                $error = 'Incorrect password';
+                throw new AccessDeniedHttpException('Incorrect password while updating user');
             }
         }
 
-        $csrfToken = $this->has('form.csrf_provider')
+        return new JsonResponse(['csrf_token' => $this->has('form.csrf_provider')
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_update')
-            : null;
-        $response = ['csrf_token' => $csrfToken];
-        if (isset($error)) {
-            $response['error'] = $error;
-        }
-
-        return new JsonResponse($response);
+            : null]);
     }
 
     /**
@@ -168,19 +162,20 @@ class AccountController extends Controller
         $error = $this->getErrorForRequest($request);
 
         $csrfToken = $this->has('form.csrf_provider')
-            ? $this->get('form.csrf_provider')->generateCsrfToken('account_login')
+            ? $this->get('form.csrf_provider')->generateCsrfToken('login')
             : null;
 
-        return $this->render(
-            'StudySauceBundle:Account:login.html.php',
-            [
-                'invite' => $invite,
-                'email' => $email,
-                'csrf_token' => $csrfToken,
-                'services' => $services,
-                'error' => $error
-            ]
-        );
+        $templateVars = [
+            'email' => $email,
+            'csrf_token' => $csrfToken,
+            'services' => $services,
+            'error' => $error->getMessage()
+        ];
+
+        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+            return new JsonResponse($templateVars);
+        }
+        return $this->render('StudySauceBundle:Account:login.html.php', $templateVars);
     }
 
     /**
@@ -205,23 +200,6 @@ class AccountController extends Controller
         return $error;
     }
 
-    public function inviteAction(Request $request) {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-        // always auto fill information for the person the invite was sent to
-        /** @var Invite $invite */
-        $invite = InviteListener::getInvite($orm, $request);
-        if (!empty($invite)) {
-            return new JsonResponse([
-                'email' => $invite->getEmail(),
-                'first' => $invite->getFirst(),
-                'last' => $invite->getLast(),
-            ]);
-        }
-        else
-            throw new NotFoundHttpException();
-    }
-
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -239,38 +217,49 @@ class AccountController extends Controller
             $services[$o] = $oauth->getLoginUrl($o);
         }
 
-        $csrfToken = $this->has('form.csrf_provider')
-            ? $this->get('form.csrf_provider')->generateCsrfToken('account_register')
-            : null;
-
         // always auto fill information for the person the invite was sent to
         /** @var Invite $invite */
         $invite = InviteListener::getInvite($orm, $request);
 
         if (!empty($invite)) {
-            return $this->render(
-                'StudySauceBundle:Account:register.html.php',
-                [
-                    'invite' => $invite,
+            if($invite->getActivated() && !empty($invite->getInvitee())) {
+                return new RedirectResponse($this->generateUrl('login'), 301);
+            }
+            else {
+                $templateVars = [
+                    'code' => $invite->getCode(),
                     'email' => $invite->getEmail(),
                     'first' => $invite->getFirst(),
                     'last' => $invite->getLast(),
-                    'csrf_token' => $csrfToken,
+                    'csrf_token' => $this->has('form.csrf_provider')
+                        ? $this->get('form.csrf_provider')->generateCsrfToken('account_create')
+                        : null,
                     'services' => $services
-                ]
-            );
+                ];
+            }
         }
-
-        return $this->render(
-            'StudySauceBundle:Account:register.html.php',
-            [
+        else {
+            if(!empty($request->get('_code'))) {
+                throw new NotFoundHttpException('Invite not found for code ' . $request->get('_code'));
+            }
+            $templateVars = [
                 'email' => $request->get('email'),
                 'first' => $request->get('first'),
                 'last' => $request->get('last'),
-                'csrf_token' => $csrfToken,
+                'csrf_token' => $this->has('form.csrf_provider')
+                    ? $this->get('form.csrf_provider')->generateCsrfToken('account_create')
+                    : null,
                 'services' => $services
-            ]
-        );
+            ];
+        }
+
+
+        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+            return new JsonResponse($templateVars);
+        }
+        else {
+            return $this->render('StudySauceBundle:Account:register.html.php', $templateVars);
+        }
     }
 
     /**
@@ -283,9 +272,10 @@ class AccountController extends Controller
         $userManager = $this->get('fos_user.user_manager');
 
         $csrfToken = $this->has('form.csrf_provider')
-            ? $this->get('form.csrf_provider')->generateCsrfToken('account_register')
+            ? $this->get('form.csrf_provider')->generateCsrfToken('reset')
             : null;
 
+        /** @var User $user */
         if (!empty($request->get('token'))
             && !empty($user = $userManager->findUserByConfirmationToken($request->get('token')))
             && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO') && !empty($request->get('newPass'))
@@ -340,7 +330,7 @@ class AccountController extends Controller
                 $user->setPasswordRequestedAt(new \DateTime());
                 $userManager->updateUser($user);
             } else {
-                $error = 'No account found, please try an alternate email address.';
+                throw new NotFoundHttpException('No account found, please try an alternate email address.');
             }
         }
 
@@ -353,10 +343,10 @@ class AccountController extends Controller
             'email' => $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO') ? $request->get(
                 'email'
             ) : $user->getEmail(),
-            'error' => !empty($error) ? $error : null,
             'csrf_token' => $csrfToken
         ];
-        if ($request->isXmlHttpRequest()) {
+
+        if (in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
         }
 
@@ -377,9 +367,7 @@ class AccountController extends Controller
         $orm = $this->get('doctrine')->getManager();
 
         $user = $userManager->findUserByEmail($request->get('email'));
-        $csrfToken = $this->has('form.csrf_provider')
-            ? $this->get('form.csrf_provider')->generateCsrfToken('account_register')
-            : null;
+
         if ($user == null) {
             // generate a new guest user in the database
             /** @var $user User */
@@ -433,7 +421,7 @@ class AccountController extends Controller
 
             return $response;
         } else {
-            return new JsonResponse(['error' => true, 'csrf_token' => $csrfToken]);
+            return new RedirectResponse($this->generateUrl('login'), 301);
         }
     }
 

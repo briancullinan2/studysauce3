@@ -1,15 +1,11 @@
 <?php
-use StudySauce\Bundle\Entity\Invite;
-use StudySauce\Bundle\Entity\ParentInvite;
-use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
-use StudySauce\Bundle\EventListener\InviteListener;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 /** @var GlobalVariables $app */
 /** @var $view TimedPhpEngine */
 /** @var $user User */
-/** @var Invite $invite */
+/** @var string $code */
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
@@ -35,8 +31,8 @@ $view['slots']->start('body'); ?>
     <div class="pane-content">
         <h2>Welcome, let's get started.</h2>
         <form action="<?php print $view['router']->generate('account_create'); ?>" method="post">
-            <?php if(!empty($invite)) { ?>
-                <input type="hidden" name="_code" value="<?php print $invite->getCode(); ?>" />
+            <?php if(!empty($code)) { ?>
+                <input type="hidden" name="_code" value="<?php print $code; ?>" />
             <?php } ?>
             <input type="hidden" name="_remember_me" value="on" />
             <div class="first-name">
@@ -53,9 +49,6 @@ $view['slots']->start('body'); ?>
             </div>
             <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>"/>
             <div class="form-actions highlighted-link invalid">
-                <?php /* if(!empty($invite) && (!empty($invite->getUser() || $invite instanceof ParentInvite || $invite instanceof StudentInvite))) { ?>
-                    <a href="<?php print $view['router']->generate('logout'); ?>" class="cloak">You have been invited by <?php print (!empty($invite) ? $invite->getUser()->getFirst() : $invite->getFromFirst()); ?>.  Click here to decline.</a>
-                <?php } */ ?>
                 <div class="invalid-only">You must complete all fields before moving on.</div>
                 <button type="submit" value="#user-register" class="more">Register</button>
             </div>

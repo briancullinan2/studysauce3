@@ -71,8 +71,9 @@ jQuery(document).ready(function() {
                 }
                 account.find('.password input').val('');
             },
-            error: function () {
+            error: function (data) {
                 account.find('.squiggle').stop().remove();
+                account.find('input[name="csrf_token"]').val(data.csrf_token);
             }
         });
     }

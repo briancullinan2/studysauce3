@@ -102,7 +102,7 @@ class ActivityController extends Controller
             ];
         }, $entities);
 
-        if($request->isXmlHttpRequest() && !empty($request->get('start')) && !empty($request->get('end'))) {
+        if(in_array('application/json', $request->getAcceptableContentTypes()) && !empty($request->get('start')) && !empty($request->get('end'))) {
             return new JsonResponse($visits);
         }
 
