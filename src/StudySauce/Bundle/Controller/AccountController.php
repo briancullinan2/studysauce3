@@ -130,6 +130,14 @@ class AccountController extends Controller
         return $this->render('StudySauceBundle:Exception:error403.html.php');
     }
 
+    public function authenticateAction(Request $request) {
+        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+            $error = $this->getErrorForRequest($request);
+            if(!empty($error)) {
+                throw $error;
+            }
+        }
+    }
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -169,8 +177,18 @@ class AccountController extends Controller
             'email' => $email,
             'csrf_token' => $csrfToken,
             'services' => $services,
-            'error' => $error->getMessage()
+            'error' => !empty($error) ? $error->getMessage() : null
         ];
+
+        // display the currently logged in user
+        /** @var User $user */
+        $user = $this->getUser();
+        if(!empty($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
+            $templateVars['email'] = $user->getEmail();
+            $templateVars['id'] = $user->getId();
+            $templateVars['first'] = $user->getFirst();
+            $templateVars['last'] = $user->getLast();
+        }
 
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
@@ -185,7 +203,7 @@ class AccountController extends Controller
      *
      * @return string|\Exception
      */
-    protected function getErrorForRequest(Request $request)
+    public static function getErrorForRequest(Request $request)
     {
         $session = $request->getSession();
         if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
@@ -222,7 +240,8 @@ class AccountController extends Controller
         $invite = InviteListener::getInvite($orm, $request);
 
         if (!empty($invite)) {
-            if($invite->getActivated() && !empty($invite->getInvitee())) {
+            if((in_array('application/json', $request->getAcceptableContentTypes()) || $request->isXmlHttpRequest())
+                && $invite->getActivated() && !empty($invite->getInvitee())) {
                 return new RedirectResponse($this->generateUrl('login'), 301);
             }
             else {
@@ -239,7 +258,8 @@ class AccountController extends Controller
             }
         }
         else {
-            if(!empty($request->get('_code'))) {
+            if((in_array('application/json', $request->getAcceptableContentTypes()) || $request->isXmlHttpRequest())
+                && !empty($request->get('_code'))) {
                 throw new NotFoundHttpException('Invite not found for code ' . $request->get('_code'));
             }
             $templateVars = [

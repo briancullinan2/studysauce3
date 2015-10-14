@@ -14,7 +14,7 @@ $user = $app->getUser();
             <li><a href="<?php print $view['router']->generate('emails'); ?>"><span>&nbsp;</span>Emails</a></li>
             <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>
             <li><a href="<?php print $view['router']->generate('activity'); ?>"><span>&nbsp;</span>Recent activity</a></li>
-            <li><a href="<?php print $view['router']->generate('results'); ?>"><span>&nbsp;</span>Quiz Results</a></li>
+            <li><a href="<?php print $view['router']->generate('results'); ?>"><span>&nbsp;</span>Results</a></li>
             <li><a href="<?php print $view['router']->generate('account'); ?>"><span>&nbsp;</span>Account settings</a></li>
         </ul>
     </nav>

@@ -249,27 +249,14 @@ class User extends BaseUser implements EncoderAwareInterface
     {
         $this->schedules = new ArrayCollection();
         $this->visits = new ArrayCollection();
-        $this->goals = new ArrayCollection();
-        $this->deadlines = new ArrayCollection();
         $this->files = new ArrayCollection();
-        $this->course1s = new ArrayCollection();
-        $this->course2s = new ArrayCollection();
-        $this->course3s = new ArrayCollection();
         $this->groups = new ArrayCollection();
-        $this->messages = new ArrayCollection();
         $this->payments = new ArrayCollection();
-        $this->partnerInvites = new ArrayCollection();
-        $this->parentInvites = new ArrayCollection();
-        $this->studentInvites = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->responses = new ArrayCollection();
         $this->invitees = new ArrayCollection();
         $this->userPacks = new ArrayCollection();
         $this->authored = new ArrayCollection();
-        $this->invitedParents = new ArrayCollection();
-        $this->invitedPartners = new ArrayCollection();
-        $this->invitedStudents = new ArrayCollection();
-        $this->invitedGroups = new ArrayCollection();
         parent::__construct();
     }
 

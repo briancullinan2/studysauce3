@@ -33,28 +33,30 @@ class DialogsController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function contactSendAction(Request $request)
+    public function signupAction(Request $request)
     {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
         /** @var $user \StudySauce\Bundle\Entity\User */
         $user = $this->getUser();
 
-        // save the invite
-        $contact = new ContactMessage();
-        if($user != 'anon.' && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
-            $contact->setUser($user);
-        }
-        $contact->setName($request->get('name'));
-        $contact->setEmail($request->get('email'));
-        $contact->setMessage(str_replace(["\n"], ['<br />'], $request->get('message')));
-        $orm->persist($contact);
-        $orm->flush();
+        $email = new EmailsController();
+        $email->setContainer($this->container);
+        $email->contactMessageAction($user, "User Signup", $request->get('email'), "Would like to know when we launch");
+
+        return new JsonResponse(true);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function contactSendAction(Request $request)
+    {
+        /** @var $user \StudySauce\Bundle\Entity\User */
+        $user = $this->getUser();
 
         $email = new EmailsController();
         $email->setContainer($this->container);
-        $email->contactMessageAction($user, $contact);
+        $email->contactMessageAction($user, $request->get('name'), $request->get('email'), $request->get('message'));
 
         return new JsonResponse(true);
     }

@@ -30,14 +30,14 @@ $view['slots']->start('body'); ?>
         <h2><?php if(!empty($token)) { ?>Set a new password<?php } else { ?>Reset your password<?php } ?></h2>
         <form action="<?php print $view['router']->generate('password_reset'); ?>" method="post">
         <div class="email <?php print (!empty($token) ? 'read-only' : ''); ?>">
-            <label class="input"><input type="text" placeholder="Email" value="<?php print $email; ?>"></label>
+            <label class="input"><input type="text" name="email" placeholder="Email" value="<?php print $email; ?>"></label>
         </div>
         <?php if(!empty($token)) { ?>
             <div class="password">
-                <label class="input"><input type="password" placeholder="New password" value=""></label>
+                <label class="input"><input type="password" name="pass" placeholder="New password" value=""></label>
             </div>
             <div class="confirm-password">
-                <label class="input"><input type="password" placeholder="Confirm password" value=""></label>
+                <label class="input"><input type="password" name="newPass" placeholder="Confirm password" value=""></label>
             </div>
         <?php } ?>
         <input type="hidden" name="token" value="<?php echo $token; ?>"/>

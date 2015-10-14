@@ -43,10 +43,10 @@ class HomeController extends Controller
     }
 
     /**
-     * @param User $user
+     * @param User|null $user
      * @return array|string
      */
-    public static function getUserRedirect(User $user)
+    public static function getUserRedirect($user)
     {
         if($user == 'anon.' || !is_object($user) || $user->hasRole('ROLE_GUEST'))
             return ['_welcome', []];

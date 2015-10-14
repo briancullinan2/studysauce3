@@ -229,6 +229,19 @@ function ssMergeScripts(content)
 $(document).ready(function () {
     var body = $('body');
 
+    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/ig) ? true : false);
+    var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
+
+    if (iOS)
+    {
+        appUrl += (window.location.search.indexOf('?') > -1 ? '&' : '?') + $('input').map(function () {
+                return $(this).attr('name') + '=' + $(this).attr('value');
+            }).toArray().join("&");
+        setTimeout(function () {
+            window.location = appUrl;
+        }, 100);
+    }
+
     $(document).tooltip({
         items: '*[title]:not(iframe):not(.cke_editable):not(.cke),*[original-title]:not(iframe):not(.cke_editable):not(.cke)',
         position: { my: "center top", at: "center bottom+10" },

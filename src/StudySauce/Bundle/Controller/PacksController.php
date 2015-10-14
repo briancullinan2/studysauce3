@@ -40,12 +40,6 @@ class PacksController extends Controller
         return new JsonResponse(array_map(function (Pack $x) {
             $group = $x->getGroup();
 
-            $creator = !empty($x->getGroup())
-                ? $x->getGroup()->getName()
-                : (!empty($x->getUser())
-                    ? ($x->getUser()->getFirst() . ' ' . $x->getUser()->getLast())
-                    : '');
-
             $logo = !empty($group)
                 ? $group->getLogo()->getUrl()
                 : (!empty($x->getUser()) && !empty($x->getUser()->getPhoto())
@@ -55,7 +49,7 @@ class PacksController extends Controller
                 'id' => $x->getId(),
                 'logo' => $logo,
                 'title' => $x->getTitle(),
-                'creator' => $creator,
+                'creator' => $x->getCreator(),
                 'created' => $x->getCreated()->format('r'),
                 'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null
             ];

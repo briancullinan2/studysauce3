@@ -16,12 +16,6 @@ $view['slots']->start('body'); ?>
 
 <div class="panel-pane" id="home">
     <?php
-    print $view['actions']->render(new ControllerReference('StudySauceBundle:Course:widget'));
-    print $view['actions']->render(new ControllerReference('StudySauceBundle:Goals:widget'));
-    print $view['actions']->render(new ControllerReference('StudySauceBundle:Deadlines:widget'));
-    print $view['actions']->render(new ControllerReference('StudySauceBundle:Metrics:widget'));
-    print $view['actions']->render(new ControllerReference('StudySauceBundle:Plan:widget'));
-    print $view['actions']->render(new ControllerReference('StudySauceBundle:Checkin:widget'));
     ?>
 </div>
 

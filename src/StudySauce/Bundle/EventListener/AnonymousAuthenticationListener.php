@@ -14,17 +14,7 @@ namespace StudySauce\Bundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
 use FOS\UserBundle\Security\LoginManager;
-use StudySauce\Bundle\Controller\CalcController;
-use StudySauce\Bundle\Controller\CourseController;
-use StudySauce\Bundle\Controller\DeadlinesController;
-use StudySauce\Bundle\Controller\GoalsController;
 use StudySauce\Bundle\Controller\HomeController;
-use StudySauce\Bundle\Controller\MetricsController;
-use StudySauce\Bundle\Controller\NotesController;
-use StudySauce\Bundle\Controller\PartnerController;
-use StudySauce\Bundle\Controller\PlanController;
-use StudySauce\Bundle\Controller\ScheduleController;
-use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\Entity\Visit;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -93,8 +83,8 @@ class AnonymousAuthenticationListener implements ListenerInterface
             // reset Guest User for oauth connections
             $controller = $request->get('_controller');
             if(($controller == 'HWI\Bundle\OAuthBundle\Controller\ConnectController::connectServiceAction' ||
-                    $controller == 'StudySauce\Bundle\Controller\AccountController::login' ||
-                    $controller == 'StudySauce\Bundle\Controller\AccountController::register' ||
+                    $controller == 'StudySauce\Bundle\Controller\AccountController::loginAction' ||
+                    $controller == 'StudySauce\Bundle\Controller\AccountController::registerAction' ||
                     $controller == 'HWI\Bundle\OAuthBundle\Controller\ConnectController::redirectToServiceAction')&&
                 ($user = $token->getUser()) !== null && ($user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')))
             {
@@ -203,25 +193,18 @@ class AnonymousAuthenticationListener implements ListenerInterface
                 $orm->flush();
             }
             elseif($user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')) {
-                ScheduleController::getDemoSchedule($this->container);
-                PlanController::createDemoEvents($this->container);
-                DeadlinesController::getDemoDeadlines($this->container);
-                MetricsController::getDemoCheckins($this->container);
-                GoalsController::getDemoGoals($this->container);
-                CalcController::getDemoCalculations($this->container);
-                CourseController::getDemoCourses($this->container);
-                PartnerController::getDemoPartner($this->container);
-                NotesController::getDemoNotes($this->container);
+
             }
+
             list($route, $options) = HomeController::getUserRedirect($user);
             $response = new RedirectResponse($router->generate($route, $options));
-
             /** @var LoginManager $loginManager */
             $loginManager = $this->container->get('fos_user.security.login_manager');
             $loginManager->loginUser('main', $user, $response);
 
             $event->setResponse($response);
         }
+
     }
 
 }

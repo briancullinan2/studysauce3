@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use StudySauce\Bundle\Controller\AccountController;
 use StudySauce\Bundle\Controller\EmailsController;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -180,6 +181,7 @@ class RedirectListener implements EventSubscriberInterface
 
     /**
      * @param FilterResponseEvent $event
+     * @throws \Exception|string
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -195,6 +197,9 @@ class RedirectListener implements EventSubscriberInterface
             /** @var Router $router */
             $router = $this->container->get('router');
             $options = ['redirect' => str_replace(trim($router->generate('_welcome', [], true), '/'), '', $response->headers->get('Location')), 'code' => $response->getStatusCode()];
+            if(!empty($error = AccountController::getErrorForRequest($request))) {
+                $options['exception'] = $error->getMessage();
+            }
             // repopulate the csrf token for login failures
             $route = $router->match($options['redirect'])['_route'];
             $csrfToken = $this->container->has('form.csrf_provider')

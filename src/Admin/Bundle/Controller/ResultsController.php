@@ -122,36 +122,6 @@ class ResultsController extends Controller
             }
         }
 
-
-        // check for individual lesson filters
-        for ($i = 1; $i <= 17; $i++) {
-            if (!empty($lesson = $request->get('lesson' . $i))) {
-                if (!in_array('c1', $joins)) {
-                    $qb = $qb
-                        ->leftJoin('u.course1s', 'c1')
-                        ->leftJoin('u.course2s', 'c2')
-                        ->leftJoin('u.course3s', 'c3');
-                    $joins[] = 'c1';
-                }
-                if ($i > 12) {
-                    $l = $i - 12;
-                    $c = 3;
-                } elseif ($i > 7) {
-                    $l = $i - 7;
-                    $c = 2;
-                } else {
-                    $l = $i;
-                    $c = 1;
-                }
-                if ($lesson == 'yes') {
-                    $qb = $qb->andWhere('c' . $c . '.lesson' . $l . '=4');
-                } else {
-                    $qb = $qb->andWhere('c' . $c . '.lesson' . $l . '<4 OR ' . 'c' . $c . '.lesson' . $l . ' IS NULL');
-                }
-            }
-        }
-
-
         if (!empty($paid = $request->get('paid'))) {
             if (!in_array('g', $joins)) {
                 $qb = $qb->leftJoin('u.groups', 'g');
@@ -213,20 +183,7 @@ class ResultsController extends Controller
             if ($field == 'created' || $field == 'lastLogin' || $field == 'lastVisit' || $field == 'last') {
                 $users = $users->orderBy('u.' . $field, $direction);
             }
-            if ($field == 'completed') {
-                if (!in_array('c1', $joins)) {
-                    $users = $users
-                        ->leftJoin('u.course1s', 'c1')
-                        ->leftJoin('u.course2s', 'c2')
-                        ->leftJoin('u.course3s', 'c3');
-                }
-                $users = $users
-                    ->addOrderBy('c1.lesson1 + c1.lesson2 + c1.lesson3 + c1.lesson4 + c1.lesson5 + c1.lesson6 + c1.lesson7 + c2.lesson1 + c2.lesson2 + c2.lesson3 + c2.lesson4 + c2.lesson5 + c3.lesson1 + c3.lesson2 + c3.lesson3 + c3.lesson4 + c3.lesson5', $direction)
-                    ->addOrderBy('c1.lesson1 + c1.lesson2 + c1.lesson3 + c1.lesson4 + c1.lesson5 + c1.lesson6 + c1.lesson7', $direction)
-                    ->addOrderBy('c2.lesson1 + c2.lesson2 + c2.lesson3 + c2.lesson4 + c2.lesson5', $direction)
-                    ->addOrderBy('c3.lesson1 + c3.lesson2 + c3.lesson3 + c3.lesson4 + c3.lesson5', $direction);
-                $joins[] = 'c1';
-            }
+
         } else {
             $users = $users->orderBy('u.lastVisit', 'DESC');
         }
@@ -238,213 +195,7 @@ class ResultsController extends Controller
             ->getResult();
 
         // TODO: get aggregate data for every quiz answer
-        $courses = [
-            'course1' => [
-                'Course1Bundle:Introduction:quiz.html.php' => 'quiz1',
-                'Course1Bundle:SettingGoals:quiz.html.php' => 'quiz2',
-                'Course1Bundle:Distractions:quiz.html.php' => 'quiz4',
-                'Course1Bundle:Procrastination:quiz.html.php' => 'quiz3',
-                'Course1Bundle:Environment:quiz.html.php' => 'quiz5',
-                'Course1Bundle:Partners:quiz.html.php' => 'quiz6'
-            ],
-            'course2' => [
-                'Course2Bundle:StudyMetrics:quiz.html.php' => 'studyMetrics',
-                'Course2Bundle:StudyPlan:quiz.html.php' => 'studyPlan',
-                'Course2Bundle:Interleaving:quiz.html.php' => 'interleaving',
-                'Course2Bundle:StudyTests:quiz.html.php' => 'studyTests',
-                'Course2Bundle:TestTaking:quiz.html.php' => 'testTaking',
-            ],
-            'course3' => [
-                'Course3Bundle:Strategies:quiz.html.php' => 'strategies',
-                'Course3Bundle:GroupStudy:quiz.html.php' => 'groupStudy',
-                'Course3Bundle:Teaching:quiz.html.php' => 'teaching',
-                'Course3Bundle:ActiveReading:quiz.html.php' => 'activeReading',
-                'Course3Bundle:SpacedRepetition:quiz.html.php' => 'spacedRepetition',
-            ],
-        ];
-        foreach ($courses as $course => $quizes) {
-            foreach ($quizes as $t => $q) {
-                $data = $orm->getMetadataFactory()->getMetadataFor(ucfirst($course) . 'Bundle:' . ucfirst($q));
-                $fields = $data->getFieldNames();
-                $questions = [];
-                foreach ($fields as $f) {
-                    if (in_array($f, $data->getAssociationNames()) || $f == 'id' || $f == 'created') {
-                        continue;
-                    }
 
-                    $groupBy = self::searchBuilder($orm, $request, $joins)->distinct(true)->select(
-                        'q1.' . $f . ', count(q1) AS cnt'
-                    );
-                    if (!in_array('c1', $joins)) {
-                        $groupBy = $groupBy->leftJoin('u.' . $course . 's', 'c' . substr($course, -1));
-                        $joins[] = 'c1';
-                    }
-                    $counts = $groupBy
-                        ->leftJoin('c' . substr($course, -1) . '.' . $q, 'q1')
-                        ->groupBy('q1.' . $f)
-                        ->getQuery()
-                        ->getResult();
-                    $questions[$f] = $counts;
-                }
-                $cn = '\\' . ucfirst($course) . '\\Bundle\\Entity\\' . ucfirst($q);
-                $quizContent = $this->forward('AdminBundle:Results:template', ['_format' => 'tab', 'exclude_layout' => true, 'template' => $t, 'class' => $cn])->getContent();
-                foreach ($questions as $f => $c) {
-                    $total = array_sum(
-                        array_map(
-                            function ($field) {
-                                return $field['cnt'];
-                            },
-                            $c
-                        )
-                    );
-                    $answers = '<div class="response">' . join(
-                            '</div><div class="response">',
-                            array_map(
-                                function ($field) use ($f, $total) {
-                                    $val = $field[$f];
-                                    if (is_array($val)) {
-                                        $val = join(', ', $val);
-                                    }
-                                    if (is_bool($val)) {
-                                        $val = $val ? 'true' : 'false';
-                                    }
-                                    if (is_null($val)) {
-                                        $val = 'No answer';
-                                    }
-
-                                    return $val . ' - ' . $field['cnt'] . ' (' . ($total == 0 ? 0 : round(
-                                        $field['cnt'] * 100.0 / $total
-                                    )) . '%)';
-                                },
-                                $c
-                            )
-                        ) . '</div>';
-                    $quizContent = preg_replace(
-                        '/(<label[\s\S]*?<(input|textarea).*name="quiz-' . $f . '".*?>[\s\S]*?<\/label>[\s]*)+/i',
-                        $answers,
-                        $quizContent
-                    );
-                }
-                $aggregate[$q] = $quizContent;
-            }
-        }
-
-        // get why study? answers
-        /** @var QueryBuilder $whyStudy */
-        $whyStudy = self::searchBuilder($orm, $request, $joins)->distinct(true)->select(
-            'c1.whyStudy, count(c1) AS cnt'
-        );
-        if (!in_array('c1', $joins)) {
-            $whyStudy = $whyStudy->leftJoin('u.course1s', 'c1');
-            $joins[] = 'c1';
-        }
-        $whyStudy = $whyStudy->groupBy('c1.whyStudy')
-            ->getQuery()
-            ->getResult();
-        $aggregate['whyStudy'] = '<div class="response">' . join(
-                '</div><div class="response">',
-                array_map(
-                    function ($field) use ($total) {
-                        $val = $field['whyStudy'];
-                        if (is_array($val)) {
-                            $val = join(', ', $val);
-                        }
-                        if (is_bool($val)) {
-                            $val = $val ? 'true' : 'false';
-                        }
-                        if (is_null($val)) {
-                            $val = 'No answer';
-                        }
-
-                        return $val . ' - ' . $field['cnt'];
-                    },
-                    $whyStudy
-                )
-            ) . '</div>';
-
-        // get all feedback
-        /** @var QueryBuilder $feedback */
-        $feedback = self::searchBuilder($orm, $request, $joins)->distinct(true)->select(
-            'c3.feedback, count(c3) AS cnt'
-        );
-        if (!in_array('c1', $joins)) {
-            $feedback = $feedback->leftJoin('u.course3s', 'c3');
-            $joins[] = 'c1';
-        }
-        $feedback = $feedback->groupBy('c3.feedback')
-            ->getQuery()
-            ->getResult();
-        $aggregate['feedback'] = '<div class="response">' . join(
-                '</div><div class="response">',
-                array_map(
-                    function ($field) use ($total) {
-                        $val = $field['feedback'];
-                        if (is_array($val)) {
-                            $val = join(', ', $val);
-                        }
-                        if (is_bool($val)) {
-                            $val = $val ? 'true' : 'false';
-                        }
-                        if (is_null($val)) {
-                            $val = 'No answer';
-                        }
-
-                        return $val . ' - ' . $field['cnt'];
-                    },
-                    $feedback
-                )
-            ) . '</div>';
-
-        // get net promoter score
-        $good = 0.0;
-        $bad = 0.0;
-        $netTotal = 0.0;
-        /** @var QueryBuilder $netPromoter */
-        $netPromoter = self::searchBuilder($orm, $request, $joins)->distinct(true)->select(
-            'c3.netPromoter, count(c3) AS cnt'
-        );
-        if (!in_array('c1', $joins)) {
-            $netPromoter = $netPromoter->leftJoin('u.course3s', 'c3');
-            $joins[] = 'c1';
-        }
-        $netPromoter = $netPromoter->groupBy('c3.netPromoter')
-            ->getQuery()
-            ->getResult();
-        $aggregate['net-promoter'] = '<div class="response">' . join(
-                '</div><div class="response">',
-                array_map(
-                    function ($field) use ($total, &$good, &$bad, &$netTotal) {
-                        $val = $field['netPromoter'];
-                        if (is_array($val)) {
-                            $val = join(', ', $val);
-                        }
-                        if (is_bool($val)) {
-                            $val = $val ? 'true' : 'false';
-                        }
-                        if (is_null($val)) {
-                            $val = 'No answer';
-                        }
-                        if (is_numeric($val)) {
-                            $val = empty($val) ? 'No answer' : $val;
-                        }
-                        if ($val >= 9) {
-                            $good += $field['cnt'];
-                        }
-                        if ($val <= 6 && $val > 0) {
-                            $bad += $field['cnt'];
-                        }
-                        if ($val > 0) {
-                            $netTotal += $field['cnt'];
-                        }
-
-                        return $val . ' - ' . $field['cnt'] . ' (' . round(
-                            $field['cnt'] * 100.0 / $total
-                        ) . '%)';
-                    },
-                    $netPromoter
-                )
-            ) . '</div>';
-        $aggregate['net-promoter'] .= '<div class="response">Total: ' . round(($good / $netTotal - $bad / $netTotal) * 100) . '</div>';
 
         $parents = self::searchBuilder($orm, $request)
             ->select('COUNT(DISTINCT u.id)')
@@ -501,29 +252,24 @@ class ResultsController extends Controller
             $paid = $paid->leftJoin('u.groups', 'g');
         }
         $paid = $paid->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles LIKE \'%s:9:"ROLE_PAID"%\' OR g.id IN (' . self::$paidStr . ')')
+            ->andWhere('u.roles LIKE \'%s:9:"ROLE_PAID"%\'' . (!empty($paidStr) ? ' OR g.id IN (' . self::$paidStr . ')' : ''))
             ->getQuery()
             ->getSingleScalarResult();
         /** @var int $paid */
 
-        /** @var QueryBuilder $completed */
-        $completed = self::searchBuilder($orm, $request, $joins);
-        if (!in_array('c1', $joins)) {
-            $completed = $completed
-                ->leftJoin('u.course1s', 'c1')
-                ->leftJoin('u.course2s', 'c2')
-                ->leftJoin('u.course3s', 'c3');
-        }
-        $completed = $completed->select('COUNT(DISTINCT u.id)')
-            ->andWhere('c1.lesson1=4 AND c1.lesson2=4 AND c1.lesson3=4 AND c1.lesson4=4 AND c1.lesson5=4 AND c1.lesson6=4')
-            ->andWhere('c2.lesson1=4 AND c2.lesson2=4 AND c2.lesson3=4 AND c2.lesson4=4 AND c2.lesson5=4')
-            ->andWhere('c3.lesson1=4 AND c3.lesson2=4 AND c3.lesson3=4 AND c3.lesson4=4 AND c3.lesson5=4')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-
         // get the groups for use in dropdown
         $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+
+        // get the list of packs from the current list of users
+        $packs = call_user_func_array('array_merge', array_map(function (User $x) {return $x->getPacks();}, self::searchBuilder($orm, $request, $joins)
+            ->select('u,up,p,a')
+            ->leftJoin('u.userPacks', 'up')
+            ->leftJoin('up.pack', 'p')
+            ->leftJoin('u.authored', 'a')
+            ->distinct()
+            ->getQuery()
+            ->getResult())); //array_unique());
+
 
         return $this->render('AdminBundle:Results:tab.html.php', [
             'users' => $users,
@@ -535,9 +281,8 @@ class ResultsController extends Controller
             'students' => $students,
             'torch' => $torch,
             'csa' => $csa,
-            'completed' => $completed,
             'total' => $total,
-            'aggregate' => $aggregate
+            'packs' => $packs
         ]);
     }
 

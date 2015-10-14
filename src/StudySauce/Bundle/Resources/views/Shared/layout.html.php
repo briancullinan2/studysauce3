@@ -28,8 +28,8 @@ $collection = $router->getRouteCollection();
     <link rel="image_src" href="<?php print $view['assets']->getUrl('bundles/studysauce/images/studysauce-icon-300x300.png'); ?>">
     <meta name="description" content="Study Sauce teaches you the most effective study methods and provides you the tools to make the most of your study time.">
     <meta property="og:image" content="<?php print $view['assets']->getUrl('bundles/studysauce/images/studysauce-icon-300x300.png'); ?>">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" />
+    <meta name="mobile-web-app-capable">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-startup-image" href="<?php print $view['assets']->getUrl('bundles/studysauce/images/studysauce-icon-300x300.png'); ?>">
     <link rel="manifest" href="<?php print $view['assets']->getUrl('bundles/studysauce/js/manifest.json'); ?>">

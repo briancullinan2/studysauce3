@@ -183,7 +183,7 @@ $collection->add(
         '',
         [],
         [],
-        'request.isXmlHttpRequest()||request.getMethod()=="POST"'
+        'request.isXmlHttpRequest() || request.getMethod()=="POST"'
     )
 );
 $collection->add(
@@ -219,7 +219,7 @@ $collection->add(
         '',
         [],
         [],
-        'request.isXmlHttpRequest()||request.getMethod()=="POST"'
+        'request.isXmlHttpRequest() || request.getMethod()=="POST"'
     )
 );
 $collection->add(
@@ -325,6 +325,19 @@ $collection->add(
     )
 );
 $collection->add(
+    'signup_beta',
+    new Route(
+        '/signup-beta',
+        ['_controller' => 'StudySauceBundle:Dialogs:signup'],
+        [],
+        [],
+        '',
+        [],
+        [],
+        'request.isXmlHttpRequest() || request.getMethod()=="POST"'
+    )
+);
+$collection->add(
     'contact_send',
     new Route(
         '/contact/send',
@@ -334,7 +347,7 @@ $collection->add(
         '',
         [],
         [],
-        'request.isXmlHttpRequest()'
+        'request.isXmlHttpRequest() || request.getMethod()=="POST"'
     )
 );
 $collection->add(
@@ -377,5 +390,5 @@ $collection->add(
         ['_controller' => 'StudySauceBundle:Packs:download']
     )
 );
-/*$collection->add('course', new Route('/course/{_course}/{_format}', array(            '_controller' => 'StudySauceBundle:Courses:Course{_course}:index',            '_format'     => 'dashboard'        )));$collection->add('default', new Route('/{_controller}'));$acmeHello = $loader->import('@StudySauceBundle/Resources/public/images/', 'directory');$acmeHello->addPrefix('/bundles/studysauce/images/');$collection->addCollection($acmeHello);*/
+
 return $collection;

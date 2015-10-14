@@ -525,28 +525,32 @@ class EmailsController extends Controller
 
     /**
      * @param User $user
-     * @param $contact
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param $name
+     * @param $email
+     * @param $message
+     * @return Response
      */
-    public function contactMessageAction(User $user = null, ContactMessage $contact)
+    public function contactMessageAction(User $user = null, $name, $email, $message)
     {
         if($user == null)
             $user = $this->getUser();
 
         /** @var \Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
-            ->setSubject('Contact Us: From ' . $contact->getName())
+            ->setSubject('Contact Us: From ' . $name)
             ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
             ->setTo('admin@studysauce.com')
             ->setBody($this->renderView('StudySauceBundle:Emails:contact-message.html.php', [
                         'link' => '&nbsp;',
                         'user' => $user,
-                        'contact' => $contact
+                        'name' => $name,
+                        'email' => $email,
+                        'message' => str_replace(["\n"], ['<br />'], $message)
                     ]), 'text/html' );
         $headers = $message->getHeaders();
         $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
                         'category' => ['contact-message']])));
-        $this->send($message);
+        $this->sendToAdmin($message);
 
         return new Response();
     }

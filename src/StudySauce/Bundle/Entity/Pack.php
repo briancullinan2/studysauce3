@@ -100,6 +100,14 @@ class Pack
      */
     protected $modified;
 
+    public function getCreator() {
+        return !empty($this->getGroup())
+            ? $this->getGroup()->getName()
+            : (!empty($this->getUser())
+                ? ($this->getUser()->getFirst() . ' ' . $this->getUser()->getLast())
+                : '');
+    }
+
     /**
      * @param $prop
      * @param $value

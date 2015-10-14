@@ -39,12 +39,6 @@ services:
         tags:
             - {name: "kernel.fragment_renderer"}
 
-    security.authentication.listener.anonymous:
-        class: StudySauce\Bundle\EventListener\AnonymousAuthenticationListener
-        tags:
-            - {name: monolog.logger, channel: security}
-        arguments: ["@security.context", "", "@?logger", "@service_container"]
-
     kernel.listener.redirect:
         class: StudySauce\Bundle\EventListener\RedirectListener
         tags:
