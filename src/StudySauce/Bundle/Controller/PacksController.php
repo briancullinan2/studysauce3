@@ -12,11 +12,15 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\ParentInvite;
 use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\Payment;
+use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 
@@ -29,12 +33,11 @@ class PacksController extends Controller
 
     public function listAction(Request $request)
     {
-        $joins = [];
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
         /** @var QueryBuilder $qb */
-        $qb = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p');
-        $packs = $qb->select('')
+        $packs = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+            ->select('p')
             ->getQuery()
             ->getResult();
         return new JsonResponse(array_map(function (Pack $x) {
@@ -58,16 +61,44 @@ class PacksController extends Controller
 
     public function downloadAction(Request $request)
     {
-        $joins = [];
+        /** @var User $user */
+        $user = $this->getUser();
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
+        /** @var Pack $pack */
+        $pack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+            ->select('p')
+            ->where('p.id=:id')
+            ->setParameter('id', intval($request->get('pack')))
+            ->getQuery()
+            ->getOneOrNullResult();
+        if(empty($pack)) {
+            throw new NotFoundHttpException("Pack not found");
+        }
         /** @var QueryBuilder $qb */
-        $qb = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c');
-        $packs = $qb->select('')
+        $cards = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c')
+            ->select('c')
             ->where('c.pack=:id')
             ->setParameter('id', intval($request->get('pack')))
             ->getQuery()
             ->getResult();
+        /** @var UserPack $up */
+        $up = $user->getUserPacks()->filter(function (UserPack $up) use ($request) {return $up->getPack()->getId() == intval($request->get('pack'));})->first();
+        $isNew = false;
+        if(empty($up)) {
+            $up = new UserPack();
+            $up->setUser($user);
+            $up->setPack($pack);
+            $isNew = true;
+        }
+        $up->setDownloaded(new \DateTime());
+        if($isNew) {
+            $orm->persist($up);
+        }
+        else {
+            $orm->merge($up);
+        }
+        $orm->flush();
         return new JsonResponse(array_map(function (Card $x) {
             return [
                 'id' => $x->getId(),
@@ -76,6 +107,38 @@ class PacksController extends Controller
                 'created' => $x->getCreated()->format('r'),
                 'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null
             ];
-        }, $packs));
+        }, $cards));
+    }
+
+    public function responsesAction(Request $request) {
+        /** @var User $user */
+        $user = $this->getUser();
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+        /** @var UserPack $userPack */
+        $userPack = $orm->getRepository('StudySauceBundle:UserPack')->createQueryBuilder('up')
+            ->select('up')
+            ->where('up.pack=:pack')
+            ->andWhere('up.user=:user')
+            ->setParameter('pack', intval($request->get('pack')))
+            ->setParameter('user', $user->getId())
+            ->getQuery()
+            ->getOneOrNullResult();
+        if(empty($userPack)) {
+            throw new PreconditionFailedHttpException("No user-pack association.");
+        }
+
+        $card = $userPack->getPack()->getCards()->filter(function (Card $c) use ($request) {return $c->getId() == $request->get('card');})->first();
+        if(empty($card)) {
+            throw new NotFoundHttpException("Card not found.");
+        }
+        $response = new Response();
+        $response->setUser($user);
+        $response->setCard($card);
+        $response->setCorrect($request->get('correct') == '1');
+        $orm->persist($response);
+        $orm->flush();
+
+        return new JsonResponse(true);
     }
 }

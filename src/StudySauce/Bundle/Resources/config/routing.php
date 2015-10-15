@@ -390,5 +390,11 @@ $collection->add(
         ['_controller' => 'StudySauceBundle:Packs:download']
     )
 );
-
+$collection->add(
+    'responses',
+    new Route(
+        '/packs/responses',
+        ['_controller' => 'StudySauceBundle:Packs:responses']
+    )
+);
 return $collection;

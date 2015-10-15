@@ -3,16 +3,10 @@
 namespace StudySauce\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use StudySauce\Bundle\Entity\ContactMessage;
-use StudySauce\Bundle\Entity\Course;
-use StudySauce\Bundle\Entity\ParentInvite;
-use StudySauce\Bundle\Entity\Schedule;
-use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use TorchAndLaurel\Bundle\Controller\EmailsController as TorchEmailsController;
 
 /**
  * Class DialogsController
@@ -59,23 +53,6 @@ class DialogsController extends Controller
         $email->contactMessageAction($user, $request->get('name'), $request->get('email'), $request->get('message'));
 
         return new JsonResponse(true);
-    }
-
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function sdsMessagesAction()
-    {
-        // get the total number of checkins
-
-        /** @var $user \StudySauce\Bundle\Entity\User */
-        $user = $this->getUser();
-
-        /** @var $schedule Schedule */
-        $schedule = $user->getSchedules()->first() ?: new Schedule();
-
-        $count = array_sum($schedule->getClasses()->map(function (Course $c) {return $c->getCheckins()->count();})->toArray());
-        return $this->render('StudySauceBundle:Dialogs:sds-messages.html.php', ['id' => 'sds-messages', 'count' => $count]);
     }
 
     /**

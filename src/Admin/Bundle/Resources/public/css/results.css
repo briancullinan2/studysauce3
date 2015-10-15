@@ -28,13 +28,17 @@
     display:inline-block;
 }
 
-#results table.results > tbody > tr > td
+#results table.results > tbody > tr > td,
+#results table.results > tbody > tr > td > table > tbody > tr > td
 {
     padding: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     table-layout: fixed;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    vertical-align: middle;
 }
 
 #results table.results > tbody > tr > td > *
@@ -54,18 +58,15 @@
     border-spacing: 0;
     border-collapse: separate;
 }
-#results table.results > tbody > tr > td
-{
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
-    vertical-align: middle;
-}
 
-#results table.results > tbody > tr:hover:not(.selected):not(.edit) > td {
+#results table.results > tbody > tr:nth-child(odd):hover:not(.selected):not(.edit) > td,
+#results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd):hover:not(.selected):not(.edit) > td
+{
     box-shadow: 0 1px 4px rgba(255,255,255,.25);
     border-top: 1px solid #DDDDDD;
     border-bottom: 1px solid #DDDDDD;
     background-color: rgba(255,255,255,.50);
+    cursor: pointer;
 }
 
 #results table.results > thead > tr > th
@@ -91,12 +92,12 @@
     table-layout: fixed;
 }
 
-#results table.results table tr:nth-child(even)
+#results table.results > tbody > tr > td > table > tbody > tr:nth-child(even)
 {
     display:none;
 }
 
-#results table.results table tr.selected + tr
+#results table.results > tbody > tr > td > table > tbody > tr.selected + tr
 {
     display:table-row;
 }

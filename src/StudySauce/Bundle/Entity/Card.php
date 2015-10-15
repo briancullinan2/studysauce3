@@ -64,7 +64,7 @@ class Card
     protected $recurrence = ''; // default is 1 day, 2 day 4 day, 1 week, 2 week, 4 week
 
     /**
-     * @ORM\OneToMany(targetEntity="Response", mappedBy="card")
+     * @ORM\OneToMany(targetEntity="Response", mappedBy="card", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $responses;

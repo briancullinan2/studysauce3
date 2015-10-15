@@ -64,7 +64,10 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         $view['slots']->stop();
         $view['slots']->start('body');
         echo $view->render('StudySauceBundle:Shared:header.html.php');
-        if($app->getUser()->hasRole('ROLE_ADMIN'))
+        if($app->getUser() == 'anon.' || !is_object($app->getUser()) || $app->getUser()->hasRole('ROLE_GUEST') || $app->getUser()->hasRole('ROLE_DEMO')) {
+
+        }
+        elseif($app->getUser()->hasRole('ROLE_ADMIN'))
             echo $view->render('AdminBundle:Shared:menu.html.php');
         elseif($app->getUser()->hasRole('ROLE_PARTNER'))
             echo $view->render('StudySauceBundle:Partner:menu.html.php');

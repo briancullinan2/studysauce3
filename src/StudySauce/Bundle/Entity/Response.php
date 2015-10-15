@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="responsew")
+ * @ORM\Table(name="response")
  * @ORM\HasLifecycleCallbacks()
  */
 class Response

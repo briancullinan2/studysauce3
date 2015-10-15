@@ -5,7 +5,7 @@ $view->extend('StudySauceBundle::Dialogs/dialog.html.php');
 
 /** @var User $user */
 $user = $app->getUser();
-$isDemo = $user == 'anon.' || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO');
+$isDemo = $user == 'anon.' || !is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO');
 
 
 $view['slots']->start('modal-header') ?>
