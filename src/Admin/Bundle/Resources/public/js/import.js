@@ -2,8 +2,6 @@
 jQuery(document).ready(function() {
 
     var body = $('body');
-    var ctrlDown = false;
-    var ctrlKey = 17, vKey = 86, cKey = 67;
 
     function importFunc() {
         var importTab = $('#import'),
@@ -44,20 +42,9 @@ jQuery(document).ready(function() {
     body.on('change', '#import .first-name input, #import .last-name input, #import .email input', importFunc);
     body.on('keyup', '#import .first-name input, #import .last-name input, #import .email input', importFunc);
 
-    $(document).keydown(function(e)
-    {
-        if (e.keyCode == ctrlKey) ctrlDown = true;
-    }).keyup(function(e)
-    {
-        if (e.keyCode == ctrlKey) ctrlDown = false;
-    });
-
-    body.on('keydown', '#import', function(e)
-    {
+    key('⌘+v, ctrl+v, command+v', function () {
         var importTab = $('#import');
-        if (ctrlDown && (e.keyCode == vKey || e.keyCode == cKey)) {
-
-            // get the clipboard text
+        if(importTab.is(':visible')) {
             importTab.find('textarea').focus();
         }
     });
@@ -76,9 +63,11 @@ jQuery(document).ready(function() {
 
         // write out in a table
         for (i=0; i<clipRows.length; i++) {
+            // skip the heading rows
             if(clipRows[i].length == 0 || clipRows[i][0].length == 0 || clipRows[i].indexOf('email') > -1 ||
                 clipRows[i].indexOf('e-mail') > -1 || clipRows[i].indexOf('E-mail') > -1)
                 continue;
+
             var addUser = importTab.find('.import-row').last(),
                 newRow = addUser.clone().attr('id', '').addClass('edit');
             if(append != null)
@@ -127,21 +116,24 @@ jQuery(document).ready(function() {
             clearTimeout(previewTimeout);
         previewTimeout = setTimeout(function () {
             // select the first couple rows or limit to 1000 characters
-            var first1000 = /[\s\S]{0,1000}/i;
-            var match = first1000.exec(importTab.find('textarea').val());
+            var entry = importTab.find('textarea').val();
+            var first1000 = /[\s\S]{0,500}/i;
+            var match = first1000.exec(entry)[0];
+
+            // get the lines around where the cursor is
+            var start = importTab.find('textarea')[0].selectionStart;
+            if(typeof start == 'number') {
+                var lastLine = (/.*?$/ig).exec(entry.substr(0, start))[0];
+                match = first1000.exec(entry.substr(start - lastLine.length, entry.length))[0];
+            }
+
             var preview = importTab.find('fieldset');
             preview.find('.import-row').remove();
-            rowImport(match[0], preview);
+            rowImport(match, preview);
         }, 1000);
     }
 
-    body.on('mousedown', '#import textarea', previewImport);
-    body.on('mouseup', '#import textarea', previewImport);
-    body.on('change', '#import textarea', previewImport);
-    body.on('focus', '#import textarea', previewImport);
-    body.on('blur', '#import textarea', previewImport);
-    body.on('keydown', '#import textarea', previewImport);
-    body.on('keyup', '#import textarea', previewImport);
+    body.on('mousedown mouseup change focus blur keydown keyup', '#import textarea', previewImport);
 
     body.on('click', '#import a[href="#import-group"]', function (evt) {
         evt.preventDefault();
@@ -176,8 +168,8 @@ jQuery(document).ready(function() {
                 last: that.find('.last-name input').val(),
                 email: that.find('.email input').val(),
             };
-            if(that.find('.adviser select').length > 0) {
-                newInvite.adviser = that.find('.adviser select').val()
+            if(that.find('.group select').length > 0) {
+                newInvite.group = that.find('.group select').val()
             }
             users[users.length] = newInvite;
         });

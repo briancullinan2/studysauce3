@@ -263,6 +263,7 @@
 {
     float:none;
     margin:0;
+    position:static;
 }
 
 #emails .variables > tbody > tr > td,

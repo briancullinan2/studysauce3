@@ -55,6 +55,6 @@ class HomeController extends Controller
             return ['userlist', []];
         elseif($user->hasRole('ROLE_PARENT'))
             return ['thanks', []];
-        return ['home', []];
+        return ['results', []];
     }
 }

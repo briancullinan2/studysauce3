@@ -10,18 +10,7 @@ $user = $app->getUser();
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(
-    ['@AdminBundle/Resources/public/css/menu.css'],
-    [],
-    ['output' => 'bundles/admin/css/*.css']
-) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(
-    ['@AdminBundle/Resources/public/css/validation.css'],
-    [],
-    ['output' => 'bundles/admin/css/*.css']
-) as $url): ?>
+foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/validation.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
 <?php endforeach;
 $view['slots']->stop();
@@ -55,13 +44,14 @@ $view['slots']->start('body'); ?>
                 <label class="input host-setting"><span>Selenium Server</span>
                     <input type="text"
                            value="<?php print $view->escape(
-                               $acceptance['modules']['config']['WebDriver']['host']
+                               $_SERVER['REMOTE_ADDR']
+                           // from settings: $acceptance['modules']['config']['WebDriver']['host']
                            ); ?>"/>
                     <small>You must run <a href="http://www.seleniumhq.org/download/">Selenium Server</a> and <a
                             href="https://sites.google.com/a/chromium.org/chromedriver/downloads">ChromeDriver</a> with
                         the
                         command
-                        <code>java -jar selenium-server-standalone-2.44.0.jar
+                        <code>java -jar selenium-server-standalone-2.48.2.jar
                             -Dwebdriver.chrome.driver=.\chromedriver.exe
                             -port
                             4444</code>

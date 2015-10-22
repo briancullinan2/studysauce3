@@ -126,8 +126,6 @@ function setupSelectize()
 $(document).ready(function () {
 
     var body = $('body');
-    var ctrlDown = false;
-    var ctrlKey = 17, vKey = 86, cKey = 67;
     var orderBy = 'created DESC',
         searchTimeout = null,
         searchRequest = null;
@@ -185,18 +183,10 @@ $(document).ready(function () {
         searchTimeout = setTimeout(loadResults, 1000);
     });
 
-    $(document).keydown(function(e)
-    {
-        if (e.keyCode == ctrlKey) ctrlDown = true;
-    }).keyup(function(e)
-    {
-        if (e.keyCode == ctrlKey) ctrlDown = false;
-    });
-
-    body.find('#emails').on('keydown', function(e)
+    key('⌘+v, ctrl+v, command+v', function()
     {
         var email = $('#send-email');
-        if (ctrlDown && (e.keyCode == vKey || e.keyCode == cKey)) {
+        if (email.is(':visible')) {
 
             // get the clipboard text
             var that = $(this),

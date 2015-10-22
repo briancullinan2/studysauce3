@@ -9,11 +9,6 @@
 
 .import-row > *
 {
-    width:33.33%
-}
-
-.master .import-row > *
-{
     width:20%;
     display:inline-block;
     vertical-align: bottom;

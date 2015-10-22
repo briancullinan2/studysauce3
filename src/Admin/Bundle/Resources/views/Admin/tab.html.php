@@ -17,9 +17,6 @@ $user = $app->getUser();
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/menu.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
 foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/admin.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
 <?php endforeach;
@@ -34,7 +31,7 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/admin.
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="command_control">
     <div class="pane-content">
-    <form action="<?php print $view['router']->generate('save_group'); ?>" method="post">
+    <form action="<?php print $view['router']->generate('save_user'); ?>" method="post">
     <div class="search">
         <label class="input"><input name="search" type="text" value="" placeholder="Search"/></label>
     </div>
@@ -132,7 +129,7 @@ $view['slots']->start('body'); ?>
                     <option value="yes">Y</option>
                     <option value="no">N</option>
                 </select></label></th>
-        <th><label><span><a href="#all">All</a></span><br/><span><a href="#tools">Tools</a></span><br/><span>Actions</span><br/>
+        <th><label><span>Actions</span><br/>
                 <select name="actions">
                     <option value="">Select All</option>
                     <option value="delete">Delete All</option>

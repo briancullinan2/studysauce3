@@ -76,7 +76,7 @@ class User extends BaseUser implements EncoderAwareInterface
     protected $authored;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserPack", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="UserPack", mappedBy="user", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $userPacks;

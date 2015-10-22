@@ -9,6 +9,7 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/jquery.plugin.js',
                 '@StudySauceBundle/Resources/public/js/jquery.timeentry.js',
                 '@StudySauceBundle/Resources/public/js/jquery.scrollintoview.js',
+                '@StudySauceBundle/Resources/public/js/keymaster.js',
                 '@StudySauceBundle/Resources/public/js/sauce.js',
                 '@StudySauceBundle/Resources/public/js/contact.js',
             ],
@@ -48,7 +49,6 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/jquery-2.1.4.js',
                 '@StudySauceBundle/Resources/public/js/jquery.textfill.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery-ui.min.js',
-                '@StudySauceBundle/Resources/public/js/bootstrap.js',
                 '@StudySauceBundle/Resources/public/js/underscore-min.js'
             ],
             'filters' => [],

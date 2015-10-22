@@ -37,7 +37,7 @@ $collection = $router->getRouteCollection();
 
     <?php foreach ($view['assetic']->stylesheets([
             '@StudySauceBundle/Resources/public/css/jquery-ui.min.css',
-            '@StudySauceBundle/Resources/public/css/bootstrap.min.css',
+            '@StudySauceBundle/Resources/public/css/normalize.css',
             '@StudySauceBundle/Resources/public/css/selectize.default.css',
             '@StudySauceBundle/Resources/public/css/fonts.css',
             '@StudySauceBundle/Resources/public/css/sauce.css',

@@ -154,7 +154,7 @@ class EmailsController extends Controller
      * @param GroupInvite $groupInvite
      * @return Response
      */
-    public function groupReminderAction(User $user = null, GroupInvite $groupInvite = null)
+    public function groupReminderAction(User $user = null, Invite $invite = null)
     {
         /** @var $user User */
         if(empty($user))
@@ -166,7 +166,6 @@ class EmailsController extends Controller
             ->setFrom($user->getEmail())
             ->setTo(trim($groupInvite->getEmail()))
             ->setBody($this->renderView('StudySauceBundle:Emails:group-invite.html.php', [
-                'user' => $user,
                 'invite' => $groupInvite,
                 'group' => $groupInvite->getGroup(),
                 'greeting' => 'Dear ' . $groupInvite->getFirst() . ' ' . $groupInvite->getLast() . ',',

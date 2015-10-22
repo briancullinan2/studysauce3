@@ -34,10 +34,10 @@ class AdviserCest
      */
     public function tryAdviserLogin(AcceptanceTester $I)
     {
-        $I->wantTo('Login as the adviser account studyadviser@mailinator.com');
+        $I->wantTo('Login as the adviser account brian@studysauce.com');
         $I->amOnPage('/login');
-        $I->fillField('#login .email input', 'studyadviser@mailinator.com');
-        $I->fillField('#login .password input', 'guest');
+        $I->fillField('#login .email input', 'brian@studysauce.com');
+        $I->fillField('#login .password input', 'password');
         $I->click('#login [value="#user-login"]');
         $I->wait(5);
     }

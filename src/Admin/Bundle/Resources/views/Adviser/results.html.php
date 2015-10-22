@@ -35,10 +35,7 @@ $view['slots']->start('body');
 $view['slots']->output('results-body');
 $view['slots']->stop();
 
-$view['slots']->start('stylesheets'); ?>
-<?php foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/menu.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
+$view['slots']->start('stylesheets');
 foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/results.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
 <?php endforeach;

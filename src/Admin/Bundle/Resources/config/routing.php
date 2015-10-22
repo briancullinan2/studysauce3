@@ -10,7 +10,7 @@ $collection->add(
     'command_control',
     new Route(
         '/cerebro/{_format}',
-        ['_controller' => 'AdminBundle:Admin:index', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Admin:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
 );
@@ -33,7 +33,7 @@ $collection->add(
     'activity',
     new Route(
         '/activity/{_format}',
-        ['_controller' => 'AdminBundle:Activity:index', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Activity:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS],
         [],
         '',
@@ -47,7 +47,7 @@ $collection->add(
     'results',
     new Route(
         '/results/{_format}',
-        ['_controller' => 'AdminBundle:Results:index', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Results:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS],
         [],
         '',
@@ -173,7 +173,7 @@ $collection->add(
     'validation',
     new Route(
         '/validation/{_format}',
-        ['_controller' => 'AdminBundle:Validation:index', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Validation:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
 );
@@ -224,7 +224,7 @@ $collection->add(
     'emails',
     new Route(
         '/emails/{_format}',
-        ['_controller' => 'AdminBundle:Emails:index', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Emails:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
 );
@@ -302,7 +302,7 @@ $collection->add(
     'import',
     new Route(
         '/import/{_format}',
-        ['_controller' => 'AdminBundle:Import:index', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Import:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
 );
@@ -323,7 +323,7 @@ $collection->add(
     'userlist',
     new Route(
         '/userlist/{_format}',
-        ['_controller' => 'AdminBundle:Adviser:userlist', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Adviser:userlist', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
 );
@@ -344,7 +344,7 @@ $collection->add(
     'adviser',
     new Route(
         '/adviser/{_user}/{_tab}/{_format}',
-        ['_controller' => 'AdminBundle:Adviser:adviser', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Adviser:adviser', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS, '_user' => '[0-9]+']
     )
 );
@@ -352,7 +352,7 @@ $collection->add(
     'adviser_partner',
     new Route(
         '/partner/{_user}/{_tab}/{_format}',
-        ['_controller' => 'AdminBundle:Adviser:partner', '_format' => 'adviser'],
+        ['_controller' => 'AdminBundle:Adviser:partner', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS, '_user' => '[0-9]+']
     )
 );

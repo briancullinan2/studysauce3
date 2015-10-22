@@ -380,6 +380,27 @@ $collection->add(
     'packs',
     new Route(
         '/packs',
+        ['_controller' => 'StudySauceBundle:Packs:index', '_format' => 'index'],
+        ['_format' => DASHBOARD_VIEWS]
+    )
+);
+$collection->add(
+    'packs_create',
+    new Route(
+        '/packs/create',
+        ['_controller' => 'StudySauceBundle:Packs:create'],
+        [],
+        [],
+        '',
+        [],
+        [],
+        'request.isXmlHttpRequest()'
+    )
+);
+$collection->add(
+    'packs_list',
+    new Route(
+        '/packs/list',
         ['_controller' => 'StudySauceBundle:Packs:list']
     )
 );

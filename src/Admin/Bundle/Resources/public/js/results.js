@@ -28,11 +28,9 @@ $(document).ready(function () {
             order: orderBy,
             search: admin.find('input[name="search"]').val().trim(),
             page: admin.find('input[name="page"]').val().trim(),
-            role: admin.find('select[name="role"]').val().trim(),
             group: admin.find('select[name="group"]').val().trim(),
             last: admin.find('select[name="last"]').val().trim(),
             completed: admin.find('select[name="completed"]').val().trim(),
-            paid: admin.find('select[name="hasPaid"]').val().trim()
         };
 
         //for(var i = 1; i <= 17; i++) {

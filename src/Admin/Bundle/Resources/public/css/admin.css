@@ -566,14 +566,14 @@
     height: 1em;
 }
 
-#command_control table.results > thead > tr > th:nth-child(31),
-#command_control table.results > tbody > tr > td:nth-child(31)
+#command_control table.results > thead > tr > th:last-child,
+#command_control table.results > tbody > tr > td:last-child
 {
     text-align: right;
     width: 210px;
 }
 
-#command_control table.results > thead > tr > th:nth-child(31) > label
+#command_control table.results > thead > tr > th:last-child > label
 {
     margin-right:-30px;
     padding-right:30px;

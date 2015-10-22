@@ -27,21 +27,10 @@ $(document).ready(function () {
             role: admin.find('select[name="role"]').val().trim(),
             group: admin.find('select[name="group"]').val().trim(),
             last: admin.find('select[name="last"]').val().trim(),
-            completed: admin.find('select[name="completed"]').val().trim(),
             paid: admin.find('select[name="hasPaid"]').val().trim(),
-            goals: admin.find('select[name="hasGoals"]').val().trim(),
-            deadlines: admin.find('select[name="hasDeadlines"]').val().trim(),
-            schedules: admin.find('select[name="hasSchedules"]').val().trim(),
-            partners: admin.find('select[name="hasPartners"]').val().trim(),
-            notes: admin.find('select[name="hasNotes"]').val().trim(),
-            grades: admin.find('select[name="hasGrades"]').val().trim(),
             lastVisit: admin.find('input[name="lastVisit"]').val().trim(),
             created: admin.find('input[name="created"]').val().trim()
         };
-
-        for(var i = 1; i <= 17; i++) {
-            result['lesson' + i] = admin.find('select[name="lesson' + i + '"]').val().trim();
-        }
 
         return result;
     }
@@ -87,22 +76,10 @@ $(document).ready(function () {
         row.removeClass('edit').addClass('read-only');
     });
 
-    var ctrlDown = false;
-    var ctrlKey = 17, cKey = 67;
-
-    $(document).keydown(function(e)
-    {
-        if (e.keyCode == ctrlKey) ctrlDown = true;
-    }).keyup(function(e)
-    {
-        if (e.keyCode == ctrlKey) ctrlDown = false;
-    });
-
-
-    body.find('#command_control').on('keydown', function(e)
+    key('⌘+c, ctrl+c, command+c', function()
     {
         var command = $('#command_control');
-        if (ctrlDown && e.keyCode == cKey) {
+        if (command.is(':visible')) {
 
             // get the clipboard text
             var that = $(this),
@@ -116,7 +93,7 @@ $(document).ready(function () {
                     if(i == 0) {
                         return 'Visited';
                     }
-                    if(i == 5) {
+                    if(i == 4) {
                         return 'Sign up';
                     }
                     if(i == 3) {
@@ -544,13 +521,6 @@ $(document).ready(function () {
             data: data,
             success: loadContent
         });
-    });
-
-    body.on('click', '#command_control a[href="#all"], #command_control a[href="#courses"], #command_control a[href="#tools"]', function (evt) {
-        evt.preventDefault();
-        var admin = $('#command_control');
-        admin.removeClass('all courses tools');
-        admin.addClass(this.hash.substr(1));
     });
 
     body.on('click', '#command_control .paginate a', function (evt) {

@@ -5,6 +5,7 @@
     margin-right:-300px;
     padding-right:300px;
     clear:both;
+    margin-top:35px;
 }
 
 #results .paginate {
@@ -29,7 +30,8 @@
 }
 
 #results table.results > tbody > tr > td,
-#results table.results > tbody > tr > td > table > tbody > tr > td
+#results table.results > tbody > tr > td > table > tbody > tr > td,
+#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td
 {
     padding: 5px;
     overflow: hidden;
@@ -51,7 +53,8 @@
     margin:0;
 }
 
-#results table.results
+#results table.results,
+#results table.results > tbody > tr > td > table
 {
     table-layout: fixed;
     width:100%;
@@ -79,6 +82,14 @@
     vertical-align: bottom;
 }
 
+#results table.results > thead > tr > th:first-child {
+    padding-left:0;
+}
+
+#results table.results > thead > tr > th:last-child {
+    padding-right:0;
+}
+
 #results table.results .panel-pane
 {
     padding:0;
@@ -90,6 +101,83 @@
     white-space: normal;
     width: 100%;
     table-layout: fixed;
+}
+
+#results table.results > tbody > tr:nth-child(odd) > td:first-child,
+#results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd) > td:first-child
+{
+    position:relative;
+    padding-left: 30px;
+}
+
+#results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd) > td:first-child:before,
+#results table.results > tbody > tr:nth-child(odd) > td:first-child:before
+{
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=-3);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
+    -moz-transform-origin: center center;
+    -ms-transform-origin: center center;
+    -o-transform-origin: center center;
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px;
+    left: 10px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
+    height: 16px;
+    width: 16px;
+    transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
+}
+
+#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child,
+#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.correct > td:last-child {
+    color:transparent;
+    position: relative;
+}
+
+#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child:before,
+#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.correct > td:last-child:before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px;
+    margin-left: -10px;
+    left: 50%;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -1503px transparent;
+    height: 16px;
+    width: 16px;
+    font-size: 18px;
+}
+
+#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child:before
+{
+    content: "X";
+    background: none;
+    color: inherit;
+}
+
+#results table.results > tbody > tr:nth-child(even) > td > table > tbody > tr:nth-child(odd) > td:last-child,
+#results table.results > tbody > tr:nth-child(even) > td > table > tbody > tr:nth-child(odd) > td > table > tbody > tr > td:last-child {
+    text-align: center;
+}
+
+#results table.results > tbody > tr > td > table > tbody > tr.selected > td:first-child:before,
+#results table.results > tbody > tr.selected > td:first-child:before
+{
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
 }
 
 #results table.results > tbody > tr > td > table > tbody > tr:nth-child(even)
@@ -137,8 +225,8 @@
     padding-top:0;
 }
 
-#results table.results > tbody > tr > td:nth-child(3) label:nth-child(2),
-#results table.results > tbody > tr > td:nth-child(3) label:nth-child(1)
+#results table.results > tbody > tr > td .first,
+#results table.results > tbody > tr > td .last
 {
     width:50%;
     margin: 0 -2px;
@@ -146,8 +234,7 @@
     display:inline-block;
 }
 
-#results table.results > tbody > tr > td:nth-child(1) label,
-#results table.results > tbody > tr > td:nth-child(2) label
+#results table.results > tbody > tr > td > label.checkbox
 {
     display:block;
     min-height: 0;
@@ -161,6 +248,11 @@
 #results table.results > tbody > tr:nth-child(even)
 {
     display:none;
+}
+
+#results table.results > tbody > tr:nth-child(even) > td
+{
+    padding:0;
 }
 
 #results table.results > tbody > tr.loading
@@ -179,19 +271,16 @@
     margin:0 auto;
 }
 
-#results table.results .read-only td:nth-child(2) input,
-#results table.results .read-only td:nth-child(2) input ~ *,
-#results table.results .read-only td:nth-child(1) input,
-#results table.results .read-only td:nth-child(1) input ~ *,
-#results table.results .read-only td:nth-child(1) input[value="ROLE_PAID"]:checked,
-#results table.results .read-only td:nth-child(1) input[value="ROLE_PAID"]:checked ~ *,
-#results table.results .read-only td:nth-child(1) input[value="ROLE_PAID"],
-#results table.results .read-only td:nth-child(1) input[value="ROLE_PAID"] ~ * {
+#results table.results .read-only td .checkbox input,
+#results table.results .read-only td .checkbox input ~ *,
+#results table.results .read-only td .checkbox input[value="ROLE_PAID"]:checked,
+#results table.results .read-only td .checkbox input[value="ROLE_PAID"]:checked ~ *,
+#results table.results .read-only td .checkbox input[value="ROLE_PAID"],
+#results table.results .read-only td .checkbox input[value="ROLE_PAID"] ~ * {
     display:none;
 }
 
-#results table.results .read-only td:nth-child(2) input:checked ~ span,
-#results table.results .read-only td:nth-child(1) input:checked ~ span
+#results table.results .read-only td .checkbox input:checked ~ span
 {
     display:inline;
 }

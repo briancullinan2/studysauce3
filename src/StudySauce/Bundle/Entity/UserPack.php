@@ -49,6 +49,30 @@ class UserPack
     protected $created;
 
     /**
+     * @param int $correct
+     * @return Response[]
+     */
+    public function getResponses(&$correct = 0)
+    {
+        $responses = [];
+        $rids = [];
+        $correct = 0;
+        foreach($this->getUser()->getResponses()->toArray() as $r) {
+            /** @var Response $r */
+            if($r->getCard()->getPack()->getId() == $this->getPack()->getId()
+                && !in_array($r->getCard()->getId(), $rids))
+            {
+                $rids[] = $r->getCard()->getId();
+                $responses[] = $r;
+                if($r->getCorrect()) {
+                    $correct++;
+                }
+            }
+        }
+        return $responses;
+    }
+
+    /**
      * @ORM\PrePersist
      */
     public function setCreatedValue()
@@ -217,4 +241,5 @@ class UserPack
     {
         return $this->pack;
     }
+
 }

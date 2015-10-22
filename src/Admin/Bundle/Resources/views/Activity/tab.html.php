@@ -9,10 +9,7 @@ $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets'); ?>
 <link type="text/css" rel="stylesheet" href="<?php print $view['router']->generate('_welcome'); ?>bundles/admin/js/vis/vis.css"/>
-<?php foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/menu.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/activity.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
+<?php foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/activity.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
 <?php endforeach;
 $view['slots']->stop();

@@ -32,7 +32,7 @@ class Pack
     protected $user;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserPack", mappedBy="pack")
+     * @ORM\OneToMany(targetEntity="UserPack", mappedBy="pack", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $userPacks;
@@ -80,7 +80,7 @@ class Pack
     protected $description = '';
 
     /**
-     * @ORM\Column(type="simple_array", name="tags")
+     * @ORM\Column(type="simple_array", name="tags", nullable=true)
      */
     protected $tags;
 

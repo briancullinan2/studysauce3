@@ -28,47 +28,7 @@ $view['slots']->start('body'); ?>
     <div class="panel-pane" id="account">
         <div class="pane-content">
             <h2>Account settings</h2>
-            <form action="<?php print $view['router']->generate('update_goals'); ?>" method="post">
-                <div class="type">
-                    <label><span>Account type</span><span style="font-weight: normal;"><?php
-                        if (!$user->hasRole('ROLE_PAID')) {
-                            print 'Free';
-                        }
-                        elseif (!empty($payment) && $payment->getProduct() == 'monthly') {
-                            print 'Monthly';
-                        }
-                        elseif (!empty($payment) && !empty($payment->getCoupon()) &&
-                            !empty($payment->getCoupon()->getDescription())) {
-                            print $payment->getCoupon()->getDescription();
-                        }
-                        elseif (!empty($payment) && !empty($payment->getCoupon()) &&
-                            !empty($payment->getCoupon()->getOptions()) && isset(array_pop($payment->getCoupon()->getOptions())['description'])) {
-                            print array_pop($payment->getCoupon()->getOptions())['description'];
-                        }
-                        else {
-                            print 'Yearly';
-                        }
-                        if($user->hasRole('ROLE_PAID') && !empty($payment)) {
-                            $options = !empty($payment->getCoupon()) && !empty($payment->getCoupon()->getOptions())
-                                ? $payment->getCoupon()->getOptions()
-                                : \StudySauce\Bundle\Controller\BuyController::$defaultOptions;
-
-                            if(!empty($options[$payment->getProduct()]) &&
-                                !empty($options[$payment->getProduct()]['reoccurs'])) {
-                                $increment = $options[$payment->getProduct()]['reoccurs'];
-                                $i = clone $payment->getCreated();
-                                do {
-                                    $i = date_add($i, new DateInterval('P' . $increment . 'M'));
-                                } while($i < new \DateTime());
-                                print ' (next renewal - ' . $i->format('n/j/y') . ')';
-                            }
-                            if(!empty($payment->getCoupon()) && !empty($payment->getCoupon()->getValidTo())) {
-                                print ' expires ' . $payment->getCoupon()->getValidTo()->format('n/j/y');
-                            }
-                        }
-                        ?></span>
-                    </label>
-                </div>
+            <form action="<?php print $view['router']->generate('account_update'); ?>" method="post">
                 <div class="account-info read-only">
                     <div class="first-name">
                         <label class="input"><span>First name</span>
@@ -118,11 +78,6 @@ $view['slots']->start('body'); ?>
                         <a href="#edit-account">Edit information</a>
                         <a href="#edit-password">Change password</a>
                         <a href="<?php print $view['router']->generate('password_reset'); ?>">Forgot password</a>
-                        <?php if ($user->hasRole('ROLE_PAID')) { ?>
-                            <a href="#cancel-confirm" data-toggle="modal">Cancel account</a>
-                        <?php } else { ?>
-                            <a href="<?php print $view['router']->generate('premium'); ?>" class="more">Upgrade</a>
-                        <?php } ?>
                     </div>
                     <div class="form-actions">
                         <div class="invalid-only">You must complete all fields before moving on.</div>

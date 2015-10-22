@@ -140,6 +140,7 @@ class ValidationController extends Controller
                 'resultId' => $file
             ];
         }
+        $ids = call_user_func_array('array_merge', array_map(function ($s) {return array_keys($s);}, self::$config['tests']));
         foreach (self::$config['suites'] as $suite) {
             foreach (self::$config['tests'][$suite] as $id => $t) {
                 /** @var Cest $t */
@@ -178,6 +179,8 @@ class ValidationController extends Controller
                 ];
 
                 foreach($depends as $edge) {
+                    if(!in_array($edge, $ids))
+                        continue;
                     $existing = array_merge(isset($edgeIndex[$id . $edge]) ? $edgeIndex[$id . $edge] : [], isset($edgeIndex[$edge . $id]) ? $edgeIndex[$id . $edge] : []);
                     $size = count($existing) + 1;
                     foreach($existing as $eI) {
@@ -198,6 +201,8 @@ class ValidationController extends Controller
                 }
 
                 foreach($includes as $edge) {
+                    if(!in_array($edge, $ids))
+                        continue;
                     $existing = array_merge(isset($edgeIndex[$id . $edge]) ? $edgeIndex[$id . $edge] : [], isset($edgeIndex[$edge . $id]) ? $edgeIndex[$id . $edge] : []);
                     $size = count($existing) + 1;
                     foreach($existing as $eI) {

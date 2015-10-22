@@ -130,7 +130,7 @@ $(document).ready(function () {
         var parent = $(this).parents('#left-panel, #right-panel');
         if($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]'))
             evt.preventDefault();
-        if(parent.length > 0 && parent.width() < 150) {
+        if(parent.is('.collapsed')) {
             // record this special case where its not a link, everything else is recorded automatically
             visits[visits.length] = {path: window.location.pathname, query: window.location.search, hash: '#expand', time:(new Date()).toJSON()};
             // cancel navigation is we are uncollapsing instead
@@ -179,14 +179,6 @@ $(document).ready(function () {
     // remove it so it never comes up more than once
     body.on('hidden.bs.modal', '#bookmark', function () {
         $(this).remove();
-    });
-
-    body.on('click', '.main-menu a.accordion-toggle', function (evt) {
-        evt.preventDefault();
-        expandMenu.apply(this, [evt]);
-        if($($(this).attr('data-parent')).find($(this).attr('data-target')).is('.in')){
-            evt.stopPropagation();
-        }
     });
 
     body.on('click', ':not(#left-panel):not(#right-panel):not(#left-panel *):not(#right-panel *)', collapseMenu);

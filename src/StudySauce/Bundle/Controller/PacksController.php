@@ -4,16 +4,9 @@ namespace StudySauce\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use FOS\UserBundle\Doctrine\UserManager;
 use StudySauce\Bundle\Entity\Card;
-use StudySauce\Bundle\Entity\Coupon;
-use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Pack;
-use StudySauce\Bundle\Entity\ParentInvite;
-use StudySauce\Bundle\Entity\PartnerInvite;
-use StudySauce\Bundle\Entity\Payment;
 use StudySauce\Bundle\Entity\Response;
-use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -21,7 +14,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 
 /**
@@ -30,8 +22,52 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class PacksController extends Controller
 {
+    public function indexAction() {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
 
-    public function listAction(Request $request)
+        $total = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')->select('COUNT(DISTINCT p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+        $packs = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+            ->getQuery()
+            ->getResult();
+        // get the groups for use in dropdown
+        $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+
+        return $this->render('StudySauceBundle:Packs:tab.html.php', [
+            'packs' => $packs,
+            'total' => $total,
+            'groups' => $groups
+        ]);
+    }
+
+    public function createAction(Request $request) {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $newPack = new Pack();
+        $newPack->setTitle($request->get('title'));
+        $newPack->setUser($user);
+        $orm->persist($newPack);
+
+        foreach($request->get('cards') as $c) {
+            $newCard = new Card();
+            $newCard->setContent($c['content']);
+            $newCard->setPack($newPack);
+            $newPack->addCard($newCard);
+            $newCard->setResponseContent($c['response']);
+            $orm->persist($newCard);
+        }
+        $orm->flush();
+
+        return $this->forward('StudySauceBundle:Packs:index', ['_format' => 'tab']);
+    }
+
+    public function listAction()
     {
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();

@@ -1,0 +1,294 @@
+#packs fieldset {
+    background-color: #fff;
+    white-space: nowrap;
+    overflow:hidden;
+    min-width: 0;
+}
+
+#packs .title,
+#packs .creator {
+    display:inline-block;
+    margin: 0 -2px;
+    padding: 0 2px;
+    width: 50%;
+    vertical-align: top;
+}
+
+#packs .preview-title {
+    position:absolute;
+    display:block;
+    right: 20px;
+    top: 20px;
+    font-size: 12px;
+    line-height: 120%;
+}
+
+#packs .preview-count {
+    position:absolute;
+    display:block;
+    left: 50%;
+    margin-left: -30px;
+    top: 20px;
+    font-size: 12px;
+    line-height: 120%;
+}
+
+#packs .response,
+#packs .question {
+    background-color:#eee;
+    border-color: #ccc;
+    padding:50px 20px 100px 20px;
+    margin:20px;
+    width: 300px;
+    height: 400px;
+    display:inline-block;
+    vertical-align: top;
+    font-size: 30px;
+    text-align: justify;
+    line-height: 120%;
+    border-radius: 10px;
+    position:relative;
+    white-space: normal;
+}
+
+#packs .inner {
+    overflow-y: auto;
+    max-height: 100%;
+    padding: 2px 0;
+}
+
+#packs .answer {
+    background-color: #0099BB;
+    color: #fff;
+    position: absolute;
+    display: block;
+    padding: 5px 10px;
+    left: 50%;
+    margin-left: -50px;
+    bottom: 20px;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+#packs .correct {
+    background-color: #119900;
+    color: #fff;
+    position: absolute;
+    display: block;
+    padding: 15px 10px;
+    left: 20px;
+    bottom: 20px;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+#packs .wrong {
+    background-color: #991100;
+    color: #fff;
+    position: absolute;
+    display: block;
+    padding: 15px 10px;
+    right: 20px;
+    bottom: 20px;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+#packs table.results > tbody > tr > td,
+#packs table.results > tbody > tr > td > table > tbody > tr > td
+{
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    table-layout: fixed;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    vertical-align: middle;
+}
+
+#packs table.results > tbody > tr > td > *
+{
+    vertical-align: middle;
+    line-height: 100%;
+}
+
+#packs table.results > tbody > tr > td .checkbox {
+    margin:0;
+}
+
+#packs table.results,
+#packs table.results > tbody > tr > td > table
+{
+    table-layout: fixed;
+    width:100%;
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+#packs table.results > tbody > tr:nth-child(odd):hover:not(.selected):not(.edit) > td,
+#packs table.results > tbody > tr > td > table > tbody > tr:hover:not(.selected):not(.edit) > td
+{
+    box-shadow: 0 1px 4px rgba(255,255,255,.25);
+    border-top: 1px solid #DDDDDD;
+    border-bottom: 1px solid #DDDDDD;
+    background-color: rgba(255,255,255,.50);
+    cursor: pointer;
+}
+
+#packs table.results > thead > tr > th
+{
+    background:transparent;
+    position: relative;
+    overflow: hidden;
+    padding:5px;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+#packs table.results > thead > tr > th:first-child {
+    padding-left:0;
+}
+
+#packs table.results > thead > tr > th:last-child {
+    padding-right:0;
+}
+
+#packs table.results .panel-pane
+{
+    padding:0;
+    width:auto;
+}
+
+#packs table.results > tbody > tr > td table
+{
+    white-space: normal;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#packs table.results > tbody > tr:nth-child(odd) > td:first-child
+{
+    position:relative;
+    padding-left: 30px;
+}
+
+#packs table.results > tbody > tr:nth-child(odd) > td:first-child:before
+{
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=-3);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
+    -moz-transform-origin: center center;
+    -ms-transform-origin: center center;
+    -o-transform-origin: center center;
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px;
+    left: 10px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
+    height: 16px;
+    width: 16px;
+    transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
+}
+
+#packs table.results > tbody > tr.selected > td:first-child:before
+{
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
+}
+
+#packs table.results .highlighted-link,
+#packs table.results .tab-tracker,
+#packs table.results h2
+{
+    display:none;
+}
+
+#packs table.results > tbody > tr > td > table > tbody > tr > td > h3
+{
+    color:#555;
+    cursor: pointer;
+}
+
+#packs table.results > tbody > tr > td > table > tbody > tr > td > h3:hover
+{
+    color:#09B;
+}
+
+#packs table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > h4
+{
+    cursor: pointer;
+}
+
+#packs table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > h4:hover
+{
+    color:#0CE;
+}
+
+#packs table.results > thead > tr > th.filtered > label > input,
+#packs table.results > thead > tr > th.filtered > label > select
+{
+    border:3px solid #FF9900;
+    padding-top:0;
+}
+
+#packs table.results > tbody > tr > td .first,
+#packs table.results > tbody > tr > td .last
+{
+    width:50%;
+    margin: 0 -2px;
+    padding-left: 2px;
+    display:inline-block;
+}
+
+#packs table.results > tbody > tr > td > label.checkbox
+{
+    display:block;
+    min-height: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 100%;
+}
+
+#packs table.results > tbody > tr:nth-child(even)
+{
+    display:none;
+}
+
+#packs table.results > tbody > tr:nth-child(even) > td
+{
+    padding:0;
+}
+
+#packs table.results > tbody > tr.selected + tr
+{
+    display:table-row;
+}
+
+#packs table.results .read-only td .checkbox input,
+#packs table.results .read-only td .checkbox input ~ *,
+#packs table.results .read-only td .checkbox input[value="ROLE_PAID"]:checked,
+#packs table.results .read-only td .checkbox input[value="ROLE_PAID"]:checked ~ *,
+#packs table.results .read-only td .checkbox input[value="ROLE_PAID"],
+#packs table.results .read-only td .checkbox input[value="ROLE_PAID"] ~ * {
+    display:none;
+}
+
+#packs table.results .read-only td .checkbox input:checked ~ span
+{
+    display:inline;
+}
+

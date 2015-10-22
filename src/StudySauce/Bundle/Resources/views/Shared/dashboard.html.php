@@ -1,6 +1,8 @@
 
 <?php
 /** @var $view \Symfony\Bundle\FrameworkBundle\Templating\PhpEngine */
+use StudySauce\Bundle\Entity\User;
+
 /** @var $app \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables */
 
 if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_format') == 'funnel' ||
@@ -35,6 +37,11 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         ?>
         <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
     <?php endforeach;
+    if($app->getUser() instanceof User && $app->getUser()->hasRole('ROLE_ADMIN')) {
+        foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/menu.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
+            <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
+        <?php endforeach;
+    }
     $view['slots']->output('tmp-stylesheets');
     $view['slots']->stop();
 
@@ -45,7 +52,17 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         $view['slots']->stop();
         $view['slots']->start('body');
         echo $view->render('StudySauceBundle:Shared:header.html.php');
-        echo $view->render('StudySauceBundle:Shared:menu.html.php');
+        if($app->getUser() == 'anon.' || !is_object($app->getUser()) || $app->getUser()->hasRole('ROLE_GUEST') || $app->getUser()->hasRole('ROLE_DEMO')) {
+
+        }
+        elseif($app->getUser()->hasRole('ROLE_ADMIN'))
+            echo $view->render('AdminBundle:Shared:menu.html.php');
+        elseif($app->getUser()->hasRole('ROLE_PARTNER'))
+            echo $view->render('StudySauceBundle:Partner:menu.html.php');
+        elseif($app->getUser()->hasRole('ROLE_MASTER_ADVISER') || $app->getUser()->hasRole('ROLE_ADVISER'))
+            echo $view->render('AdminBundle:Adviser:menu.html.php');
+        else
+            echo $view->render('StudySauceBundle:Shared:menu.html.php');
         $view['slots']->output('tmp-body');
         $view['slots']->stop();
     }
