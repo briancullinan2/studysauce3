@@ -379,7 +379,7 @@ $collection->add(
 $collection->add(
     'packs',
     new Route(
-        '/packs',
+        '/packs/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )

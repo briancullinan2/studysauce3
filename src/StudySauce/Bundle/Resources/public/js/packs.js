@@ -20,6 +20,24 @@ $(document).ready(function () {
         }
     });
 
+    body.on('change', '#packs .type select', function () {
+        var tab = $('#packs');
+        var card = $(this).parents('.card');
+        var entry = tab.find('textarea').val();
+        var row = parseInt(card.find('.preview-count').text().split(/\s/g)[0]) - 1;
+        var rows = entry.split(/\n/ig);
+        var lastLine = rows[row];
+        var clip = lastLine.split(/\t|\s\s\s\s+/ig);
+        card.parent().find('.card').each(function (i) {
+            clip[2+i] = $(this).find('select').val();
+        });
+        tab.find('textarea').val(rows.slice(0, row).join("\n") + "\n"
+            + clip.join("\t") + "\n" + rows.slice(row + 1, rows.length).join("\n"));
+        var start = rows.slice(0, row).map(function(x) {return x.length;}).reduce(function (a, b) {return a + b;}) + row;
+        setSelectionRange(tab.find('textarea')[0], start, start);
+        previewImport();
+    });
+
     var previewTimeout = null;
     function previewImport() {
         var importTab = $('#packs');
@@ -39,33 +57,39 @@ $(document).ready(function () {
             }
 
             var preview = importTab.find('fieldset');
-            preview.find('.question, .response').remove();
+            preview.find('.card').remove();
             var count = (entry.substr(0, start).match(/\n/g) || []).length;
-            rowImport(match, preview, count);
-            if(importTab.find('.title input').val() != '' && preview.find('.question').length > 0) {
+            rowImport((/.*/).exec(match)[0], preview, count);
+            if(importTab.find('.title input').val() != '' && preview.find('.card').length > 0) {
                 importTab.find('.highlighted-link').removeClass('invalid').addClass('valid');
             }
             else {
                 importTab.find('.highlighted-link').removeClass('valid').addClass('invalid');
             }
-        }, 1000);
+        }, 200);
     }
 
     function setFontSize() {
         var words = $(this).find('.inner').text().split(/\s+/ig),
             size = 12;
-        $(this).css('font-size', size);
+        $(this).find('.inner').css('font-size', size);
         var origLines = Math.ceil($(this).find('.inner').height() / (size * 1.2)),
             numberOfLines = 0;
         do {
             size++;
-            $(this).css('font-size', size);
+            $(this).find('.inner').css('font-size', size);
             numberOfLines = Math.ceil($(this).find('.inner').height() / (size * 1.2));
         } while(size < 32 && $(this).find('.inner').height() < $(this).height() - (size * 1.2)
             && $(this).find('.inner').height() < $(this).width()
             && (numberOfLines < Math.floor(words.length / numberOfLines)
-                || numberOfLines == origLines || words.length / numberOfLines / 2 > $(this).width() / $(this).height()));
-        $(this).css('font-size', size - 1);
+                || numberOfLines <= origLines || words.length / numberOfLines / 4 > $(this).width() / $(this).height()));
+        $(this).find('.inner').css('font-size', size - 1);
+        if($(this).find('.inner').height() < $(this).height()) {
+            $(this).find('.inner').css('margin-top', ($(this).height() - $(this).find('.inner').height()) / 2);
+        }
+        else {
+            $(this).find('.inner').css('margin-top', 0);
+        }
     }
 
     function rowImport(clipText, append, count) {
@@ -90,9 +114,34 @@ $(document).ready(function () {
                 continue;
 
             count++;
-            var newBoxes = $('<div class="question"><div class="inner">' + clipRows[i][0].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />") + '</div><div class="preview-count">' + count + ' of ' + total + '</div><div class="preview-title">' + importTab.find('.title input').val().trim() + '</div><div class="answer">Get answer</div></div><div class="response"><div class="inner">' + clipRows[i][1].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />") + '</div><div class="preview-count">' + count + ' of ' + total + '</div><div class="preview-title">' + importTab.find('.title input').val().trim() + '</div><div class="wrong">Wrong</div><div class="correct">Correct</div></div>').appendTo(append);
-            setFontSize.apply(newBoxes.filter('.question'));
-            setFontSize.apply(newBoxes.filter('.response'));
+            if(clipRows[i].length >= 4 && clipRows[i][3] == 'multiple') {
+                var newMultipleBoxes = importTab.find('.templates > *').not('.card:not(.type-multiple)').clone().appendTo(append);
+                newMultipleBoxes.filter('.card').first().find('.inner').html(clipRows[i][0].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
+                if(clipRows[i].length >= 3) {
+                    newMultipleBoxes.filter('.card').first().find('select').val(clipRows[i][2]);
+                }
+                newMultipleBoxes.find('.preview-count').text(count + ' of ' + total);
+                newMultipleBoxes.find('.preview-title').text(importTab.find('.title input').val().trim());
+                var rows = clipRows[i][1].split(',');
+                newMultipleBoxes.filter('.card').eq(1).find('.inner').html(rows.map(function (x) {return '<div class="response">' + x.replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />") + '</div>';}).join(''));
+                newMultipleBoxes.filter('.card').last().find('select').append($(rows.map(function (x) {return '<option>' + x + '</option>';}).join('')));
+                if(clipRows[i].length >= 5) {
+                    newMultipleBoxes.filter('.card').last().find('select').val(clipRows[i][4]);
+                    newMultipleBoxes.filter('.card').last().find('.inner').html(clipRows[i][4].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
+                }
+                newMultipleBoxes.filter('.card').each(function () { setFontSize.apply($(this)); });
+            }
+            else {
+                var newBoxes = importTab.find('.templates > *').not('.card.type-multiple').clone().appendTo(append);
+                if(clipRows[i].length >= 3) {
+                    newBoxes.filter('.card').first().find('select').val(clipRows[i][2]);
+                }
+                newBoxes.filter('.card').first().find('.inner').html(clipRows[i][0].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
+                newBoxes.find('.preview-count').text(count + ' of ' + total);
+                newBoxes.find('.preview-title').text(importTab.find('.title input').val().trim());
+                newBoxes.filter('.card').last().find('.inner').html(clipRows[i][1].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
+                newBoxes.filter('.card').each(function () { setFontSize.apply($(this)); });
+            }
         }
 
         // remove empties
@@ -130,7 +179,7 @@ $(document).ready(function () {
         // get the parsed list of cards
         var cards = [], cardsDiv;
         rowImport(tab.find('textarea').val(), cardsDiv = $('<div>'));
-        cardsDiv.find('.question').each(function () {
+        cardsDiv.find('.card.question').each(function () {
             cards[cards.length] = {
                 content: $(this).find('.inner').text(),
                 response: $(this).next('.response').text()
@@ -158,7 +207,7 @@ $(document).ready(function () {
         })
     });
 
-    body.on('change keydown keyup', '#packs .title input', previewImport);
-    body.on('mousedown mouseup change focus blur keydown keyup', '#packs textarea', previewImport);
+    body.on('mousedown focus keyup', '#packs .title input', previewImport);
+    body.on('mousedown focus keyup', '#packs textarea', previewImport);
 
 });

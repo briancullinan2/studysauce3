@@ -51,7 +51,23 @@ jQuery(document).ready(function() {
 
     function rowImport(clipText, append)
     {
-        var importTab = $('#import');
+        var importTab = $('#import'),
+            colFirst = 0, colLast = 1, colEmail = 2, colGroup = 3;
+
+        // check first row for column names
+        var firstRow = (/.*mail.*/i).exec(importTab.find('textarea').val().trim());
+        if(firstRow != null) {
+            var firstFirst = (/.*first/i).exec(firstRow[0]);
+            var firstLast = (/.*last/i).exec(firstRow[0]);
+            var firstEmail = (/.*email/i).exec(firstRow[0]);
+            var firstGroup = (/.*group/i).exec(firstRow[0]);
+            if(firstFirst != null && firstLast != null && firstEmail != null && firstGroup != null) {
+                colFirst = firstFirst[0].match(/\t|\s\s\s\s+/ig).length;
+                colLast = firstLast[0].match(/\t|\s\s\s\s+/ig).length;
+                colEmail = firstEmail[0].match(/\t|\s\s\s\s+/ig).length;
+                colGroup = firstGroup[0].match(/\t|\s\s\s\s+/ig).length;
+            }
+        }
 
         // split into rows
         var clipRows = clipText.split(/\n/ig);
@@ -62,32 +78,21 @@ jQuery(document).ready(function() {
         }
 
         // write out in a table
-        for (i=0; i<clipRows.length; i++) {
-            // skip the heading rows
-            if(clipRows[i].length == 0 || clipRows[i][0].length == 0 || clipRows[i].indexOf('email') > -1 ||
-                clipRows[i].indexOf('e-mail') > -1 || clipRows[i].indexOf('E-mail') > -1)
-                continue;
+        // skip the heading rows
+        for (i=firstRow != null && clipText.indexOf(firstRow[0]) > -1 ? 1 : 0; i<clipRows.length; i++) {
 
             var addUser = importTab.find('.import-row').last(),
-                newRow = addUser.clone().attr('id', '').addClass('edit');
+                newRow = addUser.clone().attr('id', '').addClass('edit').removeClass('read-only');
             if(append != null)
                 newRow.appendTo(append);
             else
                 newRow.insertBefore(addUser);
-            for (var j=0; j<clipRows[i].length; j++) {
-                if (clipRows[i][j].length == 0) {
-                    newRow.find('input, select').eq(j).val('');
-                }
-                else {
-                    var option = newRow.find('option:contains("' + clipRows[i][j] + '")');
-                    if(j == 3 && option.length > 0) {
-                        newRow.find('input, select').eq(j).val(option.attr('value'));
-                    }
-                    else {
-                        newRow.find('input, select').eq(j).val(clipRows[i][j]);
-                    }
-                }
-            }
+            newRow.find('.first-name input').val(clipRows[i][colFirst]);
+            newRow.find('.last-name input').val(clipRows[i][colLast]);
+            newRow.find('.email input').val(clipRows[i][colEmail]);
+            var option = newRow.find('option:contains("' + clipRows[i][colGroup] + '")');
+            newRow.find('.group input').val(option.length > 0 ? option.attr('value') : clipRows[i][colGroup]);
+            newRow.find('a[href*="_code"]').remove();
             importFunc.apply(newRow);
             importTab.addClass('edit-user-only');
 
@@ -130,10 +135,10 @@ jQuery(document).ready(function() {
             var preview = importTab.find('fieldset');
             preview.find('.import-row').remove();
             rowImport(match, preview);
-        }, 1000);
+        }, 200);
     }
 
-    body.on('mousedown mouseup change focus blur keydown keyup', '#import textarea', previewImport);
+    body.on('mousedown focus keyup', '#import textarea', previewImport);
 
     body.on('click', '#import a[href="#import-group"]', function (evt) {
         evt.preventDefault();

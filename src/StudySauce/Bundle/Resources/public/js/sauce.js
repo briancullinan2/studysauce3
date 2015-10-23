@@ -10,6 +10,25 @@ $(window).unload(function() {
     window.noError = true;
 });
 
+function setSelectionRange(input, selectionStart, selectionEnd) {
+    if (input.setSelectionRange) {
+        input.focus();
+        input.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (input.createTextRange) {
+        var range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+}
+
+key.filter = function(event){
+        //var tagName = (event.target || event.srcElement).tagName;
+        //key.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tagName) ? 'input' : 'other');
+        return true;
+    };
 
 +function ($) {
     'use strict';

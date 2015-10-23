@@ -84,6 +84,9 @@ $(document).ready(function () {
             // get the clipboard text
             var that = $(this),
                 text = $('<textarea></textarea>')
+                    .css('position', 'fixed')
+                    .css('top', 0)
+                    .css('left', -10000)
                     .css('opacity', '0')
                     .css('height', 1)
                     .css('width', 1).appendTo(command).focus();

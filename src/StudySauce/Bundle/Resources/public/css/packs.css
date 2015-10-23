@@ -1,7 +1,8 @@
 #packs fieldset {
     background-color: #fff;
     white-space: nowrap;
-    overflow:hidden;
+    overflow: visible;
+    overflow-x:auto;
     min-width: 0;
 }
 
@@ -12,6 +13,14 @@
     padding: 0 2px;
     width: 50%;
     vertical-align: top;
+}
+
+#packs .input.type {
+    position:absolute;
+    display:block;
+    left: 0;
+    top: -35px;
+    width:100%;
 }
 
 #packs .preview-title {
@@ -33,28 +42,46 @@
     line-height: 120%;
 }
 
-#packs .response,
-#packs .question {
+#packs .templates {
+    display:none;
+}
+
+#packs .card {
     background-color:#eee;
     border-color: #ccc;
     padding:50px 20px 100px 20px;
-    margin:20px;
+    margin:40px 10px 0 10px;
     width: 300px;
     height: 400px;
     display:inline-block;
     vertical-align: top;
-    font-size: 30px;
-    text-align: justify;
-    line-height: 120%;
     border-radius: 10px;
     position:relative;
     white-space: normal;
 }
 
+#packs .card:first-of-type {
+    margin-left:0;
+}
+
 #packs .inner {
     overflow-y: auto;
     max-height: 100%;
-    padding: 2px 0;
+    padding: 2px;
+    text-align: justify;
+    font-size: 30px;
+    line-height: 120%;
+}
+
+#packs .response {
+    background-color: #0099BB;
+    color: #fff;
+    display: block;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 120%;
+    text-align: center;
+    margin: 10px 0;
 }
 
 #packs .answer {

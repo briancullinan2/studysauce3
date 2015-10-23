@@ -23,23 +23,3 @@
 {
     display:block;
 }
-
-#import .import-users
-{
-    width:50%;
-    display:inline-block;
-    margin: 0 -2px;
-    padding-right: 5px;
-    padding-left: 2px;
-    vertical-align: bottom;
-}
-
-#user-preview
-{
-    min-height: 8em;
-    width:50%;
-    display:inline-block;
-    margin-left: -4px;
-    vertical-align: bottom;
-}
-
