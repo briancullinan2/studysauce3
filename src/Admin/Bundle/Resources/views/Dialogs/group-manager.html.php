@@ -8,7 +8,7 @@ Use the list below to manage groups.
 <?php $view['slots']->stop();
 
 $view['slots']->start('modal-body') ?>
-<table>
+<table class="results">
     <thead>
     <tr>
         <th><span><a href="#add-group">Add Group</a></span><br />Name</th>

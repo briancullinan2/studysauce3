@@ -131,11 +131,6 @@
     background-color: #DDDDDD;
 }
 
-#left-panel
-{
-    border-right: 1px solid #555;
-}
-
 #right-panel h3,
 #left-panel h3
 {
@@ -153,7 +148,6 @@
 {
     right: 0;
     left:auto;
-    border-left: 1px solid #555;
 }
 
 #right-panel ul,
@@ -897,18 +891,18 @@ a[href*="/redirect/facebook"]:focus
     border-bottom-color: #224477;
 }
 
-.main-menu a:hover,
-.main-menu a:focus,
-.main-menu a:active,
-.main-menu a.active,
-#left-panel.expanded .main-menu a:hover,
-#left-panel.expanded .main-menu a:focus,
-#left-panel.expanded .main-menu a:active,
-#left-panel.expanded .main-menu a.active,
-#right-panel.expanded .main-menu a:hover,
-#right-panel.expanded .main-menu a:focus,
-#right-panel.expanded .main-menu a:active,
-#right-panel.expanded .main-menu a.active
+.main-menu li ~ li a:hover,
+.main-menu li ~ li a:focus,
+.main-menu li ~ li a:active,
+.main-menu li ~ li a.active,
+#left-panel.expanded .main-menu li ~ li a:hover,
+#left-panel.expanded .main-menu li ~ li a:focus,
+#left-panel.expanded .main-menu li ~ li a:active,
+#left-panel.expanded .main-menu li ~ li a.active,
+#right-panel.expanded .main-menu li ~ li a:hover,
+#right-panel.expanded .main-menu li ~ li a:focus,
+#right-panel.expanded .main-menu li ~ li a:active,
+#right-panel.expanded .main-menu li ~ li a.active
 {
     padding-left:45px;
     background-color:#DDDDDD;
@@ -1154,6 +1148,7 @@ a[href*="/redirect/facebook"]:focus
     padding-left:50px;
 }
 
+
 @media all and (max-width: 1300px), (max-height: 700px)
 {
     #left-panel,
@@ -1223,6 +1218,37 @@ a[href*="/redirect/facebook"]:focus
     {
         overflow: hidden;
     }
+}
+
+@media all and (min-width: 1500px) {
+    #right-panel a[href="#expand"],
+    #right-panel.expanded a[href="#collapse"],
+    #right-panel.expanded a:not([href]) span,
+    #right-panel.expanded .navbar-toggle,
+    #right-panel.expanded a[href="#expand"],
+    #right-panel.expanded a[href="#expand"],
+    #right-panel a:not([href]) span,
+    #right-panel .navbar-toggle,
+    #right-panel a[href="#expand"],
+    #right-panel a[href="#expand"] {
+        display:none;
+    }
+
+    #right-panel.collapsed h3,
+    #right-panel.collapsed .main-menu,
+    #right-panel.expanded h3,
+    #right-panel.expanded .main-menu {
+        display:block;
+    }
+
+    #right-panel,
+    #right-panel.collapsed,
+    #right-panel.expanded {
+        width: 220px;
+        white-space: normal;
+        padding-top: 50px;
+    }
+
 }
 
 @media all and (max-width:700px), all and (max-height:700px) {
@@ -1417,7 +1443,6 @@ a[href*="/redirect/facebook"]:focus
         padding-top:0;
         background:#555 none;
         color:#ffffff;
-        border-color:transparent;
     }
 
     #left-panel .navbar-toggle

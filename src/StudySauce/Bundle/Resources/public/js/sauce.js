@@ -143,7 +143,7 @@ key.filter = function(event){
     // TAB DATA-API
     // ============
 
-    $(document).on('click.bs.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
+    $(document).on('click', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
         e.preventDefault()
         Plugin.call($(this), 'show')
     })

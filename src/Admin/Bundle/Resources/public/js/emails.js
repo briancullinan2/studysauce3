@@ -85,10 +85,11 @@ function setupSelectize()
         searchField: ['text', 'value', '1', '0'],
         plugins: ['continue_editing', 'restore_on_backspace2'],
         maxItems: 1,
+        dropdownParent:'body',
         options: [that.val()],
         render: {
             option: function(item) {
-                return '<div>' +
+                return '<div class="email-variables">' +
                 '<span class="title">' +
                 '<span class="name"><i class="icon source"></i>' + item.text + '</span>' +
                 '<span class="by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>' +
@@ -253,28 +254,6 @@ $(document).ready(function () {
                 }
             }
         }
-    });
-
-    body.on('click', '#emails .paginate a', function (evt) {
-        evt.preventDefault();
-        var admin = $('#emails'),
-            page = this.hash.match(/([0-9]*|last|prev|next|first)$/i)[0],
-            current = parseInt(admin.find('input[name="page"]').val()),
-            last = parseInt(admin.find('#page-total').text());
-        if(page == 'first')
-            page = 1;
-        if(page == 'next')
-            page = current + 1;
-        if(page == 'prev')
-            page = current - 1;
-        if(page == 'last')
-            page = last;
-        if(page > last)
-            page = last;
-        if(page < 1)
-            page = 1;
-        admin.find('input[name="page"]').val(page);
-        loadResults();
     });
 
     body.on('click', '#emails a[href="#send-email"]', function () {

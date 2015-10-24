@@ -6,20 +6,21 @@ $(document).ready(function () {
         searchRequest = null;
 
     function loadContent (data) {
-        var admin = jQuery('#command_control'),
+        var admin = jQuery('#command'),
             content = $(data);
-        admin.find('table.results > tbody > tr').remove();
-        content.find('table.results > tbody > tr').appendTo(admin.find('table.results > tbody'));
-        admin.find('table.results > thead > tr > th').each(function (i) {
+        admin.find('#users table.results > tbody > tr').remove();
+        content.filter('#command').find('#users table.results > tbody > tr').appendTo(admin.find('#users table.results > tbody'));
+        admin.find('#users table.results > thead > tr > th').each(function (i) {
             $(this).find('label:first-child > *:not(select):not(input)').remove();
-            content.find('.pane-content th').eq(i).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
+            content.filter('#command').find('#users table.results > thead > tr > th').eq(i).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
         });
+        admin.find('#groups table.results').replaceWith(content.filter('#command').find('#groups .results'));
         admin.find('#page-total').text(content.find('#page-total').text());
     }
 
     function getData()
     {
-        var admin = jQuery('#command_control');
+        var admin = jQuery('#command');
         var result = {
             order: orderBy,
             search: admin.find('input[name="search"]').val().trim(),
@@ -51,26 +52,26 @@ $(document).ready(function () {
         }, 100);
     }
 
-    body.on('keyup', '#command_control input[name="search"], #command_control input[name="page"]', function () {
+    body.on('keyup', '#command input[name="search"], #command input[name="page"]', function () {
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
         searchTimeout = setTimeout(loadResults, 1000);
     });
 
-    body.on('click', '#command_control a[href="#edit-user"], #group-manager a[href="#edit-group"]', function (evt) {
+    body.on('click', '#command a[href="#edit-user"], #command a[href="#edit-group"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('tr');
         row.removeClass('read-only').addClass('edit');
     });
 
-    body.on('click', '#command_control a[href^="/emails"]', function () {
+    body.on('click', '#command a[href^="/emails"]', function () {
         var that = $(this);
         body.one('show', '#emails', function () {
             $('#emails').find('input[name="search"]').val(that[0].hash).trigger('keyup');
         });
     });
 
-    body.on('click', '#command_control a[href="#cancel-edit"]', function (evt) {
+    body.on('click', '#command a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('tr');
         row.removeClass('edit').addClass('read-only');
@@ -78,7 +79,7 @@ $(document).ready(function () {
 
     key('⌘+c, ctrl+c, command+c', function()
     {
-        var command = $('#command_control');
+        var command = $('#command');
         if (command.is(':visible')) {
 
             // get the clipboard text
@@ -141,19 +142,9 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#group-manager a[href="#cancel-edit"]', function (evt) {
+    body.on('click', '#command a[href="#add-group"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('tr'),
-            groupId = (/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class'))[1];
-        row.removeClass('edit').addClass('read-only');
-        if(groupId == '') {
-            row.remove();
-        }
-    });
-
-    body.on('click', '#group-manager a[href="#add-group"]', function (evt) {
-        evt.preventDefault();
-        var manager = $('#group-manager'),
+        var manager = $('#command').find('table.results'),
             newRow = manager.find('tbody tr').first().clone().attr('class', 'group-id- edit');
         newRow.find('input[type="checkbox"]').prop('checked', false);
         newRow.find('input[type="text"], textarea').val('');
@@ -161,7 +152,7 @@ $(document).ready(function () {
         newRow.prependTo(manager.find('tbody'));
     });
 
-    body.on('click', '#group-manager a[href="#save-group"]', function (evt) {
+    body.on('click', '#command a[href="#save-group"]', function (evt) {
         evt.preventDefault();
         var data = getData(),
             row = $(this).parents('tr');
@@ -178,7 +169,7 @@ $(document).ready(function () {
             dataType: 'text',
             data: data,
             success: function (response) {
-                var admin = $('#command_control'),
+                var admin = $('#command'),
                     content = $(response),
                     current = admin.find('th:nth-child(3) select').val();
                 // update group select in heading
@@ -194,15 +185,15 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '#command_control a[href*="_switch_user"]', function () {
+    body.on('click', '#command a[href*="_switch_user"]', function () {
         if(searchRequest != null)
             searchRequest.abort();
     });
 
-    body.on('click', '#add-user a[href="#add-user"]', function (evt) {
+    body.on('click', '#command a[href="#new-user"]', function (evt) {
         evt.preventDefault();
-        var admin = $('#command_control'),
-            dialog = $('#add-user'),
+        var admin = $('#command'),
+            dialog = $('#users').find('.pane-top'),
             data = {
                 first: dialog.find('.first-name input').val().trim(),
                 last: dialog.find('.last-name input').val().trim(),
@@ -240,11 +231,11 @@ $(document).ready(function () {
         });
     });
 
-    body.on('show', '#command_control', function () {
+    body.on('show', '#command', function () {
         if($(this).is('.loaded'))
             return;
         $(this).addClass('loaded');
-        var admin = $('#command_control'),
+        var admin = $('#command'),
             pickers = admin.find('th:nth-child(1) .input + div, th:nth-child(6) .input + div');
 
         var cur = -1, prv = -1;
@@ -397,7 +388,7 @@ $(document).ready(function () {
             });
         });
 
-        body.on('mousedown', '#command_control *', function (evt) {
+        body.on('mousedown', '#command *', function (evt) {
             if(this == evt.target &&
                 $(evt.target).parents('.ui-datepicker').length == 0 &&
                 $(evt.target).parents('th:nth-child(1), th:nth-child(6)').length == 0) {
@@ -405,12 +396,12 @@ $(document).ready(function () {
             }
         });
 
-        body.on('blur', '#command_control th:nth-child(1) input, #command_control th:nth-child(6) input', function () {
+        body.on('blur', '#command th:nth-child(1) input, #command th:nth-child(6) input', function () {
             var that = $(this).parent().next();
             hideTimeout = setTimeout(function () { that.hide(); }, 500);
         });
 
-        body.on('focus', '#command_control th:nth-child(1) input, #command_control th:nth-child(6) input', function () {
+        body.on('focus', '#command th:nth-child(1) input, #command th:nth-child(6) input', function () {
             setTimeout(function () {
                 if(hideTimeout)
                     clearTimeout(hideTimeout);
@@ -440,10 +431,10 @@ $(document).ready(function () {
 
     });
 
-    body.on('submit', '#command_control form', function (evt) {
+    body.on('submit', '#command form', function (evt) {
         evt.preventDefault();
         var data = getData(),
-            admin = $('#command_control');
+            admin = $('#command');
         data['users'] = [];
         admin.find('table.results > tbody > tr.edit:not(.invalid)').each(function () {
             var row = $(this);
@@ -466,7 +457,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '#command_control a[href="#confirm-remove-user"]', function (evt) {
+    body.on('click', '#command a[href="#confirm-remove-user"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('tr'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
@@ -474,7 +465,7 @@ $(document).ready(function () {
         $('#confirm-remove-user').data('userId', userId);
     });
 
-    body.on('click', '#command_control a[href="#confirm-cancel-user"]', function (evt) {
+    body.on('click', '#command a[href="#confirm-cancel-user"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('tr'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
@@ -482,7 +473,7 @@ $(document).ready(function () {
         $('#confirm-cancel-user').data('userId', userId);
     });
 
-    body.on('click', '#command_control a[href="#confirm-password-reset"]', function (evt) {
+    body.on('click', '#command a[href="#confirm-password-reset"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('tr'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
@@ -526,34 +517,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '#command_control .paginate a', function (evt) {
-        evt.preventDefault();
-        var admin = $('#command_control'),
-            page = this.hash.match(/([0-9]*|last|prev|next|first)$/i)[0],
-            current = parseInt(admin.find('input[name="page"]').val()),
-            last = parseInt(admin.find('#page-total').text());
-        if(page == 'first')
-            page = 1;
-        if(page == 'next')
-            page = current + 1;
-        if(page == 'prev')
-            page = current - 1;
-        if(page == 'last')
-            page = last;
-        if(page > last)
-            page = last;
-        if(page < 1)
-            page = 1;
-        admin.find('input[name="page"]').val(page);
-        loadResults();
-    });
-
-    body.on('click', '#command_control table.results > tbody > tr.read-only', function () {
-        $(this).find('input[name="selected"]')
-            .prop('checked', !$(this).find('input[name="selected"]').prop('checked'));
-    });
-
-    body.on('change', '#command_control table.results > thead > tr > th:not(:last-child) > label > select, #command_control table.results > thead > tr > th:not(:last-child) > label > input', function () {
+    body.on('change', '#command table.results > thead > tr > th:not(:last-child) > label > select, #command table.results > thead > tr > th:not(:last-child) > label > input', function () {
         var that = $(this);
 
         if(that.val() == '_ascending' || that.val() == '_descending')

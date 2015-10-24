@@ -119,18 +119,57 @@ $(document).ready(function () {
         loadingAnimation($(this));
     });
 
+    body.on('click', '.results [class*="-row"], table.results > tbody > tr', function () {
+        $(this).find('> *:last-child input[name="selected"]')
+            .prop('checked', !$(this).find('input[name="selected"]').prop('checked'));
+    });
+
+    body.on('click', '.results.expandable > tbody > tr:nth-child(odd)', function () {
+        var row = $(this);
+        if(row.is('.selected')) {
+            row.removeClass('selected');
+        }
+        else {
+            row.addClass('selected');
+        }
+    });
+
     // hide any visible modals when panel changes
     body.on('hide', '.panel-pane', function () {
         body.find('.modal:visible').modal('hide');
         body.find('.ui-datepicker').hide();
     });
 
+    body.on('click', '.paginate a', function (evt) {
+        evt.preventDefault();
+        var admin = $('.paginate'),
+            page = this.hash.match(/([0-9]*|last|prev|next|first)$/i)[0],
+            current = parseInt(admin.find('input[name="page"]').val()),
+            last = parseInt(admin.find('#page-total').text());
+        if(page == 'first')
+            page = 1;
+        if(page == 'next')
+            page = current + 1;
+        if(page == 'prev')
+            page = current - 1;
+        if(page == 'last')
+            page = last;
+        if(page > last)
+            page = last;
+        if(page < 1)
+            page = 1;
+        admin.find('input[name="page"]').val(page);
+        loadResults();
+    });
+
     function expandMenu(evt)
     {
         var parent = $(this).parents('#left-panel, #right-panel');
-        if($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]'))
+        if($(this).is('[href="#collapse"]'))
+            return collapseMenu();
+        if($(this).is('[href="#expand"]'))
             evt.preventDefault();
-        if(parent.is('.collapsed')) {
+        if(parent.length > 0 && parent.width() < 150) {
             // record this special case where its not a link, everything else is recorded automatically
             visits[visits.length] = {path: window.location.pathname, query: window.location.search, hash: '#expand', time:(new Date()).toJSON()};
             // cancel navigation is we are uncollapsing instead
@@ -162,7 +201,9 @@ $(document).ready(function () {
             body.find('.panel-pane:visible').css('top', '');
             body.find('#left-panel, #right-panel').removeClass('expanded').addClass('collapsed');
             $(window).scrollTop(-parseInt(top));
+            return false;
         }
+        return true;
     }
 
     body.on('show', '#home', function () {

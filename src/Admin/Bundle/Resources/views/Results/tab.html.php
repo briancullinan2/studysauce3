@@ -32,17 +32,10 @@ $view['slots']->start('body'); ?>
             </ul>
             <div class="search"><label class="input"><input name="search" type="text" value=""
                                                             placeholder="Search"/></label></div>
-            <div class="paginate">
-                <a href="?page=first">&lt;&lt;</a> <a href="?page=prev">&lt;</a>
-                <label class="input"><input name="page" type="text" value="1"/> / <span
-                        id="page-total"><?php print ceil(
-                            $total / 25
-                        ); ?></span></label>
-                <a href="?page=next">&gt;</a> <a href="?page=last">&gt;&gt;</a>
-            </div>
+            <?php print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $total]); ?>
             <div class="tab-content">
                 <div id="individual" class="tab-pane active">
-                    <table class="results">
+                    <table class="results expandable">
                         <thead>
                         <tr>
                             <th><label><span>Add Connection</span><br/>
@@ -167,7 +160,7 @@ $view['slots']->start('body'); ?>
                             </tr>
                             <tr>
                                 <td colspan="5">
-                                    <table>
+                                    <table class="results expandable">
                                         <tbody>
                                         <?php
                                         if ($u->getUserPacks()->count() > 0) {
@@ -182,7 +175,7 @@ $view['slots']->start('body'); ?>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="5">
-                                                        <table>
+                                                        <table class="results">
                                                             <tbody>
                                                             <?php
                                                             if (count($responses) > 0) {
@@ -218,7 +211,7 @@ $view['slots']->start('body'); ?>
                     </table>
                 </div>
                 <div id="aggregate" class="tab-pane">
-                    <table class="results">
+                    <table class="results expandable">
                         <thead>
                         <tr>
                             <th><label><span>Add Pack</span><br/>
@@ -319,7 +312,7 @@ $view['slots']->start('body'); ?>
                             </tr>
                             <tr>
                                 <td colspan="5">
-                                    <table>
+                                    <table class="results expandable">
                                         <tbody>
                                         <?php
                                         if ($p->getUserPacks()->count() > 0) {
@@ -334,7 +327,7 @@ $view['slots']->start('body'); ?>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="5">
-                                                        <table>
+                                                        <table class="results">
                                                             <tbody>
                                                             <?php
                                                             if (count($responses)) {

@@ -1,25 +1,6 @@
 
-#import .import-row {
-    clear: both;
-    display: block;
-    vertical-align: top;
-    position: relative;
-    white-space: nowrap;
-}
-
-.import-row > *
+#import .results header > *,
+#import .import-row > *
 {
     width:20%;
-    display:inline-block;
-    vertical-align: bottom;
-}
-
-.import-row label > span
-{
-    display:none;
-}
-
-.import-row:first-of-type label > span
-{
-    display:block;
 }

@@ -13,16 +13,6 @@
     background-position: left -4152px;
 }
 
-#emails table.variables,
-#emails table.templates,
-#emails table.history
-{
-    width: 100%;
-    table-layout: fixed;
-    border-spacing: 0;
-    border-collapse: separate;
-}
-
 #editor1
 {
     background-color:#fff;
@@ -168,27 +158,6 @@
     display:block;
 }
 
-#emails .paginate {
-    display: inline-block;
-    width: 300px;
-    margin: 0 -4px;
-    padding: 0 2px;
-    vertical-align: middle;
-    text-align: center;
-}
-
-#emails .paginate label {
-    margin: 0 -50px;
-    padding: 0 50px;
-    display: inline-block;
-}
-
-#emails .paginate input {
-    margin-right: -50px;
-    padding-right: 50px;
-    display:inline-block;
-}
-
 #emails .search {
     display:inline-block;
     width:100%;
@@ -213,22 +182,26 @@
     overflow: hidden;
 }
 
-#emails .variables .selectize-dropdown .title {
+.email-variables .title {
     display: block;
 }
 
-#emails .variables .selectize-dropdown .name {
+.email-variables .name {
     font-weight: bold;
     margin-right: 5px;
 }
 
-#emails .variables .selectize-dropdown .description {
+.email-variables .description {
     display: block;
     opacity: 0.5;
     white-space: nowrap;
     width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.email-variables .by {
+    opacity: 0.8;
 }
 
 .variables
@@ -255,8 +228,8 @@
     display:table;
 }
 
-#emails .variables .selectize-dropdown .by {
-    opacity: 0.8;
+#emails .templates {
+    margin-top: 35px;
 }
 
 #send-email .nav-tabs
@@ -266,36 +239,12 @@
     position:static;
 }
 
-#emails .variables > tbody > tr > td,
-#emails .templates > tbody > tr > td,
-#emails .history > tbody > tr > td
-{
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
-    vertical-align: middle;
-}
-
-#emails .variables > tbody > tr:hover:not(.selected):not(.edit) > td,
-#emails .templates > tbody > tr:hover:not(.selected):not(.edit) > td,
-#emails .history > tbody > tr:hover:not(.selected):not(.edit) > td
-{
-    box-shadow: 0 1px 4px rgba(255,255,255,.25);
-    border-top: 1px solid #DDDDDD;
-    border-bottom: 1px solid #DDDDDD;
-    background-color: rgba(255,255,255,.50);
-}
-
 [contenteditable="true"]
 {
     outline: none;
 }
 
-#send-email .save-template
-{
-    clear:both;
-}
-
-#send-email .save-template .input
+#send-email .pane-top .input
 {
     width: 50%;
     display:inline-block;
@@ -303,8 +252,12 @@
     padding: 0 2px;
 }
 
-#send-email .save-template .input.save
+#send-email .pane-top .input:first-of-type {
+    margin-top:35px;
+}
+
+#send-email .pane-top .input.save
 {
-    margin-right: -100px;
-    padding-right: 100px;
+    margin-right: -130px;
+    padding-right: 130px;
 }

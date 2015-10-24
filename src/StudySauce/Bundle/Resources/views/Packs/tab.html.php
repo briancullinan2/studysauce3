@@ -30,107 +30,75 @@ $view['slots']->stop();
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="packs">
         <div class="pane-content">
-            <h2>Create a pack</h2>
-
             <form action="<?php print $view['router']->generate('packs_create'); ?>" method="post">
-                <label class="input title">
-                    <input name="title" placeholder="Title your pack" value=""/>
-                </label>
-                <label class="input creator">
-                    <input name="creator" placeholder="Creator name"
-                           value="<?php print $app->getUser()->getFirst(); ?> <?php print $app->getUser()->getLast(); ?>"/>
-                    <small>* If the pack is public this is the name others will see.</small>
-                </label>
+                <div class="pane-top">
+                    <h2>Create a pack</h2>
+                    <label class="input title">
+                        <input name="title" placeholder="Title your pack" value=""/>
+                    </label>
+                    <label class="input creator">
+                        <input name="creator" placeholder="Creator name"
+                               value="<?php print $app->getUser()->getFirst(); ?> <?php print $app->getUser()->getLast(); ?>"/>
+                        <small>* If the pack is public this is the name others will see.</small>
+                    </label>
 
-                <h3>Add questions and answers by pasting from excel to the space below (make sure you have questions in
-                    column 1 and responses in column 2).</h3>
-                <label class="input import-users">
-                    <textarea rows="4" placeholder="question,response&para;question,response"></textarea>
-                    <small>* Hint: you can copy all cards in one batch. The preview follows your cursor.</small>
-                </label>
-                <fieldset id="cards-preview">
-                    <legend>Preview</legend>
-                </fieldset>
+                    <h3>Add questions and answers by pasting from excel to the space below (make sure you have questions in
+                        column 1 and responses in column 2).</h3>
+
+                </div>
+
+                <div class="results">
+                <header>
+                    <label>Type</label>
+                    <label>Prompt</label>
+                    <label>Response</label>
+                    <label>Answer/Context</label>
+                    <label></label>
+                </header>
+                <?php for($i = 0; $i < 5; $i++) { ?>
+                    <div class="card-row edit">
+                        <label class="input type">
+                            <select name="type">
+                                <option value="">Default</option>
+                                <option value="mc" data-text="Multiple choice">MC</option>
+                                <option value="tf" data-text="True/False">TF</option>
+                            </select>
+                        </label>
+                        <label class="input content">
+                            <input type="text" name="content" placeholder="Prompt" value="" />
+                        </label>
+                        <label class="input response">
+                            <span>X</span>
+                            <input type="text" name="response" placeholder="Response" value="" />
+                            <span>C</span>
+                            <input type="text" name="response" placeholder="Response" value="" />
+                        </label>
+                        <label class="input response type-mc">
+                            <textarea name="response" placeholder="one per line"></textarea>
+                        </label>
+                        <label class="input response type-tf">
+                            <span>T</span>
+                            <input type="text" name="response" placeholder="True" value="" />
+                            <span>F</span>
+                            <input type="text" name="response" placeholder="False" value="" />
+                        </label>
+                        <label class="input answer">
+                            <input type="text" name="answer" placeholder="Description" value="" />
+                        </label>
+                        <div class="highlighted-link">
+                            <a title="Remove card" href="#remove-card" data-toggle="modal"></a>
+                            <label class="checkbox"><input type="checkbox" name="selected"><i></i></label>
+                        </div>
+                    </div>
+                <?php } ?>
+                </div>
                 <div class="highlighted-link form-actions invalid">
+                    <a href="#add-card" class="big-add">Add <span>+</span> card</a>
                     <a href="#create-new" class="more">Create Pack</a>
                 </div>
             </form>
-            <div class="templates">
-                <div class="card">
-                    <label class="input type">
-                        <select name="type">
-                            <option value="">Type</option>
-                            <option value="plain">Plain text (default)</option>
-                            <option value="audio">Audio</option>
-                            <option value="video">Video</option>
-                        </select>
-                    </label>
-                    <div class="inner" contenteditable="true"></div>
-                    <div class="preview-count"></div>
-                    <div class="preview-title"></div>
-                    <div class="answer">Get answer</div>
-                </div>
-                <div class="card">
-                    <label class="input type">
-                        <select name="type">
-                            <option value="">Answers</option>
-                            <option value="self">Self-assessment (default)</option>
-                            <option value="multiple">Multiple choice</option>
-                            <option value="truefalse">True/False</option>
-                        </select>
-                    </label>
-                    <div class="inner" contenteditable="true"></div>
-                    <div class="preview-count"></div>
-                    <div class="preview-title"></div>
-                    <div class="wrong">Wrong</div>
-                    <div class="correct">Correct</div>
-                </div>
-                <div class="card type-multiple">
-                    <label class="input type">
-                        <select name="type">
-                            <option value="">Type</option>
-                            <option value="plain">Plain text (default)</option>
-                            <option value="audio">Audio</option>
-                            <option value="video">Video</option>
-                        </select>
-                    </label>
-                    <div class="inner" contenteditable="true"></div>
-                    <div class="preview-count"></div>
-                    <div class="preview-title"></div>
-                    <div class="answer">Get answer</div>
-                </div>
-                <div class="card type-multiple">
-                    <label class="input type">
-                        <select name="type">
-                            <option value="">Answers</option>
-                            <option value="self">Self-assessment (default)</option>
-                            <option value="multiple" selected="selected">Multiple choice</option>
-                            <option value="truefalse">True/False</option>
-                        </select>
-                    </label>
-                    <div class="inner" contenteditable="true">
-                        <div class="response"></div>
-                        <div class="response"></div>
-                        <div class="response"></div>
-                        <div class="response"></div>
-                    </div>
-                    <div class="preview-count"></div>
-                    <div class="preview-title"></div>
-                </div>
-                <div class="card type-multiple">
-                    <label class="input type">
-                        <select name="type">
-                            <option value="">Correct</option>
-                        </select>
-                    </label>
-                    <div class="inner" contenteditable="true"></div>
-                    <div class="preview-count"></div>
-                    <div class="preview-title"></div>
-                    <div class="answer">Next question</div>
-                </div>
-            </div>
-            <hr/>
-            <table class="results">
+            <div class="pane-bottom">
+            <table class="results expandable">
                 <thead>
                 <tr>
                     <th><label><span>Title</span><br/>
@@ -234,7 +202,7 @@ $view['slots']->start('body'); ?>
                     </tr>
                     <tr>
                         <td colspan="5">
-                            <table>
+                            <table class="results">
                                 <tbody>
                                 <?php
                                 if ($p->getCards()->count() > 0) {
@@ -258,6 +226,7 @@ $view['slots']->start('body'); ?>
                 <?php } ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>

@@ -10,65 +10,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#packs table.results > tbody > tr:nth-child(odd)', function () {
-        var row = $(this);
-        if(row.is('.selected')) {
-            row.removeClass('selected');
-        }
-        else {
-            row.addClass('selected');
-        }
-    });
-
-    body.on('change', '#packs .type select', function () {
-        var tab = $('#packs');
-        var card = $(this).parents('.card');
-        var entry = tab.find('textarea').val();
-        var row = parseInt(card.find('.preview-count').text().split(/\s/g)[0]) - 1;
-        var rows = entry.split(/\n/ig);
-        var lastLine = rows[row];
-        var clip = lastLine.split(/\t|\s\s\s\s+/ig);
-        card.parent().find('.card').each(function (i) {
-            clip[2+i] = $(this).find('select').val();
-        });
-        tab.find('textarea').val(rows.slice(0, row).join("\n") + "\n"
-            + clip.join("\t") + "\n" + rows.slice(row + 1, rows.length).join("\n"));
-        var start = rows.slice(0, row).map(function(x) {return x.length;}).reduce(function (a, b) {return a + b;}) + row;
-        setSelectionRange(tab.find('textarea')[0], start, start);
-        previewImport();
-    });
-
-    var previewTimeout = null;
-    function previewImport() {
-        var importTab = $('#packs');
-        if(previewTimeout != null)
-            clearTimeout(previewTimeout);
-        previewTimeout = setTimeout(function () {
-            // select the first couple rows or limit to 1000 characters
-            var entry = importTab.find('textarea').val();
-            var first1000 = /(.*?\n){4}|[\s\S]{0,500}/i;
-            var match = first1000.exec(entry)[0];
-
-            // get the lines around where the cursor is
-            var start = importTab.find('textarea')[0].selectionStart;
-            if(typeof start == 'number') {
-                var lastLine = (/.*?$/ig).exec(entry.substr(0, start))[0];
-                match = first1000.exec(entry.substr(start - lastLine.length, entry.length))[0];
-            }
-
-            var preview = importTab.find('fieldset');
-            preview.find('.card').remove();
-            var count = (entry.substr(0, start).match(/\n/g) || []).length;
-            rowImport((/.*/).exec(match)[0], preview, count);
-            if(importTab.find('.title input').val() != '' && preview.find('.card').length > 0) {
-                importTab.find('.highlighted-link').removeClass('invalid').addClass('valid');
-            }
-            else {
-                importTab.find('.highlighted-link').removeClass('valid').addClass('invalid');
-            }
-        }, 200);
-    }
-
     function setFontSize() {
         var words = $(this).find('.inner').text().split(/\s+/ig),
             size = 12;
@@ -100,7 +41,7 @@ $(document).ready(function () {
 
         // split rows into columns
         for (var i=0; i<clipRows.length; i++) {
-            clipRows[i] = clipRows[i].split(/\t|\s\s\s\s+/ig);
+            clipRows[i] = clipRows[i].split(/\t|\s\s\s\s/ig);
         }
 
         // write out in a table
@@ -129,7 +70,6 @@ $(document).ready(function () {
                     newMultipleBoxes.filter('.card').last().find('select').val(clipRows[i][4]);
                     newMultipleBoxes.filter('.card').last().find('.inner').html(clipRows[i][4].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
                 }
-                newMultipleBoxes.filter('.card').each(function () { setFontSize.apply($(this)); });
             }
             else {
                 var newBoxes = importTab.find('.templates > *').not('.card.type-multiple').clone().appendTo(append);
@@ -140,7 +80,6 @@ $(document).ready(function () {
                 newBoxes.find('.preview-count').text(count + ' of ' + total);
                 newBoxes.find('.preview-title').text(importTab.find('.title input').val().trim());
                 newBoxes.filter('.card').last().find('.inner').html(clipRows[i][1].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
-                newBoxes.filter('.card').each(function () { setFontSize.apply($(this)); });
             }
         }
 
@@ -159,11 +98,24 @@ $(document).ready(function () {
         }
     }
 
+    body.on('focus mousedown keydown change keyup', '#packs .response textarea', function () {
+        $(this).css('height', '');
+        $(this).height($(this)[0].scrollHeight - 4);
+    });
+
+    body.on('change', '#packs .type select', function () {
+        var row = $(this).parents('.card-row');
+        row.attr('class', row.attr('class').replace(/type-.*?(\s|$)/ig, ''));
+        if($(this).val() != '') {
+            row.addClass('type-' + $(this).val());
+        }
+    });
+
     body.on('click', '#packs a[href="#create-new"]', function (evt) {
         evt.preventDefault();
 
         var tab = $('#packs');
-        if(tab.find('.highlighted-link').is('invalid')) {
+        if(tab.find('.highlighted-link').is('.invalid')) {
             if(tab.find('.title input').val().trim() == '') {
                 tab.find('.title input').focus();
             }
@@ -196,18 +148,14 @@ $(document).ready(function () {
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
-                var content = $(data).find('table.results');
-                if(content.length > 0) {
-                    tab.find('table.results').replaceWith(content);
-                }
+                tab.find('table.results').each(function (i) {
+                    $(this).replaceWith($(data).filter('#packs').find('table.results').eq(i));
+                });
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
             }
         })
     });
-
-    body.on('mousedown focus keyup', '#packs .title input', previewImport);
-    body.on('mousedown focus keyup', '#packs textarea', previewImport);
 
 });

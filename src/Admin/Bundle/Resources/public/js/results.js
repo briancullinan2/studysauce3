@@ -12,10 +12,10 @@ $(document).ready(function () {
             content = $(data);
         admin.find('table.results').each(function (i) {
             $(this).find('> tbody > tr').remove();
-            content.find('table.results').eq(i).find('> tbody > tr').appendTo($(this).find('> tbody'));
+            content.filter('#results').find('table.results').eq(i).find('> tbody > tr').appendTo($(this).find('> tbody'));
             $(this).find('> thead > tr > th').each(function (j) {
                 $(this).find('label:first-child > *:not(select):not(input)').remove();
-                content.find('.pane-content th').eq(j).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
+                content.filter('#results').find('table.results > thead > tr > th').eq(j).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
             });
         });
         admin.find('#page-total').text(content.find('#page-total').text());
@@ -63,23 +63,6 @@ $(document).ready(function () {
         searchTimeout = setTimeout(loadResults, 1000);
     });
 
-    body.on('click', '#results .paginate a', function (evt) {
-        evt.preventDefault();
-        var admin = $('#results'),
-            page = this.search.match(/([0-9]*|last|prev|next|first)$/i)[0],
-            current = parseInt(admin.find('input[name="page"]').val());
-        if(page == 'first')
-            page = 1;
-        if(page == 'next')
-            page = current + 1;
-        if(page == 'prev')
-            page = current - 1;
-        if(page == 'last')
-            page = parseInt(admin.find('#page-total').text());
-        admin.find('input[name="page"]').val(page);
-        loadResults();
-    });
-
     body.on('change', '#results table.results > thead > tr > th:not(:last-child) > label > select, #results table.results > thead > tr > th:not(:last-child) > label > input', function () {
         var that = $(this);
 
@@ -100,16 +83,6 @@ $(document).ready(function () {
         }
 
         loadResults();
-    });
-
-    body.on('click', '#results table.results > tbody > tr:nth-child(odd), #results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd)', function () {
-        var row = $(this);
-        if(row.is('.selected')) {
-            row.removeClass('selected');
-        }
-        else {
-            row.addClass('selected');
-        }
     });
 
     body.on('change', '#results input[name="search"], #results input[name="page"]', loadResults);

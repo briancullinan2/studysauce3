@@ -25,26 +25,6 @@
     min-width: 100%;
 }
 
-#validation table {
-    width:100%;
-    table-layout: fixed;
-}
-
-#validation table td:nth-child(1)
-{
-    width:30%;
-}
-
-#validation table td:nth-child(2)
-{
-}
-
-#validation table td:nth-child(3)
-{
-    width:150px;
-    text-align: right;
-}
-
 #validation {
     position: absolute;
     height: 100%;
@@ -177,56 +157,4 @@
 
 #validation code {
     cursor:pointer;
-}
-
-#validation table
-{
-    table-layout: fixed;
-    width:100%;
-    border-spacing: 0;
-    border-collapse: separate;
-}
-
-#validation tbody tr td
-{
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
-    vertical-align: middle;
-}
-
-#validation tbody tr td small
-{
-    font-size: 12px;
-}
-
-#validation tbody tr:hover:not(.selected):not(.edit) td
-{
-    box-shadow: 0 1px 4px rgba(255,255,255,.25);
-    border-top: 1px solid #DDDDDD;
-    border-bottom: 1px solid #DDDDDD;
-    background-color: rgba(255,255,255,.50);
-}
-
-#validation tbody tr.dependency td
-{
-    box-shadow: 0 1px 4px rgba(200,200,255,.25);
-    border-top: 1px solid #AAAADD;
-    border-bottom: 1px solid #AAAADD;
-    background-color: rgba(200,200,255,.50);
-}
-
-#validation tbody tr.included td
-{
-    box-shadow: 0 1px 4px rgba(200,255,200,.25);
-    border-top: 1px solid #AADDAA;
-    border-bottom: 1px solid #AADDAA;
-    background-color: rgba(200,255,200,.50);
-}
-
-#validation tbody tr.dependency.included td
-{
-    box-shadow: 0 1px 4px rgba(255,200,200,.25);
-    border-top: 1px solid #DDAAAA;
-    border-bottom: 1px solid #DDAAAA;
-    background-color: rgba(255,200,200,.50);
 }

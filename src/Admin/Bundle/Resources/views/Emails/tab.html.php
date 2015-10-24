@@ -40,14 +40,8 @@ $view['slots']->start('body'); ?>
                     <div class="search">
                         <label class="input"><input name="search" type="text" value="" placeholder="Search"/></label>
                     </div>
-                    <div class="paginate">
-                        <a href="#first">&lt;&lt;</a> <a href="#prev">&lt;</a>
-                        <label class="input"><input name="page" type="text" value="1"> / <span id="page-total">
-                                <?php print ceil($total / 25); ?>
-                            </span></label>
-                        <a href="#next">&gt;</a> <a href="#last">&gt;&gt;</a>
-                    </div>
-                    <table class="history">
+                    <?php print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $total]); ?>
+                    <table class="results history">
                         <thead>
                         <tr>
                             <th colspan="2"><label class="input">
@@ -56,7 +50,7 @@ $view['slots']->start('body'); ?>
                                 </label>
                                 <div></div>
                             </th>
-                            <th><label class="input"><span>Recipient: </span>
+                            <th><label class="input"><span>Recipient: </span><br/>
                                     <select name="recipient">
                                         <option>Recipient</option>
                                         <option>Ascending (A-Z)</option>
@@ -73,7 +67,7 @@ $view['slots']->start('body'); ?>
                                             <option value="<?php print $c; ?>"><?php print str_replace('STATUS_', '', $n); ?></option>
                                         <?php } ?>
                                     </select></label></th>
-                            <th><label class="input"><span>Sender: </span>
+                            <th><label class="input"><span>Sender: </span><br/>
                                     <select name="sender">
                                         <option>Sender</option>
                                         <option>Ascending (A-Z)</option>
@@ -219,7 +213,7 @@ $view['slots']->start('body'); ?>
                     </table>
                 </div>
                 <div id="templates" class="tab-pane">
-                    <table class="templates">
+                    <table class="results templates">
                         <thead>
                         <tr>
                             <th><label><span>Name: </span></label></th>
@@ -243,7 +237,7 @@ $view['slots']->start('body'); ?>
                     </table>
                 </div>
                 <div id="send-email" class="tab-pane">
-                    <div class="save-template">
+                    <div class="pane-top save-template">
                         <label class="input"><span>Template</span>
                             <select name="template">
                                 <option value="">Select email template</option>
@@ -251,8 +245,10 @@ $view['slots']->start('body'); ?>
                                     <option value="<?php print $email['id']; ?>"><?php print $email['id']; ?></option>
                                 <?php } ?>
                             </select></label>
-                        <label class="input save"><input type="text" name="template-name" placeholder="Template name" /></label> <a href="#save-template" class="more">Save</a></div>
-                    <table class="variables">
+                        <label class="input save"><input type="text" name="template-name" placeholder="Template name" /></label> <a href="#save-template" class="more">Save</a>
+                        <label class="input"><span>Subject</span><input type="text" name="subject"/></label>
+                    </div>
+                    <table class="results variables">
                         <thead>
                         <tr>
                             <th><label>User</label></th>
@@ -274,13 +270,14 @@ $view['slots']->start('body'); ?>
                         <a href="#add-line" class="big-add">Add <span>+</span> line</a>
                         <a href="#send-confirm" class="more" data-toggle="modal">Send now</a>
                     </div>
-                    <label class="input"><span>Subject</span><input type="text" name="subject"/></label>
+                    <div class="pane-bottom">
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#editor1">Preview</a></li>
                         <li><a href="#markdown">Source</a></li>
                         <li><a href="#headers">Headers</a></li>
                     </ul>
                     <div class="preview"></div>
+                    </div>
                 </div>
             </div>
         </div>

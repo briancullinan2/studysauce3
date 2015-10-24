@@ -7,9 +7,9 @@ use Symfony\Component\Routing\Route;
 $collection = new RouteCollection();
 
 $collection->add(
-    'command_control',
+    'command',
     new Route(
-        '/cerebro/{_format}',
+        '/command/{_format}',
         ['_controller' => 'AdminBundle:Admin:index', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
@@ -18,7 +18,7 @@ $collection->add(
 $collection->add(
     'command_callback',
     new Route(
-        '/cerebro/list',
+        '/command/list',
         ['_controller' => 'AdminBundle:Admin:index', '_format' => 'tab'],
         [],
         [],
@@ -88,7 +88,7 @@ $collection->add(
 $collection->add(
     'remove_user',
     new Route(
-        '/cerebro/remove/user',
+        '/command/remove/user',
         ['_controller' => 'AdminBundle:Admin:removeUser', '_format' => 'tab'],
         [],
         [],
@@ -102,7 +102,7 @@ $collection->add(
 $collection->add(
     'cancel_user',
     new Route(
-        '/cerebro/cancel/user',
+        '/command/cancel/user',
         ['_controller' => 'AdminBundle:Admin:cancelUser', '_format' => 'tab'],
         [],
         [],
@@ -116,7 +116,7 @@ $collection->add(
 $collection->add(
     'save_user',
     new Route(
-        '/cerebro/save/user',
+        '/command/save/user',
         ['_controller' => 'AdminBundle:Admin:saveUser', '_format' => 'tab'],
         [],
         [],
@@ -130,7 +130,7 @@ $collection->add(
 $collection->add(
     'add_user',
     new Route(
-        '/cerebro/add/user',
+        '/command/add/user',
         ['_controller' => 'AdminBundle:Admin:addUser', '_format' => 'tab'],
         [],
         [],
@@ -144,7 +144,7 @@ $collection->add(
 $collection->add(
     'save_group',
     new Route(
-        '/cerebro/save/group',
+        '/command/save/group',
         ['_controller' => 'AdminBundle:Admin:saveGroup', '_format' => 'tab'],
         [],
         [],
@@ -158,7 +158,7 @@ $collection->add(
 $collection->add(
     'reset_user',
     new Route(
-        '/cerebro/reset/user',
+        '/command/reset/user',
         ['_controller' => 'AdminBundle:Admin:resetUser', '_format' => 'tab'],
         [],
         [],

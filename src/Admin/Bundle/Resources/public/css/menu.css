@@ -45,6 +45,17 @@
     background-position: left -905px;
 }
 
+#right-panel .main-menu a[href*="/packs"] span {
+    background-position: left -1805px;
+}
+
+#right-panel .main-menu a[href*="/packs"]:hover span,
+#right-panel .main-menu a[href*="/packs"]:focus span,
+#right-panel .main-menu a[href*="/packs"]:active span,
+#right-panel .main-menu a[href*="/packs"].active span {
+    background-position: left -1905px;
+}
+
 @media all and (max-width: 700px ) {
 
     #right-panel .main-menu a[href*="/command"] span

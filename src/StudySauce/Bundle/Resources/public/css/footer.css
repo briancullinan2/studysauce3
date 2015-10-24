@@ -1,19 +1,22 @@
 .footer
 {
     background: none;
-    color: #EEEEEE;
     font-weight: bold;
     font-size: 12px;
     text-align: center;
     vertical-align: middle;
     padding: 10px 0;
-    position: static;
+    position: absolute;
     bottom: 0;
     top: auto;
     left: 0;
     right: 0;
     width: 100%;
     z-index: 100;
+}
+
+body {
+    padding-bottom: 70px;
 }
 
 .landing-home .footer
@@ -42,14 +45,14 @@
     white-space: nowrap;
 }
 
-.footer li a
+.landing-home .footer li a
 {
     color: #EEEEEE;
 }
 
-.footer li a:hover,
-.footer li a:focus,
-.footer li a:active
+.landing-home .footer li a:hover,
+.landing-home .footer li a:focus,
+.landing-home .footer li a:active
 {
     color: #FFFFFF;
 }

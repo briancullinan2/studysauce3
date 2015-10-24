@@ -51,7 +51,7 @@
     <?php endforeach; ?>
 </div>
 <div class="subject"><?php print $subject; ?></div>
-<table class="variables">
+<table class="variables results">
     <thead>
     <tr>
         <?php

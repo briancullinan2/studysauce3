@@ -8,134 +8,6 @@
     margin-top:35px;
 }
 
-#results .paginate {
-    display: inline-block;
-    width: 300px;
-    margin: 0 -4px;
-    padding: 0 2px;
-    vertical-align: middle;
-    text-align: center;
-}
-
-#results .paginate label {
-    margin: 0 -50px;
-    padding: 0 50px;
-    display: inline-block;
-}
-
-#results .paginate input {
-    margin-right: -50px;
-    padding-right: 50px;
-    display:inline-block;
-}
-
-#results table.results > tbody > tr > td,
-#results table.results > tbody > tr > td > table > tbody > tr > td,
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td
-{
-    padding: 5px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    table-layout: fixed;
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
-    vertical-align: middle;
-}
-
-#results table.results > tbody > tr > td > *
-{
-    vertical-align: middle;
-    line-height: 100%;
-}
-
-#results table.results > tbody > tr > td .checkbox {
-    margin:0;
-}
-
-#results table.results,
-#results table.results > tbody > tr > td > table
-{
-    table-layout: fixed;
-    width:100%;
-    border-spacing: 0;
-    border-collapse: separate;
-}
-
-#results table.results > tbody > tr:nth-child(odd):hover:not(.selected):not(.edit) > td,
-#results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd):hover:not(.selected):not(.edit) > td
-{
-    box-shadow: 0 1px 4px rgba(255,255,255,.25);
-    border-top: 1px solid #DDDDDD;
-    border-bottom: 1px solid #DDDDDD;
-    background-color: rgba(255,255,255,.50);
-    cursor: pointer;
-}
-
-#results table.results > thead > tr > th
-{
-    background:transparent;
-    position: relative;
-    overflow: hidden;
-    padding:5px;
-    white-space: nowrap;
-    vertical-align: bottom;
-}
-
-#results table.results > thead > tr > th:first-child {
-    padding-left:0;
-}
-
-#results table.results > thead > tr > th:last-child {
-    padding-right:0;
-}
-
-#results table.results .panel-pane
-{
-    padding:0;
-    width:auto;
-}
-
-#results table.results > tbody > tr > td table
-{
-    white-space: normal;
-    width: 100%;
-    table-layout: fixed;
-}
-
-#results table.results > tbody > tr:nth-child(odd) > td:first-child,
-#results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd) > td:first-child
-{
-    position:relative;
-    padding-left: 30px;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr:nth-child(odd) > td:first-child:before,
-#results table.results > tbody > tr:nth-child(odd) > td:first-child:before
-{
-    transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=-3);
-    transform-origin: center center;
-    -webkit-transform-origin: center center;
-    -moz-transform-origin: center center;
-    -ms-transform-origin: center center;
-    -o-transform-origin: center center;
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 50%;
-    margin-top: -10px;
-    left: 10px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
-    height: 16px;
-    width: 16px;
-    transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
-}
-
 #results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child,
 #results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.correct > td:last-child {
     color:transparent;
@@ -169,55 +41,6 @@
     text-align: center;
 }
 
-#results table.results > tbody > tr > td > table > tbody > tr.selected > td:first-child:before,
-#results table.results > tbody > tr.selected > td:first-child:before
-{
-    transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -moz-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr:nth-child(even)
-{
-    display:none;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr.selected + tr
-{
-    display:table-row;
-}
-
-#results table.results .highlighted-link,
-#results table.results .tab-tracker,
-#results table.results h2
-{
-    display:none;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr > td > h3
-{
-    color:#555;
-    cursor: pointer;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr > td > h3:hover
-{
-    color:#09B;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > h4
-{
-    cursor: pointer;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > h4:hover
-{
-    color:#0CE;
-}
-
 #results table.results > thead > tr > th.filtered > label > input,
 #results table.results > thead > tr > th.filtered > label > select
 {
@@ -234,35 +57,9 @@
     display:inline-block;
 }
 
-#results table.results > tbody > tr > td > label.checkbox
-{
-    display:block;
-    min-height: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 100%;
-}
-
-#results table.results > tbody > tr:nth-child(even)
-{
-    display:none;
-}
-
-#results table.results > tbody > tr:nth-child(even) > td
-{
-    padding:0;
-}
-
 #results table.results > tbody > tr.loading
 {
     text-align: center;
-}
-
-#results table.results > tbody > tr.selected + tr
-{
-    display:table-row;
 }
 
 #results table.results > tbody > tr.loading div

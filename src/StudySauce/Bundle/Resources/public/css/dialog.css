@@ -296,6 +296,7 @@ body.right-menu #bookmark
     font-family: 'Rufina',serif;
     font-size: 22px;
     font-weight: bold;
+    position:relative;
 }
 
 .modal .modal-header + .modal-footer
@@ -325,20 +326,32 @@ body.right-menu #bookmark
 
 .modal-header .close
 {
-    color:#FFF;
+    color: #FFF;
     opacity: .9;
     font-size: 40px;
-    line-height: 30px;
-    height: 30px;
-    position:relative;
-    top:-15px;
-    right:-25px;
+    top: 0;
+    right: 0;
+    position: absolute;
+    height: 100%;
+    background-color: rgba(255,255,255,.2);
+    border-top-right-radius: 10px;
+    width:50px;
+    transition: background-color ease-in-out .15s;
+}
+
+.modal-header .close span {
+    position: absolute;
+    top: 50%;
+    margin-top: -25px;
+    left: 50%;
+    margin-left: -10px;
 }
 
 .close:hover, .close:focus
 {
     color:#FFF;
     opacity: 1;
+    background-color: rgba(0,0,0,.2);
 }
 
 .dialog

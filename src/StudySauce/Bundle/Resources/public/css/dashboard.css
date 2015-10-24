@@ -2,7 +2,8 @@
 .dashboard-home
 {
     /* background: url(../images/grunge.png) repeat fixed 0 0 #555555; */
-    background: #555555;
+    /* background: #555555; */
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
 }
 
 .dashboard-home .panel-pane[id^="uid-"]
@@ -68,9 +69,10 @@
     margin:0 auto;
     max-width: none;
     width: 100%;
-    padding:70px 70px 20px 20px;
+    padding:50px 50px 0 0;
     box-sizing: border-box;
     position:relative;
+    background: url(../images/noise_white.png) #FFFFFF;
 }
 
 .admin aside + .panel-pane,
@@ -91,13 +93,26 @@ aside + .panel-pane,
 
 .pane-content
 {
-    min-height: 500px;
     padding: 20px;
-    box-shadow: 0 0 15px rgba(0,0,0,.5);
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
     position: relative;
-    border-radius: 5px;
     overflow: hidden;
+}
+
+.pane-top {
+    background: rgba(255,153,0,.2);
+    margin:-20px -20px 20px -20px;
+    padding: 20px 20px 1px 20px;
+}
+
+.pane-bottom {
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
+    margin: 0 -20px -20px -20px;
+    padding: 20px;
+}
+
+.pane-content form > .highlighted-link:last-child {
+    margin: 0 -20px;
+    padding: 20px;
 }
 
 .pane-content h4,
@@ -109,6 +124,43 @@ aside + .panel-pane,
 .pane-content h2
 {
     margin-bottom:20px;
+}
+
+.paginate {
+    display: inline-block;
+    width: 300px;
+    margin: 0 -4px;
+    padding: 0 2px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.paginate label {
+    margin: 0 -80px;
+    padding: 0 80px;
+    width:100%;
+    display: inline-block;
+}
+
+.paginate input {
+    margin-right: -50px;
+    padding-right: 50px;
+    display:inline-block;
+}
+
+.paginate a {
+    font-size: 30px;
+    padding: 0 10px;
+    background-color: #EEE;
+    border-radius: 5px;
+    line-height: 100%;
+    vertical-align: middle;
+    display: inline-block;
+    transition: background-color ease-in-out .15s;
+}
+
+.paginate a:hover {
+    background-color: #DDD;
 }
 
 /*
@@ -138,7 +190,7 @@ aside + .panel-pane,
     font-weight: 700;
     display: inline-block;
     float: left;
-    margin-top: 20px;
+    margin-top: 10px;
     padding-left:40px;
 }
 
@@ -156,71 +208,187 @@ aside + .panel-pane,
     vertical-align: middle;
 }
 
-.import-row > *,
-.session-row > *,
-#schedule header > *,
-.class-row > *,
-#deadlines header > *,
-.deadline-row > *
+table.results {
+    table-layout: fixed;
+    width:100%;
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+table.results > thead > tr > th
 {
-    vertical-align: top;
+    background:transparent;
+    position: relative;
+    overflow: hidden;
+    padding:5px;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.results header > *
+{
     display:inline-block;
     margin:0 -2px;
     padding: 5px 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    vertical-align: bottom;
 }
 
-.grade-row > * label,
-.session-row > * label,
-#schedule header > * label,
-.class-row > * label,
-#deadlines header > * label,
-.deadline-row > * label
+.results [class*="-row"] > *,
+table.results > tbody > tr > td
+{
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    table-layout: fixed;
+}
+
+table.results > tbody > tr > td:first-child,
+table.results > thead > tr > th:first-child {
+    padding-left:0;
+}
+
+table.results > tbody > tr > td:last-child,
+table.results > thead > tr > th:last-child {
+    padding-right:0;
+}
+
+.results [class*="-row"] > * .checkbox,
+table.results > tbody > tr > td .checkbox {
+    margin:0;
+}
+
+.results [class*="-row"] > *
+{
+    display:inline-block;
+    margin:0 -2px;
+    padding: 5px 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.results :not(.highlighted-link) label.checkbox
+{
+    min-height: 0;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 100%;
+}
+
+.results .read-only :not(.highlighted-link) label.checkbox input,
+.results .read-only :not(.highlighted-link) label.checkbox input ~ *,
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"]:checked,
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"]:checked ~ *,
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"],
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"] ~ * {
+    display:none;
+}
+
+.results .edit :not(.highlighted-link) label.checkbox {
+    display:block;
+}
+
+.results .read-only label.checkbox,
+.results .read-only label.checkbox input:checked ~ span
+{
+    display:inline;
+}
+
+.results [class*="-row"] > *,
+table.results > tbody > tr > td > *
+{
+    vertical-align: middle;
+    line-height: 100%;
+}
+
+.results [class*="-row"] > * > label,
+.results header label,
+table.results > thead > tr > th > label,
+table.results > tbody > tr > td > label
 {
     margin-top:0;
     margin-bottom:0;
 }
 
-#what-if .class-row .class-name span,
-#calculator .class-row .class-name i,
-.deadline-row .class-name i,
-.deadlines-widget .deadline-row i,
-#metrics ol span,
-#metrics .class-name span,
-.class-row .class-name i,
-#plan .class-name span,
-.plan-widget .class-name span
-{
-    display: inline-block;
-    height: 30px;
-    width: 30px;
-    border: 3px solid #555555;
-    border-radius: 100%;
-    text-align: center;
-    font-size: 0;
-    color: #555555;
-    line-height: 15px;
-    margin: -5px 10px -5px 0;
-    vertical-align: middle;
-}
-
-.class-row,
-.deadline-row,
-.session-row
+.results [class*="-row"],
+table.results > tbody > tr > td
 {
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
 }
 
-.class-row:hover:not(.selected):not(.edit),
-.session-row:hover:not(.selected),
-.deadline-row:hover:not(.selected):not(.edit) {
+.results [class*="-row"]:hover:not(.selected):not(.edit),
+table.results > tbody > tr:hover:not(.selected):not(.edit) > td
+{
     box-shadow: 0 1px 4px rgba(255,255,255,.25);
     border-top: 1px solid #DDDDDD;
     border-bottom: 1px solid #DDDDDD;
     background-color: rgba(255,255,255,.50);
+    cursor: pointer;
+}
+
+table.results.expandable > tbody > tr:nth-child(even):hover > td
+{
+    box-shadow: none;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    background-color: transparent;
+    cursor: default;
+}
+
+table.results.expandable > tbody > tr:nth-child(odd) > td:first-child
+{
+    position:relative;
+    padding-left: 30px;
+}
+
+table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
+{
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=-3);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
+    -moz-transform-origin: center center;
+    -ms-transform-origin: center center;
+    -o-transform-origin: center center;
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px;
+    left: 10px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
+    height: 16px;
+    width: 16px;
+    transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
+}
+table.results.expandable > tbody > tr.selected > td:first-child:before
+{
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
+}
+
+table.results.expandable > tbody > tr:nth-child(even)
+{
+    display:none;
+}
+
+table.results.expandable > tbody > tr.selected + tr
+{
+    display:table-row;
+}
+
+table.results.expandable > tbody > tr:nth-child(even) > td
+{
+    padding:0;
 }
 
 a[href="#edit-grade"],
@@ -416,13 +584,14 @@ a[href="#remove-deadline"]:hover
 
 }
 
+@media all and (min-width: 1500px) {
+    .panel-pane {
+        padding-right: 220px;
+    }
+}
+
 @media all and (max-width: 1300px)
 {
-    .panel-pane
-    {
-        padding-left:20px;
-        padding-right:70px;
-    }
 
     .dashboard-home .footer
     {
@@ -482,8 +651,6 @@ a[href="#remove-deadline"]:hover
     }
 
     .panel-pane {
-        padding-left: 20px;
-        padding-right: 70px;
         max-width: none;
     }
 
@@ -492,19 +659,6 @@ a[href="#remove-deadline"]:hover
         padding-left:70px;
         padding-right:70px;
         max-width: 100%;
-    }
-}
-
-@media all and (min-height: 700px) {
-    .panel-pane {
-        padding-top: 70px;
-        padding-bottom: 20px;
-    }
-}
-
-@media all and (min-width: 1000px) {
-    .panel-pane {
-        padding-bottom: 20px;
     }
 }
 
@@ -534,7 +688,7 @@ a[href="#remove-deadline"]:hover
     }
 
     .panel-pane {
-        padding: 50px 0 40px 0;
+        padding: 50px 0 0 0;
         width: 100%;
         transition: left linear .15s;
         left:0;

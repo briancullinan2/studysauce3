@@ -74,7 +74,7 @@ jQuery(document).ready(function() {
 
         // split rows into columns
         for (var i=0; i<clipRows.length; i++) {
-            clipRows[i] = clipRows[i].split(/\t|\s\s\s\s+/ig);
+            clipRows[i] = clipRows[i].split(/\t|\s\s\s\s/ig);
         }
 
         // write out in a table
