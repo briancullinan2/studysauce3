@@ -38,7 +38,7 @@
 
 #packs header > *,
 #packs .card-row > * {
-    width: 33.33%;
+    width: 25%;
 }
 
 #packs header > *:first-child,
@@ -68,46 +68,62 @@
 }
 
 #packs header > *:nth-last-child(2),
-#packs .card-row > *:nth-last-child(2) {
+#packs .card-row > .answers,
+#packs .card-row:not([class*="type-"]) > .correct
+{
     margin-right: -104px;
     padding-right: 104px;
+    width:50%;
+}
+
+#packs .card-row > .correct.type-tf {
+    margin-right: -53px;
+    padding-right: 53px;
+}
+
+#packs .card-row > .correct.type-tf {
+    text-align: right;
+}
+
+#packs .card-row > .correct.type-tf + .correct.type-tf {
+    text-align: left;
+}
+
+#packs header > *:last-child {
+    text-align: right;
+}
+
+#packs .card-row > .answers.type-mc,
+#packs .card-row > .answers.type-sa,
+#packs .card-row > .answers.type-tf
+{
+    width:25%;
 }
 
 #packs .card:first-of-type {
     margin-left:0;
 }
 
-#packs .card-row[class*="type"] .response:not([class*="type-"]),
-#packs .response[class*="type-"] {
+#packs .card-row[class*="type"] .correct:not([class*="type-"]),
+#packs .correct[class*="type-"],
+#packs .card-row[class*="type"] .answers:not([class*="type-"]),
+#packs .answers[class*="type-"]
+{
     display:none;
 }
 
-#packs .card-row.type-tf .response.type-tf,
-#packs .card-row.type-mc .response.type-mc {
+#packs .card-row.type-tf .answers.type-tf,
+#packs .card-row.type-mc .answers.type-mc,
+#packs .card-row.type-sa .answers.type-sa,
+#packs .card-row.type-tf .correct.type-tf,
+#packs .card-row.type-mc .correct.type-mc,
+#packs .card-row.type-sa .correct.type-sa
+{
     display:inline-block;
 }
 
-#packs .response textarea {
+#packs .answers textarea {
     height:27px;
-}
-
-#packs .response:not([class*="type-"]) input,
-#packs .response.type-tf input {
-    width: 50%;
-    padding-left: 15px;
-}
-
-#packs .response:not([class*="type-"]) input:first-of-type,
-#packs .response.type-tf input:first-of-type {
-    margin-right: -5px;
-}
-
-#packs .response:not([class*="type-"]) span,
-#packs .response.type-tf span {
-    position:absolute;
-    z-index:3;
-    margin-top: 3px;
-    margin-left: 3px;
 }
 
 #packs .inner {
@@ -118,28 +134,3 @@
     font-size: 30px;
     line-height: 120%;
 }
-
-#packs .correct {
-    background-color: #119900;
-    color: #fff;
-    position: absolute;
-    display: block;
-    padding: 15px 10px;
-    left: 20px;
-    bottom: 20px;
-    font-size: 16px;
-    line-height: 120%;
-}
-
-#packs .wrong {
-    background-color: #991100;
-    color: #fff;
-    position: absolute;
-    display: block;
-    padding: 15px 10px;
-    right: 20px;
-    bottom: 20px;
-    font-size: 16px;
-    line-height: 120%;
-}
-

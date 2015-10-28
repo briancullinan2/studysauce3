@@ -827,7 +827,6 @@ input[type=datetime-local],
 input[type=month],
 .ui-datepicker-title select
 {
-    background:#ffffff none;
     color: #555555;
     font-size: 16px;
     font-style: normal;
@@ -840,7 +839,7 @@ input[type=month],
     border-radius: 2px;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
-    border: 1px solid #555555;
+    border: 2px solid #EEE;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-shadow: none;
@@ -849,6 +848,7 @@ input[type=month],
     vertical-align: middle;
     margin:0;
     max-width: 100%;
+    background: #EEE none;
 }
 
 input:-webkit-autofill {
@@ -999,6 +999,7 @@ input[type=datetime-local]:focus,
 input[type=month]:focus
 {
     border-color:#0099BB;
+    background: white none;
 }
 
 .read-only .selectize-input,

@@ -92,7 +92,11 @@ class InviteListener implements EventSubscriberInterface
                 $this->container->get('security.context')->setToken($token);
                 $session->set('_security_main',serialize($token));
 
-                $event->setResponse(new RedirectResponse($this->container->get('router')->generate('home')));
+                $response = new RedirectResponse($this->container->get('router')->generate('home'));
+                /** @var LoginManager $loginManager */
+                $loginManager = $this->container->get('fos_user.security.login_manager');
+                $loginManager->loginUser('main', $user, $response);
+                $event->setResponse($response);
             }
             // redirect back to page with a fresh session
             elseif(null !== ($token = $this->container->get('security.context')->getToken()) && is_object($user = $token->getUser()) &&

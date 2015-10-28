@@ -68,9 +68,7 @@ jQuery(document).ready(function() {
         accountFunc();
     });
 
-    body.on('change', '#account input', accountFunc);
-    body.on('keyup', '#account input', accountFunc);
-    body.on('keydown', '#account input', accountFunc);
+    body.on('change keyup keydown', '#account input', accountFunc);
 
     body.on('click', '#account a[href="#edit-account"]', function (evt) {
         var account = jQuery('#account');

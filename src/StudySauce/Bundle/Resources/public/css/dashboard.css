@@ -364,6 +364,7 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
     height: 16px;
     width: 16px;
+    cursor: pointer;
     transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
 }
 table.results.expandable > tbody > tr.selected > td:first-child:before

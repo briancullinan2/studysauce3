@@ -19,6 +19,12 @@ class Answer
     protected $id;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Card", inversedBy="answers")
+     * @ORM\JoinColumn(name="card_id", referencedColumnName="id")
+     */
+    protected $card;
+
+    /**
      * @ORM\Column(type="text", name="content")
      */
     protected $content;
@@ -34,7 +40,7 @@ class Answer
     protected $value;
 
     /**
-     * @ORM\Column(type="boolean", name="correct")
+     * @ORM\Column(type="boolean", name="correct", nullable=true)
      */
     protected $correct;
 
@@ -249,5 +255,28 @@ class Answer
     public function getCorrect()
     {
         return $this->correct;
+    }
+
+    /**
+     * Set card
+     *
+     * @param \StudySauce\Bundle\Entity\Card $card
+     * @return Answer
+     */
+    public function setCard(\StudySauce\Bundle\Entity\Card $card = null)
+    {
+        $this->card = $card;
+
+        return $this;
+    }
+
+    /**
+     * Get card
+     *
+     * @return \StudySauce\Bundle\Entity\Card 
+     */
+    public function getCard()
+    {
+        return $this->card;
     }
 }

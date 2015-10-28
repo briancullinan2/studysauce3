@@ -4,6 +4,7 @@ namespace StudySauce\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\Response;
@@ -60,6 +61,34 @@ class PacksController extends Controller
             $newCard->setPack($newPack);
             $newPack->addCard($newCard);
             $newCard->setResponseContent($c['response']);
+            if(!empty($c['type'])) {
+                $newCard->setResponseType($c['type']);
+            }
+            if(!empty($c['answers'])) {
+                $answers = explode("\n", $c['answers']);
+                foreach($answers as $a) {
+                    if(empty(trim($a)))
+                        continue;
+                    $newAnswer = new Answer();
+                    $newAnswer->setContent(trim($a));
+                    $newAnswer->setResponse(trim($a));
+                    $newAnswer->setValue(trim($a));
+                    if(!empty($c['correct'])) {
+                        if(strtolower(trim($a)) == strtolower(trim($c['correct']))) {
+                            $newAnswer->setCorrect(true);
+                        }
+                        if($c['correct'] == 'contains') {
+                            $newAnswer->setValue('%' . trim($a) . '%');
+                        }
+                        if($c['correct'] == 'exactly') {
+                            $newAnswer->setValue('"' . trim($a) . '"');
+                        }
+                    }
+                    $newAnswer->setCard($newCard);
+                    $newCard->addAnswer($newAnswer);
+                    $orm->persist($newAnswer);
+                }
+            }
             $orm->persist($newCard);
         }
         $orm->flush();
@@ -113,7 +142,8 @@ class PacksController extends Controller
         }
         /** @var QueryBuilder $qb */
         $cards = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c')
-            ->select('c')
+            ->select('c,a')
+            ->leftJoin('c.answers', 'a')
             ->where('c.pack=:id')
             ->setParameter('id', intval($request->get('pack')))
             ->getQuery()
@@ -140,8 +170,18 @@ class PacksController extends Controller
                 'id' => $x->getId(),
                 'content' => $x->getContent(),
                 'response' => $x->getResponseContent(),
+                'response_type' => $x->getResponseType(),
                 'created' => $x->getCreated()->format('r'),
-                'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null
+                'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null,
+                'answers' => array_map(function (Answer $a) {
+                    return [
+                        'id' => $a->getId(),
+                        'value' => $a->getValue(),
+                        'correct' => $a->getCorrect(),
+                        'created' => $a->getCreated()->format('r'),
+                        'modified' => !empty($a->getModified()) ? $a->getModified()->format('r') : null
+                    ];
+                }, $x->getAnswers()->toArray())
             ];
         }, $cards));
     }
@@ -164,6 +204,7 @@ class PacksController extends Controller
             throw new PreconditionFailedHttpException("No user-pack association.");
         }
 
+        /** @var Card $card */
         $card = $userPack->getPack()->getCards()->filter(function (Card $c) use ($request) {return $c->getId() == $request->get('card');})->first();
         if(empty($card)) {
             throw new NotFoundHttpException("Card not found.");
@@ -171,7 +212,11 @@ class PacksController extends Controller
         $response = new Response();
         $response->setUser($user);
         $response->setCard($card);
-        $response->setCorrect($request->get('correct') == '1');
+        $response->setCorrect($request->get('correct') == '1' || $request->get('correct') == 'true');
+        if(!empty($request->get('answer'))) {
+            $response->setAnswer($card->getAnswers()->filter(function (Answer $a) use ($request) {
+                return $a->getId() == $request->get('answer');})->first());
+        }
         $orm->persist($response);
         $orm->flush();
 

@@ -106,7 +106,8 @@ jQuery(document).ready(function() {
                 var that = jQuery(this);
                 if(that.find('.first-name input').val().trim() == '' &&
                     that.find('.last-name input').val().trim() == '' &&
-                    that.find('.email input').val().trim() == '')
+                    that.find('.email input').val().trim() == '' &&
+                    importTab.find('.import-row').length > 1)
                 {
                     that.remove();
                 }

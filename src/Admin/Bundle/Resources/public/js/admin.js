@@ -83,8 +83,7 @@ $(document).ready(function () {
         if (command.is(':visible')) {
 
             // get the clipboard text
-            var that = $(this),
-                text = $('<textarea></textarea>')
+            var text = $('<textarea></textarea>')
                     .css('position', 'fixed')
                     .css('top', 0)
                     .css('left', -10000)
@@ -124,7 +123,6 @@ $(document).ready(function () {
             setTimeout(function () {
                 var clipText = text.val(), i;
                 text.remove();
-                that.focus();
 
                 // split into rows
                 var clipRows = clipText.split(/\n/ig);

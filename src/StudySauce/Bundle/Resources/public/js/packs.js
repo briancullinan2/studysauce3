@@ -1,12 +1,26 @@
 
 $(document).ready(function () {
 
-    var body = $('body');
+    var body = $('body'),
+        radioCounter = 5;
 
     key('⌘+v, ctrl+v, command+v', function () {
-        var importTab = $('#packs');
-        if(importTab.is(':visible')) {
-            importTab.find('textarea').focus();
+        var tab = $('#packs');
+        if(tab.is(':visible')) {
+            // get the clipboard text
+            var text = $('<textarea></textarea>')
+                .css('position', 'fixed')
+                .css('top', 0)
+                .css('left', -10000)
+                .css('opacity', '0')
+                .css('height', 1)
+                .css('width', 1).appendTo(tab).focus();
+
+            setTimeout(function () {
+                var clipText = text.val(), i;
+                text.remove();
+                rowImport(clipText);
+            }, 100);
         }
     });
 
@@ -33,8 +47,9 @@ $(document).ready(function () {
         }
     }
 
-    function rowImport(clipText, append, count) {
-        var importTab = $('#packs');
+    function rowImport(clipText) {
+        var tab = $('#packs'),
+            last = tab.find('.card-row').last();
 
         // split into rows
         var clipRows = clipText.split(/\n/ig);
@@ -45,97 +60,166 @@ $(document).ready(function () {
         }
 
         // write out in a table
-        if(typeof count == 'undefined') {
-            count = 0;
-        }
-        var total = (importTab.find('textarea').val().match(/\n/g) || []).length + 1;
         for (i=0; i<clipRows.length; i++) {
             // skip partial rows
             if(clipRows[i].length < 2)
                 continue;
-
-            count++;
-            if(clipRows[i].length >= 4 && clipRows[i][3] == 'multiple') {
-                var newMultipleBoxes = importTab.find('.templates > *').not('.card:not(.type-multiple)').clone().appendTo(append);
-                newMultipleBoxes.filter('.card').first().find('.inner').html(clipRows[i][0].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
-                if(clipRows[i].length >= 3) {
-                    newMultipleBoxes.filter('.card').first().find('select').val(clipRows[i][2]);
-                }
-                newMultipleBoxes.find('.preview-count').text(count + ' of ' + total);
-                newMultipleBoxes.find('.preview-title').text(importTab.find('.title input').val().trim());
-                var rows = clipRows[i][1].split(',');
-                newMultipleBoxes.filter('.card').eq(1).find('.inner').html(rows.map(function (x) {return '<div class="response">' + x.replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />") + '</div>';}).join(''));
-                newMultipleBoxes.filter('.card').last().find('select').append($(rows.map(function (x) {return '<option>' + x + '</option>';}).join('')));
-                if(clipRows[i].length >= 5) {
-                    newMultipleBoxes.filter('.card').last().find('select').val(clipRows[i][4]);
-                    newMultipleBoxes.filter('.card').last().find('.inner').html(clipRows[i][4].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
-                }
+            var newRow = last.clone().insertAfter(tab.find('.card-row').last());
+            newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
+            if(newRow.find('.type select option[value="' + clipRows[i][0] + '"]').length > 0) {
+                newRow.find('.type select').val(clipRows[i][0]).trigger('change');
+            }
+            else if(clipRows[i][0].match(/multiple/ig) != null) {
+                newRow.find('.type select').val('mc').trigger('change');
+            }
+            else if(clipRows[i][0].match(/false/ig) != null) {
+                newRow.find('.type select').val('tf').trigger('change');
+            }
+            else if(clipRows[i][0].match(/blank|short/ig) != null) {
+                newRow.find('.type select').val('sa').trigger('change');
             }
             else {
-                var newBoxes = importTab.find('.templates > *').not('.card.type-multiple').clone().appendTo(append);
-                if(clipRows[i].length >= 3) {
-                    newBoxes.filter('.card').first().find('select').val(clipRows[i][2]);
-                }
-                newBoxes.filter('.card').first().find('.inner').html(clipRows[i][0].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
-                newBoxes.find('.preview-count').text(count + ' of ' + total);
-                newBoxes.find('.preview-title').text(importTab.find('.title input').val().trim());
-                newBoxes.filter('.card').last().find('.inner').html(clipRows[i][1].replace(/\s*\n\s*|(\\r)*\\n(\\r)*/g, "<br />"));
+                newRow.find('.type select').val('');
+            }
+
+            newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
+            newRow.find('.answers textarea').val(clipRows[i].splice(4).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
+            newRow.find('.correct.type-tf input').filter(clipRows[i][3].match(/t/i) ? '[value="true"]' : (clipRows[i][3]
+                .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
+            newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][3]).trigger('change');
+
+            if(clipRows[i].length == 2) {
+                newRow.find('.content input').val(clipRows[i][0]);
+                newRow.find('.response input').val(clipRows[i][1]);
+            }
+            else {
+                newRow.find('.content input').val(clipRows[i][1]);
+                newRow.find('.response input').val(clipRows[i][2]);
             }
         }
 
         // remove empties
-        if(importTab.find('.import-row.edit.valid').not('fieldset .import-row').length > 1)
-        {
-            importTab.find('.import-row.edit').each(function () {
-                var that = jQuery(this);
-                if(that.find('.first-name input').val().trim() == '' &&
-                    that.find('.last-name input').val().trim() == '' &&
-                    that.find('.email input').val().trim() == '')
-                {
-                    that.remove();
-                }
-            });
-        }
+        tab.find('.card-row.empty').each(function () {
+            var that = jQuery(this);
+            if(that.find('.content input').val().trim() == '' &&
+                that.find('.response input').val().trim() == '' &&
+                tab.find('.card-row').length > 1) {
+                that.remove();
+            }
+        });
+
+        packsFunc();
     }
 
-    body.on('focus mousedown keydown change keyup', '#packs .response textarea', function () {
+    body.on('focus mousedown keydown change keyup', '#packs .answers textarea', function () {
         $(this).css('height', '');
         $(this).height($(this)[0].scrollHeight - 4);
+        var row = $(this).parents('.card-row');
+        // get current line
+        var orig = row.find('.correct.type-mc select').val();
+        var line = row.find('.correct.type-mc option[value="' + orig + '"]').index();
+        row.find('.correct.type-mc option').remove();
+        var answers = $(this).val().split(/\n/ig) || [];
+        for(var i in answers) {
+            if(!answers.hasOwnProperty(i))
+                continue;
+            $('<option value="' + answers[i] + '">' + answers[i] + '</option>').appendTo(row.find('.correct.type-mc select'));
+        }
+        var newVal = row.find('.correct.type-mc option[value="' + orig + '"]');
+        if(newVal.length == 0) {
+            newVal = row.find('.corrent.type-mc option').eq(line);
+        }
+        row.find('.correct.type-mc select').val(newVal.attr('value'));
     });
 
     body.on('change', '#packs .type select', function () {
         var row = $(this).parents('.card-row');
         row.attr('class', row.attr('class').replace(/type-.*?(\s|$)/ig, ''));
-        if($(this).val() != '') {
+        if($(this).val() != '' && $(this).val() != null) {
             row.addClass('type-' + $(this).val());
         }
+        if($(this).val() == 'mc') {
+            row.find('.type-mc textarea').trigger('change');
+        }
     });
+
+    body.on('mousedown click focus', '#packs .type select', function () {
+        $(this).find('option').each(function () {
+            if($(this).attr('data-text') != null) {
+                $(this).text($(this).attr('data-text'));
+            }
+        });
+    });
+
+    body.on('change blur', '#packs .type select', function () {
+        $(this).find('option').each(function () {
+            if($(this).attr('value') != '') {
+                $(this).text($(this).attr('value').toLocaleUpperCase());
+            }
+        });
+    });
+
+    function packsFunc () {
+        var tab = $('#packs');
+        tab.find('.card-row').each(function () {
+            var row = $(this);
+            if(row.find('.content input').val().trim() == '' &&
+                row.find('.response input').val().trim() == '' && (
+                    row.find('.type select').val() != 'mc' || row.find('.answers.type-mc textarea').val().trim() == ''
+                )) {
+                row.removeClass('invalid').addClass('empty valid');
+            }
+            else if (row.find('.content input').val().trim() != '' && (
+                    row.find('.type select').val() != 'mc' || row.find('.answers.type-mc textarea').val().trim() != ''
+                )) {
+                row.removeClass('invalid empty').addClass('valid');
+            }
+            else {
+                row.removeClass('valid empty').addClass('invalid');
+            }
+        });
+        if(tab.find('.card-row.invalid').length == 0 && tab.find('.card-row.valid:not(.empty)').length > 0) {
+            tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
+        }
+        else {
+            tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+        }
+    }
+
+    body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
 
     body.on('click', '#packs a[href="#create-new"]', function (evt) {
         evt.preventDefault();
 
         var tab = $('#packs');
         if(tab.find('.highlighted-link').is('.invalid')) {
-            if(tab.find('.title input').val().trim() == '') {
-                tab.find('.title input').focus();
-            }
-            else {
-                tab.find('textarea').focus();
-            }
+            // TODO: select incorrect row
             return;
         }
 
         tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
-        loadingAnimation(tab.find('.highlighted-link a'));
+        loadingAnimation($(this));
 
         // get the parsed list of cards
-        var cards = [], cardsDiv;
-        rowImport(tab.find('textarea').val(), cardsDiv = $('<div>'));
-        cardsDiv.find('.card.question').each(function () {
-            cards[cards.length] = {
-                content: $(this).find('.inner').text(),
-                response: $(this).next('.response').text()
-            };
+        var cards = [];
+        tab.find('.card-row').each(function () {
+            var rowId = (/card-id-([0-9]*)(\s|$)/i).exec($(this).attr('class'));
+            if($(this).is('removed')) {
+                cards[cards.length] = {
+                    id: rowId != null ? rowId[0] : null,
+                    remove: true
+                };
+            }
+            else {
+                cards[cards.length] = {
+                    id: rowId != null ? rowId[0] : null,
+                    type: $(this).find('.type select').val(),
+                    content: $(this).find('.content:visible input').val(),
+                    response: $(this).find('.response:visible input').val(),
+                    answers: $(this).find('.answers textarea').val(),
+                    correct: $(this).find('.correct:visible input:not([type="radio"]), .correct:visible select, .correct:visible input[type="radio"]:checked').val()
+                };
+            }
         });
 
         $.ajax({
@@ -144,13 +228,26 @@ $(document).ready(function () {
             dataType: 'text',
             data: {
                 cards: cards,
-                title: tab.find('.title input').val()
+                title: tab.find('.title input').val(),
+                creator: tab.find('.creator input').val()
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
                 tab.find('table.results').each(function (i) {
                     $(this).replaceWith($(data).filter('#packs').find('table.results').eq(i));
                 });
+
+                // reset card entry form
+                tab.find('.title input').val('');
+                var remove = tab.find('.card-row').detach();
+                for(var i = 0; i < 5; i++) {
+                    var newRow = remove.last().clone().insertAfter(tab.find('.card-row').last());
+                    newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
+                    newRow.find('.type select, .answers textarea, .correct.type-mc select, .answers.type-sa input, .content input, .response input, .correct input[type="text"]').val('').trigger('change');
+                    newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
+                    newRow.find('.correct.type-tf input').prop('checked', false);
+                }
+                remove.remove();
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
