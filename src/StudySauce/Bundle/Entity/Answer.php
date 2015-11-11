@@ -40,9 +40,9 @@ class Answer
     protected $value;
 
     /**
-     * @ORM\Column(type="boolean", name="correct", nullable=true)
+     * @ORM\Column(type="boolean", name="correct")
      */
-    protected $correct;
+    protected $correct = false;
 
     /**
      * @ORM\OneToMany(targetEntity="Response", mappedBy="answer")
@@ -59,6 +59,11 @@ class Answer
      * @ORM\Column(type="datetime", name="modified", nullable=true)
      */
     protected $modified;
+
+    /**
+     * @ORM\Column(type="boolean", name="deleted")
+     */
+    protected $deleted = false;
 
 
     /**
@@ -278,5 +283,28 @@ class Answer
     public function getCard()
     {
         return $this->card;
+    }
+
+    /**
+     * Set deleted
+     *
+     * @param boolean $deleted
+     * @return Answer
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get deleted
+     *
+     * @return boolean 
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
     }
 }

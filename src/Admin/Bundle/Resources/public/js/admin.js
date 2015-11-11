@@ -459,7 +459,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var row = $(this).parents('tr'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        $('#remove-user-name').text(row.find('td').eq('3').find('input').first().val());
+        $('#remove-user-name').text(row.find('[name="first-name"]').val());
         $('#confirm-remove-user').data('userId', userId);
     });
 
@@ -479,7 +479,8 @@ $(document).ready(function () {
         $('#confirm-password-reset').data('userId', userId);
     });
 
-    body.on('click', '#confirm-remove-user a[href="#remove-user"]', function () {
+    body.on('click', '#confirm-remove-user a[href="#remove-user"]', function (evt) {
+        evt.preventDefault();
         var data = getData();
         data.userId = $('#confirm-remove-user').data('userId');
         $.ajax({

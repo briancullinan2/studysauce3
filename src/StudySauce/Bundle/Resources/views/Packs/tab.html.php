@@ -1,17 +1,16 @@
 <?php
+use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
-use StudySauce\Bundle\Entity\Payment;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /** @var GlobalVariables $app */
 /** @var $view TimedPhpEngine */
 /** @var $user User */
-/** @var Payment $payment */
+/** @var Pack $pack */
 
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
@@ -34,11 +33,11 @@ $view['slots']->start('body'); ?>
                 <div class="pane-top">
                     <h2>Create a pack</h2>
                     <label class="input title">
-                        <input name="title" placeholder="Title your pack" value=""/>
+                        <input name="title" placeholder="Title your pack" value="<?php print (!empty($pack) ? $pack->getTitle() : ''); ?>"/>
                     </label>
                     <label class="input creator">
                         <input name="creator" placeholder="Creator name"
-                               value="<?php print $app->getUser()->getFirst(); ?> <?php print $app->getUser()->getLast(); ?>"/>
+                               value="<?php print (!empty($pack) ? $pack->getCreator() : ($app->getUser()->getFirst() . ' ' . $app->getUser()->getLast())); ?>"/>
                         <small>* If the pack is public this is the name others will see.</small>
                     </label>
 
@@ -52,31 +51,39 @@ $view['slots']->start('body'); ?>
                     <header>
                         <label>Type</label>
                         <label>Prompt/Question</label>
-                        <label>Hint/Context</label>
                         <label>Correct/Response</label>
+                        <label>Hint/Context</label>
                         <label class="checkbox"><input type="checkbox" name="selected"><i></i></label>
                     </header>
-                    <?php for ($i = 0; $i < 5; $i++) { ?>
-                        <div class="card-row edit">
+                    <?php
+                    $cards = !empty($pack) ? $pack->getCards() : array_map(function () {return new Card();}, range(0, 5));
+                    $i = 0;
+                    foreach ($cards as $c) {
+                        /** @var Card $c */
+                        ?>
+                        <div class="card-row edit <?php
+                        print (!empty($c->getId()) ? (' card-id-' . $c->getId()) : '');
+                        print (empty($c->getResponseType()) ? '' : (' type-' . $c->getResponseType())); ?>">
                             <label class="input type">
                                 <select name="type">
-                                    <option value="">Default</option>
-                                    <option value="mc" data-text="Multiple choice">MC</option>
-                                    <option value="tf" data-text="True/False">TF</option>
-                                    <option value="sa" data-text="Short answer">SA</option>
+                                    <option value="" <?php print (empty($c->getResponseType()) ? 'selected="selected"' : ''); ?> data-text="Flash card (default)">Type</option>
+                                    <option value="mc" <?php print ($c->getResponseType() == 'mc' ? 'selected="selected"' : ''); ?> data-text="Multiple choice">MC</option>
+                                    <option value="tf" <?php print ($c->getResponseType() == 'tf' ? 'selected="selected"' : ''); ?> data-text="True/False">TF</option>
+                                    <option value="sa" <?php print ($c->getResponseType() == 'sa' ? 'selected="selected"' : ''); ?> data-text="Short answer">SA</option>
                                 </select>
                             </label>
                             <label class="input content">
-                                <input type="text" name="content" placeholder="Prompt" value=""/>
-                            </label>
-                            <label class="input response">
-                                <input type="text" name="response" placeholder="Description" value=""/>
+                                <input type="text" name="content" placeholder="Prompt" value="<?php print $view->escape($c->getContent()); ?>"/>
                             </label>
                             <label class="input correct">
-                                <input name="correct" placeholder="for display only" />
+                                <input name="correct" placeholder="for display only" value="<?php print (!empty($c->getCorrect()) ? $view->escape($c->getCorrect()->getValue()) : ''); ?>" />
                             </label>
                             <label class="input correct type-mc">
-                                <select></select>
+                                <select><?php foreach($c->getAnswers()->toArray() as $a) {
+                                        /** @var Answer $a */
+                                        ?>
+                                        <option value="<?php print $a->getValue(); ?>" <?php print ($a->getCorrect() ? 'selected="selected"' : ''); ?>><?php print $a->getValue(); ?></option>
+                                    <?php } ?></select>
                             </label>
                             <label class="input correct type-sa">
                                 <select>
@@ -86,30 +93,33 @@ $view['slots']->start('body'); ?>
                             </label>
                             <label class="radio correct type-tf">
                                 <span>True</span>
-                                <input type="radio" name="correct-<?php print $i; ?>" value="true" />
+                                <input type="radio" name="correct-<?php print $i; ?>" value="true" <?php print (!empty($c->getCorrect()) && preg_match('/t/i', $c->getCorrect()->getValue()) ? 'checked="checked"' : ''); ?> />
                                 <i></i>
                             </label>
                             <label class="radio correct type-tf">
-                                <input type="radio" name="correct-<?php print $i; ?>" value="false" />
+                                <input type="radio" name="correct-<?php print $i; ?>" value="false" <?php print (!empty($c->getCorrect()) && preg_match('/f/i', $c->getCorrect()->getValue()) ? 'checked="checked"' : ''); ?> />
                                 <i></i>
                                 <span>False</span>
                             </label>
                             <label class="input answers type-mc">
-                                <textarea name="answers" placeholder="one per line"></textarea>
+                                <textarea name="answers" placeholder="one per line"><?php print implode("\n", $c->getAnswers()->map(function (Answer $a) {return $a->getValue();})->toArray()); ?></textarea>
                             </label>
                             <label class="input answers type-sa">
                                 <input name="answers" placeholder="fill in the blank" />
                             </label>
+                            <label class="input response">
+                                <input type="text" name="response" placeholder="Description" value="<?php print $view->escape($c->getResponseContent()); ?>"/>
+                            </label>
                             <div class="highlighted-link">
-                                <a title="Remove card" href="#remove-card" data-toggle="modal"></a>
+                                <a title="Remove card" href="#remove-card"></a>
                                 <label class="checkbox"><input type="checkbox" name="selected"><i></i></label>
                             </div>
                         </div>
-                    <?php } ?>
+                    <?php $i++; } ?>
                 </div>
                 <div class="highlighted-link form-actions invalid">
                     <a href="#add-card" class="big-add">Add <span>+</span> card</a>
-                    <a href="#create-new" class="more">Create Pack</a>
+                    <a href="#create-new" class="more">Save Pack</a>
                 </div>
             </form>
             <div class="pane-bottom">
@@ -215,10 +225,13 @@ $view['slots']->start('body'); ?>
                             </td>
                             <td><?php print (!empty($p->getModified()) ? $p->getModified()->format('j M') : $p->getCreated()->format('j M')); ?></td>
                             <td><?php print $p->getUserPacks()->count(); ?></td>
-                            <td><a title="Edit pack" href="#edit-pack" data-toggle="modal"></a></td>
+                            <td class="highlighted-link">
+                                <a title="Edit pack" href="<?php print $view['router']->generate('packs_edit', ['pack' => $p->getId()]); ?>" target="_blank"></a>
+                                <a title="Remove pack" href="#confirm-remove-pack" data-toggle="modal"></a>
+                            </td>
                         </tr>
                         <tr>
-                            <td colspan="5">
+                            <td colspan="6">
                                 <table class="results">
                                     <tbody>
                                     <?php
@@ -228,7 +241,7 @@ $view['slots']->start('body'); ?>
                                             ?>
                                             <tr>
                                                 <td><?php print $c->getContent(); ?></td>
-                                                <td><?php print $c->getResponseContent(); ?></td>
+                                                <td><?php print (!empty($c->getCorrect()) ? ($c->getCorrect()->getValue() . '<br />') : ''); ?><?php print $c->getResponseContent(); ?></td>
                                             </tr>
                                         <?php }
                                     } else { ?>
@@ -249,6 +262,7 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('sincludes');
+print $this->render('StudySauceBundle:Dialogs:confirm-remove-pack.html.php', ['id' => 'confirm-remove-pack']);
 
 $view['slots']->stop();
 

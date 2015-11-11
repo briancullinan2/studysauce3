@@ -29,11 +29,20 @@
     white-space: normal;
 }
 
+#packs a[href="#confirm-remove-pack"],
 #packs a[href="#remove-card"] {
     display: inline-block;
     height: 24px;
     width: 24px;
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
+}
+
+#packs a[href*="/packs/"]
+{
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
 }
 
 #packs header > *,
@@ -67,18 +76,24 @@
     margin: 0;
 }
 
-#packs header > *:nth-last-child(2),
+#packs header > *:nth-child(3),
 #packs .card-row > .answers,
 #packs .card-row:not([class*="type-"]) > .correct
 {
-    margin-right: -104px;
-    padding-right: 104px;
     width:50%;
 }
 
-#packs .card-row > .correct.type-tf {
-    margin-right: -53px;
-    padding-right: 53px;
+#packs header > *:nth-last-child(2),
+#packs .card-row > .response {
+    margin-right: -104px;
+    padding-right: 104px;
+}
+
+#packs .pane-bottom .results.expandable > thead > tr > td:nth-child(4),
+#packs .pane-bottom .results.expandable > tbody > tr > td:nth-child(4),
+#packs .pane-bottom .results.expandable > thead > tr > td:nth-child(5),
+#packs .pane-bottom .results.expandable > tbody > tr > td:nth-child(5) {
+    text-align: center;
 }
 
 #packs .card-row > .correct.type-tf {

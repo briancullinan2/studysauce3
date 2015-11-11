@@ -76,6 +76,14 @@ class Card
     protected $answers;
 
     /**
+     * @return Answer
+     */
+    public function getCorrect()
+    {
+        return $this->getAnswers()->filter(function (Answer $a) {return $a->getCorrect() == 1;})->first();
+    }
+
+    /**
      * @ORM\PrePersist
      */
     public function setCreatedValue()

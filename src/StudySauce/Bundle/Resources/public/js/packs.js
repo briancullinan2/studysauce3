@@ -83,10 +83,10 @@ $(document).ready(function () {
             }
 
             newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
-            newRow.find('.answers textarea').val(clipRows[i].splice(4).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
-            newRow.find('.correct.type-tf input').filter(clipRows[i][3].match(/t/i) ? '[value="true"]' : (clipRows[i][3]
+            newRow.find('.answers textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
+            newRow.find('.correct.type-tf input').filter(clipRows[i][2].match(/t/i) ? '[value="true"]' : (clipRows[i][2]
                 .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
-            newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][3]).trigger('change');
+            newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][2]).trigger('change');
 
             if(clipRows[i].length == 2) {
                 newRow.find('.content input').val(clipRows[i][0]);
@@ -94,7 +94,7 @@ $(document).ready(function () {
             }
             else {
                 newRow.find('.content input').val(clipRows[i][1]);
-                newRow.find('.response input').val(clipRows[i][2]);
+                newRow.find('.response input').val(clipRows[i][7]);
             }
         }
 
@@ -156,6 +156,9 @@ $(document).ready(function () {
             if($(this).attr('value') != '') {
                 $(this).text($(this).attr('value').toLocaleUpperCase());
             }
+            else {
+                $(this).text('Type');
+            }
         });
     });
 
@@ -177,6 +180,7 @@ $(document).ready(function () {
             else {
                 row.removeClass('valid empty').addClass('invalid');
             }
+            row.find('.answers textarea').height(row.find('.answers textarea')[0].scrollHeight - 4);
         });
         if(tab.find('.card-row.invalid').length == 0 && tab.find('.card-row.valid:not(.empty)').length > 0) {
             tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
@@ -186,7 +190,34 @@ $(document).ready(function () {
         }
     }
 
+    body.on('click', '#packs a[href="#confirm-remove-pack"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('tr'),
+            packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
+        $('#remove-pack-name').text(row.find('td:nth-child(1)').text());
+        $('#confirm-remove-pack').data('packId', packId);
+    });
+
+    body.on('click', '#confirm-remove-pack [href="#remove-pack"]', function (evt) {
+        evt.preventDefault();
+        $.ajax({
+            url: window.callbackPaths['packs_remove'],
+            type: 'POST',
+            dataType: 'text',
+            data: {
+                id: $('#confirm-remove-pack').data('packId')
+            },
+            success: loadContent
+        });
+    });
+
     body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
+
+    function loadContent(data) {
+        var tab = $('#packs');
+        tab.find('form table.results').replaceWith($(data).filter('#packs').find('form table.results'));
+        tab.find('.pane-bottom > table.results').replaceWith($(data).filter('#packs').find('.pane-bottom > table.results'));
+    }
 
     body.on('click', '#packs a[href="#create-new"]', function (evt) {
         evt.preventDefault();
@@ -202,17 +233,17 @@ $(document).ready(function () {
 
         // get the parsed list of cards
         var cards = [];
-        tab.find('.card-row').each(function () {
-            var rowId = (/card-id-([0-9]*)(\s|$)/i).exec($(this).attr('class'));
-            if($(this).is('removed')) {
+        tab.find('.card-row.valid:not(.empty)').each(function () {
+            var rowId = (/card-id-([0-9]+)(\s|$)/i).exec($(this).attr('class'));
+            if($(this).is('.removed')) {
                 cards[cards.length] = {
-                    id: rowId != null ? rowId[0] : null,
+                    id: rowId != null ? rowId[1] : null,
                     remove: true
                 };
             }
             else {
                 cards[cards.length] = {
-                    id: rowId != null ? rowId[0] : null,
+                    id: rowId != null ? rowId[1] : null,
                     type: $(this).find('.type select').val(),
                     content: $(this).find('.content:visible input').val(),
                     response: $(this).find('.response:visible input').val(),
@@ -227,27 +258,14 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'text',
             data: {
+                id: ((/\/packs\/([0-9]+)/i).exec(window.location.pathname) || [null,null])[1],
                 cards: cards,
                 title: tab.find('.title input').val(),
                 creator: tab.find('.creator input').val()
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
-                tab.find('table.results').each(function (i) {
-                    $(this).replaceWith($(data).filter('#packs').find('table.results').eq(i));
-                });
-
-                // reset card entry form
-                tab.find('.title input').val('');
-                var remove = tab.find('.card-row').detach();
-                for(var i = 0; i < 5; i++) {
-                    var newRow = remove.last().clone().insertAfter(tab.find('.card-row').last());
-                    newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
-                    newRow.find('.type select, .answers textarea, .correct.type-mc select, .answers.type-sa input, .content input, .response input, .correct input[type="text"]').val('').trigger('change');
-                    newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
-                    newRow.find('.correct.type-tf input').prop('checked', false);
-                }
-                remove.remove();
+                loadContent(data)
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
@@ -255,4 +273,7 @@ $(document).ready(function () {
         })
     });
 
+    body.on('show', '#packs', function () {
+        packsFunc()
+    });
 });

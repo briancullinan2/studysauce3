@@ -385,10 +385,31 @@ $collection->add(
     )
 );
 $collection->add(
+    'packs_edit',
+    new Route(
+        '/packs/{pack}',
+        ['_controller' => 'StudySauceBundle:Packs:index', '_format' => 'index', 'pack' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'pack' => '[0-9]+']
+    )
+);
+$collection->add(
     'packs_create',
     new Route(
         '/packs/create',
         ['_controller' => 'StudySauceBundle:Packs:create'],
+        [],
+        [],
+        '',
+        [],
+        [],
+        'request.isXmlHttpRequest()'
+    )
+);
+$collection->add(
+    'packs_remove',
+    new Route(
+        '/packs/remove',
+        ['_controller' => 'StudySauceBundle:Packs:remove'],
         [],
         [],
         '',

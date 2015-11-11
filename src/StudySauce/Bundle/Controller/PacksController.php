@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
  */
 class PacksController extends Controller
 {
-    public function indexAction() {
+    public function indexAction(Pack $pack = null) {
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
@@ -39,7 +39,8 @@ class PacksController extends Controller
         return $this->render('StudySauceBundle:Packs:tab.html.php', [
             'packs' => $packs,
             'total' => $total,
-            'groups' => $groups
+            'groups' => $groups,
+            'pack' => $pack
         ]);
     }
 
@@ -50,46 +51,118 @@ class PacksController extends Controller
         /** @var User $user */
         $user = $this->getUser();
 
-        $newPack = new Pack();
+        /** @var Pack $newPack */
+        $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', intval($request->get('id')))
+            ->getQuery()
+            ->getOneOrNullResult();
+        if(empty($newPack)) {
+            $newPack = new Pack();
+            $newPack->setUser($user);
+        }
         $newPack->setTitle($request->get('title'));
-        $newPack->setUser($user);
-        $orm->persist($newPack);
+        if(empty($newPack->getId())) {
+            $orm->persist($newPack);
+        }
+        else {
+            $newPack->setModified(new \DateTime());
+            $orm->merge($newPack);
+        }
 
         foreach($request->get('cards') as $c) {
-            $newCard = new Card();
+            if (empty($c['content'])) {
+                continue;
+            }
+            $newCard = $newPack->getCards()->filter(function (Card $x) use ($c) {return $c['id'] == $x->getId() && !empty($x->getId());})->first();
+            if(empty($newCard)) {
+                $newCard = new Card();
+                $newCard->setPack($newPack);
+                $newPack->addCard($newCard);
+            }
             $newCard->setContent($c['content']);
-            $newCard->setPack($newPack);
-            $newPack->addCard($newCard);
             $newCard->setResponseContent($c['response']);
             if(!empty($c['type'])) {
                 $newCard->setResponseType($c['type']);
             }
-            if(!empty($c['answers'])) {
-                $answers = explode("\n", $c['answers']);
-                foreach($answers as $a) {
-                    if(empty(trim($a)))
-                        continue;
+
+            if(empty($c['answers'])) {
+                $c['answers'] = $c['correct'];
+            }
+            $answers = explode("\n", $c['answers']);
+            $answerValues = [];
+            foreach($answers as $a) {
+                if(empty(trim($a)))
+                    continue;
+                $newAnswer = $newCard->getAnswers()->filter(function (Answer $x) use ($a) {return trim($a) == $x->getValue();})->first();
+                if(empty($newAnswer)) {
                     $newAnswer = new Answer();
-                    $newAnswer->setContent(trim($a));
-                    $newAnswer->setResponse(trim($a));
-                    $newAnswer->setValue(trim($a));
-                    if(!empty($c['correct'])) {
-                        if(strtolower(trim($a)) == strtolower(trim($c['correct']))) {
-                            $newAnswer->setCorrect(true);
-                        }
-                        if($c['correct'] == 'contains') {
-                            $newAnswer->setValue('%' . trim($a) . '%');
-                        }
-                        if($c['correct'] == 'exactly') {
-                            $newAnswer->setValue('"' . trim($a) . '"');
-                        }
-                    }
                     $newAnswer->setCard($newCard);
                     $newCard->addAnswer($newAnswer);
+                }
+                $newAnswer->setContent(trim($a));
+                $newAnswer->setResponse(trim($a));
+                $newAnswer->setValue(trim($a));
+                $answerValues[] = trim($a);
+                if(!empty($c['correct'])) {
+                    if(strtolower(trim($a)) == strtolower(trim($c['correct']))) {
+                        $newAnswer->setCorrect(true);
+                    }
+                    if($c['correct'] == 'contains') {
+                        $newAnswer->setValue('%' . trim($a) . '%');
+                    }
+                    if($c['correct'] == 'exactly') {
+                        $newAnswer->setValue('"' . trim($a) . '"');
+                    }
+                }
+                if(empty($newAnswer->getId())) {
                     $orm->persist($newAnswer);
                 }
+                else {
+                    $orm->merge($newAnswer);
+                }
             }
-            $orm->persist($newCard);
+
+            // remove missing answers
+            foreach($newCard->getAnswers()->toArray() as $a) {
+                /** @var Answer $a */
+                if(!in_array($a->getValue(), $answerValues)) {
+                    $a->setDeleted(true);
+                }
+            }
+            if(empty($newCard->getId())) {
+                $orm->persist($newCard);
+            }
+            else {
+                $orm->merge($newCard);
+            }
+        }
+        $orm->flush();
+
+        return $this->forward('StudySauceBundle:Packs:index', ['pack' => $newPack->getId(), '_format' => 'tab']);
+    }
+
+    public function removeAction(Request $request) {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+
+        /** @var Pack $newPack */
+        $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', intval($request->get('id')))
+            ->getQuery()
+            ->getOneOrNullResult();
+        if(!empty($newPack)) {
+            foreach($newPack->getCards()->toArray() as $c) {
+                /** @var Card $c */
+                foreach($c->getAnswers()->toArray() as $a) {
+                    $c->removeAnswer($a);
+                    $orm->remove($a);
+                }
+                $c->getPack()->removeCard($c);
+                $orm->remove($c);
+            }
+            $orm->remove($newPack);
         }
         $orm->flush();
 
@@ -119,7 +192,8 @@ class PacksController extends Controller
                 'title' => $x->getTitle(),
                 'creator' => $x->getCreator(),
                 'created' => $x->getCreated()->format('r'),
-                'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null
+                'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null,
+                'count' => $x->getCards()->count()
             ];
         }, $packs));
     }
@@ -213,9 +287,9 @@ class PacksController extends Controller
         $response->setUser($user);
         $response->setCard($card);
         $response->setCorrect($request->get('correct') == '1' || $request->get('correct') == 'true');
-        if(!empty($request->get('answer'))) {
-            $response->setAnswer($card->getAnswers()->filter(function (Answer $a) use ($request) {
-                return $a->getId() == $request->get('answer');})->first());
+        if(!empty($request->get('answer')) && !empty($a = $card->getAnswers()->filter(function (Answer $a) use ($request) {
+                return $a->getId() == $request->get('answer');})->first())) {
+            $response->setAnswer($a);
         }
         $orm->persist($response);
         $orm->flush();
