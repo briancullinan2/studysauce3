@@ -79,7 +79,7 @@ $view['slots']->start('body'); ?>
                 <?php foreach ($user->getInvites()->toArray() as $g) {
                     /** @var Invite $g */
                     ?>
-                    <div class="import-row read-only invalid">
+                    <div class="import-row invite-id-<?php print $g->getId(); ?> read-only invalid">
                         <label class="input first-name">
                             <input type="text" placeholder="First name" value="<?php print $g->getFirst(); ?>"/>
                         </label>

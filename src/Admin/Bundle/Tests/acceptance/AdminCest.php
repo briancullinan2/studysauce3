@@ -1,6 +1,8 @@
 <?php
 namespace Admin\Bundle\Tests;
 
+use Admin\Bundle\Controller\ValidationController;
+use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
 use WebDriver;
 use WebDriverBy;
@@ -12,7 +14,7 @@ use WebDriverKeys;
  * @backupGlobals false
  * @backupStaticAttributes false
  */
-class AdviserCest
+class AdminCest
 {
     /**
      * @param AcceptanceTester $I
@@ -32,7 +34,7 @@ class AdviserCest
     /**
      * @param AcceptanceTester $I
      */
-    public function tryAdviserLogin(AcceptanceTester $I)
+    public function tryAdminLogin(AcceptanceTester $I)
     {
         $I->wantTo('Login as the adviser account brian@studysauce.com');
         $I->amOnPage('/login');
@@ -43,13 +45,90 @@ class AdviserCest
     }
 
     /**
-     * @depends tryAdviserLogin
+     * @depends tryAdminLogin
+     * @param AcceptanceTester $I
+     */
+    public function tryCreateTestGroup(AcceptanceTester $I) {
+        $last = substr(md5(microtime()), -5);
+        $I->wantTo('Create a group (TestGroup' . $last . ') that contains users for testing');
+        $I->seeAmOnPage('/command');
+        $I->click('Groups');
+        $I->test('tryDeleteTestGroup');
+        $I->click('a[href="#add-group"]');
+        $I->fillField('#groups input[name="groupName"]', 'TestGroup' . $last);
+        $I->click('Create group');
+        $I->wait(3);
+        $I->seeInField('input[name="groupName"]', 'TestGroup' . $last);
+    }
+
+    /**
+     * @param AcceptanceTester $I
+     */
+    public function tryDeleteTestGroup(AcceptanceTester $I) {
+        $I->wantTo('Delete the existing test groups');
+        //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
+    }
+
+    /**
+     * @depends tryAdminLogin
+     * @depends tryCreateTestGroup
+     * @param AcceptanceTester $I
+     */
+    public function tryInviteTestUser(AcceptanceTester $I) {
+        $last = substr(md5(microtime()), -5);
+        $I->wantTo('Invite a test user (TestInvite' . $last . ') to download the app and register');
+        $I->seeAmOnPage('/import');
+        $I->fillField('#import .first-name input', 'Test');
+        $I->fillField('#import .last-name input', 'Invite' . $last);
+        $I->fillField('#import .email input', 'TestInvite' . $last . '@mailinator.com');
+        $test = $I->grabValueFrom('//option[contains(.,"TestGroup")]');
+        $I->selectOption('#import .group select', $test);
+        $I->click('Import');
+        $I->wait(3);
+        $I->seeInField('#import .last-name input', 'Invite' . $last);
+    }
+
+    /**
+     * @depends tryAdminLogin
+     * @depends tryCreateTestGroup
+     * @depends tryInviteTestUser
+     * @param AcceptanceTester $I
+     */
+    public function tryAcceptInvite(AcceptanceTester $I) {
+        $host = ValidationController::$settings['modules']['config']['WebDriver']['host'];
+        $I->amOnPage('/cron');
+        $I->amOnPage('http://localhost:50001/startp');
+        $I->see('PASS');
+        $I->amOnPage('http://localhost:50001/scripts/home/Documents/studysauceapp/StudySauceTests/');
+        $I->see('PASS');
+        $I->amOnPage('http://localhost:50001/run/invite_code');
+        $I->see('PASS');
+    }
+
+    /**
+     * @depends tryAdminLogin
+     * @depends tryCreateTestGroup
+     * @depends tryInviteTestUser
+     * @depends tryAcceptInvite
+     * @param AcceptanceTester $I
+     */
+    public function tryAllHomeCards(AcceptanceTester $I) {
+        $I->amOnPage('http://localhost:50001/run/home_screen');
+        $I->see('PASS');
+        // TODO: check if results are recorded properly
+
+
+        // TODO: change response dates, reset app and check for
+    }
+
+    /**
+     * @depends tryAdminLogin
      * @param AcceptanceTester $I
      */
     public function tryGroupInvite(AcceptanceTester $I)
     {
         $I->wantTo('Invite a student to join study sauce');
-        $I->seeAmOnUrl('/userlist');
+        $I->seeAmOnPage('/userlist');
         $I->click('#right-panel a[href="#expand"]');
         $I->click('User Import');
         $I->wait(5);
@@ -62,7 +141,7 @@ class AdviserCest
 
         $I->wantTo('Try to register as a new student without clicking the email');
         $I->click('a[href*="/logout"]');
-        $I->seeAmOnUrl('/register');
+        $I->seeAmOnPage('/register');
         $I->fillField('#register .first-name input', $last);
         $I->fillField('#register .last-name input', 'last' . $last);
         $I->fillField('#register .email input', 'firstlast' . $last . '@mailinator.com');
@@ -73,7 +152,7 @@ class AdviserCest
         $I->wantTo('See the student\'s entries from the adviser view');
         $I->click('a[href*="/logout"]');
         $I->click('a[href*="/login"]');
-        $I->test('tryAdviserLogin');
+        $I->test('tryAdminLogin');
         // search for student name
         $I->fillField('[name="search"]', $last);
         $I->see('last' . $last); // check for student name in user list
@@ -128,7 +207,7 @@ class AdviserCest
         $I->wantTo('See the student\'s entries from the adviser view');
         $I->click('a[href*="/logout"]');
         $I->click('a[href*="/login"]');
-        $I->test('tryAdviserLogin');
+        $I->test('tryAdminLogin');
         $I->see('last' . $last); // check for student name in user list
         $I->click('last' . $last); // load the student
         $I->see('last' . $last); // check the name in the corner of the tab
@@ -138,7 +217,7 @@ class AdviserCest
 
         $I->wantTo('Register as a new student before my adviser has a chance to invite me');
         $I->click('a[href*="/logout"]');
-        $I->seeAmOnUrl('/register');
+        $I->seeAmOnPage('/register');
         $last = 'tester' . substr(md5(microtime()), -5);
         $I->fillField('#register .first-name input', $last);
         $I->fillField('#register .last-name input', 'last' . $last);
@@ -150,7 +229,7 @@ class AdviserCest
         $I->wantTo('invite a user that already jump the gun and signed up early');
         $I->amOnPage('/logout');
         $I->click('a[href*="/login"]');
-        $I->test('tryAdviserLogin');
+        $I->test('tryAdminLogin');
         $I->click('#right-panel a[href="#expand"]');
         $I->click('User Import');
         $I->wait(5);
@@ -166,46 +245,4 @@ class AdviserCest
 
     }
 
-    /**
-     * @depends tryAdviserLogin
-     * @depends tryGroupInvite
-     * @param AcceptanceTester $I
-     */
-    public function tryGroupDeadlines(AcceptanceTester $I)
-    {
-        $I->wantTo('set up course deadlines for my students');
-        $I->seeAmOnUrl('/userlist');
-        $I->click('#right-panel a[href="#expand"]');
-        $I->click('Deadlines');
-        $I->wait(5);
-
-        if($I->grabValueFrom('.deadline-row .assignment input') == 'Course completion') {
-            $I->click(
-                '//div[contains(@class,"deadline-row") and .//input[contains(@value,"Course completion")]]//a[contains(@href,"remove-deadline")]'
-            );
-            $I->wait(5);
-        }
-
-        $I->selectOption('.deadline-row.edit .class-name select', 'Course completion');
-        $I->click('.deadline-row.edit input[value="86400"] + i');
-        $I->click('.deadline-row.edit input[value="172800"] + i');
-        $I->click('.deadline-row.edit input[value="345600"] + i');
-        $I->click('.deadline-row.edit input[value="604800"] + i');
-        $I->fillField('.deadline-row.edit .due-date input', date_add(new \DateTime(), new \DateInterval('P8D'))->format('m/d/Y'));
-        $I->click('#deadlines .highlighted-link [value="#save-deadline"]');
-        $I->wait(10);
-
-        $I->wantTo('check mailinator to see if the students received the email');
-        $I->amOnPage('/cron/emails');
-        $I->amOnUrl('http://mailinator.com');
-        $I->fillField('.input-append input', 'studymarketing');
-        $I->click('.input-append btn');
-        $I->waitForText('a minute ago', 60*5);
-        $I->seeLink('Study Sauce course');
-        $I->click('//a[contains(.,"Study Sauce course")]');
-
-        // TODO: add past due test
-
-
-    }
 }

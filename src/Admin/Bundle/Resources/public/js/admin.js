@@ -8,13 +8,10 @@ $(document).ready(function () {
     function loadContent (data) {
         var admin = jQuery('#command'),
             content = $(data);
-        admin.find('#users table.results > tbody > tr').remove();
-        content.filter('#command').find('#users table.results > tbody > tr').appendTo(admin.find('#users table.results > tbody'));
-        admin.find('#users table.results > thead > tr > th').each(function (i) {
-            $(this).find('label:first-child > *:not(select):not(input)').remove();
-            content.filter('#command').find('#users table.results > thead > tr > th').eq(i).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
-        });
-        admin.find('#groups table.results').replaceWith(content.filter('#command').find('#groups .results'));
+        admin.find('#users > form .results').replaceWith(content.filter('#command').find('#users > form .results'));
+        admin.find('#users .pane-top .results').replaceWith(content.filter('#command').find('#users .pane-top .results'));
+        admin.find('#groups > form .results').replaceWith(content.filter('#command').find('#groups > form .results'));
+        admin.find('#groups .pane-top .results').replaceWith(content.filter('#command').find('#groups .pane-top .results'));
         admin.find('#page-total').text(content.find('#page-total').text());
     }
 
@@ -60,7 +57,7 @@ $(document).ready(function () {
 
     body.on('click', '#command a[href="#edit-user"], #command a[href="#edit-group"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('tr');
+        var row = $(this).parents('.group-row');
         row.removeClass('read-only').addClass('edit');
     });
 
@@ -73,7 +70,7 @@ $(document).ready(function () {
 
     body.on('click', '#command a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('tr');
+        var row = $(this).parents('.group-row, .user-row');
         row.removeClass('edit').addClass('read-only');
     });
 
@@ -92,7 +89,7 @@ $(document).ready(function () {
                     .css('width', 1).appendTo(command).focus();
             // generate rows in current view
             var currentView =
-                command.find('.results > thead > tr > th:visible:not(:last-child)').map(function (i) {
+                command.find('#users > form header > *:visible:not(:last-child)').map(function (i) {
                     if(i == 0) {
                         return 'Visited';
                     }
@@ -104,8 +101,8 @@ $(document).ready(function () {
                     }
                     return $(this).find('> label > select option:first-child').text();
                 }).toArray().join("\t") + "\r\n" +
-                command.find('.results > tbody > tr').map(function () {
-                return $(this).find('> td:visible:not(:last-child)').map(function (i) {
+                command.find('#users .user-row').map(function () {
+                return $(this).find('> *:visible:not(:last-child)').map(function (i) {
                     if(i == 1 || i == 2) {
                         return $(this).find(':checked ~ span').map(function () {
                             return $(this).text();
@@ -140,45 +137,79 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#command a[href="#add-group"]', function (evt) {
+    body.on('click', '#command a[href="#add-user"], #command a[href="#add-group"]', function (evt) {
         evt.preventDefault();
-        var manager = $('#command').find('table.results'),
-            newRow = manager.find('tbody tr').first().clone().attr('class', 'group-id- edit');
-        newRow.find('input[type="checkbox"]').prop('checked', false);
-        newRow.find('input[type="text"], textarea').val('');
-        newRow.find('td:nth-child(4)').text('0');
-        newRow.prependTo(manager.find('tbody'));
+        $(this).parents('.pane-top').addClass('adding');
     });
 
-    body.on('click', '#command a[href="#save-group"]', function (evt) {
+    body.on('change focus blur mousedown mouseup keydown keyup', '#command .group-row input, #command .group-row select', function () {
+        var tab = $('#command');
+        var row = $(this).parents('.group-row');
+        if(row.find('input[name="groupName"]').val().trim() == '' && row.find('textarea[name="description"]').val().trim() == '' && row.find('input[name="roles"]:checked').length == 0) {
+            row.removeClass('invalid').addClass('valid empty');
+        }
+        else if((row.find('textarea[name="description"]').val().trim() != '' || row.find('input[name="roles"]:checked').length != 0) && row.find('input[name="groupName"]').val().trim() == '') {
+            row.removeClass('valid empty').addClass('invalid');
+        }
+        else {
+            row.removeClass('invalid empty').addClass('valid');
+        }
+        if(tab.find('.group-row.invalid, .group-row.empty').length > 0) {
+            tab.find('#groups .pane-top .highlighted-link').removeClass('valid').addClass('invalid');
+        }
+        else {
+            tab.find('#groups .pane-top .highlighted-link').removeClass('invalid').addClass('valid');
+        }
+    });
+
+    body.on('click', '#command #groups a[href="#remove-group"]', function (evt) {
         evt.preventDefault();
-        var data = getData(),
-            row = $(this).parents('tr');
-        if(row.is('.invalid'))
-            return;
-        row.removeClass('edit').addClass('read-only');
-        data.groupName = row.find('input[name="groupName"]').val().trim();
-        data.description = row.find('textarea[name="description"]').val().trim();
-        data.roles = row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(',');
-        data.groupId = (/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class'))[1];
+        var row = $(this).parents('.group-row');
+        var groupId = ((/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
         $.ajax({
             url: window.callbackPaths['save_group'],
             type: 'POST',
             dataType: 'text',
-            data: data,
-            success: function (response) {
-                var admin = $('#command'),
-                    content = $(response),
-                    current = admin.find('th:nth-child(3) select').val();
-                // update group select in heading
-                admin.find('th:nth-child(3) select').replaceWith(content.find('.pane-content th:nth-child(3) select').val(current));
-                if(data.groupName == '_remove') {
-                    row.remove();
-                }
-                if(data.groupId == '') {
+            data: {
+                groupId: groupId,
+                remove: 1
+            },
+            success: loadContent
+        });
+    });
 
-                }
+    body.on('click', '#command a[href="#new-group"], #command a[href="#save-group"]', function (evt) {
+        evt.preventDefault();
+        var that = $(this);
+        var row = that.parents('.user-row');
+        if(row.length == 0) {
+            row = $('#groups').find('.group-row');
+        }
+        if(that.parents('.highlighted-link').is('.invalid'))
+            return;
+        loadingAnimation(that);
+        that.parents('.highlighted-link').removeClass('valid').addClass('invalid');
+        $.ajax({
+            url: window.callbackPaths['save_group'],
+            type: 'POST',
+            dataType: 'text',
+            data: {
+                groupName: row.find('input[name="groupName"]').val().trim(),
+                description: row.find('textarea[name="description"]').val().trim(),
+                roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
+                groupId: ((/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1]
+            },
+            success: function (response) {
+                that.find('.squiggle').stop().remove();
+                var dialog = $('#groups').find('.pane-top');
+                dialog.find('input[name="groupName"], textarea[name="description"]').val('');
+                dialog.find('input[name="roles"]').prop('checked', false);
+
+                // update group select in heading
                 loadContent(response);
+            },
+            error: function () {
+                that.find('.squiggle').stop().remove();
             }
         });
     });
@@ -190,6 +221,7 @@ $(document).ready(function () {
 
     body.on('click', '#command a[href="#new-user"]', function (evt) {
         evt.preventDefault();
+        var that = $(this);
         var admin = $('#command'),
             dialog = $('#users').find('.pane-top'),
             data = {
@@ -198,15 +230,17 @@ $(document).ready(function () {
                 email: dialog.find('.email input').val().trim(),
                 pass: dialog.find('.password input').val()
             };
-        if(dialog.is('.invalid'))
+        if(dialog.find('.highlighted-link').is('.invalid'))
             return;
-        dialog.removeClass('valid').addClass('invalid');
+        loadingAnimation(that);
+        dialog.find('.highlighted-link').removeClass('valid').addClass('invalid');
         $.ajax({
             url: window.callbackPaths['add_user'],
             type: 'POST',
             dataType: 'text',
             data: data,
             success: function (response) {
+                that.find('.squiggle').stop().remove();
                 // reset dialog fields for next entry
                 dialog.find('.first-name input').val('');
                 dialog.find('.last-name input').val('');
@@ -225,7 +259,36 @@ $(document).ready(function () {
                 });
 
                 loadContent(response);
+            },
+            error: function () {
+                that.find('.squiggle').stop().remove();
             }
+        });
+    });
+
+    body.on('submit', '#command #users > form', function (evt) {
+        evt.preventDefault();
+        var data = getData(),
+            admin = $(this);
+        data['users'] = [];
+        admin.find('.user-row.edit:not(.invalid)').each(function () {
+            var row = $(this);
+            row.removeClass('edit').addClass('read-only');
+            data['users'][data['users'].length] = {
+                groups : row.find('input[name="groups"]:checked').map(function () {return $(this).val();}).toArray().join(','),
+                roles : row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
+                firstName : row.find('input[name="first-name"]').val().trim(),
+                lastName : row.find('input[name="last-name"]').val().trim(),
+                email : row.find('input[name="email"]').val().trim(),
+                userId : (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1]
+            };
+        });
+        $.ajax({
+            url: window.callbackPaths['save_user'],
+            type: 'POST',
+            dataType: 'text',
+            data: data,
+            success: loadContent
         });
     });
 
@@ -429,35 +492,9 @@ $(document).ready(function () {
 
     });
 
-    body.on('submit', '#command form', function (evt) {
-        evt.preventDefault();
-        var data = getData(),
-            admin = $('#command');
-        data['users'] = [];
-        admin.find('table.results > tbody > tr.edit:not(.invalid)').each(function () {
-            var row = $(this);
-            row.removeClass('edit').addClass('read-only');
-            data['users'][data['users'].length] = {
-                groups : row.find('input[name="groups"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                roles : row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                firstName : row.find('input[name="first-name"]').val().trim(),
-                lastName : row.find('input[name="last-name"]').val().trim(),
-                email : row.find('input[name="email"]').val().trim(),
-                userId : (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1]
-            };
-        });
-        $.ajax({
-            url: window.callbackPaths['save_user'],
-            type: 'POST',
-            dataType: 'text',
-            data: data,
-            success: loadContent
-        });
-    });
-
     body.on('click', '#command a[href="#confirm-remove-user"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('tr'),
+        var row = $(this).parents('.user-row'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
         $('#remove-user-name').text(row.find('[name="first-name"]').val());
         $('#confirm-remove-user').data('userId', userId);
@@ -465,17 +502,17 @@ $(document).ready(function () {
 
     body.on('click', '#command a[href="#confirm-cancel-user"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('tr'),
+        var row = $(this).parents('.user-row'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        $('#cancel-user-name').text(row.find('td').eq('3').find('input').first().val());
+        $('#cancel-user-name').text(row.find('input[name="first-name"]').first().val());
         $('#confirm-cancel-user').data('userId', userId);
     });
 
     body.on('click', '#command a[href="#confirm-password-reset"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('tr'),
+        var row = $(this).parents('.user-row'),
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        $('#reset-user-name').text(row.find('td').eq('3').find('input').first().val());
+        $('#reset-user-name').text(row.find('input[name="first-name"]').first().val());
         $('#confirm-password-reset').data('userId', userId);
     });
 
@@ -516,7 +553,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '#command table.results > thead > tr > th:not(:last-child) > label > select, #command table.results > thead > tr > th:not(:last-child) > label > input', function () {
+    body.on('change', '#command #users > form header label > select, #command #users > form header label > input', function () {
         var that = $(this);
 
         if(that.val() == '_ascending' || that.val() == '_descending')

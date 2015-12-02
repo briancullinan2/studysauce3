@@ -52,7 +52,7 @@ class AcceptanceHelper extends \Codeception\Module
      * @param $url
      * @throws \Codeception\Exception\Module
      */
-    public function seeAmOnUrl($url)
+    public function seeAmOnPage($url)
     {
         // first assert that we see the url
         /** @var WebDriver $driver */

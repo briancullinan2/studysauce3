@@ -20,13 +20,13 @@ class Invite
 
     /**
      * @ORM\ManyToOne(targetEntity="Group", inversedBy="invites")
-     * @ORM\JoinColumn(name="group_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable=true)
      */
     protected $group;
 
     /**
      * @ORM\ManyToOne(targetEntity="Pack", inversedBy="invites")
-     * @ORM\JoinColumn(name="group_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id", nullable=true)
      */
     protected $pack;
 
@@ -100,7 +100,7 @@ class Invite
      * Set first
      *
      * @param string $first
-     * @return GroupInvite
+     * @return Invite
      */
     public function setFirst($first)
     {
@@ -123,7 +123,7 @@ class Invite
      * Set last
      *
      * @param string $last
-     * @return GroupInvite
+     * @return Invite
      */
     public function setLast($last)
     {
@@ -146,7 +146,7 @@ class Invite
      * Set email
      *
      * @param string $email
-     * @return GroupInvite
+     * @return Invite
      */
     public function setEmail($email)
     {
@@ -169,7 +169,7 @@ class Invite
      * Set activated
      *
      * @param boolean $activated
-     * @return GroupInvite
+     * @return Invite
      */
     public function setActivated($activated)
     {
@@ -192,7 +192,7 @@ class Invite
      * Set code
      *
      * @param string $code
-     * @return GroupInvite
+     * @return Invite
      */
     public function setCode($code)
     {
@@ -215,7 +215,7 @@ class Invite
      * Set created
      *
      * @param \DateTime $created
-     * @return GroupInvite
+     * @return Invite
      */
     public function setCreated($created)
     {
@@ -238,7 +238,7 @@ class Invite
      * Set reminder
      *
      * @param \DateTime $reminder
-     * @return GroupInvite
+     * @return Invite
      */
     public function setReminder($reminder)
     {
@@ -261,7 +261,7 @@ class Invite
      * Set group
      *
      * @param \StudySauce\Bundle\Entity\Group $group
-     * @return GroupInvite
+     * @return Invite
      */
     public function setGroup(\StudySauce\Bundle\Entity\Group $group = null)
     {
@@ -284,7 +284,7 @@ class Invite
      * Set user
      *
      * @param \StudySauce\Bundle\Entity\User $user
-     * @return GroupInvite
+     * @return Invite
      */
     public function setUser(\StudySauce\Bundle\Entity\User $user = null)
     {
@@ -301,29 +301,6 @@ class Invite
     public function getUser()
     {
         return $this->user;
-    }
-
-    /**
-     * Set student
-     *
-     * @param \StudySauce\Bundle\Entity\User $student
-     * @return GroupInvite
-     */
-    public function setStudent(\StudySauce\Bundle\Entity\User $student = null)
-    {
-        $this->student = $student;
-
-        return $this;
-    }
-
-    /**
-     * Get student
-     *
-     * @return \StudySauce\Bundle\Entity\User 
-     */
-    public function getStudent()
-    {
-        return $this->student;
     }
 
     /**

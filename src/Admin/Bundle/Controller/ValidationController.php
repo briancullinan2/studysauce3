@@ -50,6 +50,7 @@ class ValidationController extends Controller
 
     public static $dispatcher;
     private static $config = [];
+    public static $settings;
 
     private static function setupThis()
     {
@@ -377,7 +378,7 @@ class ValidationController extends Controller
         self::setupThis();
 
         $steps = [];
-        if (!empty($settings = self::$config[$suite = $request->get('suite')])) {
+        if (!empty(static::$settings = self::$config[$suite = $request->get('suite')])) {
             // get the path of the test
             $options = ['verbosity' => 3, 'colors' => false];
             if (!empty($request->get('test'))) {
@@ -392,16 +393,16 @@ class ValidationController extends Controller
 
             // set customized settings
             if (!empty($request->get('host'))) {
-                $settings['modules']['config']['WebDriver']['host'] = $request->get('host');
+                static::$settings['modules']['config']['WebDriver']['host'] = $request->get('host');
             }
             if (!empty($request->get('browser'))) {
-                $settings['modules']['config']['WebDriver']['browser'] = $request->get('browser');
+                static::$settings['modules']['config']['WebDriver']['browser'] = $request->get('browser');
             }
             if (!empty($request->get('wait'))) {
-                $settings['modules']['config']['WebDriver']['wait'] = $request->get('wait');
+                static::$settings['modules']['config']['WebDriver']['wait'] = $request->get('wait');
             }
             if (!empty($request->get('url'))) {
-                $settings['modules']['config']['WebDriver']['url'] = $request->get('url');
+                static::$settings['modules']['config']['WebDriver']['url'] = $request->get('url');
             }
 
 
@@ -610,16 +611,16 @@ class ValidationController extends Controller
             $runner->setPrinter($printer);
 
             // don't initialize Symfony2 module because we are already running and will feed it the right parameters
-            if (($i = array_search('Symfony2', $settings['modules']['enabled'])) !== false) {
-                unset($settings['modules']['enabled'][$i]);
+            if (($i = array_search('Symfony2', static::$settings['modules']['enabled'])) !== false) {
+                unset(static::$settings['modules']['enabled'][$i]);
             }
 
-            $suiteManager = new SuiteManager(self::$dispatcher, $suite, $settings);
+            $suiteManager = new SuiteManager(self::$dispatcher, $suite, static::$settings);
             $suiteManager->initialize();
             // add Symfony2 module back in without initializing, setting the correct kernel for the current instance
-            $settings['modules']['enabled'] = ['Symfony2'];
+            static::$settings['modules']['enabled'] = ['Symfony2'];
             /** @var Symfony2 $symfony */
-            $symfony = Configuration::modules($settings)['Symfony2'];
+            $symfony = Configuration::modules(static::$settings)['Symfony2'];
             SuiteManager::$modules['Symfony2'] = $symfony;
             $symfony->kernel = $this->container->get('kernel');
             $suiteManager->getSuite()->setBackupGlobals(false);

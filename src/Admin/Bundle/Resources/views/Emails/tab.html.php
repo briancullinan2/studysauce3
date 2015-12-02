@@ -258,7 +258,7 @@ $view['slots']->start('body'); ?>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
+                        <tr class="edit">
                             <td><label class="input"><input name="userFirst" placeholder="First" type="text"/></label></td>
                             <td><label class="input"><input name="userLast" placeholder="Last" type="text"/></label></td>
                             <td><label class="input"><input name="userEmail" placeholder="Email" type="text"/></label></td>

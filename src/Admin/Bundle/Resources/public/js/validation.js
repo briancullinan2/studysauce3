@@ -141,21 +141,6 @@ $(document).ready(function () {
 
     body.on('mouseout', '#validation tbody tr', removeHighlight);
 
-    // Add a method to the graph model that returns an
-    // object with every neighbors of a node inside:
-    sigma.classes.graph.addMethod('neighbors', function(nodeId) {
-        var k,
-            neighbors = {},
-            index = this.allNeighborsIndex[nodeId] || {};
-
-        for (k in index)
-            neighbors[k] = this.nodesIndex[k];
-
-        return neighbors;
-    });
-
-    sigma.renderers.def = sigma.renderers.canvas;
-
     var graphConfig = {
         container: 'sigma-container',
         type: 'canvas',
@@ -428,7 +413,33 @@ $(document).ready(function () {
 
     }
 
-    sigma.parsers.json(
-        window.callbackPaths['validation_refresh'], graphConfig, createGraph);
+    body.on('show', '#validation', function () {
+        if ($(this).is('.loaded')) {
+            $(this).trigger('testended');
+        }
+        else {
+            $(this).addClass('loaded');
+
+
+            // Add a method to the graph model that returns an
+            // object with every neighbors of a node inside:
+            sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+                var k,
+                    neighbors = {},
+                    index = this.allNeighborsIndex[nodeId] || {};
+
+                for (k in index) {
+                    neighbors[k] = this.nodesIndex[k];
+                }
+
+                return neighbors;
+            });
+
+            sigma.renderers.def = sigma.renderers.canvas;
+
+            sigma.parsers.json(
+                window.callbackPaths['validation_refresh'], graphConfig, createGraph);
+        }
+    });
 
 });

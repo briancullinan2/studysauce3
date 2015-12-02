@@ -38,7 +38,7 @@ $view['slots']->start('body'); ?>
             <div class="tab-content">
                 <div id="users" class="tab-pane active">
                     <div class="pane-top">
-                        <form>
+                        <form action="<?php print $view['router']->generate('save_user'); ?>" method="post">
                             <h2>Users</h2>
 
                             <div class="results">
@@ -73,17 +73,13 @@ $view['slots']->start('body'); ?>
                                                         placeholder="Search"/></label>
                         </div>
                         <?php print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $total]); ?>
-                        <table class="results">
-                            <thead>
-                            <tr>
-                                <th><label class="input">
-                                        <span>Visitors: <?php print $visitors; ?></span><br/>
-                                        <input type="text" name="lastVisit" value="" placeholder="All Visits"/>
-                                    </label>
-
-                                    <div></div>
-                                </th>
-                                <th><label><span>Parents: <?php print $parents; ?></span><br/>
+                        <div class="results">
+                            <header>
+                                <label class="input">
+                                    <span>Visitors: <?php print $visitors; ?></span><br/>
+                                    <input type="text" name="lastVisit" value="" placeholder="All Visits"/>
+                                </label>
+                                <label><span>Parents: <?php print $parents; ?></span><br/>
                                         <span>Partners: <?php print $partners; ?></span><br/>
                                         <span>Students: <?php print $students; ?></span><br/>
                                         <span>Advisers: <?php print $advisers; ?></span><br/>
@@ -100,8 +96,8 @@ $view['slots']->start('body'); ?>
                                             <option value="ROLE_STUDENT">STUDENT</option>
                                             <option value="ROLE_GUEST">GUEST</option>
                                             <option value="ROLE_DEMO">DEMO</option>
-                                        </select></label></th>
-                                <th><label>
+                                        </select></label>
+                                <label>
                                         <span>TAL: <?php print $torch; ?></span><br/>
                                         <span>CSA: <?php print $csa; ?></span><br/>
                                         <select name="group">
@@ -115,8 +111,8 @@ $view['slots']->start('body'); ?>
                                                 value="<?php print $g->getId(); ?>"><?php print $g->getName(); ?></option><?php
                                             } ?>
                                             <option value="nogroup">No Groups</option>
-                                        </select></label></th>
-                                <th><label><span>Total: <?php print $total; ?></span><br/>
+                                        </select></label>
+                                <label><span>Total: <?php print $total; ?></span><br/>
                                         <select name="last">
                                             <option value="">Student</option>
                                             <option value="_ascending">Ascending (A-Z)</option>
@@ -147,20 +143,17 @@ $view['slots']->start('body'); ?>
                                             <option value="X%">X</option>
                                             <option value="Y%">Y</option>
                                             <option value="Z%">Z</option>
-                                        </select></label></th>
-                                <th><label class="input"><span>Sign Ups: <?php print $signups; ?></span><br/>
+                                        </select></label>
+                                <label class="input"><span>Sign Ups: <?php print $signups; ?></span><br/>
                                         <input type="text" name="created" value="" placeholder="All Sign Ups"/>
-                                    </label>
-
-                                    <div></div>
-                                </th>
-                                <th><label><span>Paid: <?php print $paid; ?></span><br/>
+                                </label>
+                                <label><span>Paid: <?php print $paid; ?></span><br/>
                                         <select name="hasPaid">
                                             <option value="">Paid</option>
                                             <option value="yes">Y</option>
                                             <option value="no">N</option>
-                                        </select></label></th>
-                                <th><label><span>Actions</span><br/>
+                                        </select></label>
+                                <label><span>Actions</span><br/>
                                         <select name="actions">
                                             <option value="">Select All</option>
                                             <option value="delete">Delete All</option>
@@ -169,24 +162,21 @@ $view['slots']->start('body'); ?>
                                             <option value="export">Export All</option>
                                             <option value="export">Clear All</option>
                                         </select></label>
-                                    <label class="checkbox"><input type="checkbox" name="select-all"/><i></i></label>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
+                                <label class="checkbox"><input type="checkbox" name="select-all"/><i></i></label>
+                            </header>
                             <?php foreach ($users as $i => $u) {
                                 /** @var User $u */
 
                                 ?>
-                                <tr class="user-id-<?php print $u->getId(); ?> read-only status_<?php print ($u->getProperty(
+                                <div class="user-row user-id-<?php print $u->getId(); ?> read-only status_<?php print ($u->getProperty(
                                     'adviser_status'
                                 ) ?: 'green'); ?>">
-                                    <td data-timestamp="<?php print (empty($u->getLastVisit())
+                                    <div data-timestamp="<?php print (empty($u->getLastVisit())
                                         ? ''
                                         : $u->getLastVisit()->getTimestamp()); ?>"><?php print (empty($u->getLastVisit())
                                             ? 'N/A'
-                                            : $u->getLastVisit()->format('j M')); ?></td>
-                                    <td>
+                                            : $u->getLastVisit()->format('j M')); ?></div>
+                                    <div>
                                         <label class="checkbox"><input type="checkbox" name="roles"
                                                                        value="ROLE_PAID" <?php print ($u->hasRole(
                                                 'ROLE_PAID'
@@ -219,16 +209,16 @@ $view['slots']->start('body'); ?>
                                                                        value="ROLE_GUEST" <?php print ($u->hasRole(
                                                 'ROLE_GUEST'
                                             ) ? 'checked="checked"' : ''); ?> /><i></i><span>GUEST</span></label>
-                                    </td>
-                                    <td>
+                                    </div>
+                                    <div>
                                         <?php foreach ($groups as $i => $g) { ?>
                                             <label class="checkbox"><input type="checkbox" name="groups"
                                                                            value="<?php print $g->getId(); ?>" <?php print ($u->hasGroup(
                                                     $g->getName()
                                                 ) ? 'checked="checked"' : ''); ?> /><i></i><span><?php print $g->getName(); ?></span></label>
                                         <?php } ?>
-                                    </td>
-                                    <td>
+                                    </div>
+                                    <div class="user-name">
                                         <label class="input"><input type="text" name="first-name"
                                                                     value="<?php print $u->getFirst(); ?>"
                                                                     placeholder="First name"/></label>
@@ -238,15 +228,15 @@ $view['slots']->start('body'); ?>
                                         <label class="input"><input type="text" name="email"
                                                                     value="<?php print $u->getEmail(); ?>"
                                                                     placeholder="Email"/></label>
-                                    </td>
-                                    <td title="&lt;pre style='text-align:left; width:300px;'&gt;<?php print $view->escape(implode("\r\n", array_map(function ($i, $k) {
+                                    </div>
+                                    <div title="&lt;pre style='text-align:left; width:300px;'&gt;<?php print $view->escape(implode("\r\n", array_map(function ($i, $k) {
                                         return $k . ' = ' . print_r($i, true);
                                     }, $u->getProperties() ?: [], array_keys($u->getProperties() ?: [])))); ?>&lt;/pre&gt;"
                                         data-timestamp="<?php print $u->getCreated()->getTimestamp(); ?>"><?php print $u->getCreated()->format(
                                             'j M y'
-                                        ); ?></td>
-                                    <td><?php print ($u->hasRole('ROLE_PAID') ? 'Y' : 'N'); ?></td>
-                                    <td class="highlighted-link">
+                                        ); ?></div>
+                                    <div><?php print ($u->hasRole('ROLE_PAID') ? 'Y' : 'N'); ?></div>
+                                    <div class="highlighted-link">
                                         <a title="Send email"
                                            href="<?php print $view['router']->generate('emails'); ?>#<?php print $u->getEmail(); ?>"></a>
                                         <a title="Masquerade"
@@ -259,16 +249,15 @@ $view['slots']->start('body'); ?>
                                         <a href="#cancel-edit">Cancel</a>
                                         <button type="submit" class="more" value="#save-user">Save</button>
                                         <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
                             <?php } ?>
-                            </tbody>
-                        </table>
+                        </div>
                     </form>
                 </div>
                 <div id="groups" class="tab-pane">
                     <div class="pane-top">
-                        <form>
+                        <form action="<?php print $view['router']->generate('save_group'); ?>" method="post">
                             <h2>Groups</h2>
 
                             <div class="results">
@@ -279,11 +268,58 @@ $view['slots']->start('body'); ?>
                                 </header>
                                 <div class="group-row edit">
                                     <label class="input"><input type="text" name="groupName"
+                                                                value=""/></label>
+                                    <label class="input"><textarea
+                                            name="description"></textarea></label>
+
+                                    <div class="group">
+                                        <label class="checkbox"><input type="checkbox" name="roles"
+                                                                       value="ROLE_PAID"/><i></i><span>PAID</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="roles"
+                                                                       value="ROLE_ADMIN"/><i></i><span>ADMIN</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="roles"
+                                                                       value="ROLE_PARENT"/><i></i><span>PARENT</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="roles"
+                                                                       value="ROLE_PARTNER"/><i></i><span>PARTNER</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="roles"
+                                                                       value="ROLE_ADVISER"/><i></i><span>ADVISER</span></label>
+                                        <label class="checkbox"><input type="checkbox" name="roles"
+                                                                       value="ROLE_MASTER_ADVISER"/><i></i><span>MASTER_ADVISER</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="highlighted-link">
+                                <a href="#add-group" class="big-add">Add <span>+</span> group</a>
+                                <a href="#new-group" class="more" data-toggle="modal">Create group</a>
+                            </div>
+                        </form>
+                    </div>
+                    <form action="<?php print $view['router']->generate('save_group'); ?>" method="post">
+                        <div class="search">
+                            <label class="input"><input name="search" type="text" value=""
+                                                        placeholder="Search"/></label>
+                        </div>
+                        <?php print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $total]); ?>
+                        <div class="results">
+                            <header>
+                                <label>Name</label>
+                                <label>Description</label>
+                                <label>Roles</label>
+                                <label>Users</label>
+                                <label></label>
+                            </header>
+                            <?php
+                            if (empty($groups))
+                                $groups = [new Group()];
+                            foreach ($groups as $i => $g) {
+                                /** @var Group $g */
+                                ?>
+                                <div class="group-row group-id-<?php print $g->getId(); ?> read-only">
+                                    <label class="input"><input type="text" name="groupName"
                                                                 value="<?php print $view->escape($g->getName()); ?>"/></label>
                                     <label class="input"><textarea
                                             name="description"><?php print $view->escape($g->getDescription()); ?></textarea></label>
-
-                                    <div class="group">
+                                    <div>
                                         <label class="checkbox"><input type="checkbox" name="roles"
                                                                        value="ROLE_PAID" <?php print ($g->hasRole('ROLE_PAID') ? 'checked="checked"' : ''); ?> /><i></i><span>PAID</span></label>
                                         <label class="checkbox"><input type="checkbox" name="roles"
@@ -297,68 +333,16 @@ $view['slots']->start('body'); ?>
                                         <label class="checkbox"><input type="checkbox" name="roles"
                                                                        value="ROLE_MASTER_ADVISER" <?php print ($g->hasRole('ROLE_MASTER_ADVISER') ? 'checked="checked"' : ''); ?> /><i></i><span>MASTER_ADVISER</span></label>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="highlighted-link">
-                                <a href="#add-group" class="big-add">Add <span>+</span> group</a>
-                                <a href="#new-group" class="more" data-toggle="modal">Create group</a>
-                            </div>
-                        </form>
-                    </div>
-                    <form action="<?php print $view['router']->generate('save_user'); ?>" method="post">
-                        <div class="search">
-                            <label class="input"><input name="search" type="text" value=""
-                                                        placeholder="Search"/></label>
-                        </div>
-                        <?php print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $total]); ?>
-                        <table class="results">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Roles</th>
-                                <th>Users</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php
-                            if (empty($groups))
-                                $groups = [new Group()];
-                            foreach ($groups as $i => $g) {
-                                /** @var Group $g */
-                                ?>
-                                <tr class="group-id-<?php print $g->getId(); ?> read-only">
-                                    <td><label class="input"><input type="text" name="groupName"
-                                                                    value="<?php print $view->escape($g->getName()); ?>"/></label>
-                                    </td>
-                                    <td><label class="input"><textarea
-                                                name="description"><?php print $view->escape($g->getDescription()); ?></textarea></label>
-                                    </td>
-                                    <td>
-                                        <label class="checkbox"><input type="checkbox" name="roles"
-                                                                       value="ROLE_PAID" <?php print ($g->hasRole('ROLE_PAID') ? 'checked="checked"' : ''); ?> /><i></i><span>PAID</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="roles"
-                                                                       value="ROLE_ADMIN" <?php print ($g->hasRole('ROLE_ADMIN') ? 'checked="checked"' : ''); ?> /><i></i><span>ADMIN</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="roles"
-                                                                       value="ROLE_PARENT" <?php print ($g->hasRole('ROLE_PARENT') ? 'checked="checked"' : ''); ?> /><i></i><span>PARENT</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="roles"
-                                                                       value="ROLE_PARTNER" <?php print ($g->hasRole('ROLE_PARTNER') ? 'checked="checked"' : ''); ?> /><i></i><span>PARTNER</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="roles"
-                                                                       value="ROLE_ADVISER" <?php print ($g->hasRole('ROLE_ADVISER') ? 'checked="checked"' : ''); ?> /><i></i><span>ADVISER</span></label>
-                                        <label class="checkbox"><input type="checkbox" name="roles"
-                                                                       value="ROLE_MASTER_ADVISER" <?php print ($g->hasRole('ROLE_MASTER_ADVISER') ? 'checked="checked"' : ''); ?> /><i></i><span>MASTER_ADVISER</span></label>
-                                    </td>
-                                    <td><?php print $g->getUsers()->count(); ?></td>
-                                    <td class="highlighted-link">
-                                        <a href="#edit-group"></a>
+                                    <div><?php print $g->getUsers()->count(); ?></div>
+                                    <div class="highlighted-link">
+                                        <a title="Remove group" href="#remove-group"></a>
+                                        <a title="Edit group" href="#edit-group"></a>
                                         <a href="#cancel-edit">Cancel</a>
                                         <a href="#save-group" class="more">Save</a>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
                             <?php } ?>
-                            </tbody>
-                        </table>
+                        </div>
                     </form>
                 </div>
             </div>

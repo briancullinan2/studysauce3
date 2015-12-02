@@ -45,6 +45,10 @@
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
 }
 
+#packs .card-row.removed {
+    display:none;
+}
+
 #packs header > *,
 #packs .card-row > * {
     width: 25%;

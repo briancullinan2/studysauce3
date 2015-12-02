@@ -151,7 +151,7 @@ class EmailsController extends Controller
 
     /**
      * @param User $user
-     * @param GroupInvite $groupInvite
+     * @param Invite $invite
      * @return Response
      */
     public function groupReminderAction(User $user = null, Invite $invite = null)
@@ -164,12 +164,11 @@ class EmailsController extends Controller
         $message = Swift_Message::newInstance()
             ->setSubject('Your invitation to join Study Sauce is still pending')
             ->setFrom($user->getEmail())
-            ->setTo(trim($groupInvite->getEmail()))
+            ->setTo(trim($invite->getEmail()))
             ->setBody($this->renderView('StudySauceBundle:Emails:group-invite.html.php', [
-                'invite' => $groupInvite,
-                'group' => $groupInvite->getGroup(),
-                'greeting' => 'Dear ' . $groupInvite->getFirst() . ' ' . $groupInvite->getLast() . ',',
-                'link' => '<a href="' . $this->generateUrl('register', ['_code' => $groupInvite->getCode()], UrlGeneratorInterface::ABSOLUTE_URL) . '" style="color: #FF9900;">Go to Study Sauce</a>'
+                'group' => !empty($invite->getGroup()) ? (' by ' . $invite->getGroup()->getDescription()) : '',
+                'greeting' => 'Dear ' . $invite->getFirst() . ' ' . $invite->getLast() . ',',
+                'link' => '<a href="' . $this->generateUrl('register', ['_code' => $invite->getCode()], UrlGeneratorInterface::ABSOLUTE_URL) . '" style="color: #FF9900;">Go to Study Sauce</a>'
             ]), 'text/html');
         $headers = $message->getHeaders();
         $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
@@ -472,17 +471,17 @@ class EmailsController extends Controller
         if(empty($group))
             $group = $invite->getGroup();
 
+        $codeUrl = $this->generateUrl('register', ['_code' => $invite->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
+
         /** @var Swift_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Invitation to Study Sauce!')
             ->setFrom($invite->getUser()->getEmail())
             ->setTo($invite->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:group-invite.html.php', [
-                        'user' => $user,
-                        'invite' => $invite,
-                        'group' => $group,
+                        'group' => !empty($group) ? (' by ' . $group->getDescription()) : '',
                         'greeting' => 'Dear ' . $invite->getFirst() . ' ' . $invite->getLast() . ',',
-                        'link' => '<a href="' . $this->generateUrl('register', ['_code' => $invite->getCode()], UrlGeneratorInterface::ABSOLUTE_URL) . '" style="color: #FF9900;">Go to Study Sauce</a>'
+                        'link' => '<a href="' . $codeUrl . '" style="color: #FF9900;">Go to Study Sauce</a>'
                     ]), 'text/html');
         $headers = $message->getHeaders();
         $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([

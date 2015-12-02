@@ -6,6 +6,8 @@ use FOS\UserBundle\Doctrine\UserManager;
 use HWI\Bundle\OAuthBundle\Templating\Helper\OAuthHelper;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class HomeController
@@ -14,15 +16,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class HomeController extends Controller
 {
     /**
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         /** @var User $user */
         $user = $this->getUser();
+
+        $templateVars = ['_format' => $request->get('_format')];
+
         list($route, $options) = self::getUserRedirect($user);
-        if($route != 'home')
+        if($route != 'home' && $route != 'results')
             return $this->redirect($this->generateUrl($route, $options));
+
+        // display the currently logged in user
+        if(!empty($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
+            $templateVars['email'] = $user->getEmail();
+            $templateVars['id'] = $user->getId();
+            $templateVars['first'] = $user->getFirst();
+            $templateVars['last'] = $user->getLast();
+        }
 
         $showBookmark = false; // TODO: false in production
         if(empty($user->getProperty('seen_bookmark'))) {
@@ -33,13 +47,11 @@ class HomeController extends Controller
             $userManager->updateUser($user);
         }
 
-        return $this->render(
-            'StudySauceBundle:Home:tab.html.php',
-            [
-                'showBookmark' => $showBookmark,
-                'user' => $user,
-            ]
-        );
+
+        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+            return new JsonResponse($templateVars);
+        }
+        return $this->forward('AdminBundle:Results:index', $templateVars);
     }
 
     /**
@@ -55,6 +67,6 @@ class HomeController extends Controller
             return ['userlist', []];
         elseif($user->hasRole('ROLE_PARENT'))
             return ['thanks', []];
-        return ['results', []];
+        return ['home', []];
     }
 }

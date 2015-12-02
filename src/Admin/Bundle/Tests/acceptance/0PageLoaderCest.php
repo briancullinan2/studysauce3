@@ -38,7 +38,7 @@ class PageLoaderCest
     public function tryLandingPages(AcceptanceTester $I)
     {
         $I->wantTo('see StudySauce in title');
-        $I->seeAmOnUrl('/');
+        $I->seeAmOnPage('/');
         $I->seeInTitle('StudySauce');
         $I->wait(3);
         $I->executeInSelenium(function (WebDriver $driver) {
@@ -89,7 +89,7 @@ class PageLoaderCest
     public function tryContactUs(AcceptanceTester $I)
     {
         $I->wantTo('contact the site\'s administrators');
-        $I->seeAmOnUrl('/');
+        $I->seeAmOnPage('/');
         $I->wait(5);
         $I->click('.footer a[href="#contact-support"]');
         $I->fillField('#contact-support input[name="your-name"]', 'test testers');
@@ -118,7 +118,7 @@ class PageLoaderCest
     public function tryBillMyParents(AcceptanceTester $I)
     {
         $I->wantTo('bill my parents');
-        $I->seeAmOnUrl('/torchandlaurel');
+        $I->seeAmOnPage('/torchandlaurel');
         $I->wait(5);
         $I->click('a[href="#bill-parents"]');
         $I->fillField('#bill-parents .first-name input', 'Test');
@@ -165,7 +165,7 @@ class PageLoaderCest
     public function tryPrepayParent(AcceptanceTester $I)
     {
         $I->wantTo('prepay for my student as a parent');
-        $I->seeAmOnUrl('/parents');
+        $I->seeAmOnPage('/parents');
         $I->wait(5);
         $I->seeLink('Tell your student');
         $I->click('Tell your student');
@@ -211,7 +211,7 @@ class PageLoaderCest
     public function tryGuestCheckout(AcceptanceTester $I)
     {
         $I->wantTo('complete the checkout');
-        $I->seeAmOnUrl('/checkout');
+        $I->seeAmOnPage('/checkout');
         $I->fillField('input[name="first-name"]', 'test');
         $last = 'tester' . substr(md5(microtime()), -5);
         $I->fillField('input[name="last-name"]', $last);
@@ -237,7 +237,7 @@ class PageLoaderCest
     public function trySignup(AcceptanceTester $I)
     {
         $I->wantTo('sign up for study sauce');
-        $I->seeAmOnUrl('/signup');
+        $I->seeAmOnPage('/signup');
         $I->fillField('input[name="organization"]', 'Study Sauce');
         $I->fillField('input[name="first-name"]', 'test');
         $I->fillField('input[name="title"]', 'Mr');
@@ -276,14 +276,14 @@ class PageLoaderCest
      */
     public function trySocialLogin(AcceptanceTester $I)
     {
-        $I->seeAmOnUrl('/course/1/lesson/1/step');
+        $I->seeAmOnPage('/course/1/lesson/1/step');
         $I->click('a[href*="/google"]');
         $I->fillField('input[name="Email"]', 'brian@studysauce.com');
         $I->click('Next');
         $I->wait(1);
         $I->fillField('input[name="Passwd"]', 'Da1ddy23');
         $I->click('Sign in');
-        $I->seeAmOnUrl('/course/1/lesson/1/step');
+        $I->seeAmOnPage('/course/1/lesson/1/step');
 
         // log out and log back in using social login
         $I->click('a[href*="/logout"]');
@@ -294,7 +294,7 @@ class PageLoaderCest
     public function tryGoogleLogin(AcceptanceTester $I)
     {
         $I->wantTo('connect to google');
-        $I->seeAmOnUrl('/account');
+        $I->seeAmOnPage('/account');
         $I->click('#account a[href*="gcal"]');
         $I->fillField('input[id="Email"]', 'brian@studysauce.com');
         $I->click('Next');
@@ -350,7 +350,7 @@ class PageLoaderCest
 
     public function tryGoogleReconnect(AcceptanceTester $I)
     {
-        $I->seeAmOnUrl('/account');
+        $I->seeAmOnPage('/account');
         $I->click('#account a[href="#remove-gcal"]');
         $I->wait(5);
         $I->click('#account a[href*="gcal"]');

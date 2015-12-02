@@ -158,8 +158,13 @@ $collection = $router->getRouteCollection();
 $agent = strtolower($app->getRequest()->server->get('HTTP_USER_AGENT'));
 if((strpos($agent, 'android') && strpos($agent, 'chrome') === false) ||
     preg_match('/(?i)msie/', $agent)) {
-    echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'unsupported']));
+    print $this->render('StudySauceBundle:Dialogs:unsupported.html.php', ['id' => 'unsupported']);
 }
+// load the Use the App! dialog if we haven't seen it today
+if(preg_match('/(iPad|iPhone|iPod)/i', $agent)) {
+    print $this->render('StudySauceBundle:Dialogs:gettheapp.html.php', ['id' => 'gettheapp']);
+}
+
 $view['slots']->output('javascripts');
 $view['slots']->output('sincludes');
 // show error dialogs in debug environment

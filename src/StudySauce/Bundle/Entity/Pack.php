@@ -86,7 +86,6 @@ class Pack
 
     /**
      * @ORM\OneToMany(targetEntity="Card", mappedBy="pack")
-     * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $cards;
 
@@ -99,6 +98,11 @@ class Pack
      * @ORM\Column(type="datetime", name="modified", nullable=true)
      */
     protected $modified;
+
+    /**
+     * @ORM\Column(type="boolean", name="deleted")
+     */
+    protected $deleted = false;
 
     public function getCreator() {
         return !empty($this->getGroup())
@@ -577,5 +581,28 @@ class Pack
     public function getUserPacks()
     {
         return $this->userPacks;
+    }
+
+    /**
+     * Set deleted
+     *
+     * @param boolean $deleted
+     * @return Pack
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get deleted
+     *
+     * @return boolean 
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
     }
 }

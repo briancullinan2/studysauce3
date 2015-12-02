@@ -57,7 +57,7 @@ class EmailsCest
     }
 
     private function setLastLogin(AcceptanceTester $I) {
-        $I->seeAmOnUrl('/account');
+        $I->seeAmOnPage('/account');
         $I->wait(1);
         $email = $I->grabValueFrom('#account .email input');
         // change sign up date

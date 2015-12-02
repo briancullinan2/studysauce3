@@ -22,8 +22,5 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->stop();
 
 $view['slots']->start('sincludes');
-if($showBookmark)
-{
-    echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'bookmark']));
-}
+
 $view['slots']->stop();

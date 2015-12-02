@@ -1,6 +1,6 @@
 #! /bin/bash
 
-cd /var/www/studysauce2/;
+cd /var/www/studysauce3/;
 php app/console cache:clear --env=test;
 php app/console doctrine:generate:entities StudySauceBundle;
 php app/console doctrine:generate:entities Course1;

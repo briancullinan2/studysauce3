@@ -2,26 +2,9 @@
 
 namespace StudySauce\Bundle\Command;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use EDAM\Error\EDAMSystemException;
-use EDAM\Types\Notebook;
-use EDAM\Types\Tag;
-use Evernote\Client as EvernoteClient;
 use StudySauce\Bundle\Controller\EmailsController;
-use StudySauce\Bundle\Controller\NotesController;
-use StudySauce\Bundle\Controller\PlanController;
-use StudySauce\Bundle\Entity\Course;
-use StudySauce\Bundle\Entity\Deadline;
-use StudySauce\Bundle\Entity\Group;
-use StudySauce\Bundle\Entity\GroupInvite;
 use StudySauce\Bundle\Entity\Invite;
-use StudySauce\Bundle\Entity\PartnerInvite;
-use StudySauce\Bundle\Entity\Schedule;
-use StudySauce\Bundle\Entity\StudyNote;
-use StudySauce\Bundle\Entity\User;
 use Swift_Mailer;
 use Swift_Transport;
 use Swift_Transport_SpoolTransport;

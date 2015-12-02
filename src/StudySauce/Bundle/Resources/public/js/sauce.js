@@ -24,11 +24,13 @@ function setSelectionRange(input, selectionStart, selectionEnd) {
     }
 }
 
-key.filter = function(event){
+if (typeof key != 'undefined') {
+    key.filter = function (event) {
         //var tagName = (event.target || event.srcElement).tagName;
         //key.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tagName) ? 'input' : 'other');
         return true;
     };
+}
 
 +function ($) {
     'use strict';
@@ -641,17 +643,16 @@ function ssMergeScripts(content)
 $(document).ready(function () {
     var body = $('body');
 
-    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/ig) ? true : false);
     var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
 
-    if (iOS)
+    var appDialog = $('#gettheapp').modal({show: true});
+    if (appDialog.length > 0)
     {
         appUrl += (window.location.search.indexOf('?') > -1 ? '&' : '?') + $('input').map(function () {
                 return $(this).attr('name') + '=' + $(this).attr('value');
             }).toArray().join("&");
-        setTimeout(function () {
-            window.location = appUrl;
-        }, 100);
+        // TODO: show invite dialog
+        appDialog.find('.highlighted-link a').attr('href', appUrl);
     }
 
     $(document).tooltip({

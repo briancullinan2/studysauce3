@@ -80,6 +80,7 @@
     background-position: left -1602px;
 }
 
+#command a[href="#remove-group"],
 #command a[href="#confirm-remove-user"]
 {
     display: inline-block;
@@ -121,35 +122,6 @@
     display:none;
 }
 
-#command #groups .results th:nth-child(5),
-#command #groups .results td:nth-child(5)
-{
-    width: 100px;
-    text-align: right;
-}
-
-#command #groups .results th:nth-child(4),
-#command #groups .results td:nth-child(4)
-{
-    width: 50px;
-    text-align: center;
-}
-
-#command #pane-top .first-name,
-#command #pane-top .last-name
-{
-    margin: 0 -2px;
-    padding: 0 2px;
-    width: 50%;
-    display:inline-block;
-}
-
-#command #pane-top .first-name label,
-#command #pane-top .last-name label
-{
-    margin-bottom:0;
-}
-
 #command .read-only a[href*="/emails"]
 {
     display: inline-block;
@@ -177,51 +149,59 @@
     font-weight: bold;
 }
 
-#command .results > thead > tr > th.filtered > label > input,
-#command .results > thead > tr > th.filtered > label > select
+#command #users > form label.filtered > input,
+#command #users > form label.filtered > select
 {
     border:3px solid #FF9900;
     padding-top:0;
 }
 
-#command .results > tbody > tr > td:nth-child(4) label:nth-child(2),
-#command .results > tbody > tr > td:nth-child(4) label:nth-child(1)
+#command #users > form .user-row .user-name .input:nth-child(1),
+#command #users > form .user-row .user-name .input:nth-child(2)
 {
-    width:50%;
     margin: 0 -2px;
-    padding-left: 2px;
+    padding: 0 2px;
+    width: 50%;
     display:inline-block;
 }
 
-
-#command .results > thead > tr > th:nth-child(1),
-#command .results > thead > tr > th:nth-child(6)
-{
-    overflow:visible;
+#command a[href="#new-group"],
+#command a[href="#new-user"] {
+    visibility: hidden;
 }
 
-#command .results > thead > tr > th:nth-child(1) .input + div,
-#command .results > thead > tr > th:nth-child(6) .input + div
-{
-    position: absolute;
-    z-index: 100;
+#command .adding a[href="#add-group"],
+#command .adding a[href="#add-user"],
+#command .pane-top .results {
+    display:none;
 }
 
-#command .results .edit td:nth-child(4) label:nth-child(1),
-#command .results .edit td:nth-child(4) label:nth-child(2)
-{
-    margin-bottom:5px;
+#command .adding a[href="#new-group"],
+#command .adding a[href="#new-user"] {
+    visibility: visible;
 }
 
-#command .results > tbody > tr > td:nth-child(4) label:last-child
-{
-    margin: 0;
+#command .pane-top.adding .results {
+    display:block;
 }
 
-#command .results > tbody > tr > td:nth-child(4) label:last-child input
-{
-    font-size:12px;
-    height:auto;
+#command #groups .pane-top header > *,
+#command .pane-top .group-row > * {
+    width: 33.33%
+}
+
+#command #groups > form header > *,
+#command #groups > form .group-row > * {
+    width: 20%
+}
+
+#command .pane-top .user-row > * {
+    width: 25%;
+}
+
+#command #users > form header > *,
+#command #users > form .user-row > * {
+    width: 14.28%;
 }
 
 #command .read-only textarea
@@ -229,19 +209,14 @@
     height: 1em;
 }
 
-#command .results > thead > tr > th:last-child,
-#command .results > tbody > tr > td:last-child
+#command #users > form header > *:nth-last-child(2)
 {
-    text-align: right;
-    width: 210px;
+    padding-right: 40px;
+    margin-right: -40px
 }
 
-#command .results > thead > tr > th:last-child > label
-{
-    margin-right:-30px;
-    padding-right:30px;
-    display:inline-block;
-    width:100%;
+#command #users > form header > *:last-child {
+    width: auto;
 }
 
 @media all and (max-width:1000px)

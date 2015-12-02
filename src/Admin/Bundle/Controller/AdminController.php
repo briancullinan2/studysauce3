@@ -20,6 +20,7 @@ use StudySauce\Bundle\Entity\Goal;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Schedule;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -523,8 +524,6 @@ class AdminController extends Controller
      */
     public function saveGroupAction(Request $request) {
 
-        /** @var $userManager UserManager */
-        $userManager = $this->get('fos_user.user_manager');
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
@@ -559,15 +558,9 @@ class AdminController extends Controller
 
         if(empty($g->getId()))
             $orm->persist($g);
-        elseif($g->getName() == '_remove') {
+        elseif($request->get('remove') == '1') {
             // remove group from users
-            foreach($g->getUsers()->toArray() as $i => $u) {
-                /** @var User $u */
-                $u->removeGroup($g);
-                $g->removeUser($u);
-                $userManager->updateUser($u, false);
-            }
-            $invites = $orm->getRepository('StudySauceBundle:GroupInvite')->findBy(['group' => $request->get('groupId')]);
+            $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
             foreach($invites as $i => $in) {
                 $orm->remove($in);
             }
@@ -577,13 +570,18 @@ class AdminController extends Controller
                 $c->setGroup(null);
                 $orm->merge($c);
             }
-            $orm->remove($g);
+            if($g->getUsers()->count() == 0) {
+                $orm->remove($g);
+            }
+            else {
+                $g->setDeleted(true);
+            }
         }
         else
             $orm->merge($g);
         $orm->flush();
 
-        return $this->indexAction($request);
+        return $this->forward('AdminBundle:Admin:index', ['_format' => 'tab']);
     }
 
     /**
@@ -678,183 +676,35 @@ class AdminController extends Controller
                 ->andWhere('v.user = :uid')
                 ->setParameter(':uid', $u)
                 ->getQuery()->execute();
-            foreach($u->getCourse1s()->toArray() as $i => $c1) {
-                /** @var Course1 $c1 */
-                foreach($c1->getQuiz1()->toArray() as $j => $q1) {
-                    $c1->removeQuiz1($q1);
-                    $orm->remove($q1);
-                }
-                foreach($c1->getQuiz2()->toArray() as $j => $q2) {
-                    $c1->removeQuiz2($q2);
-                    $orm->remove($q2);
-                }
-                foreach($c1->getQuiz3()->toArray() as $j => $q3) {
-                    $c1->removeQuiz3($q3);
-                    $orm->remove($q3);
-                }
-                foreach($c1->getQuiz4()->toArray() as $j => $q4) {
-                    $c1->removeQuiz4($q4);
-                    $orm->remove($q4);
-                }
-                foreach($c1->getQuiz5()->toArray() as $j => $q5) {
-                    $c1->removeQuiz5($q5);
-                    $orm->remove($q5);
-                }
-                foreach($c1->getQuiz6()->toArray() as $j => $q6) {
-                    $c1->removeQuiz6($q6);
-                    $orm->remove($q6);
-                }
-                $u->removeCourse1($c1);
-                $orm->remove($c1);
-            }
-            foreach($u->getCourse2s()->toArray() as $i => $c2) {
-                /** @var Course2 $c2 */
-                foreach($c2->getInterleaving()->toArray() as $j => $q1) {
-                    $c2->removeInterleaving($q1);
-                    $orm->remove($q1);
-                }
-                foreach($c2->getStudyMetrics()->toArray() as $j => $q2) {
-                    $c2->removeStudyMetric($q2);
-                    $orm->remove($q2);
-                }
-                foreach($c2->getStudyPlan()->toArray() as $j => $q3) {
-                    $c2->removeStudyPlan($q3);
-                    $orm->remove($q3);
-                }
-                foreach($c2->getStudyTests()->toArray() as $j => $q4) {
-                    $c2->removeStudyTest($q4);
-                    $orm->remove($q4);
-                }
-                foreach($c2->getTestTaking()->toArray() as $j => $q5) {
-                    $c2->removeTestTaking($q5);
-                    $orm->remove($q5);
-                }
-                $u->removeCourse2($c2);
-                $orm->remove($c2);
-            }
-            foreach($u->getCourse3s()->toArray() as $i => $c3) {
-                /** @var Course3 $c3 */
-                foreach($c3->getActiveReading()->toArray() as $j => $q1) {
-                    $c3->removeActiveReading($q1);
-                    $orm->remove($q1);
-                }
-                foreach($c3->getGroupStudy()->toArray() as $j => $q2) {
-                    $c3->removeGroupStudy($q2);
-                    $orm->remove($q2);
-                }
-                foreach($c3->getSpacedRepetition()->toArray() as $j => $q3) {
-                    $c3->removeSpacedRepetition($q3);
-                    $orm->remove($q3);
-                }
-                foreach($c3->getStrategies()->toArray() as $j => $q4) {
-                    $c3->removeStrategy($q4);
-                    $orm->remove($q4);
-                }
-                foreach($c3->getTeaching()->toArray() as $j => $q5) {
-                    $c3->removeTeaching($q5);
-                    $orm->remove($q5);
-                }
-                $u->removeCourse3($c3);
-                $orm->remove($c3);
-            }
-            foreach($u->getMessages()->toArray() as $i => $m) {
-                $u->removeMessage($m);
-                $orm->remove($m);
-            }
+            $orm->getRepository('StudySauceBundle:Response')->createQueryBuilder('r')
+                ->delete()
+                ->andWhere('r.user = :uid')
+                ->setParameter(':uid', $u)
+                ->getQuery()->execute();
             foreach($u->getFiles()->toArray() as $i => $f) {
                 $u->removeFile($f);
                 $orm->remove($f);
             }
-            foreach($u->getGoals()->toArray() as $i => $g) {
-                /** @var Goal $g */
-                foreach($g->getClaims()->toArray() as $j => $c) {
-                    $g->removeClaim($c);
-                    $orm->remove($c);
-                }
-                $u->removeGoal($g);
-                $orm->remove($g);
-            }
             foreach($u->getGroups()->toArray() as $i => $gr) {
                 $u->removeGroup($gr);
             }
-            foreach($u->getGroupInvites()->toArray() as $i => $gri) {
-                $u->removeGroupInvite($gri);
+            foreach($u->getInvites()->toArray() as $i => $gri) {
+                $u->removeInvite($gri);
                 $orm->remove($gri);
-            }
-            foreach($u->getParentInvites()->toArray() as $i => $p) {
-                $u->removeParentInvite($p);
-                $orm->remove($p);
-            }
-            foreach($u->getPartnerInvites()->toArray() as $i => $pa) {
-                $u->removePartnerInvite($pa);
-                $orm->remove($pa);
             }
             foreach($u->getPayments()->toArray() as $i => $pay) {
                 $u->removePayment($pay);
                 $orm->remove($pay);
             }
-            foreach($u->getSchedules()->toArray() as $i => $s) {
-                /** @var Schedule $s */
-                foreach ($s->getEvents()->toArray() as $j => $e) {
-                    /** @var Event $e */
-                    $s->removeEvent($e);
-                    $orm->remove($e);
-                }
-            }
-            $orm->flush();
-            foreach($u->getDeadlines()->toArray() as $i => $d) {
-                /** @var Deadline $d */
-                $u->removeDeadline($d);
-                if(!empty($d->getCourse())) {
-                    $d->getCourse()->removeDeadline($d);
-                }
-                $orm->remove($d);
-            }
-            $orm->flush();
-            foreach($u->getSchedules()->toArray() as $i => $s) {
-                foreach($s->getCourses()->toArray() as $j => $co) {
-                    /** @var Course $co */
-                    foreach($co->getDeadlines()->toArray() as $d) {
-                        $co->removeDeadline($d);
-                        $orm->remove($d);
-                    }
-                    foreach($co->getCheckins()->toArray() as $k => $ch) {
-                        $co->removeCheckin($ch);
-                        $orm->remove($ch);
-                    }
-                    foreach($co->getGrades()->toArray() as $gr) {
-                        $co->removeGrade($gr);
-                        $orm->remove($gr);
-                    }
-                    $s->removeCourse($co);
-                    $orm->remove($co);
-                }
-                $u->removeSchedule($s);
+            foreach($u->getUserPacks()->toArray() as $i => $s) {
+                /** @var UserPack $s */
+                $u->removeUserPack($s);
                 $orm->remove($s);
             }
-           foreach($u->getStudentInvites()->toArray() as $i => $st) {
-                $u->removeStudentInvite($st);
-                $orm->remove($st);
-            }
-            foreach($u->getInvitedStudents()->toArray() as $i => $is) {
-                $u->removeInvitedStudent($is);
-                $orm->remove($is);
-            }
-            foreach($u->getInvitedPartners()->toArray() as $i => $ip) {
-                $u->removeInvitedPartner($ip);
-                $orm->remove($ip);
-            }
-            foreach($u->getInvitedParents()->toArray() as $i => $ipa) {
-                $u->removeInvitedParent($ipa);
-                $orm->remove($ipa);
-            }
-            foreach($u->getInvitedGroups()->toArray() as $i => $ig) {
-                $u->removeInvitedGroup($ig);
+            $orm->flush();
+            foreach($u->getInvitees()->toArray() as $i => $ig) {
+                $u->removeInvitee($ig);
                 $orm->remove($ig);
-            }
-            foreach($u->getNotes()->toArray() as $i => $n) {
-                $u->removeNote($n);
-                $orm->remove($n);
             }
             $orm->remove($u);
             $orm->flush();

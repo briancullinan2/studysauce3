@@ -160,19 +160,21 @@ jQuery(document).ready(function() {
 
     body.on('click', '#import a[href="#save-group"]', function (evt) {
         evt.preventDefault();
+        var that = $(this);
         var importTab = $('#import'),
             users = [],
             rows = importTab.find('.import-row.edit.valid').not('fieldset .row');
         if(importTab.find('.form-actions').is('.invalid')) {
             return;
         }
+        loadingAnimation(that);
         importTab.find('.form-actions').removeClass('valid').addClass('invalid');
         rows.each(function () {
             var that = jQuery(this);
             var newInvite = {
                 first: that.find('.first-name input').val(),
                 last: that.find('.last-name input').val(),
-                email: that.find('.email input').val(),
+                email: that.find('.email input').val()
             };
             if(that.find('.group select').length > 0) {
                 newInvite.group = that.find('.group select').val()
@@ -188,9 +190,13 @@ jQuery(document).ready(function() {
             },
             success: function (data)
             {
+                that.find('.squiggle').stop().remove();
                 var content = $(data);
-                importTab.find('.import-row').remove();
-                content.find('.import-row').insertBefore(importTab.find('.form-actions'));
+                importTab.find('form > .results').replaceWith(content.filter('#import').find('form > .results'));
+                importTab.find('.pane-bottom.results').replaceWith(content.filter('#import').find('.pane-bottom.results'));
+            },
+            error: function () {
+                that.find('.squiggle').stop().remove();
             }
         });
     });

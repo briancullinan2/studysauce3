@@ -158,16 +158,6 @@ class AccountController extends Controller
             'error' => !empty($error) ? $error->getMessage() : null
         ];
 
-        // display the currently logged in user
-        /** @var User $user */
-        $user = $this->getUser();
-        if(!empty($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
-            $templateVars['email'] = $user->getEmail();
-            $templateVars['id'] = $user->getId();
-            $templateVars['first'] = $user->getFirst();
-            $templateVars['last'] = $user->getLast();
-        }
-
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
         }

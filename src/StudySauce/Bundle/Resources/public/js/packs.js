@@ -164,7 +164,7 @@ $(document).ready(function () {
 
     function packsFunc () {
         var tab = $('#packs');
-        tab.find('.card-row').each(function () {
+        tab.find('.card-row:not(.removed)').each(function () {
             var row = $(this);
             if(row.find('.content input').val().trim() == '' &&
                 row.find('.response input').val().trim() == '' && (
@@ -182,13 +182,20 @@ $(document).ready(function () {
             }
             row.find('.answers textarea').height(row.find('.answers textarea')[0].scrollHeight - 4);
         });
-        if(tab.find('.card-row.invalid').length == 0 && tab.find('.card-row.valid:not(.empty)').length > 0) {
+        if(tab.find('.card-row.invalid:not(.removed)').length == 0 && (
+            tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0)) {
             tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
         }
         else {
             tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
         }
     }
+
+    body.on('click', '#packs a[href="#remove-card"]', function (evt) {
+        evt.preventDefault();
+        $(this).parents('.card-row').addClass('removed');
+        packsFunc()
+    });
 
     body.on('click', '#packs a[href="#confirm-remove-pack"]', function (evt) {
         evt.preventDefault();
@@ -211,12 +218,25 @@ $(document).ready(function () {
         });
     });
 
+    body.on('click', '#packs a[href="#add-card"]', function (evt) {
+        evt.preventDefault();
+        var tab = $("#packs");
+        var newRow = tab.find('form .card-row').last().clone().insertAfter(tab.find('.card-row').last());
+        newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
+        newRow.find('.type select, .answers textarea, .correct.type-mc select, .answers.type-sa input, .content input, .response input, .correct input[type="text"]').val('').trigger('change');
+        newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
+        newRow.find('.correct.type-tf input').prop('checked', false);
+        packsFunc();
+    });
+
     body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
 
     function loadContent(data) {
-        var tab = $('#packs');
-        tab.find('form table.results').replaceWith($(data).filter('#packs').find('form table.results'));
-        tab.find('.pane-bottom > table.results').replaceWith($(data).filter('#packs').find('.pane-bottom > table.results'));
+        var tab = $('#packs'),
+            content = $(data);
+        tab.find('form .results').replaceWith(content.filter('#packs').find('form .results'));
+        tab.find('#all-packs > .results').replaceWith(content.filter('#packs').find('#all-packs > .results'));
+        tab.find('#membership > .results').replaceWith(content.filter('#packs').find('#membership > .results'));
     }
 
     body.on('click', '#packs a[href="#create-new"]', function (evt) {

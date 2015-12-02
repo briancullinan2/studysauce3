@@ -29,6 +29,12 @@ class Coupon
     protected $description;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Group", inversedBy="coupons")
+     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable=true)
+     */
+    protected $group;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Pack", inversedBy="coupons")
      * @ORM\JoinColumn(name="pack_id", referencedColumnName="id", nullable=true)
      */

@@ -76,6 +76,22 @@ class Card
     protected $answers;
 
     /**
+     * @ORM\Column(type="boolean", name="deleted")
+     */
+    protected $deleted = false;
+
+    /**
+     * @param User $user
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getResponsesForUser($user)
+    {
+        return $this->getResponses()->filter(function (Response $r) use ($user) {
+            return $r->getUser() == $user;
+        });
+    }
+
+    /**
      * @return Answer
      */
     public function getCorrect()
@@ -358,4 +374,28 @@ class Card
     {
         return $this->answers;
     }
+
+    /**
+     * Set deleted
+     *
+     * @param boolean $deleted
+     * @return Card
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get deleted
+     *
+     * @return boolean 
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
+
 }

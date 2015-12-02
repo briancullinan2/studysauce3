@@ -161,7 +161,7 @@ class ResultsController extends Controller
         /** @var User $user */
         $user = $this->getUser();
         list($route, $options) = HomeController::getUserRedirect($user);
-        if($route != 'results')
+        if($route != 'home' && $route != 'results')
             return $this->redirect($this->generateUrl($route, $options));
 
         set_time_limit(0);

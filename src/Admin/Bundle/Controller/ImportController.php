@@ -6,6 +6,7 @@ namespace Admin\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
+use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -55,21 +56,23 @@ class ImportController extends Controller
 
         $users = $request->get('users');
         $existing = $user->getInvites()->toArray();
-        $emails = new EmailsController();
+        $emails = new \StudySauce\Bundle\Controller\EmailsController();
         $emails->setContainer($this->container);
         foreach($users as $i => $u)
         {
-            if(!empty($u['adviser'])) {
+            $group = null;
+            if(!empty($u['group'])) {
                 /** @var User $adviser */
-                $adviser = $userManager->findUserByEmail($u['adviser']);
+                $adviser = $userManager->findUserByEmail($u['group']);
                 if(!empty($adviser)) {
+                    /** @var Group $group */
                     $group = $adviser->getGroups()->first();
                 }
-                elseif(is_numeric($u['adviser'])) {
+                elseif(is_numeric($u['group'])) {
                     $group = $orm->getRepository('StudySauceBundle:Group')->createQueryBuilder('g')
                         ->select('g')
                         ->orWhere('g.id=:group')
-                        ->setParameter('group', intval($u['adviser']))
+                        ->setParameter('group', intval($u['group']))
                         ->setMaxResults(1)
                         ->getQuery()
                         ->getOneOrNullResult();
@@ -78,7 +81,7 @@ class ImportController extends Controller
                     $group = $orm->getRepository('StudySauceBundle:Group')->createQueryBuilder('g')
                         ->select('g')
                         ->where('g.name LIKE :search')
-                        ->setParameter('search', '%' . $u['adviser'] . '%')
+                        ->setParameter('search', '%' . $u['group'] . '%')
                         ->setMaxResults(1)
                         ->getQuery()
                         ->getOneOrNullResult();
@@ -106,12 +109,13 @@ class ImportController extends Controller
             if((!isset($invite) || $invite->getCreated() < date_sub(new \DateTime(), new \DateInterval('P1D'))) && !empty($group)) {
                 $invite = new Invite();
                 $invite->setGroup($group);
+                $group->addInvite($invite);
                 $invite->setUser($user);
+                $user->addInvite($invite);
                 $invite->setFirst($u['first']);
                 $invite->setLast($u['last']);
                 $invite->setEmail(trim($u['email']));
                 $invite->setCode(md5(microtime()));
-                $user->addInvite($invite);
                 $orm->persist($invite);
                 $orm->flush();
                 // don't send emails to existing users

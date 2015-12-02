@@ -63,7 +63,9 @@ class Response
      */
     public function setCreatedValue()
     {
-        $this->created = new \DateTime();
+        if($this->created == null) {
+            $this->created = new \DateTime();
+        }
     }
 
     /**

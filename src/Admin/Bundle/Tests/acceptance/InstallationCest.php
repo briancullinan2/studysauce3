@@ -211,16 +211,15 @@ ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
 
 export GIT_SSL_NO_VERIFY=true
 cd /var/www/
-git clone https://bjcullinan:Da1ddy23@bitbucket.org/StudySauce/studysauce2.git
+git clone https://bjcullinan:Da1ddy23@bitbucket.org/StudySauce/studysauce3.git
 
 chown -R mysql:mysql /var/lib/mysql
 service mysqld start
 /usr/bin/mysqladmin -u root password 'MyNewPass'
-echo "CREATE DATABASE studysauce; GRANT ALL ON studysauce.* TO 'study'@'localhost' IDENTIFIED BY 'itekIO^#(';" | mysql -u root --password=MyNewPass -h localhost
-mysqldump -u study -h studysauce2.cjucxx5pvknl.us-west-2.rds.amazonaws.com --password=itekIO^#\( studysauce | mysql -u study --password=itekIO^#\( -h localhost studysauce
+echo "CREATE DATABASE studysauce; GRANT ALL ON studysauce.* TO 'study'@'localhost' IDENTIFIED BY 'itekIO^#(123';" | mysql -u root --password=MyNewPass -h localhost
 
-echo "* * * * * apache /var/www/studysauce2/cron.sh" >> /etc/crontab
-chmod a+x /var/www/studysauce2/cron.sh
+echo "* * * * * apache /var/www/studysauce3/cron.sh" >> /etc/crontab
+chmod a+x /var/www/studysauce3/cron.sh
 echo "
 127.0.0.1  studysauce.com
 127.0.0.1  test.studysauce.com
@@ -237,7 +236,7 @@ sed -i "s/^SSLCertificateKeyFile/#SSLCertificateKeyFile/" /etc/httpd/conf.d/ssl.
 echo "$cert" > /etc/pki/tls/certs/localhost.crt
 echo "$bundle" > /etc/pki/tls/certs/ca-bundle.crt
 rm -R /var/www/html
-ln -s /var/www/studysauce2/web /var/www/html
+ln -s /var/www/studysauce3/web /var/www/html
 
 service httpd restart
 chkconfig httpd on
