@@ -96,7 +96,7 @@ class Card
      */
     public function getCorrect()
     {
-        return $this->getAnswers()->filter(function (Answer $a) {return $a->getCorrect() == 1;})->first();
+        return $this->getAnswers()->filter(function (Answer $a) {return $a->getCorrect() == 1 && !$a->getDeleted();})->first();
     }
 
     /**

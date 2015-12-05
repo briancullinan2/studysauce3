@@ -40,6 +40,18 @@ class ImportController extends Controller
         return $this->render('AdminBundle:Import:tab.html.php', ['groups' => $groups]);
     }
 
+    static public function getSimpleCode() {
+        return md5(microtime());
+    }
+
+    static public function getAbbreviationCode(Group $g, EntityManager $orm) {
+        preg_match_all('/\s[a-z]|[A-Z]/', $g->getName(), $matches);
+        $prefix = implode('', array_map(function ($x) { return trim($x); }, $matches[0]));
+        $random = strtoupper(substr(md5(microtime()), -4));
+        // TODO: make sure it doesn't already exist in the database
+        return  $prefix . $random;
+    }
+
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -115,7 +127,7 @@ class ImportController extends Controller
                 $invite->setFirst($u['first']);
                 $invite->setLast($u['last']);
                 $invite->setEmail(trim($u['email']));
-                $invite->setCode(md5(microtime()));
+                $invite->setCode(static::getAbbreviationCode($group, $orm));
                 $orm->persist($invite);
                 $orm->flush();
                 // don't send emails to existing users

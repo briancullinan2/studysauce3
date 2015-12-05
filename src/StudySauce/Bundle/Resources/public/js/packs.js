@@ -267,7 +267,7 @@ $(document).ready(function () {
                     type: $(this).find('.type select').val(),
                     content: $(this).find('.content:visible input').val(),
                     response: $(this).find('.response:visible input').val(),
-                    answers: $(this).find('.answers textarea').val(),
+                    answers: $(this).find('.answers:visible textarea, .answers:visible input').val(),
                     correct: $(this).find('.correct:visible input:not([type="radio"]), .correct:visible select, .correct:visible input[type="radio"]:checked').val()
                 };
             }

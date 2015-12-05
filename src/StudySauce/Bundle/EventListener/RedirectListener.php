@@ -196,12 +196,13 @@ class RedirectListener implements EventSubscriberInterface
         if (in_array('application/json', $request->getAcceptableContentTypes()) && $response->isRedirect()) {
             /** @var Router $router */
             $router = $this->container->get('router');
-            $options = ['redirect' => str_replace(trim($router->generate('_welcome', [], true), '/'), '', $response->headers->get('Location')), 'code' => $response->getStatusCode()];
+            $parts = parse_url($response->headers->get('Location'));
+            $options = ['redirect' => (!empty($parts['path']) ? $parts['path'] : '') . '?' . (!empty($parts['query']) ? $parts['query'] : '') . '#' . (!empty($parts['hash']) ? $parts['hash'] : ''), 'code' => $response->getStatusCode()];
             if(!empty($error = AccountController::getErrorForRequest($request))) {
                 $options['exception'] = $error->getMessage();
             }
             // repopulate the csrf token for login failures
-            $route = $router->match($options['redirect'])['_route'];
+            $route = $router->match($parts['path'])['_route'];
             $csrfToken = $this->container->has('form.csrf_provider')
                 ? $this->container->get('form.csrf_provider')->generateCsrfToken($route)
                 : null;

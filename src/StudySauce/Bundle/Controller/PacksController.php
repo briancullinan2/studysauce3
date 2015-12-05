@@ -124,19 +124,20 @@ class PacksController extends Controller
                     $newAnswer->setCard($newCard);
                     $newCard->addAnswer($newAnswer);
                 }
+                $answerValues[] = $newAnswer;
                 $newAnswer->setContent(trim($a));
                 $newAnswer->setResponse(trim($a));
                 $newAnswer->setValue(trim($a));
-                $answerValues[] = trim($a);
                 if (!empty($c['correct'])) {
                     if (strtolower(trim($a)) == strtolower(trim($c['correct']))) {
                         $newAnswer->setCorrect(true);
                     }
                     if ($c['correct'] == 'contains') {
-                        $newAnswer->setValue('%' . trim($a) . '%');
+                        $newAnswer->setCorrect(true);
                     }
                     if ($c['correct'] == 'exactly') {
-                        $newAnswer->setValue('"' . trim($a) . '"');
+                        $newAnswer->setCorrect(true);
+                        $newAnswer->setValue('^' . trim($a) . '$');
                     }
                 }
                 if (empty($newAnswer->getId())) {
@@ -149,8 +150,15 @@ class PacksController extends Controller
             // remove missing answers
             foreach ($newCard->getAnswers()->toArray() as $a) {
                 /** @var Answer $a */
-                if (!in_array($a->getValue(), $answerValues)) {
-                    $a->setDeleted(true);
+                if (!in_array($a->getValue(), array_map(function (Answer $x) { return $x->getValue(); }, $answerValues))) {
+                    if ($a->getResponses()->count() == 0) {
+                        $newCard->removeAnswer($a);
+                        $orm->remove($a);
+                    }
+                    else {
+                        $a->setDeleted(true);
+                        $orm->merge($a);
+                    }
                 }
             }
             if (empty($newCard->getId())) {
@@ -177,6 +185,12 @@ class PacksController extends Controller
             ->getOneOrNullResult();
         if (!empty($newPack)) {
             // TODO: set deleted flag if there are existing responses, we don't delete here
+            foreach ($newPack->getUserPacks()->toArray() as $up) {
+                /** @var UserPack $up */
+                $newPack->removeUserPack($up);
+                $up->getUser()->removeUserPack($up);
+                $orm->remove($up);
+            }
             foreach ($newPack->getCards()->toArray() as $c) {
                 /** @var Card $c */
                 foreach ($c->getAnswers()->toArray() as $a) {
@@ -370,6 +384,6 @@ class PacksController extends Controller
         $orm->persist($response);
         $orm->flush();
 
-        return new JsonResponse(true);
+        return new JsonResponse($response->getId());
     }
 }

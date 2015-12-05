@@ -4,6 +4,8 @@ namespace Admin\Bundle\Tests;
 use Admin\Bundle\Controller\ValidationController;
 use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
+use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\Response;
 use WebDriver;
 use WebDriverBy;
 use WebDriverKeys;
@@ -105,6 +107,18 @@ class AdminCest
         $I->see('PASS');
     }
 
+    private function subtract1Day($user) {
+        Doctrine2::$em->clear();
+        /** @var Response[] $responses */
+        $responses = Doctrine2::$em->getRepository('StudySauceBundle:Response')->findBy(['user' => $user]);
+        foreach($responses as $r) {
+            $r->setCreated(date_sub(clone $r->getCreated(), new \DateInterval('P1D')));
+            Doctrine2::$em->merge($r);
+        }
+        Doctrine2::$em->flush();
+        return count($responses);
+    }
+
     /**
      * @depends tryAdminLogin
      * @depends tryCreateTestGroup
@@ -113,12 +127,64 @@ class AdminCest
      * @param AcceptanceTester $I
      */
     public function tryAllHomeCards(AcceptanceTester $I) {
+        // get the last test user added
+        $I->amOnPage('https://' . $_SERVER['HTTP_HOST'] . '/import');
+        $test = $I->grabAttributeFrom('//div[contains(@class,"import-row") and .//input[contains(@value,"Test")]]', 'class');
+        $I->assertTrue(preg_match('/invite-id-([0-9]*)/', $test, $matches) == 1);
+        /** @var Invite $invite */
+        $invite = Doctrine2::$em->getRepository('StudySauceBundle:Invite')->findOneBy(['id' => $matches[1]]);
+
         $I->amOnPage('http://localhost:50001/run/home_screen');
         $I->see('PASS');
-        // TODO: check if results are recorded properly
 
-
+        // check if results are recorded properly
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee());
+        $I->assertEquals(7, $count);
+        $I->wait(10);
         // TODO: change response dates, reset app and check for
+        $I->amOnPage('http://localhost:50001/run/home_screen_1');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(8, $count);
+        $I->wait(10);
+        $I->amOnPage('http://localhost:50001/run/home_screen_5');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(13, $count);
+        $I->wait(10);
+        $I->amOnPage('http://localhost:50001/run/home_screen_1');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(14, $count);
+        $I->wait(10);
+        $I->amOnPage('http://localhost:50001/run/home_screen_empty');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(14, $count);
+        $I->wait(10);
+        $I->amOnPage('http://localhost:50001/run/home_screen_empty');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(14, $count);
+        $I->wait(10);
+        $I->amOnPage('http://localhost:50001/run/home_screen_5');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(19, $count);
+        $I->wait(10);
+        $I->amOnPage('http://localhost:50001/run/home_screen_1');
+        $I->see('PASS');
+        $I->wait(1);
+        $count = self::subtract1Day($invite->getInvitee()->getId());
+        $I->assertEquals(20, $count);
+        $I->wait(10);
     }
 
     /**

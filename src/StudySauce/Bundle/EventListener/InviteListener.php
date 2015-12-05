@@ -59,22 +59,22 @@ class InviteListener implements EventSubscriberInterface
         /** @var Request $request */
         $request = $event->getRequest();
         // TODO: only accept codes from landing pages?
-        if(empty($request->get('_code')))
-            return;
         /** @var Session $session */
         $session = $request->getSession();
+        if(empty($request->get('_code')))
+            return;
         /** @var $orm EntityManager */
         $orm = $this->container->get('doctrine')->getManager();
         /** @var Invite $group */
         $invite = $orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->get('_code')]);
         /** @var Invite $invite */
         if(!empty($invite)) {
-            self::$autoLogoutUser[$request->get('_code')] = function (Session $session) use ($request) {
-                $session->set('invite', $request->get('_code'));
-            };
-            // set associations if user already exists
+            $session->set('invite', $request->get('_code'));
+
             /** @var User $user */
             $user = $userManager->findUserByEmail($invite->getEmail());
+
+            // set associations if user already exists
             if($user != null && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
                 self::setInviteRelationship($orm, $request, $user);
                 $userManager->updateUser($user);
@@ -84,17 +84,19 @@ class InviteListener implements EventSubscriberInterface
                 $this->container->get('security.context')->setToken($token);
                 $session->set('_security_main',serialize($token));
 
-                $response = new RedirectResponse($this->container->get('router')->generate('home'));
-                /** @var LoginManager $loginManager */
-                $loginManager = $this->container->get('fos_user.security.login_manager');
-                $loginManager->loginUser('main', $user, $response);
-                $event->setResponse($response);
+                if($request->get('_route') != 'home' && $request->get('_route') != 'results') {
+                    $response = new RedirectResponse($this->container->get('router')->generate('home', ['_code' => $invite->getCode()]));
+                    /** @var LoginManager $loginManager */
+                    $loginManager = $this->container->get('fos_user.security.login_manager');
+                    $loginManager->loginUser('main', $user, $response);
+                    $event->setResponse($response);
+                }
             }
             // redirect back to page with a fresh session
             /** @var TokenInterface $token */
             elseif(null !== ($token = $this->container->get('security.context')->getToken()) && is_object($user = $token->getUser()) &&
                 !$user->hasRole('ROLE_GUEST')) {
-                // Logging user out.
+                // Already logged in as another user, logging user out.
                 $this->container->get('security.context')->setToken(null);
                 // Invalidating the session.
                 $request->getSession()->invalidate();
@@ -110,11 +112,7 @@ class InviteListener implements EventSubscriberInterface
                 }
                 $event->setResponse($response);
             }
-            // just set up the session on guest or demo
-            else {
-                $setter = self::$autoLogoutUser[$request->get('_code')];
-                $setter($session);
-            }
+            // session already set for guest and demo
         }
     }
 

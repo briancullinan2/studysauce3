@@ -45,7 +45,7 @@ $view['slots']->start('body'); ?>
                             </label>
                             <label class="input creator">
                                 <input name="creator" placeholder="Creator name"
-                                       value="<?php print (!empty($pack) ? $pack->getCreator() : ($app->getUser()->getFirst() . ' ' . $app->getUser()->getLast())); ?>"/>
+                                       value="<?php print (!empty($pack) ? $pack->getCreator() : (!empty($app->getUser()) ? ($app->getUser()->getFirst() . ' ' . $app->getUser()->getLast()) : '')); ?>"/>
                                 <small>* If the pack is public this is the name others will see.</small>
                             </label>
 
@@ -116,7 +116,7 @@ $view['slots']->start('body'); ?>
                                         <textarea name="answers" placeholder="one per line"><?php print implode("\n", $c->getAnswers()->map(function (Answer $a) {return $a->getValue();})->toArray()); ?></textarea>
                                     </label>
                                     <label class="input answers type-sa">
-                                        <input type="text" name="answers" placeholder="fill in the blank" />
+                                        <input type="text" name="answers" placeholder="fill in the blank" value="<?php print (!empty($c->getCorrect()) ? trim($c->getCorrect()->getValue(), '$^') : ''); ?>" />
                                     </label>
                                     <label class="input response">
                                         <input type="text" name="response" placeholder="Description" value="<?php print $view->escape($c->getResponseContent()); ?>"/>

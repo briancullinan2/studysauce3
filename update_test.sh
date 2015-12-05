@@ -3,9 +3,6 @@
 cd /var/www/studysauce3/;
 php app/console cache:clear --env=test;
 php app/console doctrine:generate:entities StudySauceBundle;
-php app/console doctrine:generate:entities Course1;
-php app/console doctrine:generate:entities Course2;
-php app/console doctrine:generate:entities Course3;
 php app/console doctrine:schema:update --force --env=test;
 php app/console assets:install --env=test --symlink;
 php app/console assetic:dump --env=test;
