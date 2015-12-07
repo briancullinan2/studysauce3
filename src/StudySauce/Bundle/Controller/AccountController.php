@@ -328,7 +328,7 @@ class AccountController extends Controller
 
         $templateVars = [
             'token' => $request->get('token'),
-            'email' => empty($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO') ? $request->get(
+            'email' => empty($user) || !is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO') ? $request->get(
                 'email'
             ) : $user->getEmail(),
             'csrf_token' => $csrfToken
