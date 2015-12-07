@@ -84,15 +84,15 @@ $(document).ready(function () {
 
             newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
             newRow.find('.answers textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
-            newRow.find('.correct.type-tf input').filter(clipRows[i][2].match(/t/i) ? '[value="true"]' : (clipRows[i][2]
-                .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
-            newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][2]).trigger('change');
 
             if(clipRows[i].length == 2) {
                 newRow.find('.content input').val(clipRows[i][0]);
                 newRow.find('.response input').val(clipRows[i][1]);
             }
             else {
+                newRow.find('.correct.type-tf input').filter(clipRows[i][2].match(/t/i) ? '[value="true"]' : (clipRows[i][2]
+                    .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
+                newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][2]).trigger('change');
                 newRow.find('.content input').val(clipRows[i][1]);
                 newRow.find('.response input').val(clipRows[i][7]);
             }
