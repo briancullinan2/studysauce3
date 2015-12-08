@@ -197,6 +197,12 @@ class PacksController extends Controller
                     $c->removeAnswer($a);
                     $orm->remove($a);
                 }
+                foreach($c->getResponses()->toArray() as $r) {
+                    /** @var Response $r */
+                    $c->removeResponse($r);
+                    $r->getUser()->removeResponse($r);
+                    $orm->remove($r);
+                }
                 $c->getPack()->removeCard($c);
                 $orm->remove($c);
             }
