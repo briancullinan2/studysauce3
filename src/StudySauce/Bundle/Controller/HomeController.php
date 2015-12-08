@@ -54,6 +54,20 @@ class HomeController extends Controller
         return $this->forward('AdminBundle:Results:index', $templateVars);
     }
 
+    public function appLinksAction() {
+        return new JsonResponse([
+            "applinks"=> [
+                "apps"=> [],
+                "details"=> [
+                    [
+                        "appID"=> "3MV67NZ3PZ.com.studysauce.companyapp",
+                        "paths"=> [ "*", '/' ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
     /**
      * @param User|null $user
      * @return array|string

@@ -16,6 +16,9 @@ $collection = $router->getRouteCollection();
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta property="al:ios:url" content="studysauce://studysauce.com" />
+    <meta property="al:ios:app_store_id" content="3MV67NZ3PZ" />
+    <meta property="al:ios:app_name" content="Study Sauce" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
     <link rel="icon" sizes="76x76" href="<?php print $view['assets']->getUrl('bundles/studysauce/images/studysauce-icon-76x76.png'); ?>">
     <link rel="icon" sizes="120x120" href="<?php print $view['assets']->getUrl('bundles/studysauce/images/studysauce-icon-120x120.png'); ?>">
