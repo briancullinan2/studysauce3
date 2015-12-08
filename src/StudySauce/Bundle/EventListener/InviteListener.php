@@ -8,6 +8,7 @@ use FOS\UserBundle\Security\LoginManager;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -124,11 +125,11 @@ class InviteListener implements EventSubscriberInterface
      */
     public static function getInvite(EntityManager $orm, Request $request)
     {
-        if(!empty($request->get('_code'))) {
-            $code = $request->get('_code');
-        }
         if(!empty($request->getSession()->get('invite'))) {
             $code = $request->getSession()->get('invite');
+        }
+        if(!empty($request->get('_code'))) {
+            $code = $request->get('_code');
         }
         if(isset($code)) {
             /** @var Invite $partner */
@@ -163,8 +164,16 @@ class InviteListener implements EventSubscriberInterface
                 $invite->setActivated(true);
                 $invite->setInvitee($user);
                 $user->addInvitee($invite);
-                if(!empty($invite->getGroup()) && !$user->hasGroup($invite->getGroup()->getName()))
+                if(!empty($invite->getGroup()) && !$user->hasGroup($invite->getGroup()->getName())) {
                     $user->addGroup($invite->getGroup());
+                }
+                if(!empty($invite->getPack()) && empty($user->getUserPacks()->filter(function (UserPack $x) use ($invite) {return $x->getPack() == $invite->getPack();})->first())) {
+                    $up = new UserPack();
+                    $up->setUser($user);
+                    $up->setPack($invite->getPack());
+                    $user->addUserPack($up);
+                    $orm->persist($up);
+                }
                 $orm->merge($invite);
             }
         }
