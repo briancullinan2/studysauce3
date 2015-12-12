@@ -57,7 +57,7 @@ $(document).ready(function () {
 
     body.on('click', '#command a[href="#edit-user"], #command a[href="#edit-group"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.group-row');
+        var row = $(this).parents('.group-row, .user-row');
         row.removeClass('read-only').addClass('edit');
     });
 

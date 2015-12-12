@@ -249,7 +249,7 @@ class PacksController extends Controller
                 })->count(),
                 'downloaded' => !empty($up) ? 1 : 0,
                 'user_packs' => !empty($up) ? array_values($up->getPack()->getCards()
-                    ->filter(function (Card $c) use ($up) {return !empty($c->getResponsesForUser($up->getUser())->count());})
+                    ->filter(function (Card $c) use ($up) {return !$c->getDeleted() && !empty($c->getResponsesForUser($up->getUser())->count());})
                     ->map(function (Card $c) use ($up) {
                     return [
                         'card' => $c->getId(),
