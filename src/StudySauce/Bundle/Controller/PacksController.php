@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
+use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\User;
@@ -29,15 +30,23 @@ class PacksController extends Controller
         $orm = $this->get('doctrine')->getManager();
 
         $total = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')->select('COUNT(DISTINCT p.id)')
-            ->andWhere('p.deleted = 0 OR p.deleted IS NULL')
+            ->andWhere('p.status != \'DELETED\'')
             ->getQuery()
             ->getSingleScalarResult();
         $packs = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
-            ->andWhere('p.deleted = 0 OR p.deleted IS NULL')
+            ->andWhere('p.status != \'DELETED\'')
             ->getQuery()
             ->getResult();
+
         // get the groups for use in dropdown
-        $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+        /** @var User $user */
+        $user = $this->getUser();
+        if($user->hasRole('ROLE_ADMIN')) {
+            $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+        }
+        else {
+            $groups = $user->getGroups()->toArray();
+        }
 
         return $this->render('StudySauceBundle:Packs:tab.html.php', [
             'packs' => $packs,
@@ -65,7 +74,17 @@ class PacksController extends Controller
             $newPack = new Pack();
             $newPack->setUser($user);
         }
+        if ($user->hasRole('ROLE_ADMIN')) {
+            $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+        }
+        else {
+            $groups = $user->getGroups()->toArray();
+        }
+        $groups = array_filter($groups, function (Group $g) use ($request) {return $g->getId() == intval($request->get('group'));});
         $newPack->setTitle($request->get('title'));
+        $group = array_pop($groups);
+        $newPack->setGroup(!empty($group) ? $group : null);
+        $newPack->setStatus($request->get('status'));
         if (empty($newPack->getId())) {
             $orm->persist($newPack);
         } else {
@@ -220,15 +239,29 @@ class PacksController extends Controller
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
         /** @var QueryBuilder $qb */
-        $packs = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+        $packs = array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->select('p')
-            ->andWhere('p.deleted = 0 OR p.deleted IS NULL')
+            ->andWhere('p.status != \'DELETED\'')
             ->getQuery()
-            ->getResult();
+            ->getResult(), function (Pack $p) use ($user) {
+            if($p->getStatus() == 'UNPUBLISHED') {
+                return false;
+            }
+            if($p->getStatus() == 'UNLISTED' && $p->getUserPacks()->filter(function (UserPack $up) use ($user) {return $up->getUser() == $user;})->count() > 0) {
+                return true;
+            }
+            if($p->getStatus() == 'GROUP' && !empty($p->getGroup()) && $user->hasGroup($p->getGroup()->getName())) {
+                return true;
+            }
+            if($p->getStatus() == 'PUBLIC') {
+                return true;
+            }
+            return false;
+        }));
         $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
             $group = $x->getGroup();
 
-            $logo = !empty($group)
+            $logo = !empty($group) && !empty($group->getLogo())
                 ? $group->getLogo()->getUrl()
                 : (!empty($x->getUser()) && !empty($x->getUser()->getPhoto())
                     ? $x->getUser()->getPhoto()->getUrl()
@@ -254,6 +287,7 @@ class PacksController extends Controller
                     return [
                         'card' => $c->getId(),
                         'responses' => array_values($c->getResponsesForUser($up->getUser())
+                            ->filter(function (Response $r) {return $r->getCreated() <= new \DateTime();})
                             ->map(function (Response $r) {
                                 return [
                                     'id' => $r->getId(),
@@ -344,7 +378,7 @@ class PacksController extends Controller
                         'user' => $r->getUser()->getId()
                     ];
                 }, $x->getResponses()->filter(function (Response $r) use ($user) {
-                    return $r->getUser() == $user;
+                    return $r->getUser() == $user && $r->getCreated() <= new \DateTime();
                 })->toArray()))
             ];
         }, $cards));

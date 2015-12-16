@@ -43,16 +43,34 @@ $view['slots']->start('body'); ?>
                             <label class="input title">
                                 <input name="title" placeholder="Title your pack" value="<?php print (!empty($pack) ? $pack->getTitle() : ''); ?>"/>
                             </label>
-                            <label class="input creator">
+                            <label class="input creator read-only">
                                 <input name="creator" placeholder="Creator name"
                                        value="<?php print (!empty($pack) ? $pack->getCreator() : (!empty($app->getUser()) ? ($app->getUser()->getFirst() . ' ' . $app->getUser()->getLast()) : '')); ?>"/>
                                 <small>* If the pack is public this is the name others will see.</small>
                             </label>
-
+                            <label class="input group">
+                                <select name="group">
+                                    <option value="">Group</option>
+                                    <?php foreach ($groups as $i => $g) {
+                                        /** @var Group $g */
+                                        ?>
+                                        <option value="<?php print $g->getId(); ?>" <?php print (!empty($pack) && !empty($pack->getGroup()) && $pack->getGroup() == $g ? 'selected="selected"' : ''); ?>><?php print $g->getName(); ?></option><?php
+                                    } ?>
+                                </select>
+                            </label>
+                            <label class="input status">
+                                <select name="status">
+                                    <option value="">Status</option>
+                                    <option value="UNPUBLISHED" <?php print (!empty($pack) && $pack->getStatus() == 'UNPUBLISHED' ? 'selected="selected"' : ''); ?>>Unpublished</option>
+                                    <option value="PUBLIC" <?php print (!empty($pack) && $pack->getStatus() == 'PUBLIC' ? 'selected="selected"' : ''); ?>>Public</option>
+                                    <option value="GROUP" <?php print (!empty($pack) && $pack->getStatus() == 'GROUP' ? 'selected="selected"' : ''); ?>>Group-only</option>
+                                    <option value="UNLISTED" <?php print (!empty($pack) && $pack->getStatus() == 'UNLISTED' ? 'selected="selected"' : ''); ?>>Unlisted</option>
+                                    <option value="DELETED" <?php print (!empty($pack) && $pack->getStatus() == 'DELETED' ? 'selected="selected"' : ''); ?>>Deleted</option>
+                                </select>
+                            </label>
                             <h3>Add questions and answers by pasting from excel to the space below (make sure you have questions
                                 in
                                 column 1 and responses in column 2).</h3>
-
                         </div>
 
                         <div class="results">
@@ -216,7 +234,7 @@ $view['slots']->start('body'); ?>
                                         <option value="1,2,3">Completed</option>
                                         <option value="!1,!2,!3">Not Completed</option>
                                     </select></label></th>
-                            <th></th>
+                            <th><label>Status:</label></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -238,6 +256,7 @@ $view['slots']->start('body'); ?>
                                 <td><?php print (!empty($p->getModified()) ? $p->getModified()->format('j M') : $p->getCreated()->format('j M')); ?></td>
                                 <td><?php print $p->getUserPacks()->count(); ?></td>
                                 <td class="highlighted-link">
+                                    <?php print (!empty($p->getStatus()) ? $p->getStatus() : 'Not Set'); ?>&nbsp;&nbsp;
                                     <a title="Edit pack" href="<?php print $view['router']->generate('packs_edit', ['pack' => $p->getId()]); ?>" target="_blank"></a>
                                     <a title="Remove pack" href="#confirm-remove-pack" data-toggle="modal"></a>
                                 </td>

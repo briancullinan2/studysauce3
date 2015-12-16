@@ -280,6 +280,8 @@ $(document).ready(function () {
             data: {
                 id: ((/\/packs\/([0-9]+)/i).exec(window.location.pathname) || [null,null])[1],
                 cards: cards,
+                group: tab.find('.group select').val(),
+                status: tab.find('.status select').val(),
                 title: tab.find('.title input').val(),
                 creator: tab.find('.creator input').val()
             },

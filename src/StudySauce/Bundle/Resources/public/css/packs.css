@@ -6,8 +6,10 @@
     min-width: 0;
 }
 
-#packs .title,
-#packs .creator {
+#packs .pane-top .group,
+#packs .pane-top .status,
+#packs .pane-top .title,
+#packs .pane-top .creator {
     display:inline-block;
     margin: 0 -2px;
     padding: 0 2px;

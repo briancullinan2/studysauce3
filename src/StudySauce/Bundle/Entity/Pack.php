@@ -99,11 +99,6 @@ class Pack
      */
     protected $modified;
 
-    /**
-     * @ORM\Column(type="boolean", name="deleted")
-     */
-    protected $deleted = false;
-
     public function getCreator() {
         return !empty($this->getGroup())
             ? $this->getGroup()->getName()
@@ -591,7 +586,7 @@ class Pack
      */
     public function setDeleted($deleted)
     {
-        $this->deleted = $deleted;
+        $this->setStatus($deleted ? 'DELETED' : 'UNPUBLISHED');
 
         return $this;
     }
@@ -603,6 +598,6 @@ class Pack
      */
     public function getDeleted()
     {
-        return $this->deleted;
+        return $this->getStatus() == 'DELETED';
     }
 }
