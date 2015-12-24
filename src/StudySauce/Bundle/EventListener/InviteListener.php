@@ -162,8 +162,11 @@ class InviteListener implements EventSubscriberInterface
             $invite = $orm->getRepository('StudySauceBundle:Invite')->findOneBy($criteria);
             if (!empty($invite)) {
                 $invite->setActivated(true);
-                $invite->setInvitee($user);
-                $user->addInvitee($invite);
+                // only set invitee on single use invites, multi-use invites have no email address
+                if(!empty($invite->getEmail())) {
+                    $invite->setInvitee($user);
+                    $user->addInvitee($invite);
+                }
                 if(!empty($invite->getGroup()) && !$user->hasGroup($invite->getGroup()->getName())) {
                     $user->addGroup($invite->getGroup());
                 }

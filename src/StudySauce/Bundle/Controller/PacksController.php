@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Group;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\User;
@@ -232,12 +233,17 @@ class PacksController extends Controller
         return $this->forward('StudySauceBundle:Packs:index', ['_format' => 'tab']);
     }
 
-    public function listAction()
+    public function listAction(User $user = null)
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        if(empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;})) {
+            $user = $currentUser;
+        }
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
+
         /** @var QueryBuilder $qb */
         $packs = array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->select('p')
@@ -251,6 +257,8 @@ class PacksController extends Controller
                 return true;
             }
             if($p->getStatus() == 'GROUP' && !empty($p->getGroup()) && $user->hasGroup($p->getGroup()->getName())) {
+                    // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
+                    //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
                 return true;
             }
             if($p->getStatus() == 'PUBLIC') {
@@ -270,6 +278,8 @@ class PacksController extends Controller
             $up = $user->getUserPacks()->filter(function (UserPack $up) use ($x) {
                 return $up->getPack()->getId() == $x->getId();
             })->first();
+            // pack should automatically download if user is in group
+            $shouldDownload = !empty($up) || (!empty($x->getGroup()) && $user->hasGroup($x->getGroup()->getName()));
             return [
                 'id' => $x->getId(),
                 'logo' => $logo,
@@ -280,7 +290,7 @@ class PacksController extends Controller
                 'count' => $x->getCards()->filter(function (Card $c) {
                     return !$c->getDeleted();
                 })->count(),
-                'downloaded' => !empty($up) ? 1 : 0,
+                'downloaded' => $shouldDownload,
                 'user_packs' => !empty($up) ? array_values($up->getPack()->getCards()
                     ->filter(function (Card $c) use ($up) {return !$c->getDeleted() && !empty($c->getResponsesForUser($up->getUser())->count());})
                     ->map(function (Card $c) use ($up) {
@@ -384,46 +394,75 @@ class PacksController extends Controller
         }, $cards));
     }
 
-    public function responsesAction(Request $request)
+    public function responsesAction(Request $request, User $user)
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        if(empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;})) {
+            $user = $currentUser;
+        }
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
-        /** @var UserPack $userPack */
-        $userPack = $orm->getRepository('StudySauceBundle:UserPack')->createQueryBuilder('up')
-            ->select('up')
-            ->where('up.pack=:pack')
-            ->andWhere('up.user=:user')
-            ->setParameter('pack', intval($request->get('pack')))
-            ->setParameter('user', $user->getId())
-            ->getQuery()
-            ->getOneOrNullResult();
-        if (empty($userPack)) {
-            throw new PreconditionFailedHttpException("No user-pack association.");
-        }
 
-        /** @var Card $card */
-        $card = $userPack->getPack()->getCards()->filter(function (Card $c) use ($request) {
-            return $c->getId() == $request->get('card');
-        })->first();
-        if (empty($card)) {
-            throw new NotFoundHttpException("Card not found.");
+        $responses = $request->get('responses');
+        if(!empty($request->get('pack')) && !empty($request->get('card')) && !empty($request->get('answer'))
+            && !empty($request->get('correct')) && !empty($request->get('created'))) {
+            $responses[] = [
+                'pack' => $request->get('pack'),
+                'card' => $request->get('card'),
+                'answer' => $request->get('answer'),
+                'correct' => $request->get('correct'),
+                'created' => $request->get('created'),
+                'user' => $currentUser
+            ];
         }
-        $response = new Response();
-        $response->setUser($user);
-        $response->setCard($card);
-        $response->setCreated(date_timezone_set(new \DateTime($request->get('created')), new \DateTimeZone(date_default_timezone_get())));
-        $response->setCorrect($request->get('correct') == '1' || $request->get('correct') == 'true');
-        if (!empty($request->get('answer')) && !empty($a = $card->getAnswers()->filter(function (Answer $a) use ($request) {
-                return $a->getId() == $request->get('answer');
-            })->first())
-        ) {
-            $response->setAnswer($a);
+        /** @var [UserPack] $userPacks */
+        $result = [];
+        foreach($responses as $r) {
+
+            /** @var Pack $pack */
+            $pack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+                ->select('p')
+                ->where('p.id=:id')
+                ->setParameter('id', intval($r['pack']))
+                ->getQuery()
+                ->getOneOrNullResult();
+            if (empty($pack)) {
+                $result[] = null;
+                continue;
+            }
+
+            /** @var Card $card */
+            $card = $pack->getCards()->filter(function (Card $c) use ($r) {
+                return $c->getId() == intval($r['card']);
+            })->first();
+            if (empty($card)) {
+                $result[] = null;
+                continue;
+            }
+
+            $response = new Response();
+            $response->setUser($user);
+            $response->setCard($card);
+            $response->setCreated(date_timezone_set(new \DateTime($r['created']), new \DateTimeZone(date_default_timezone_get())));
+            $response->setCorrect($r['correct'] == '1' || $r['correct'] == 'true');
+            if (!empty($r['answer'])
+                && !empty($a = $card->getAnswers()->filter(function (Answer $a) use ($r) {
+                    return $a->getId() == intval($r['answer']);
+                })->first())
+            ) {
+                $response->setAnswer($a);
+            }
+            $orm->persist($response);
+            $result[] = $response;
         }
-        $orm->persist($response);
         $orm->flush();
 
-        return new JsonResponse($response->getId());
+        $ids = array_map(function ($r) {
+            /** @var Response $r */
+            return empty($r) ? null : $r->getId();}, $result);
+
+        return new JsonResponse($ids);
     }
 }

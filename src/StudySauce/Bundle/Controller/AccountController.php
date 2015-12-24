@@ -341,6 +341,39 @@ class AccountController extends Controller
         return $this->render('StudySauceBundle:Account:reset.html.php', $templateVars);
     }
 
+    private function setChildAccount(User $user, Request $request, UserManager $userManager, EntityManager $orm) {
+        /** @var User $child */
+        $child = $userManager->createUser();
+        $child->setUsername($user->getEmail() . '_' . $user->getInvites()->count());
+        $child->setEmail($user->getEmail() . '_' . $user->getInvites()->count());
+        $child->setPassword('');
+        $userManager->updateCanonicalFields($user);
+        $child->addRole('ROLE_USER');
+        $child->setEnabled(true);
+        $child->setFirst($request->get('childFirst'));
+        $child->setLast($request->get('childLast'));
+
+        // create connecting invite
+        $invite = new Invite();
+        $invite->setFirst($child->getFirst());
+        $invite->setLast($child->getLast());
+        $invite->setEmail('');
+        $invite->setCode('');
+        $invite->setUser($user);
+        $invite->setInvitee($child);
+        $invite->setActivated(true);
+        $child->addInvitee($invite);
+        $user->addInvite($invite);
+        $orm->persist($invite);
+
+        if(!$user->hasRole('ROLE_PARENT')) {
+            $user->addRole('ROLE_PARENT');
+            $userManager->updateUser($user, false);
+        }
+
+        $userManager->updateUser($child);
+    }
+
     /**
      * @param Request $request
      * @param bool $login
@@ -349,16 +382,25 @@ class AccountController extends Controller
      */
     public function createAction(Request $request, $login = true, $email = true)
     {
-        /** @var $userManager UserManager */
+        /** @var UserManager $userManager */
         $userManager = $this->get('fos_user.user_manager');
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        $user = $userManager->findUserByEmail($request->get('email'));
+        if (!empty($request->get('email'))) {
+            $user = $userManager->findUserByEmail($request->get('email'));
+        }
+        else {
+            $user = $this->getUser();
+        }
 
-        if ($user == null) {
-            // generate a new guest user in the database
-            /** @var $user User */
+        if ($user != null && !empty($request->get('email'))) {
+            return new RedirectResponse($this->generateUrl('login'), 301);
+        }
+
+        // generate a new guest user in the database
+        /** @var $user User */
+        if(!empty($request->get('email'))) {
             $user = $userManager->createUser();
             $user->setUsername($request->get('email'));
             $encoder_service = $this->get('security.encoder_factory');
@@ -369,48 +411,50 @@ class AccountController extends Controller
             $user->setEmail($request->get('email'));
             $userManager->updateCanonicalFields($user);
             $user->addRole('ROLE_USER');
-            // assign user to partner
-            InviteListener::setInviteRelationship($orm, $request, $user);
             $user->setEnabled(true);
             $user->setFirst($request->get('first'));
             $user->setLast($request->get('last'));
+            // assign user to partner
+            InviteListener::setInviteRelationship($orm, $request, $user);
             $userManager->updateUser($user);
-
-            // get the path the user should go to after logging in
-            list($route, $options) = HomeController::getUserRedirect($user);
-            $response = $this->redirect($this->generateUrl($route, $options));
-
-            if ($login) {
-                $context = $this->get('security.context');
-                $token = new UsernamePasswordToken($user, $password, 'main', $user->getRoles());
-                $context->setToken($token);
-                $session = $request->getSession();
-                $session->set('_security_main', serialize($token));
-
-                /** @var LoginManager $loginManager */
-                $loginManager = $this->get('fos_user.security.login_manager');
-                $loginManager->loginUser('main', $user, $response);
-            }
-
-            if ($email) {
-                // send welcome email
-                $emails = new EmailsController();
-                $emails->setContainer($this->container);
-                if ($user->hasRole('ROLE_PARENT')) {
-
-                } else {
-                    if ($user->hasRole('ROLE_PARTNER')) {
-                        $emails->welcomePartnerAction($user);
-                    } else {
-                        $emails->welcomeStudentAction($user);
-                    }
-                }
-            }
-
-            return $response;
-        } else {
-            return new RedirectResponse($this->generateUrl('login'), 301);
         }
+        else {
+            $login = false;
+            $email = false;
+        }
+
+        if(!empty($request->get('childFirst')) && !empty($request->get('childLast'))) {
+            $this->setChildAccount($user, $request, $userManager, $orm);
+        }
+
+        // get the path the user should go to after logging in
+        list($route, $options) = HomeController::getUserRedirect($user);
+        $response = $this->redirect($this->generateUrl($route, $options));
+
+        if ($login) {
+            $context = $this->get('security.context');
+            $token = new UsernamePasswordToken($user, $password, 'main', $user->getRoles());
+            $context->setToken($token);
+            $session = $request->getSession();
+            $session->set('_security_main', serialize($token));
+
+            /** @var LoginManager $loginManager */
+            $loginManager = $this->get('fos_user.security.login_manager');
+            $loginManager->loginUser('main', $user, $response);
+        }
+
+        if ($email) {
+            // send welcome email
+            $emails = new EmailsController();
+            $emails->setContainer($this->container);
+            if ($user->hasRole('ROLE_PARTNER')) {
+                $emails->welcomePartnerAction($user);
+            } else {
+                $emails->welcomeStudentAction($user);
+            }
+        }
+
+        return $response;
     }
 
     /**

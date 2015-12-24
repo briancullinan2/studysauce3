@@ -428,8 +428,9 @@ $collection->add(
 $collection->add(
     'packs_list',
     new Route(
-        '/packs/list',
-        ['_controller' => 'StudySauceBundle:Packs:list']
+        '/packs/list/{user}',
+        ['_controller' => 'StudySauceBundle:Packs:list'],
+        ['user' => '[0-9]*']
     )
 );
 $collection->add(
@@ -442,8 +443,9 @@ $collection->add(
 $collection->add(
     'responses',
     new Route(
-        '/packs/responses',
-        ['_controller' => 'StudySauceBundle:Packs:responses']
+        '/packs/responses/{user}',
+        ['_controller' => 'StudySauceBundle:Packs:responses'],
+        ['user' => '[0-9]*']
     )
 );
 return $collection;

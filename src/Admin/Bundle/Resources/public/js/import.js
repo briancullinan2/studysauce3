@@ -16,6 +16,10 @@ jQuery(document).ready(function() {
                 !(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(that.find('.email input').val()))
                 isValid = false;
 
+            if(that.find('.group select:visible').val() != '') {
+                isValid = true;
+            }
+
             if(isValid)
                 that.removeClass('invalid').addClass('valid');
             else
@@ -39,8 +43,7 @@ jQuery(document).ready(function() {
         evt.preventDefault();
     });
 
-    body.on('change', '#import .first-name input, #import .last-name input, #import .email input', importFunc);
-    body.on('keyup', '#import .first-name input, #import .last-name input, #import .email input', importFunc);
+    body.on('keyup change', '#import .first-name input, #import .last-name input, #import .email input, #import .group select', importFunc);
 
     key('⌘+v, ctrl+v, command+v', function () {
         var importTab = $('#import');

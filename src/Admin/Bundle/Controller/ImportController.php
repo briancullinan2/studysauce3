@@ -106,6 +106,9 @@ class ImportController extends Controller
             // check if invite has already been sent
             foreach($existing as $j => $gi)
             {
+                if(empty(trim($u['email']))) {
+                    continue;
+                }
                 /** @var Invite $gi */
                 if(trim(strtolower($gi->getEmail())) == trim(strtolower($u['email']))) {
                     $invite = $gi;
@@ -131,7 +134,7 @@ class ImportController extends Controller
                 $orm->persist($invite);
                 $orm->flush();
                 // don't send emails to existing users
-                if(empty($invitee)) {
+                if(empty($invitee) && !empty($invite->getEmail())) {
                     $emails->inviteAction($user, $invite);
                 }
             }

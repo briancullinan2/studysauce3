@@ -4,6 +4,7 @@ namespace StudySauce\Bundle\Controller;
 
 use FOS\UserBundle\Doctrine\UserManager;
 use HWI\Bundle\OAuthBundle\Templating\Helper\OAuthHelper;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,6 +37,23 @@ class HomeController extends Controller
             $templateVars['id'] = $user->getId();
             $templateVars['first'] = $user->getFirst();
             $templateVars['last'] = $user->getLast();
+            $templateVars['created'] = $user->getCreated()->format('r');
+            $templateVars['children'] = [];
+            if($user->hasRole('ROLE_PARENT') || $user->hasRole('ROLE_TEACHER')) {
+                foreach($user->getInvites()->toArray() as $invite) {
+                    /** @var Invite $invite */
+                    if(empty($invite->getInvitee())) {
+                        continue;
+                    }
+                    $templateVars['children'][] = [
+                        'id' => $invite->getInvitee()->getId(),
+                        'first' => $invite->getFirst(),
+                        'last' => $invite->getLast(),
+                        'email' => $invite->getInvitee()->getEmail(),
+                        'created' => $invite->getInvitee()->getCreated()->format('r')
+                    ];
+                }
+            }
         }
 
         $showBookmark = false; // TODO: false in production
@@ -46,7 +64,6 @@ class HomeController extends Controller
             $user->setProperty('seen_bookmark', true);
             $userManager->updateUser($user);
         }
-
 
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
@@ -79,8 +96,6 @@ class HomeController extends Controller
             // TODO: split this in to separate pages
         elseif($user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER') || $user->hasRole('ROLE_MASTER_ADVISER'))
             return ['userlist', []];
-        elseif($user->hasRole('ROLE_PARENT'))
-            return ['thanks', []];
         return ['home', []];
     }
 }
