@@ -643,16 +643,17 @@ function ssMergeScripts(content)
 $(document).ready(function () {
     var body = $('body');
 
-    var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
+    if(!body.is('.landing-home')) {
+        var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
 
-    var appDialog = $('#gettheapp').modal({show: true});
-    if (appDialog.length > 0)
-    {
-        appUrl += (window.location.search.indexOf('?') > -1 ? '&' : '?') + $('input').map(function () {
-                return $(this).attr('name') + '=' + $(this).attr('value');
-            }).toArray().join("&");
-        // TODO: show invite dialog
-        appDialog.find('.highlighted-link a').attr('href', appUrl);
+        var appDialog = $('#gettheapp').modal({show: true});
+        if (appDialog.length > 0) {
+            appUrl += (window.location.search.indexOf('?') > -1 ? '&' : '?') + $('input').map(function () {
+                    return $(this).attr('name') + '=' + $(this).attr('value');
+                }).toArray().join("&");
+            // TODO: show invite dialog
+            appDialog.find('.highlighted-link a').attr('href', appUrl);
+        }
     }
 
     $(document).tooltip({
