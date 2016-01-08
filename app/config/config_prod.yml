@@ -16,7 +16,7 @@ services:
     pdo:
         class: Doctrine\DBAL\Driver\PDOConnection
         arguments:
-            - "mysql:host=localhost;port=3306;dbname=studysauce"
+            - "mysql:host=localhost;port=3306;dbname=studysauce3"
             - "study2"
             - "itekIO^#(1234"
         calls:
