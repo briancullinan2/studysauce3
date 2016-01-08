@@ -2,8 +2,7 @@ imports:
     - { resource: config.yml }
 
 parameters:
-    authorize_test_mode: false
-    defer_all_emails: false
+    defer_all_emails: "studymarketing@mailinator.com"
 
 doctrine:
     dbal:
@@ -36,18 +35,4 @@ monolog:
         console:
             type:  console
 
-swiftmailer:
-    transport: smtp
-    encryption: ssl
-    auth_mode: login
-    host:      smtp.sendgrid.net
-    username:  Study Sauce
-    password:  2StudyBetter#
-    spool:     { type: db }
 
-hwi_oauth:
-    resource_owners:
-        evernote:
-            request_token_url: https://www.evernote.com/oauth
-            authorization_url: https://www.evernote.com/OAuth.action
-            access_token_url: https://www.evernote.com/oauth
