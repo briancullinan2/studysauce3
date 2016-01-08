@@ -218,6 +218,7 @@ class AccountController extends Controller
                     'email' => $invite->getEmail(),
                     'first' => $invite->getFirst(),
                     'last' => $invite->getLast(),
+                    'properties' => $invite->getProperties(),
                     'csrf_token' => $this->has('form.csrf_provider')
                         ? $this->get('form.csrf_provider')->generateCsrfToken('account_create')
                         : null,
@@ -342,6 +343,10 @@ class AccountController extends Controller
     }
 
     private function setChildAccount(User $user, Request $request, UserManager $userManager, EntityManager $orm) {
+        if (!empty($request->get('_code')) && empty($orm->getRepository('StudySauceBundle:Invite')->findOneBy(['code' => $request->get('_code')]))) {
+            throw new NotFoundHttpException("Invite code not found");
+        }
+
         /** @var User $child */
         $child = $userManager->createUser();
         $child->setUsername($user->getEmail() . '_' . $user->getInvites()->count());
@@ -352,6 +357,7 @@ class AccountController extends Controller
         $child->setEnabled(true);
         $child->setFirst($request->get('childFirst'));
         $child->setLast($request->get('childLast'));
+        $userManager->updateUser($child);
 
         // create connecting invite
         $invite = new Invite();
@@ -365,6 +371,9 @@ class AccountController extends Controller
         $child->addInvitee($invite);
         $user->addInvite($invite);
         $orm->persist($invite);
+        $orm->flush();
+
+        InviteListener::setInviteRelationship($orm, $request, $child);
 
         if(!$user->hasRole('ROLE_PARENT')) {
             $user->addRole('ROLE_PARENT');
@@ -415,7 +424,9 @@ class AccountController extends Controller
             $user->setFirst($request->get('first'));
             $user->setLast($request->get('last'));
             // assign user to partner
-            InviteListener::setInviteRelationship($orm, $request, $user);
+            if(empty($request->get('childFirst')) || empty($request->get('childLast'))) {
+                InviteListener::setInviteRelationship($orm, $request, $user);
+            }
             $userManager->updateUser($user);
         }
         else {

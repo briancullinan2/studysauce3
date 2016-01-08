@@ -44,7 +44,7 @@ class LandingController extends Controller
             return $this->forward('TorchAndLaurelBundle:Landing:index');
         }
 
-        return $this->render('StudySauceBundle:Landing:index.html.php');
+        return $this->render('StudySauceBundle:Landing:index2.html.php');
     }
 
     /**

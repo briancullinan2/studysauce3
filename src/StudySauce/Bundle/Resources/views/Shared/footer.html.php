@@ -3,10 +3,13 @@ $user = $app->getUser();
 ?>
 <div class="footer">
     <?php
-    if($app->getRequest()->get('_format') == 'funnel') { ?>
+    if($view['slots']->get('classes') == 'landing-home') { ?>
+        <span><?php print 'Copyright ' . date('Y'); ?></span>
+    <?php } else if($app->getRequest()->get('_format') == 'funnel') { ?>
         <ul class="menu secondary-menu">
             <li class="menu-334"><a href="<?php print $view['router']->generate('privacy'); ?>">Privacy policy</a></li>
         </ul>
+        <span><?php print 'Copyright ' . date('Y'); ?></span>
     <?php } else { ?>
         <div style="display:inline-block;">
             <iframe class="facebook-like"

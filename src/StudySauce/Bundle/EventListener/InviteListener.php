@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -73,10 +74,15 @@ class InviteListener implements EventSubscriberInterface
             $session->set('invite', $request->get('_code'));
 
             /** @var User $user */
-            $user = $userManager->findUserByEmail($invite->getEmail());
+            if (!empty($invite->getEmail())) {
+                $user = $userManager->findUserByEmail($invite->getEmail());
+            }
+            if (!empty($invite->getInvitee())) {
+                $user = $invite->getInvitee();
+            }
 
             // set associations if user already exists
-            if($user != null && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
+            if(!empty($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
                 self::setInviteRelationship($orm, $request, $user);
                 $userManager->updateUser($user);
 
@@ -86,6 +92,7 @@ class InviteListener implements EventSubscriberInterface
                 $session->set('_security_main',serialize($token));
 
                 if($request->get('_route') != 'home' && $request->get('_route') != 'results') {
+                    // TODO: redirect to all home urls?
                     $response = new RedirectResponse($this->container->get('router')->generate('home', ['_code' => $invite->getCode()]));
                     /** @var LoginManager $loginManager */
                     $loginManager = $this->container->get('fos_user.security.login_manager');
@@ -95,7 +102,7 @@ class InviteListener implements EventSubscriberInterface
             }
             // redirect back to page with a fresh session
             /** @var TokenInterface $token */
-            elseif(null !== ($token = $this->container->get('security.context')->getToken()) && is_object($user = $token->getUser()) &&
+            elseif($request->get('_route') != 'account_create' && null !== ($token = $this->container->get('security.context')->getToken()) && is_object($user = $token->getUser()) &&
                 !$user->hasRole('ROLE_GUEST')) {
                 // Already logged in as another user, logging user out.
                 $this->container->get('security.context')->setToken(null);
@@ -148,13 +155,13 @@ class InviteListener implements EventSubscriberInterface
         if(!$user->hasRole('ROLE_DEMO') && !$user->hasRole('ROLE_GUEST')) {
             $criteria = ['email' => $user->getEmail()];
         }
-        if(!empty($request->get('_code'))) {
-            $criteria = ['code' => $request->get('_code')];
-        }
         if(!empty($request->getSession())) {
             if (!empty($request->getSession()->get('invite'))) {
                 $criteria = ['code' => $request->getSession()->get('invite')];
             }
+        }
+        if(!empty($request->get('_code'))) {
+            $criteria = ['code' => $request->get('_code')];
         }
 
         if(isset($criteria)) {
@@ -179,6 +186,7 @@ class InviteListener implements EventSubscriberInterface
                 }
                 $orm->merge($invite);
             }
+
         }
         // assign correct group to anonymous users
         if(!empty($request->getSession()) && !empty($request->getSession()->get('organization'))) {

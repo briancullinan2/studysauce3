@@ -238,7 +238,7 @@ class PacksController extends Controller
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
-        if(empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;})) {
+        if(empty($user) || (!$currentUser->hasRole('ROLE_ADMIN') && !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;}))) {
             $user = $currentUser;
         }
         /** @var $orm EntityManager */
@@ -250,18 +250,25 @@ class PacksController extends Controller
             ->andWhere('p.status != \'DELETED\'')
             ->getQuery()
             ->getResult(), function (Pack $p) use ($user) {
+            /** @var UserPack $up */
             if($p->getStatus() == 'UNPUBLISHED') {
                 return false;
             }
             if($p->getStatus() == 'UNLISTED' && $p->getUserPacks()->filter(function (UserPack $up) use ($user) {return $up->getUser() == $user;})->count() > 0) {
                 return true;
             }
-            if($p->getStatus() == 'GROUP' && !empty($p->getGroup()) && $user->hasGroup($p->getGroup()->getName())) {
+            if($p->getStatus() == 'GROUP' && $p->getGroups()->exists(function ($_, Group $g) use ($user) {return $user->hasGroup($g->getName());})) {
                     // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
                     //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
                 return true;
             }
             if($p->getStatus() == 'PUBLIC') {
+                return true;
+            }
+            $up = $user->getUserPacks()->filter(function (UserPack $up) use ($p) {
+                return $up->getPack()->getId() == $p->getId();
+            })->first();
+            if(!empty($up)) {
                 return true;
             }
             return false;
@@ -279,7 +286,7 @@ class PacksController extends Controller
                 return $up->getPack()->getId() == $x->getId();
             })->first();
             // pack should automatically download if user is in group
-            $shouldDownload = !empty($up) || (!empty($x->getGroup()) && $user->hasGroup($x->getGroup()->getName()));
+            $shouldDownload = !empty($up) || $x->getGroups()->exists(function ($_, Group $g) use ($user) {return $user->hasGroup($g->getName());});
             return [
                 'id' => $x->getId(),
                 'logo' => $logo,
@@ -316,10 +323,13 @@ class PacksController extends Controller
         return $response;
     }
 
-    public function downloadAction(Request $request)
+    public function downloadAction(Request $request, User $user = null)
     {
         /** @var User $user */
-        $user = $this->getUser();
+        $currentUser = $this->getUser();
+        if(empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;})) {
+            $user = $currentUser;
+        }
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
         /** @var Pack $pack */
@@ -371,6 +381,7 @@ class PacksController extends Controller
                     return [
                         'id' => $a->getId(),
                         'value' => $a->getValue(),
+                        'content' => $a->getContent(),
                         'correct' => $a->getCorrect(),
                         'created' => $a->getCreated()->format('r'),
                         'modified' => !empty($a->getModified()) ? $a->getModified()->format('r') : null
@@ -422,21 +433,12 @@ class PacksController extends Controller
         foreach($responses as $r) {
 
             /** @var Pack $pack */
-            $pack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
-                ->select('p')
-                ->where('p.id=:id')
-                ->setParameter('id', intval($r['pack']))
+            $card = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c')
+                ->select('c')
+                ->where('c.id=:id')
+                ->setParameter('id', intval($r['card']))
                 ->getQuery()
                 ->getOneOrNullResult();
-            if (empty($pack)) {
-                $result[] = null;
-                continue;
-            }
-
-            /** @var Card $card */
-            $card = $pack->getCards()->filter(function (Card $c) use ($r) {
-                return $c->getId() == intval($r['card']);
-            })->first();
             if (empty($card)) {
                 $result[] = null;
                 continue;

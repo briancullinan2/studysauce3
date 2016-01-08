@@ -24,8 +24,7 @@ if (isset($_SERVER) &&
         Symfony\Component\Debug\Debug::enable();
         $kernel = new AppKernel('test', true);
     }
-    elseif(preg_match('/staging\.studysauce\.com/', $_SERVER['HTTP_HOST'])
-        || preg_match('/cerebro\.studysauce\.com/', $_SERVER['HTTP_HOST'])) {
+    elseif(preg_match('/staging\.studysauce\.com/', $_SERVER['HTTP_HOST'])) {
         Symfony\Component\Debug\Debug::enable();
         $kernel = new AppKernel('dev', true);
     }

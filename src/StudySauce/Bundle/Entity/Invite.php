@@ -77,6 +77,9 @@ class Invite
      */
     protected $reminder;
 
+    /** @ORM\Column(name="properties", type="array", nullable=true) */
+    protected $properties = [];
+
     /**
      * @ORM\PrePersist
      */
@@ -347,5 +350,28 @@ class Invite
     public function getInvitee()
     {
         return $this->invitee;
+    }
+
+    /**
+     * Set properties
+     *
+     * @param array $properties
+     * @return Invite
+     */
+    public function setProperties($properties)
+    {
+        $this->properties = $properties;
+
+        return $this;
+    }
+
+    /**
+     * Get properties
+     *
+     * @return array 
+     */
+    public function getProperties()
+    {
+        return $this->properties;
     }
 }

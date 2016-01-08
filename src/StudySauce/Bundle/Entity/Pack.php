@@ -2,7 +2,9 @@
 
 namespace StudySauce\Bundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Model\GroupInterface;
 use StudySauce\Bundle\Entity\UserPack;
 
 /**
@@ -24,6 +26,14 @@ class Pack
      * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable=true)
      */
     protected $group;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Group")
+     * @ORM\JoinTable(name="group_pack",
+     *      joinColumns={@ORM\JoinColumn(name="pack_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")})
+     */
+    protected $groups;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="packs")
@@ -153,8 +163,9 @@ class Pack
      */
     public function __construct()
     {
-        $this->cards = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userPacks = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->cards = new ArrayCollection();
+        $this->userPacks = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     /**
@@ -390,11 +401,66 @@ class Pack
     /**
      * Get group
      *
-     * @return \StudySauce\Bundle\Entity\Group 
+     * @return \StudySauce\Bundle\Entity\Group
      */
     public function getGroup()
     {
         return $this->group;
+    }
+
+
+    public function getGroupNames()
+    {
+        $names = array();
+        foreach ($this->getGroups() as $group) {
+            $names[] = $group->getName();
+        }
+
+        return $names;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return boolean
+     */
+    public function hasGroup($name)
+    {
+        return in_array($name, $this->getGroupNames());
+    }
+
+    /**
+     * Add groups
+     *
+     * @param \StudySauce\Bundle\Entity\Group
+     * @return User
+     */
+    public function addGroup(Group $groups)
+    {
+        $this->groups[] = $groups;
+
+        return $this;
+    }
+
+    /**
+     * Remove groups
+     *
+     * @param \StudySauce\Bundle\Entity\Group
+     * @return $this|\FOS\UserBundle\Model\GroupableInterface|void
+     */
+    public function removeGroup(Group $groups)
+    {
+        $this->groups->removeElement($groups);
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getGroups()
+    {
+        return new ArrayCollection(array_merge(!empty($this->getGroup()) ? [$this->getGroup()] : [], $this->groups->toArray()));
     }
 
     /**

@@ -1,6 +1,6 @@
 #! /bin/bash
 
-cd /var/www/Symfony/;
+cd /var/www/studysauce3/;
 php app/console cache:clear --env=prod;
 php app/console doctrine:generate:entities StudySauceBundle;
 php app/console doctrine:schema:update --force --env=prod;

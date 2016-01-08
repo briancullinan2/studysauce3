@@ -160,7 +160,6 @@ $view['slots']->start('body'); ?>
                             <img alt="VISA" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/visa.gif')) ?>" />
                             <img alt="MC" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/mc.gif')) ?>" />
                             <img alt="DISC" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/disc.gif')) ?>" />
-                            <img alt="AMEX" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/amex.gif')) ?>" />
                         </div>
                     </label>
                 </div>

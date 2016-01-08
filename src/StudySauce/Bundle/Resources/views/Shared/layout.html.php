@@ -83,10 +83,14 @@ $collection = $router->getRouteCollection();
                 $callbackUri[] = $router->generate($route);
             }
 
-            if(preg_match('/(^|\s)request.isXmlHttpRequest\(\)(\s+|$)/i', $condition)) {
-                $callbackPaths[$route] = $router->generate($route);
+            try {
+                $tmpRoute = $router->generate($route);
+                $callbackPaths[$route] = $tmpRoute;
                 $callbackKeys[] = $route;
-                $callbackUri[] = $router->generate($route);
+                $callbackUri[] = $tmpRoute;
+            }
+            catch (\Exception $e) {
+
             }
 
             if (!empty($format) && strpos($format, 'tab') > -1) {

@@ -215,8 +215,8 @@ git clone https://bjcullinan:Da1ddy23@bitbucket.org/StudySauce/studysauce3.git
 
 chown -R mysql:mysql /var/lib/mysql
 service mysqld start
-/usr/bin/mysqladmin -u root password 'MyNewPass'
-echo "CREATE DATABASE studysauce3; GRANT ALL ON studysauce3.* TO 'study2'@'localhost' IDENTIFIED BY 'itekIO^#(1234';" | mysql -u root --password=MyNewPass -h localhost
+/usr/bin/mysqladmin -u root password '9MiIsEf42mnEXx0n'
+echo "CREATE DATABASE studysauce3; GRANT ALL ON studysauce3.* TO 'study2'@'localhost' IDENTIFIED BY 'itekIO^#(1234';" | mysql -u root --password=9MiIsEf42mnEXx0n -h localhost
 
 echo "* * * * * apache /var/www/studysauce3/cron.sh" >> /etc/crontab
 chmod a+x /var/www/studysauce3/cron.sh

@@ -38,6 +38,7 @@ class HomeController extends Controller
             $templateVars['first'] = $user->getFirst();
             $templateVars['last'] = $user->getLast();
             $templateVars['created'] = $user->getCreated()->format('r');
+            $templateVars['roles'] = implode(',', $user->getRoles());
             $templateVars['children'] = [];
             if($user->hasRole('ROLE_PARENT') || $user->hasRole('ROLE_TEACHER')) {
                 foreach($user->getInvites()->toArray() as $invite) {
@@ -50,7 +51,8 @@ class HomeController extends Controller
                         'first' => $invite->getFirst(),
                         'last' => $invite->getLast(),
                         'email' => $invite->getInvitee()->getEmail(),
-                        'created' => $invite->getInvitee()->getCreated()->format('r')
+                        'created' => $invite->getInvitee()->getCreated()->format('r'),
+                        'roles' => implode(',', $invite->getInvitee()->getRoles())
                     ];
                 }
             }

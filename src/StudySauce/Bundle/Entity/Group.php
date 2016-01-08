@@ -48,12 +48,17 @@ class Group extends BaseGroup implements GroupInterface
     protected $packs;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Pack", mappedBy="groups", fetch="EXTRA_LAZY")
+     */
+    protected $group_packs;
+
+    /**
      * @ORM\ManyToMany(targetEntity="User", mappedBy="groups", fetch="EXTRA_LAZY")
      */
     protected $users;
 
     /**
-     * @ORM\OneToOne(targetEntity="File")
+     * @ORM\ManyToOne(targetEntity="File")
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable = true)
      */
     protected $logo;
@@ -135,6 +140,7 @@ class Group extends BaseGroup implements GroupInterface
     public function __construct($name = null, $roles = array()) {
         $this->users = new ArrayCollection();
         $this->packs = new ArrayCollection();
+        $this->group_packs = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->coupons = new ArrayCollection();
         $this->roles = [];
@@ -204,7 +210,7 @@ class Group extends BaseGroup implements GroupInterface
      */
     public function getPacks()
     {
-        return $this->packs;
+        return new ArrayCollection(array_merge($this->packs->toArray(), $this->group_packs->toArray()));
     }
 
     /**
@@ -317,5 +323,38 @@ class Group extends BaseGroup implements GroupInterface
     public function getInvites()
     {
         return $this->invites;
+    }
+
+    /**
+     * Add group_packs
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $groupPacks
+     * @return Group
+     */
+    public function addGroupPack(\StudySauce\Bundle\Entity\Pack $groupPacks)
+    {
+        $this->group_packs[] = $groupPacks;
+
+        return $this;
+    }
+
+    /**
+     * Remove group_packs
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $groupPacks
+     */
+    public function removeGroupPack(\StudySauce\Bundle\Entity\Pack $groupPacks)
+    {
+        $this->group_packs->removeElement($groupPacks);
+    }
+
+    /**
+     * Get group_packs
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getGroupPacks()
+    {
+        return $this->group_packs;
     }
 }

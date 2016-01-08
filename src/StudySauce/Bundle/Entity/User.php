@@ -577,40 +577,6 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
-     * Add groups
-     *
-     * @param \StudySauce\Bundle\Entity\Group|GroupInterface $groups
-     * @return User
-     */
-    public function addGroup(GroupInterface $groups)
-    {
-        $this->groups[] = $groups;
-
-        return $this;
-    }
-
-    /**
-     * Remove groups
-     *
-     * @param \StudySauce\Bundle\Entity\Group|GroupInterface $groups
-     * @return $this|\FOS\UserBundle\Model\GroupableInterface|void
-     */
-    public function removeGroup(GroupInterface $groups)
-    {
-        $this->groups->removeElement($groups);
-    }
-
-    /**
-     * Get groups
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getGroups()
-    {
-        return $this->groups;
-    }
-
-    /**
      * Set evernote_id
      *
      * @param string $evernoteId
@@ -888,5 +854,39 @@ class User extends BaseUser implements EncoderAwareInterface
     public function getUserPacks()
     {
         return $this->userPacks;
+    }
+
+    /**
+     * Add groups
+     *
+     * @param GroupInterface $group
+     * @return User
+     * @internal param Group $groups
+     */
+    public function addGroup(GroupInterface $group)
+    {
+        return parent::addGroup($group);
+    }
+
+    /**
+     * Remove groups
+     *
+     * @param GroupInterface $group
+     * @return $this|\FOS\UserBundle\Model\GroupableInterface|void
+     * @internal param Group $groups
+     */
+    public function removeGroup(GroupInterface $group)
+    {
+        parent::removeGroup($group);
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
 }

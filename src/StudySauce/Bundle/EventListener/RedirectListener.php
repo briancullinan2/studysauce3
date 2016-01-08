@@ -202,7 +202,12 @@ class RedirectListener implements EventSubscriberInterface
                 $options['exception'] = $error->getMessage();
             }
             // repopulate the csrf token for login failures
-            $route = $router->match($parts['path'])['_route'];
+            try {
+                $route = $router->match($parts['path'])['_route'];
+            }
+            catch (\Exception $e) {
+                $donothing = "";
+            }
             $csrfToken = $this->container->has('form.csrf_provider')
                 ? $this->container->get('form.csrf_provider')->generateCsrfToken($route)
                 : null;

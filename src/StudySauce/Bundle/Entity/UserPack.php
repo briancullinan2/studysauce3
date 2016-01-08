@@ -9,12 +9,12 @@ use StudySauce\Bundle\Entity\Pack;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_pack")
+ * @ORM\Table(name="user_pack",uniqueConstraints={
+ *     @ORM\UniqueConstraint(name="username_idx", columns={"user_id","pack_id"})})
  * @ORM\HasLifecycleCallbacks()
  */
 class UserPack
 {
-
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="User", inversedBy="userPacks")

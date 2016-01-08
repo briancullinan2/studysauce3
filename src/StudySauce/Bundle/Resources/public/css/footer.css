@@ -19,12 +19,6 @@ body {
     padding-bottom: 70px;
 }
 
-.landing-home .footer
-{
-    background: url(../images/noise_darkgray.png) repeat top left #111111;
-    position:static;
-}
-
 .footer > *
 {
     vertical-align: middle;

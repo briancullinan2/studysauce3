@@ -19,13 +19,7 @@ $collection->add(
     'command_callback',
     new Route(
         '/command/list',
-        ['_controller' => 'AdminBundle:Admin:index', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:index', '_format' => 'tab']
     )
 );
 
@@ -34,12 +28,7 @@ $collection->add(
     new Route(
         '/activity/{_format}',
         ['_controller' => 'AdminBundle:Activity:index', '_format' => 'index'],
-        ['_format' => DASHBOARD_VIEWS],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest() || !request.isXmlHttpRequest()'
+        ['_format' => DASHBOARD_VIEWS]
     )
 );
 
@@ -48,12 +37,7 @@ $collection->add(
     new Route(
         '/results/{_format}',
         ['_controller' => 'AdminBundle:Results:index', '_format' => 'index'],
-        ['_format' => DASHBOARD_VIEWS],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest() || !request.isXmlHttpRequest()'
+        ['_format' => DASHBOARD_VIEWS]
     )
 );
 
@@ -61,13 +45,7 @@ $collection->add(
     'results_callback',
     new Route(
         '/results/list',
-        ['_controller' => 'AdminBundle:Results:index', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Results:index', '_format' => 'tab']
     )
 );
 
@@ -75,13 +53,7 @@ $collection->add(
     'results_user',
     new Route(
         '/results/user',
-        ['_controller' => 'AdminBundle:Results:user', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Results:user', '_format' => 'tab']
     )
 );
 
@@ -89,13 +61,7 @@ $collection->add(
     'remove_user',
     new Route(
         '/command/remove/user',
-        ['_controller' => 'AdminBundle:Admin:removeUser', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:removeUser', '_format' => 'tab']
     )
 );
 
@@ -103,13 +69,7 @@ $collection->add(
     'cancel_user',
     new Route(
         '/command/cancel/user',
-        ['_controller' => 'AdminBundle:Admin:cancelUser', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:cancelUser', '_format' => 'tab']
     )
 );
 
@@ -117,13 +77,7 @@ $collection->add(
     'save_user',
     new Route(
         '/command/save/user',
-        ['_controller' => 'AdminBundle:Admin:saveUser', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:saveUser', '_format' => 'tab']
     )
 );
 
@@ -131,13 +85,7 @@ $collection->add(
     'add_user',
     new Route(
         '/command/add/user',
-        ['_controller' => 'AdminBundle:Admin:addUser', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:addUser', '_format' => 'tab']
     )
 );
 
@@ -145,13 +93,7 @@ $collection->add(
     'save_group',
     new Route(
         '/command/save/group',
-        ['_controller' => 'AdminBundle:Admin:saveGroup', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:saveGroup', '_format' => 'tab']
     )
 );
 
@@ -159,13 +101,7 @@ $collection->add(
     'reset_user',
     new Route(
         '/command/reset/user',
-        ['_controller' => 'AdminBundle:Admin:resetUser', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Admin:resetUser', '_format' => 'tab']
     )
 );
 
@@ -182,13 +118,7 @@ $collection->add(
     'validation_test',
     new Route(
         '/validation/test',
-        ['_controller' => 'AdminBundle:Validation:test'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Validation:test']
     )
 );
 
@@ -196,13 +126,7 @@ $collection->add(
     'validation_result',
     new Route(
         '/validation/result',
-        ['_controller' => 'AdminBundle:Validation:result'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Validation:result']
     )
 );
 
@@ -210,13 +134,7 @@ $collection->add(
     'validation_refresh',
     new Route(
         '/validation/refresh',
-        ['_controller' => 'AdminBundle:Validation:refresh'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'true || request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Validation:refresh']
     )
 );
 
@@ -233,13 +151,7 @@ $collection->add(
     'emails_callback',
     new Route(
         '/emails/list',
-        ['_controller' => 'AdminBundle:Emails:index', '_format' => 'tab'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Emails:index', '_format' => 'tab']
     )
 );
 
@@ -247,13 +159,7 @@ $collection->add(
     'emails_template',
     new Route(
         '/emails/template/{_email}',
-        ['_controller' => 'AdminBundle:Emails:template', '_email' => ''],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest() || !request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Emails:template', '_email' => '']
     )
 );
 
@@ -261,13 +167,7 @@ $collection->add(
     'emails_send',
     new Route(
         '/emails/send/{_email}',
-        ['_controller' => 'AdminBundle:Emails:send', '_email' => ''],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest() || !request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Emails:send', '_email' => '']
     )
 );
 
@@ -275,13 +175,7 @@ $collection->add(
     'emails_search',
     new Route(
         '/emails/search',
-        ['_controller' => 'AdminBundle:Emails:search'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Emails:search']
     )
 );
 
@@ -289,13 +183,7 @@ $collection->add(
     'emails_save',
     new Route(
         '/emails/save',
-        ['_controller' => 'AdminBundle:Emails:save'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Emails:save']
     )
 );
 $collection->add(
@@ -310,13 +198,7 @@ $collection->add(
     'import_save',
     new Route(
         '/import/save',
-        ['_controller' => 'AdminBundle:Import:update'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Import:update']
     )
 );
 $collection->add(
@@ -331,13 +213,7 @@ $collection->add(
     'userlist_status',
     new Route(
         '/userlist/status',
-        ['_controller' => 'AdminBundle:Adviser:updateStatus'],
-        [],
-        [],
-        '',
-        [],
-        [],
-        'request.isXmlHttpRequest()'
+        ['_controller' => 'AdminBundle:Adviser:updateStatus']
     )
 );
 $collection->add(
