@@ -18,7 +18,7 @@ $(document).ready(function () {
                 content.filter('#results').find('table.results > thead > tr > th').eq(j).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
             });
         });
-        admin.find('#page-total').text(content.find('#page-total').text());
+        admin.find('.page-total').text(content.find('.page-total').text());
     }
 
     function getData()
@@ -57,7 +57,7 @@ $(document).ready(function () {
     }
 
 
-    body.on('keyup', '#results input[name="search"], #results input[name="page"]', function () {
+    body.on('keyup change', '#results input[name="search"], #results input[name="page"]', function () {
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
         searchTimeout = setTimeout(loadResults, 1000);
@@ -84,7 +84,5 @@ $(document).ready(function () {
 
         loadResults();
     });
-
-    body.on('change', '#results input[name="search"], #results input[name="page"]', loadResults);
 
 });

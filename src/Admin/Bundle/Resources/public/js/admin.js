@@ -12,7 +12,7 @@ $(document).ready(function () {
         admin.find('#users .pane-top .results').replaceWith(content.filter('#command').find('#users .pane-top .results'));
         admin.find('#groups > form .results').replaceWith(content.filter('#command').find('#groups > form .results'));
         admin.find('#groups .pane-top .results').replaceWith(content.filter('#command').find('#groups .pane-top .results'));
-        admin.find('#page-total').text(content.find('#page-total').text());
+        admin.find('#users .page-total').text(content.find('#users .page-total').text());
     }
 
     function getData()
@@ -49,7 +49,7 @@ $(document).ready(function () {
         }, 100);
     }
 
-    body.on('keyup', '#command input[name="search"], #command input[name="page"]', function () {
+    body.on('keyup change', '#command input[name="search"], #command input[name="page"]', function () {
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
         searchTimeout = setTimeout(loadResults, 1000);

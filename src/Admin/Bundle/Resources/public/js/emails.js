@@ -149,7 +149,7 @@ $(document).ready(function () {
             $(this).find('label:first-child > *:not(select):not(input)').remove();
             content.find('.pane-content th').eq(i).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
         });
-        admin.find('#page-total').text(content.find('#page-total').text());
+        admin.find('.page-total').text(content.find('.page-total').text());
         // update template list and filter out any zeros
         admin.find('#history select[name="template"]').replaceWith(content.find('#history select[name="template"]'));
         if(admin.find('input[name="search"]').val().trim() != '') {
@@ -178,7 +178,7 @@ $(document).ready(function () {
         }, 100);
     }
 
-    body.on('keyup', '#emails input[name="search"], #emails input[name="page"]', function () {
+    body.on('keyup change', '#emails input[name="search"], #emails input[name="page"]', function () {
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
         searchTimeout = setTimeout(loadResults, 1000);

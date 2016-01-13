@@ -142,10 +142,10 @@ $(document).ready(function () {
 
     body.on('click', '.paginate a', function (evt) {
         evt.preventDefault();
-        var admin = $('.paginate'),
+        var admin = $(this).parents('.paginate'),
             page = this.hash.match(/([0-9]*|last|prev|next|first)$/i)[0],
             current = parseInt(admin.find('input[name="page"]').val()),
-            last = parseInt(admin.find('#page-total').text());
+            last = parseInt(admin.find('.page-total').text());
         if(page == 'first')
             page = 1;
         if(page == 'next')
@@ -158,8 +158,7 @@ $(document).ready(function () {
             page = last;
         if(page < 1)
             page = 1;
-        admin.find('input[name="page"]').val(page);
-        loadResults();
+        admin.find('input[name="page"]').val(page).trigger('change');
     });
 
     function expandMenu(evt)

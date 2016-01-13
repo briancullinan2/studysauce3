@@ -116,8 +116,8 @@ $view['slots']->start('body'); ?>
                                     </label>
                                     <label class="input correct type-sa">
                                         <select>
-                                            <option value="contains" selected="selected">Contains</option>
-                                            <option value="exactly">Matches exactly</option>
+                                            <option value="exactly" <?php print (!empty($c->getCorrect()) && substr($c->getCorrect()->getValue(), 0, 1) == '^' ? 'selected="selected"' : ''); ?>>Matches exactly</option>
+                                            <option value="contains" <?php print (!empty($c->getCorrect()) && substr($c->getCorrect()->getValue(), 0, 1) != '^' ? 'selected="selected"' : ''); ?>>Contains</option>
                                         </select>
                                     </label>
                                     <label class="radio correct type-tf">

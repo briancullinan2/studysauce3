@@ -47,9 +47,9 @@ class ImportController extends Controller
     static public function getAbbreviationCode(Group $g, EntityManager $orm) {
         preg_match_all('/\s[a-z]|[A-Z]/', $g->getName(), $matches);
         $prefix = implode('', array_map(function ($x) { return trim($x); }, $matches[0]));
-        $random = strtoupper(substr(md5(microtime()), -4));
+        $random = substr(md5(microtime()), -4);
         // TODO: make sure it doesn't already exist in the database
-        return  $prefix . $random;
+        return  strtoupper($prefix . $random);
     }
 
     /**
