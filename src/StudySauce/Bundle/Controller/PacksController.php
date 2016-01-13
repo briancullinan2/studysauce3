@@ -127,6 +127,11 @@ class PacksController extends Controller
             if (!empty($c['type'])) {
                 $newCard->setResponseType($c['type']);
             }
+            if (empty($newCard->getId())) {
+                $orm->persist($newCard);
+            } else {
+                $orm->merge($newCard);
+            }
 
             if (empty($c['answers'])) {
                 $c['answers'] = $c['correct'];
@@ -180,11 +185,6 @@ class PacksController extends Controller
                         $orm->merge($a);
                     }
                 }
-            }
-            if (empty($newCard->getId())) {
-                $orm->persist($newCard);
-            } else {
-                $orm->merge($newCard);
             }
         }
         $orm->flush();
