@@ -39,7 +39,7 @@
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
 }
 
-#packs a[href*="/packs/"]
+#packs a[href*="#edit-pack"]
 {
     display: inline-block;
     height: 24px;
@@ -58,15 +58,28 @@
 
 #packs header > *:first-child,
 #packs .card-row > *:first-child {
-    width: 100px;
+    width: 120px;
     position: relative;
     z-index: 3;
 }
 
+#packs .card-row > *:first-child {
+    padding-right:40px;
+}
+
+#packs .card-row > *:first-child span {
+    width: 40px;
+    display:inline-block;
+}
+
+#packs .card-row > *:first-child select {
+    margin-right:-44px;
+}
+
 #packs header > *:nth-child(2),
 #packs .card-row > *:nth-child(2) {
-    margin-left: -104px;
-    padding-left: 104px;
+    margin-left: -124px;
+    padding-left: 124px;
 }
 
 #packs header > *:last-child,

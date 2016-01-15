@@ -1,0 +1,1 @@
+<div><?php print (!empty($pack->getStatus()) ? $pack->getStatus() : 'Not Set'); ?></div>

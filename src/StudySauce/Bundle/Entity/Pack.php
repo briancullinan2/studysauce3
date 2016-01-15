@@ -139,15 +139,10 @@ class Pack
     }
 
     /**
-     * @return User[]
+     * @return ArrayCollection
      */
     public function getUsers() {
-        $users = [];
-        foreach($this->userPacks->toArray() as $u) {
-            /** @var UserPack $u */
-            $users[] = $u->getUser();
-        }
-        return $users;
+        return new ArrayCollection(array_merge([$this->getUser()], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())));
     }
 
     /**
@@ -512,7 +507,7 @@ class Pack
     /**
      * Get cards
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getCards()
     {

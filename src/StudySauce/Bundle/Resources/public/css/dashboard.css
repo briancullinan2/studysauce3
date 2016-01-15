@@ -99,13 +99,13 @@ aside + .panel-pane,
 }
 
 .pane-top {
-    background: rgba(255,153,0,.2);
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
     margin:-20px -20px 20px -20px;
     padding: 20px 20px 1px 20px;
 }
 
 .pane-bottom {
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
+    background: #BBBBBB;
     margin: 0 -20px -20px -20px;
     padding: 20px;
 }
@@ -288,6 +288,17 @@ table.results > tbody > tr > td .checkbox {
     display:block;
 }
 
+.results [class*="-row"]:not(.selected) > .highlighted-link > *:not(.checkbox) {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity ease-in-out .15s;
+}
+
+.results [class*="-row"]:hover > .highlighted-link > *:not(.checkbox) {
+    visibility: visible;
+    opacity: 1;
+}
+
 .results .read-only label.checkbox,
 .results .read-only label.checkbox input:checked ~ span
 {
@@ -315,6 +326,10 @@ table.results > tbody > tr > td
 {
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
+    margin-left:-20px;
+    margin-right:-20px;
+    padding-left:20px;
+    padding-right:20px;
 }
 
 .results [class*="-row"]:hover:not(.selected):not(.edit),
@@ -327,6 +342,7 @@ table.results > tbody > tr:hover:not(.selected):not(.edit) > td
     cursor: pointer;
 }
 
+.results.expandable > [class*="-row"]:nth-of-type(even):hover > *,
 table.results.expandable > tbody > tr:nth-child(even):hover > td
 {
     box-shadow: none;
@@ -336,12 +352,14 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     cursor: default;
 }
 
+.results.expandable > [class*="-row"]:nth-of-type(odd) > *:first-child,
 table.results.expandable > tbody > tr:nth-child(odd) > td:first-child
 {
     position:relative;
     padding-left: 30px;
 }
 
+.results.expandable > [class*="-row"]:nth-of-type(odd) > *:first-child:before,
 table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 {
     transform: rotate(-90deg);
@@ -367,6 +385,7 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     cursor: pointer;
     transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
 }
+
 table.results.expandable > tbody > tr.selected > td:first-child:before
 {
     transform: rotate(0deg);

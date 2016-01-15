@@ -6,6 +6,13 @@
     padding-right:300px;
 }
 
+#command .search .input {
+    margin-left: -220px;
+    padding-left: 240px;
+    width: 100%;
+    display:inline-block;
+}
+
 #command .count-bubble
 {
     height: 100px;
@@ -102,6 +109,22 @@
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1102px transparent;
 }
 
+#command a[href="#confirm-remove-pack"],
+#command a[href="#remove-card"] {
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
+}
+
+#command a[href*="#edit-pack"]
+{
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
+}
+
 #command a[href="#confirm-cancel-user"]:hover
 {
     background-position: left -1152px;
@@ -135,6 +158,23 @@
     background-position: left -4152px;
 }
 
+#command .pane-top {
+    position: fixed;
+    width:100%;
+    padding-right:70px;
+    top:50px;
+    z-index: 10;
+    height:100px;
+}
+
+#command .results .paginate {
+    width:300px;
+}
+
+#command h2 {
+    margin-top:60px;
+}
+
 #command .ui-datepicker > a
 {
     display:block;
@@ -149,15 +189,64 @@
     font-weight: bold;
 }
 
-#command #users > form label.filtered > input,
-#command #users > form label.filtered > select
+#command header label.filtered > input,
+#command header label.filtered > select
 {
     border:3px solid #FF9900;
     padding-top:0;
 }
 
-#command #users > form .user-row .user-name .input:nth-child(1),
-#command #users > form .user-row .user-name .input:nth-child(2)
+#command .results header > * {
+    display:none;
+}
+
+#command .results header > *:first-child,
+#command .results header > *:nth-child(2),
+#command .results header > *:nth-child(3) {
+    display:inline-block;
+}
+
+#command .results header > *,
+#command .results [class*="-row"] > *
+{
+    width: 16.66%;
+}
+#command .results header > *:nth-child(1) {
+    width:100%;
+}
+
+#command .results header > *.id,
+#command .results [class*="-row"] > *:nth-child(1)
+{
+    width: 10%;
+}
+
+#command .results header > *.actions,
+#command .results [class*="-row"] > *:nth-last-child(2)
+{
+    width:15%;
+    text-align: right;
+    padding-right: 32px;
+    margin-right: -32px
+}
+
+#command .results header > *:last-child,
+#command .results [class*="-row"] > *:nth-last-child(1)
+{
+    width: auto;
+    display:inline-block;
+}
+
+#command .results header > *.name,
+#command .results [class*="-row"] > *:nth-child(2)
+{
+    width: 25%;
+}
+
+#command .ss_group-row .group-name .input:nth-child(1),
+#command .ss_group-row .group-name .input:nth-child(2),
+#command .ss_user-row .user-name .input:nth-child(1),
+#command .ss_user-row .user-name .input:nth-child(2)
 {
     margin: 0 -2px;
     padding: 0 2px;
@@ -185,38 +274,9 @@
     display:block;
 }
 
-#command #groups .pane-top header > *,
-#command .pane-top .group-row > * {
-    width: 33.33%
-}
-
-#command #groups > form header > *,
-#command #groups > form .group-row > * {
-    width: 20%
-}
-
-#command .pane-top .user-row > * {
-    width: 25%;
-}
-
-#command #users > form header > *,
-#command #users > form .user-row > * {
-    width: 14.28%;
-}
-
 #command .read-only textarea
 {
     height: 1em;
-}
-
-#command #users > form header > *:nth-last-child(2)
-{
-    padding-right: 40px;
-    margin-right: -40px
-}
-
-#command #users > form header > *:last-child {
-    width: auto;
 }
 
 @media all and (max-width:1000px)

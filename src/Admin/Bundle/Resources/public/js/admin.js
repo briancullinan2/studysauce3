@@ -49,6 +49,16 @@ $(document).ready(function () {
         }, 100);
     }
 
+    body.on('mouseover', '#command .results [class*="-row"]', function () {
+        var command = $('#command');
+        var selected = command.find('.results [class*="-row"].selected');
+        var table = (/(.*)-row/i).exec($(this).attr('class'))[0];
+        if (selected.length > 0 && isElementInViewport(selected)) {
+            table = (/(.*)-row/i).exec(selected.attr('class'))[0];
+        }
+        command.attr('class', command.attr('class').replace(/\s(.*)-row/i, ' ')).addClass(table);
+    });
+
     body.on('keyup change', '#command input[name="search"], #command input[name="page"]', function () {
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
@@ -176,6 +186,19 @@ $(document).ready(function () {
             },
             success: loadContent
         });
+    });
+
+    body.on('loaded', '#command', function () {
+        if (!$(this).is('.loaded')) {
+            $(this).addClass('loaded');
+            $(this).find('header .search .checkbox').draggable();
+        }
+    });
+
+    body.on('change', '#command header .search .checkbox input', function () {
+        var command = $('#command');
+        var table = $(this).val();
+        command.find('.results [class*="-row"]').filter('.' + table + '-row').css('display', !$(this).prop('checked') ? 'none' : '');
     });
 
     body.on('click', '#command a[href="#new-group"], #command a[href="#save-group"]', function (evt) {

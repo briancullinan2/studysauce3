@@ -415,20 +415,24 @@ class AdminController extends Controller
         // get the groups for use in dropdown
         $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
 
+        $packs = $orm->getRepository('StudySauceBundle:Pack')->findAll();
+
         return $this->render('AdminBundle:Admin:tab.html.php', [
-                'groups' => $groups,
-                'users' => $users,
-                'visitors' => $visitors,
-                'signups' => $signups,
-                'parents' => $parents,
-                'partners' => $partners,
-                'advisers' => $advisers,
-                'paid' => $paid,
-                'students' => $students,
-                'torch' => $torch,
-                'csa' => $csa,
-                'total' => $total
-            ]);
+            'ss_group' => $groups,
+            'ss_user' => $users,
+            'pack' => $packs,
+            'visitors' => $visitors,
+            'signups' => $signups,
+            'parents' => $parents,
+            'partners' => $partners,
+            'advisers' => $advisers,
+            'paid' => $paid,
+            'students' => $students,
+            'torch' => $torch,
+            'csa' => $csa,
+            'total' => $total,
+            'orm' => $orm
+        ]);
     }
 
     /**

@@ -3,9 +3,6 @@
 namespace Admin\Bundle\Controller;
 
 use Aws\Sns\Exception\NotFoundException;
-use Course1\Bundle\Entity\Course1;
-use Course2\Bundle\Entity\Course2;
-use Course3\Bundle\Entity\Course3;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -274,7 +271,7 @@ class ResultsController extends Controller
         $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
 
         // get the list of packs from the current list of users
-        $resultPacks = call_user_func_array('array_merge', array_map(function (User $x) {return $x->getPacks();}, self::searchBuilder($request, $joins)
+        $resultPacks = call_user_func_array('array_merge', array_map(function (User $x) {return $x->getPacks()->toArray();}, self::searchBuilder($request, $joins)
             ->select('u,up,p,a')
             ->leftJoin('u.userPacks', 'up')
             ->leftJoin('up.pack', 'p')

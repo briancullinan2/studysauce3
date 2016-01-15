@@ -120,8 +120,17 @@ $(document).ready(function () {
     });
 
     body.on('click', '.results [class*="-row"], table.results > tbody > tr', function () {
-        $(this).find('> *:last-child input[name="selected"]')
-            .prop('checked', !$(this).find('input[name="selected"]').prop('checked'));
+        var results = $(this).parents('.results');
+        results.find('.selected').removeClass('selected').find('> *:last-child input[name="selected"]')
+            .prop('checked', false);
+        if (!$(this).find('input[name="selected"]').prop('checked')) {
+            $(this).addClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', true);
+        }
+        else {
+            $(this).removeClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', false);
+        }
     });
 
     body.on('click', '.results.expandable > tbody > tr:nth-child(odd)', function () {
@@ -160,6 +169,8 @@ $(document).ready(function () {
             page = 1;
         admin.find('input[name="page"]').val(page).trigger('change');
     });
+
+
 
     function expandMenu(evt)
     {
