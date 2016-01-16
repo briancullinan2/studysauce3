@@ -1,5 +1,5 @@
-<label>
-    <select name="role">
+<label class="input">
+    <select name="roles">
         <option value="">Role</option>
         <option value="_ascending">Ascending (A-Z)</option>
         <option value="_descending">Descending (Z-A)</option>

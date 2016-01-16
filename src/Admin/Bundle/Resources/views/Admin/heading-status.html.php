@@ -1,4 +1,4 @@
-<label class="input status">
+<label class="input">
     <select name="status">
         <option value="">Status</option>
         <option value="UNPUBLISHED">Unpublished</option>

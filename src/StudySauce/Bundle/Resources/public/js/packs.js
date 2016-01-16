@@ -111,9 +111,11 @@ $(document).ready(function () {
         packsFunc();
     }
 
-    body.on('focus mousedown keydown change keyup', '#packs .answers textarea', function () {
+    body.on('focus mousedown keydown change keyup blur', '#packs .answers textarea', function () {
         $(this).css('height', '');
-        $(this).height($(this)[0].scrollHeight - 4);
+        if ($(this).is(':focus')) {
+            $(this).height($(this)[0].scrollHeight - 4);
+        }
         var row = $(this).parents('.card-row');
         // get current line
         var orig = row.find('.correct.type-mc select').val();

@@ -908,6 +908,7 @@ $.fn.redraw = function(){
                 this.style.zIndex = 2;
                 this.style.zIndex = oldZ;
                 this.style.webkitTransform = 'scale(1)';
+                this.style.webkitTransform = '';
             }
         });
     }, 10);

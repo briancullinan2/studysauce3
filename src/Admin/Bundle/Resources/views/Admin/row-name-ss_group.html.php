@@ -5,8 +5,8 @@ use StudySauce\Bundle\Entity\Group;
 ?>
 <div class="group-name">
 <label class="input">
-    <input type="text" name="groupName" value="<?php print $view->escape($ss_group->getName()); ?>"/><br/>
+    <input type="text" name="name" value="<?php print $view->escape($ss_group->getName()); ?>"/>
 </label>
 <label class="input">
-    <textarea name="description"><?php print $view->escape($ss_group->getDescription()); ?></textarea></label>
+    <textarea name="description" placeholder="Description"><?php print $view->escape($ss_group->getDescription()); ?></textarea></label>
 </div>

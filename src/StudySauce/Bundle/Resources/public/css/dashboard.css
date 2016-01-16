@@ -105,7 +105,7 @@ aside + .panel-pane,
 }
 
 .pane-bottom {
-    background: #BBBBBB;
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
     margin: 0 -20px -20px -20px;
     padding: 20px;
 }
@@ -252,6 +252,8 @@ table.results > thead > tr > th:last-child {
     padding-right:0;
 }
 
+.results [class*="-row"] > * .radio,
+table.results > tbody > tr > td .radio,
 .results [class*="-row"] > * .checkbox,
 table.results > tbody > tr > td .checkbox {
     margin:0;
@@ -267,6 +269,7 @@ table.results > tbody > tr > td .checkbox {
     white-space: nowrap;
 }
 
+.results :not(.highlighted-link) label.radio,
 .results :not(.highlighted-link) label.checkbox
 {
     min-height: 0;
@@ -275,34 +278,53 @@ table.results > tbody > tr > td .checkbox {
     line-height: 100%;
 }
 
+.results .read-only :not(.highlighted-link) label.radio input,
+.results .read-only :not(.highlighted-link) label.radio input ~ *,
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"]:checked,
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"]:checked ~ *,
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"],
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"] ~ *,
 .results .read-only :not(.highlighted-link) label.checkbox input,
 .results .read-only :not(.highlighted-link) label.checkbox input ~ *,
 .results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"]:checked,
 .results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"]:checked ~ *,
 .results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"],
-.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"] ~ * {
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"] ~ *
+{
     display:none;
 }
 
-.results .edit :not(.highlighted-link) label.checkbox {
+.results .edit :not(.highlighted-link) label.radio,
+.results .edit :not(.highlighted-link) label.checkbox
+{
     display:block;
 }
 
-.results [class*="-row"]:not(.selected) > .highlighted-link > *:not(.checkbox) {
+.results .read-only label.checkbox input:checked ~ span:before
+{
+    content: ", ";
+}
+
+.results .read-only label.radio,
+.results .read-only label.radio input:checked ~ *:not(i),
+.results .read-only label.checkbox,
+.results .read-only label.checkbox input:checked ~ *:not(i)
+{
+    display:inline;
+}
+
+.results [class*="-row"].read-only .highlighted-link > *:not(.checkbox)
+{
     visibility: hidden;
     opacity: 0;
     transition: opacity ease-in-out .15s;
 }
 
-.results [class*="-row"]:hover > .highlighted-link > *:not(.checkbox) {
+.results [class*="-row"].selected .highlighted-link > *:not(.checkbox),
+.results [class*="-row"]:hover .highlighted-link > *:not(.checkbox)
+{
     visibility: visible;
     opacity: 1;
-}
-
-.results .read-only label.checkbox,
-.results .read-only label.checkbox input:checked ~ span
-{
-    display:inline;
 }
 
 .results [class*="-row"] > *,
@@ -386,6 +408,16 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
 }
 
+.results.collapsible > h2.collapsed ~ [class*="-row"] {
+    display:none;
+}
+
+.results.collapsible > h2.expanded ~ [class*="-row"],
+.results.collapsible > h2:not(.collapsed) ~ [class*="-row"] {
+    display:block;
+}
+
+.results.expandable > [class*="-row"].selected > *:first-child:before,
 table.results.expandable > tbody > tr.selected > td:first-child:before
 {
     transform: rotate(0deg);
@@ -396,16 +428,19 @@ table.results.expandable > tbody > tr.selected > td:first-child:before
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
 }
 
+.results.expandable > [class*="-row"] + *:nth-of-type(even),
 table.results.expandable > tbody > tr:nth-child(even)
 {
     display:none;
 }
 
+.results.expandable > [class*="-row"].selected + *,
 table.results.expandable > tbody > tr.selected + tr
 {
     display:table-row;
 }
 
+.results.expandable > [class*="-row"] + *:nth-of-type(even) > *,
 table.results.expandable > tbody > tr:nth-child(even) > td
 {
     padding:0;

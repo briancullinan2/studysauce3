@@ -2,9 +2,7 @@
 
 namespace Admin\Bundle\Controller;
 
-use Course1\Bundle\Entity\Course1;
-use Course2\Bundle\Entity\Course2;
-use Course3\Bundle\Entity\Course3;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -32,6 +30,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class AdminController extends Controller
 {
     private static $paidStr = '';
+    /** @var ClassMetadata[] $allTables */
+    private static $allTables;
+    /** @var ClassMetadata[] $allTableMetadata */
+    private static $allTableMetadata;
+    /** @var string[] $allTableClasses */
+    private static $allTableClasses;
+    private static $tables;
 
     /**
      * @param EntityManager $orm
@@ -278,6 +283,78 @@ class AdminController extends Controller
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param string $table
+     * @param array $request
+     * @return QueryBuilder
+     */
+    private function newSearchBuilder(QueryBuilder $qb, $table, $request, $joins = [])
+    {
+        /** @var QueryBuilder $qb $f */
+        foreach(self::$tables[$table] as $f) {
+            if($f == 'id') {
+                // TODO: do id and activity time here
+                if (isset($request['id']) && is_numeric($request['id'])) {
+                    $id = intval($request['id']);
+                }
+                else if (isset($request['search']) && is_numeric($request['search'])) {
+                    $id = intval($request['search']);
+                }
+
+                if (!empty($id)) {
+                    $qb = $qb->orWhere($table . '.id = :id')
+                        ->setParameter('id', $id);
+                }
+            }
+
+            if ($f == 'name') {
+                if (isset($request['name'])) {
+                    $name = $request['name'];
+                }
+                else if (isset($request['search'])) {
+                    $name = '%' . $request['search'] . '%';
+                }
+
+                if (!empty($name)) {
+                    if ($table == 'ss_user') {
+                        $qb = $qb->orWhere('ss_user.first LIKE :search OR ss_user.last LIKE :search OR ss_user.email LIKE :search')
+                            ->setParameter('search', $name);
+                    } else if ($table == 'ss_group') {
+                        $qb = $qb->orWhere('ss_group.name LIKE :search OR ss_group.description LIKE :search')
+                            ->setParameter('search', $name);
+                    } else if ($table == 'pack') {
+                        $qb = $qb->orWhere('pack.title LIKE :search')
+                            ->setParameter('search', $name);
+                    }
+                }
+            }
+
+            $associated = self::$allTables[$table]->getAssociationMappings();
+            if (isset($associated[$f])) {
+                if (isset($request[$f])) {
+                    $joinSearch = $request[$f];
+                }
+                // only do a join if column name is specified
+                //else if (isset($request['search'])) {
+                //    $joinSearch = $request['search'];
+                //}
+
+                if (!empty($joinSearch)) {
+                    $ti = array_search($associated[$f]['targetEntity'], self::$allTableClasses);
+                    $joinName = self::$allTableMetadata[$ti]->table['name'];
+                    if (!in_array($joinName, $joins)) {
+                        $joins[] = $joinName;
+                        $qb = $qb->leftJoin($table . '.' . $f, $joinName);
+                    }
+                    $qb = self::newSearchBuilder($qb, $joinName, ['search' => $joinSearch], $joins);
+                }
+            }
+        }
+
+        return $qb;
+    }
+
+    /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -293,146 +370,74 @@ class AdminController extends Controller
             throw new AccessDeniedHttpException();
         }
 
-        // count total so we know the max pages
-        $total = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        self::$tables = [
+            'ss_user' => ['id', 'name', 'groups', 'packs', 'roles', 'actions'],
+            'ss_group' => ['id', 'name', 'users', 'packs', 'roles', 'actions'],
+            'pack' => ['id', 'name', 'groups', 'users', 'status', 'actions'],
+            // TODO: this really generalized template
+            //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
+        ];
 
-        // max pagination to search count
-        if(!empty($page = $request->get('page'))) {
-            if($page == 'last') {
-                $page = $total / 25;
+
+        self::$allTableClasses = $orm->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
+
+        self::$allTableMetadata = array_map(function ($table) use ($orm) {return $orm->getMetadataFactory()->getMetadataFor($table);}, self::$allTableClasses);
+
+        self::$allTables = array_combine(array_map(function (ClassMetadata $md) {return $md->getTableName();}, self::$allTableMetadata), self::$allTableMetadata);
+        //$times = array_map(function($e) {
+                /** @var User|Group $e */
+        //    return $e->getCreated()->getTimestamp();
+        //}, $entities);
+        //array_multisort($times, SORT_NUMERIC, SORT_DESC, $entities);
+
+        $vars = ['tables' => self::$tables];
+
+        foreach(self::$tables as $table => $t) {
+            /** @var QueryBuilder $qb */
+            $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
+            $qb = self::newSearchBuilder($qb, $table, $request->query->all());
+            $total = $qb->select('COUNT(DISTINCT ' . $table . '.id)')
+                ->getQuery()
+                ->getSingleScalarResult();
+            $vars[$table . '_total'] = $total;
+
+            // max pagination to search count
+            if(!empty($page = $request->get('page'))) {
+                if($page == 'last') {
+                    $page = $total / 25;
+                }
+                $resultOffset = (min(max(1, ceil($total / 25)), max(1, intval($page))) - 1) * 25;
             }
-            $resultOffset = (min(max(1, ceil($total / 25)), max(1, intval($page))) - 1) * 25;
-        }
-        else {
-            $resultOffset = 0;
-        }
-
-        // get the actual list of users
-        /** @var QueryBuilder $users */
-        $users = self::searchBuilder($orm, $request, $joins)->distinct(true)->select('u');
-
-        // figure out how to sort
-        if(!empty($order = $request->get('order'))) {
-            $field = explode(' ', $order)[0];
-            $direction = explode(' ', $order)[1];
-            if($direction != 'ASC' && $direction != 'DESC')
-                $direction = 'DESC';
-            // no extra join information needed
-            if($field == 'created' || $field == 'lastLogin' || $field == 'lastVisit' || $field == 'last') {
-                $users = $users->orderBy('u.' . $field, $direction);
+            else {
+                $resultOffset = 0;
             }
+
+            // TODO: add sorting back in
+            // figure out how to sort
+            /*
+            if(!empty($order = $request->get('order'))) {
+                $field = explode(' ', $order)[0];
+                $direction = explode(' ', $order)[1];
+                if($direction != 'ASC' && $direction != 'DESC')
+                    $direction = 'DESC';
+                // no extra join information needed
+                if($field == 'created' || $field == 'lastLogin' || $field == 'lastVisit' || $field == 'last') {
+                    $users = $users->orderBy('u.' . $field, $direction);
+                }
+            }
+            else {
+                $users = $users->orderBy('u.lastVisit', 'DESC');
+            }
+            */
+
+            $vars[$table] = self::newSearchBuilder($orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table), $table, $request->query->all())
+                ->setFirstResult($resultOffset)
+                ->setMaxResults(25)
+                ->getQuery()
+                ->getResult();
         }
-        else {
-            $users = $users->orderBy('u.lastVisit', 'DESC');
-        }
 
-        $users = $users
-            ->setFirstResult($resultOffset)
-            ->setMaxResults(25)
-            ->getQuery()
-            ->getResult();
-
-
-        // get all the interesting aggregate counts
-        $yesterday = new \DateTime('yesterday');
-        $signups = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.created > :yesterday')
-            ->setParameter('yesterday', $yesterday)
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        $visitors = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.lastVisit > :yesterday')
-            ->setParameter('yesterday', $yesterday)
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        $parents = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles LIKE \'%s:11:"ROLE_PARENT"%\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        $partners = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles LIKE \'%s:12:"ROLE_PARTNER"%\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        $advisers = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles LIKE \'%s:12:"ROLE_ADVISER"%\' OR u.roles LIKE \'%s:19:"ROLE_MASTER_ADVISER"%\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        $students = self::searchBuilder($orm, $request)
-            ->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles NOT LIKE \'%s:12:"ROLE_ADVISER"%\'')
-            ->andWhere('u.roles NOT LIKE \'%s:19:"ROLE_MASTER_ADVISER"%\'')
-            ->andWhere('u.roles NOT LIKE \'%s:12:"ROLE_PARTNER"%\'')
-            ->andWhere('u.roles NOT LIKE \'%s:11:"ROLE_PARENT"%\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        /** @var QueryBuilder $torch */
-        $torch = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('g', $joins)) {
-            $torch = $torch->leftJoin('u.groups', 'g');
-        }
-        $torch = $torch->select('COUNT(DISTINCT u.id)')
-            ->andWhere('g.name LIKE \'%torch%\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-        /** @var int $torch */
-
-        /** @var QueryBuilder $csa */
-        $csa = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('g', $joins)) {
-            $csa = $csa->leftJoin('u.groups', 'g');
-        }
-        $csa = $csa->select('COUNT(DISTINCT u.id)')
-            ->andWhere('g.name LIKE \'%csa%\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-        /** @var int $csa */
-
-        /** @var QueryBuilder $paid */
-        $paid = self::searchBuilder($orm, $request, $joins);
-        if(!in_array('g', $joins)) {
-            $paid = $paid->leftJoin('u.groups', 'g');
-        }
-        $paid = $paid->select('COUNT(DISTINCT u.id)')
-            ->andWhere('u.roles LIKE \'%s:9:"ROLE_PAID"%\'' . (!empty(self::$paidStr) ? ('OR g.id IN (' . self::$paidStr . ')') : ''))
-            ->getQuery()
-            ->getSingleScalarResult();
-        /** @var int $paid */
-
-        // get the groups for use in dropdown
-        $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
-
-        $packs = $orm->getRepository('StudySauceBundle:Pack')->findAll();
-
-        return $this->render('AdminBundle:Admin:tab.html.php', [
-            'ss_group' => $groups,
-            'ss_user' => $users,
-            'pack' => $packs,
-            'visitors' => $visitors,
-            'signups' => $signups,
-            'parents' => $parents,
-            'partners' => $partners,
-            'advisers' => $advisers,
-            'paid' => $paid,
-            'students' => $students,
-            'torch' => $torch,
-            'csa' => $csa,
-            'total' => $total,
-            'orm' => $orm
-        ]);
+        return $this->render('AdminBundle:Admin:tab.html.php', $vars);
     }
 
     /**

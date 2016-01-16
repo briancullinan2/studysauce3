@@ -251,9 +251,9 @@ $view['slots']->start('body'); ?>
                             ?>
                             <div class="pack-row pack-id-<?php print $p->getId(); ?> read-only">
                                 <?php print $view->render('AdminBundle:Admin:row-name-pack.html.php', ['pack' => $p]); ?>
-                                <?php print $view->render('AdminBundle:Admin:row-creator-pack.html.php', ['pack' => $p]); ?>
                                 <?php print $view->render('AdminBundle:Admin:row-groups.html.php', ['entity' => $p, 'groups' => $groups]); ?>
                                 <?php print $view->render('AdminBundle:Admin:row-users.html.php', ['entity' => $p]); ?>
+                                <?php print $view->render('AdminBundle:Admin:row-status-pack.html.php', ['pack' => $p]); ?>
                                 <?php print $view->render('AdminBundle:Admin:row-actions-pack.html.php', ['pack' => $p]); ?>
                             </div>
                             <div>

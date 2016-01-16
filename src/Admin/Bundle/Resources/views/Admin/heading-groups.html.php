@@ -1,9 +1,11 @@
-<label>
-    <select name="group">
+<label class="input">
+    <select name="groups">
         <option value="">Group</option>
         <option value="_ascending">Ascending (A-Z)</option>
         <option value="_descending">Descending (Z-A)</option>
-        <?php foreach ($groups as $i => $g) {
+        <?php use StudySauce\Bundle\Entity\Group;
+
+        foreach ($groups as $i => $g) {
             /** @var Group $g */
             ?>
             <option

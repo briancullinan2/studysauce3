@@ -1,4 +1,4 @@
-<label>
+<label class="input">
     <select name="name">
         <option value="">Name</option>
         <option value="_ascending">Ascending (A-Z)</option>

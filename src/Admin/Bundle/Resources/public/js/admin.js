@@ -7,12 +7,14 @@ $(document).ready(function () {
 
     function loadContent (data) {
         var admin = jQuery('#command'),
-            content = $(data);
-        admin.find('#users > form .results').replaceWith(content.filter('#command').find('#users > form .results'));
-        admin.find('#users .pane-top .results').replaceWith(content.filter('#command').find('#users .pane-top .results'));
-        admin.find('#groups > form .results').replaceWith(content.filter('#command').find('#groups > form .results'));
-        admin.find('#groups .pane-top .results').replaceWith(content.filter('#command').find('#groups .pane-top .results'));
-        admin.find('#users .page-total').text(content.find('#users .page-total').text());
+            content = $(data).filter('#command');
+        admin.find('.class-names .checkbox input:checked').each(function () {
+            var table = $(this).val();
+            admin.find('.results > .' + table + '-row, .results > h2.' + table).remove();
+            content.find('.results > .' + table + '-row, .results > h2.' + table).appendTo(admin.find('.results'));
+        });
+        //admin.find('#users .page-total').text(content.find('#users .page-total').text());
+
     }
 
     function getData()
@@ -21,14 +23,12 @@ $(document).ready(function () {
         var result = {
             order: orderBy,
             search: admin.find('input[name="search"]').val().trim(),
-            page: admin.find('input[name="page"]').val().trim(),
-            role: admin.find('select[name="role"]').val().trim(),
-            group: admin.find('select[name="group"]').val().trim(),
-            last: admin.find('select[name="last"]').val().trim(),
-            paid: admin.find('select[name="hasPaid"]').val().trim(),
-            lastVisit: admin.find('input[name="lastVisit"]').val().trim(),
-            created: admin.find('input[name="created"]').val().trim()
+            page: admin.find('input[name="page"]').val().trim()
         };
+
+        admin.find('header .input input, header .input select').each(function () {
+            result[$(this).attr('name')] = $(this).val();
+        });
 
         return result;
     }
@@ -56,7 +56,10 @@ $(document).ready(function () {
         if (selected.length > 0 && isElementInViewport(selected)) {
             table = (/(.*)-row/i).exec(selected.attr('class'))[0];
         }
-        command.attr('class', command.attr('class').replace(/\s(.*)-row/i, ' ')).addClass(table);
+        table = table.substring(0, table.length - 3) + 'headings';
+        if(!command.is('.' + table)) {
+            command.attr('class', command.attr('class').replace(/\s(.*)-headings/i, ' ')).addClass(table);
+        }
     });
 
     body.on('keyup change', '#command input[name="search"], #command input[name="page"]', function () {
@@ -65,9 +68,9 @@ $(document).ready(function () {
         searchTimeout = setTimeout(loadResults, 1000);
     });
 
-    body.on('click', '#command a[href="#edit-user"], #command a[href="#edit-group"]', function (evt) {
+    body.on('click', '#command a[href^="#edit"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.group-row, .user-row');
+        var row = $(this).parents('[class*="-row"]');
         row.removeClass('read-only').addClass('edit');
     });
 
@@ -80,7 +83,7 @@ $(document).ready(function () {
 
     body.on('click', '#command a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.group-row, .user-row');
+        var row = $(this).parents('[class*="-row"]');
         row.removeClass('edit').addClass('read-only');
     });
 
@@ -172,6 +175,38 @@ $(document).ready(function () {
         }
     });
 
+    body.on('click', '#command .search .checkbox a', function (evt) {
+        evt.preventDefault();
+        var command = $('#command');
+        var heading = $('[name="' + this.hash.substr(1) + '"]');
+        var topPlusPane = DASHBOARD_MARGINS.padding.top + command.find('.pane-top').outerHeight(true) - heading.outerHeight();
+        heading.scrollintoview({padding: {
+            top: topPlusPane,
+            right: 0,
+            bottom: $(window).height() - DASHBOARD_MARGINS.padding.top + command.find('.pane-top').height() - heading.outerHeight(),
+            left: 0
+        }});
+        command.find('[class*="-row"].' + this.hash.substr(1) + '-row').first().trigger('mouseover');
+    });
+
+    body.on('change', '#command .search .checkbox input', function () {
+        var command = $('#command');
+        var table = $(this).val();
+        var heading = command.find('.results > h2.' + table);
+        if($(this).is(':checked')) {
+            heading.removeClass('collapsed').addClass('expanded');
+        }
+        else {
+            heading.removeClass('expanded').addClass('collapsed');
+        }
+        if($(this).is('[disabled]')) {
+            heading.hide();
+        }
+        else {
+            heading.show();
+        }
+    });
+
     body.on('click', '#command #groups a[href="#remove-group"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.group-row');
@@ -188,17 +223,12 @@ $(document).ready(function () {
         });
     });
 
-    body.on('loaded', '#command', function () {
+    body.on('show', '#command', function () {
         if (!$(this).is('.loaded')) {
             $(this).addClass('loaded');
             $(this).find('header .search .checkbox').draggable();
         }
-    });
-
-    body.on('change', '#command header .search .checkbox input', function () {
-        var command = $('#command');
-        var table = $(this).val();
-        command.find('.results [class*="-row"]').filter('.' + table + '-row').css('display', !$(this).prop('checked') ? 'none' : '');
+        $(this).find('.results [class*="-row"]').filter(function () {return isElementInViewport($(this));}).first().trigger('mouseover')
     });
 
     body.on('click', '#command a[href="#new-group"], #command a[href="#save-group"]', function (evt) {
@@ -576,24 +606,47 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '#command #users > form header label > select, #command #users > form header label > input', function () {
+    body.on('change', '#command header .input > select, #command header .input > input', function () {
         var that = $(this);
+        var admin = $('#command');
+
 
         if(that.val() == '_ascending' || that.val() == '_descending')
         {
             orderBy = that.attr('name') + (that.val() == '_ascending' ? ' ASC' : ' DESC');
             that.val(that.data('last') || that.find('option').first().attr('value'));
         }
-        else if(that.val().trim() != '')
-        {
-            that.parents('th').removeClass('unfiltered').addClass('filtered');
+        else if(that.val().trim() != '') {
+            that.parent().removeClass('unfiltered').addClass('filtered');
             that.data('last', that.val());
         }
         else
         {
-            that.parents('th').removeClass('filtered').addClass('unfiltered');
+            that.parent().removeClass('filtered').addClass('unfiltered');
             that.data('last', that.val());
         }
+
+        var disabled = [];
+        admin.find('header .filtered').each(function () {
+            var header = $(this).parents('header > *');
+            admin.find('.class-names .checkbox input').each(function () {
+                if (!header.is('.' + $(this).val())) {
+                    disabled = $.merge($(disabled), $(this));
+                }
+            });
+        });
+        admin.find('.class-names .checkbox input').each(function () {
+            if(!$(this).is('[disabled]')) {
+                $(this).data('last', $(this).prop('checked'));
+            }
+            if($(this).is(disabled)) {
+                $(this).attr('disabled', 'disabled').prop('checked', false);
+            }
+            else {
+                $(this).removeAttr('disabled').prop('checked', $(this).data('last'))
+            }
+            $(this).trigger('change');
+        });
 
         loadResults();
     });
