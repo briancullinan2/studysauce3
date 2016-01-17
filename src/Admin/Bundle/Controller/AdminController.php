@@ -285,73 +285,164 @@ class AdminController extends Controller
     /**
      * @param QueryBuilder $qb
      * @param string $table
+     * @param $tableName
      * @param array $request
-     * @return QueryBuilder
+     * @param array $joins
+     * @return string
      */
-    private function newSearchBuilder(QueryBuilder $qb, $table, $request, $joins = [])
+    private function newSearchBuilder(QueryBuilder $qb, $table, $tableName, $request, $joins = [])
     {
         /** @var QueryBuilder $qb $f */
+        /** @var string $func */
+        $orWhere = '';
+        $andWhere = '';
         foreach(self::$tables[$table] as $f) {
             if($f == 'id') {
                 // TODO: do id and activity time here
-                if (isset($request['id']) && is_numeric($request['id'])) {
+                if (!empty($request['id']) && is_numeric($request['id'])) {
                     $id = intval($request['id']);
+                    $func = 'andWhere';
                 }
-                else if (isset($request['search']) && is_numeric($request['search'])) {
+                else if (!empty($request['search']) && is_numeric($request['search'])) {
                     $id = intval($request['search']);
+                    $func = 'orWhere';
                 }
 
                 if (!empty($id)) {
-                    $qb = $qb->orWhere($table . '.id = :id')
-                        ->setParameter('id', $id);
+                    $$func .= ($$func == '' ? '' : ' OR ') . $tableName . '.id = :' . $tableName . 'id';
+                    $qb = $qb->setParameter($tableName . 'id', $id);
                 }
             }
 
             if ($f == 'name') {
-                if (isset($request['name'])) {
+                if (!empty($request['name'])) {
                     $name = $request['name'];
+                    $func = 'andWhere';
                 }
-                else if (isset($request['search'])) {
+                else if (!empty($request['search'])) {
                     $name = '%' . $request['search'] . '%';
+                    $func = 'orWhere';
                 }
 
                 if (!empty($name)) {
                     if ($table == 'ss_user') {
-                        $qb = $qb->orWhere('ss_user.first LIKE :search OR ss_user.last LIKE :search OR ss_user.email LIKE :search')
-                            ->setParameter('search', $name);
+                        $$func .= ($$func == '' ? '' : ' OR ') . $tableName . '.first LIKE :' . $tableName . 'name OR ' . $tableName . '.last LIKE :' . $tableName . 'name OR ' . $tableName . '.email LIKE :' . $tableName . 'name';
+                        $qb = $qb->setParameter($tableName . 'name', $name);
                     } else if ($table == 'ss_group') {
-                        $qb = $qb->orWhere('ss_group.name LIKE :search OR ss_group.description LIKE :search')
-                            ->setParameter('search', $name);
+                        $$func .= ($$func == '' ? '' : ' OR ') . $tableName . '.name LIKE :' . $tableName . 'name OR ' . $tableName . '.description LIKE :' . $tableName . 'name';
+                        $qb = $qb->setParameter($tableName . 'name', $name);
                     } else if ($table == 'pack') {
-                        $qb = $qb->orWhere('pack.title LIKE :search')
-                            ->setParameter('search', $name);
+                        $$func .= ($$func == '' ? '' : ' OR ') . $tableName . '.title LIKE :' . $tableName . 'name';
+                        $qb = $qb->setParameter($tableName . 'name', $name);
                     }
                 }
             }
 
-            $associated = self::$allTables[$table]->getAssociationMappings();
-            if (isset($associated[$f])) {
-                if (isset($request[$f])) {
-                    $joinSearch = $request[$f];
-                }
-                // only do a join if column name is specified
-                //else if (isset($request['search'])) {
-                //    $joinSearch = $request['search'];
-                //}
-
-                if (!empty($joinSearch)) {
-                    $ti = array_search($associated[$f]['targetEntity'], self::$allTableClasses);
-                    $joinName = self::$allTableMetadata[$ti]->table['name'];
-                    if (!in_array($joinName, $joins)) {
-                        $joins[] = $joinName;
-                        $qb = $qb->leftJoin($table . '.' . $f, $joinName);
-                    }
-                    $qb = self::newSearchBuilder($qb, $joinName, ['search' => $joinSearch], $joins);
-                }
+            // search for unions in original request only
+            if($table == $tableName && empty($request[$f]) && !empty($request['search'])) {
+                $request[$f] = $request['search'];
+                $func = 'orWhere';
             }
+            else {
+                $func = 'andWhere';
+            }
+            // only do a join if column name is specified
+            if (!empty($request[$f])) {
+                $joinSearch = $request[$f];
+
+                // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
+                if ($f == 'packs' && $table == 'ss_user') {
+                    if (!in_array('ss_user_authored', $joins)) {
+                        $joins[] = 'ss_user_authored';
+                        $qb = $qb->leftJoin($tableName . '.authored', 'ss_user_authored');
+                    }
+                    if (!in_array('ss_user_user_packs', $joins)) {
+                        $joins[] = 'ss_user_user_packs';
+                        $qb = $qb->leftJoin($tableName . '.userPacks', 'ss_user_user_packs');
+                    }
+                    if (!in_array('ss_user_user_packs_pack', $joins)) {
+                        $joins[] = 'ss_user_user_packs_pack';
+                        $qb = $qb->leftJoin('ss_user_user_packs.pack', 'ss_user_user_packs_pack');
+                    }
+                    $union1 = self::newSearchBuilder($qb, 'pack', 'ss_user_authored', ['search' => $joinSearch], $joins);
+                    $union2 = self::newSearchBuilder($qb, 'pack', 'ss_user_user_packs_pack', ['search' => $joinSearch], $joins);
+                    if (!empty($union1) && !empty($union2)) {
+                        $$func .= ($$func == '' ? '' : ' OR ') . ' (' . $union1 . ($union1 != '' && $union2 != '' ? ' OR ' : '') . $union2 . ') ';
+                    }
+                } else if ($f == 'groups' && $table == 'pack') {
+                    if (!in_array('pack_group', $joins)) {
+                        $joins[] = 'pack_group';
+                        $qb = $qb->leftJoin($tableName . '.group', 'pack_group');
+                    }
+                    if (!in_array('pack_groups', $joins)) {
+                        $joins[] = 'pack_groups';
+                        $qb = $qb->leftJoin($tableName . '.groups', 'pack_groups');
+                    }
+                    $union1 = self::newSearchBuilder($qb, 'ss_group', 'pack_group', ['search' => $joinSearch], $joins);
+                    $union2 = self::newSearchBuilder($qb, 'ss_group', 'pack_groups', ['search' => $joinSearch], $joins);
+                    if (!empty($union1) && !empty($union2)) {
+                        $$func .= ($$func == '' ? '' : ' OR ') . ' (' . $union1 . ($union1 != '' && $union2 != '' ? ' OR ' : '') . $union2 . ') ';
+                    }
+                } else if ($f == 'users' && $table == 'pack') {
+                    if (!in_array('pack_user', $joins)) {
+                        $joins[] = 'pack_user';
+                        $qb = $qb->leftJoin($tableName . '.user', 'pack_user');
+                    }
+                    if (!in_array('pack_user_packs', $joins)) {
+                        $joins[] = 'pack_user_packs';
+                        $qb = $qb->leftJoin($tableName . '.userPacks', 'pack_user_packs');
+                    }
+                    if (!in_array('pack_user_packs_user', $joins)) {
+                        $joins[] = 'pack_user_packs_user';
+                        $qb = $qb->leftJoin('pack_user_packs.user', 'pack_user_packs_user');
+                    }
+                    $union1 = self::newSearchBuilder($qb, 'ss_user', 'pack_user', ['search' => $joinSearch], $joins);
+                    $union2 = self::newSearchBuilder($qb, 'ss_user', 'pack_user_packs_user', ['search' => $joinSearch], $joins);
+                    if (!empty($union1) && !empty($union2)) {
+                        $$func .= ($$func == '' ? '' : ' OR ') . ' (' . $union1 . ($union1 != '' && $union2 != '' ? ' OR ' : '') . $union2 . ') ';
+                    }
+                } else if ($f == 'packs' && $table == 'ss_group') {
+                    if (!in_array('ss_group_packs', $joins)) {
+                        $joins[] = 'ss_group_packs';
+                        $qb = $qb->leftJoin($tableName . '.packs', 'ss_group_packs');
+                    }
+                    if (!in_array('ss_group_group_packs', $joins)) {
+                        $joins[] = 'ss_group_group_packs';
+                        $qb = $qb->leftJoin($tableName . '.group_packs', 'ss_group_group_packs');
+                    }
+                    $union1 = self::newSearchBuilder($qb, 'pack', 'ss_group_packs', ['search' => $joinSearch], $joins);
+                    $union2 = self::newSearchBuilder($qb, 'pack', 'ss_group_group_packs', ['search' => $joinSearch], $joins);
+                    if (!empty($union1) && !empty($union2)) {
+                        $$func .= ($$func == '' ? '' : ' OR ') . ' (' . $union1 . ($union1 != '' && $union2 != '' ? ' OR ' : '') . $union2 . ') ';
+                    }
+                } else {
+                    $associated = self::$allTables[$table]->getAssociationMappings();
+                    if (isset($associated[$f])) {
+                        $ti = array_search($associated[$f]['targetEntity'], self::$allTableClasses);
+                        $joinName = self::$allTableMetadata[$ti]->table['name'];
+                        if (!in_array($joinName, $joins)) {
+                            $joins[] = $joinName;
+                            $qb = $qb->leftJoin($tableName . '.' . $f, $tableName . '_' . $joinName);
+                        }
+                        $$func .= ($$func == '' ? '' : ' OR ') . self::newSearchBuilder($qb, $joinName, $tableName . '_' . $joinName, ['search' => $joinSearch], $joins);
+                    }
+
+                    $fields = self::$allTables[$table]->getFieldNames();
+                    if(in_array($f, $fields)) {
+                        $$func .= ($$func == '' ? '' : ' OR ') . $tableName . '.' . $f . ' LIKE :' . $tableName . 'field' . $f;
+                        $qb = $qb->setParameter($tableName . 'field' . $f, '%' . $joinSearch . '%');
+                    }
+
+                }
+
+            }
+
         }
 
-        return $qb;
+        if(empty($andWhere) && empty($orWhere)) {
+            return '';
+        }
+        return '(' . $andWhere . (!empty($andWhere) && !empty($orWhere) ? (' AND (' . $orWhere . ') ') : $orWhere) . ') ';
     }
 
     /**
@@ -395,10 +486,13 @@ class AdminController extends Controller
         foreach(self::$tables as $table => $t) {
             /** @var QueryBuilder $qb */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $qb = self::newSearchBuilder($qb, $table, $request->query->all());
-            $total = $qb->select('COUNT(DISTINCT ' . $table . '.id)')
-                ->getQuery()
-                ->getSingleScalarResult();
+            $where = self::newSearchBuilder($qb, $table, $table, $request->query->all());
+            if(!empty($where)) {
+                $qb = $qb->where($where);
+            }
+            $totalQuery = $qb->select('COUNT(DISTINCT ' . $table . '.id)')
+                ->getQuery();
+            $total = $totalQuery->getSingleScalarResult();
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count
@@ -429,12 +523,18 @@ class AdminController extends Controller
                 $users = $users->orderBy('u.lastVisit', 'DESC');
             }
             */
-
-            $vars[$table] = self::newSearchBuilder($orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table), $table, $request->query->all())
+            $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
+            $where = self::newSearchBuilder($qb, $table, $table, $request->query->all());
+            if(!empty($where)) {
+                $qb = $qb->where($where);
+            }
+            $query = $qb
+                ->select($table)
+                ->distinct(true)
                 ->setFirstResult($resultOffset)
                 ->setMaxResults(25)
-                ->getQuery()
-                ->getResult();
+                ->getQuery();
+            $vars[$table] = $query->getResult();
         }
 
         return $this->render('AdminBundle:Admin:tab.html.php', $vars);

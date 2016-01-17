@@ -119,21 +119,55 @@ $(document).ready(function () {
         loadingAnimation($(this));
     });
 
-    body.on('click', '.results [class*="-row"], table.results > tbody > tr', function () {
+    var lastSelected = null;
+    var selectViable = false;
+    document.onselectstart = function () {
+        if(key.shift && selectViable) {
+            return false;
+        }
+    };
+    body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function () {
+        selectViable = false;
         var results = $(this).parents('.results');
-        results.find('.selected').removeClass('selected').find('> *:last-child input[name="selected"]')
-            .prop('checked', false);
-        if (!$(this).find('input[name="selected"]').prop('checked')) {
-            $(this).addClass('selected').find('> *:last-child input[name="selected"]')
-                .prop('checked', true);
+        var type = (/(.*)-row/i).exec($(this).attr('class'))[1];
+        var state = !$(this).find('input[name="selected"]').prop('checked');
+        // clear selection unless shift is pressed
+        var range = $(this);
+        if (!key.shift) {
+            results.find('.selected').not($(this)).removeClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', false);
         }
         else {
-            $(this).removeClass('selected').find('> *:last-child input[name="selected"]')
-                .prop('checked', false);
+            // check if range is viable
+            if(lastSelected != null && lastSelected.is('.' + type + '-row')) {
+                if(lastSelected.index() < $(this).index()) {
+                    range = $.merge(range, lastSelected.nextUntil($(this)));
+                }
+                else {
+                    range = $.merge(range, $(this).nextUntil(lastSelected));
+                }
+                selectViable = true;
+            }
+        }
+        if (state) {
+            range.addClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', state);
+        }
+        else {
+            range.removeClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', state);
+        }
+
+        // if we just did a select, reset the last select so it takes two more clicks to do another range
+        if (selectViable) {
+            lastSelected = null;
+        }
+        else {
+            lastSelected = $(this);
         }
     });
 
-    body.on('click', '.results.expandable > tbody > tr:nth-child(odd)', function () {
+    body.on('click', '.results.expandable > [class*="-row"]:nth-of-type(odd), .results.expandable > tbody > tr:nth-child(odd)', function () {
         var row = $(this);
         if(row.is('.selected')) {
             row.removeClass('selected');

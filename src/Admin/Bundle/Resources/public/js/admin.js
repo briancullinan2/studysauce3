@@ -14,7 +14,29 @@ $(document).ready(function () {
             content.find('.results > .' + table + '-row, .results > h2.' + table).appendTo(admin.find('.results'));
         });
         //admin.find('#users .page-total').text(content.find('#users .page-total').text());
+    }
 
+    function resetHeader() {
+        var command = $('#command');
+        var selected = command.find('.results [class*="-row"].selected').filter(function () {
+            return isElementInViewport($(this));
+        });
+
+        if (selected.length == 0) {
+            if ($(this).is('.results [class*="-row"]') && isElementInViewport($(this))) {
+                selected = $(this);
+            }
+            else
+                selected = command.find('.results [class*="-row"]').filter(function () {
+                    return isElementInViewport($(this));
+                });
+        }
+
+        var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
+        table = table + '-headings';
+        if(!command.is('.' + table)) {
+            command.attr('class', command.attr('class').replace(/\s(.*)-headings/i, ' ')).addClass(table);
+        }
     }
 
     function getData()
@@ -49,18 +71,7 @@ $(document).ready(function () {
         }, 100);
     }
 
-    body.on('mouseover', '#command .results [class*="-row"]', function () {
-        var command = $('#command');
-        var selected = command.find('.results [class*="-row"].selected');
-        var table = (/(.*)-row/i).exec($(this).attr('class'))[0];
-        if (selected.length > 0 && isElementInViewport(selected)) {
-            table = (/(.*)-row/i).exec(selected.attr('class'))[0];
-        }
-        table = table.substring(0, table.length - 3) + 'headings';
-        if(!command.is('.' + table)) {
-            command.attr('class', command.attr('class').replace(/\s(.*)-headings/i, ' ')).addClass(table);
-        }
-    });
+    body.on('mouseover click', '#command .results [class*="-row"]', resetHeader);
 
     body.on('keyup change', '#command input[name="search"], #command input[name="page"]', function () {
         if(searchTimeout != null)
@@ -228,7 +239,7 @@ $(document).ready(function () {
             $(this).addClass('loaded');
             $(this).find('header .search .checkbox').draggable();
         }
-        $(this).find('.results [class*="-row"]').filter(function () {return isElementInViewport($(this));}).first().trigger('mouseover')
+        resetHeader();
     });
 
     body.on('click', '#command a[href="#new-group"], #command a[href="#save-group"]', function (evt) {
@@ -606,7 +617,13 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '#command header .input > select, #command header .input > input', function () {
+    body.on('submit', '#command header form', function (evt) {
+        evt.preventDefault();
+
+        loadResults();
+    });
+
+    body.on('change', '#command header .input > select, #command header .input > input', function (evt) {
         var that = $(this);
         var admin = $('#command');
 
@@ -630,7 +647,7 @@ $(document).ready(function () {
         admin.find('header .filtered').each(function () {
             var header = $(this).parents('header > *');
             admin.find('.class-names .checkbox input').each(function () {
-                if (!header.is('.' + $(this).val())) {
+                if (!header.is('.search') && !header.is('.paginate') && !header.is('.' + $(this).val())) {
                     disabled = $.merge($(disabled), $(this));
                 }
             });

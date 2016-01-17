@@ -6,7 +6,7 @@ use StudySauce\Bundle\Entity\User;
 <div class="results collapsible">
     <header class="pane-top">
         <div class="search">
-            <form action="<?php print $view['router']->generate('save_user'); ?>" method="post">
+            <form action="<?php print $view['router']->generate('command'); ?>" method="post">
                 <div class="class-names">
                     <?php foreach($tables as $table => $t) { ?>
                         <label class="checkbox"><input type="checkbox" name="packs" value="<?php print $table; ?>" checked="checked" /><i></i> <a href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
@@ -19,7 +19,7 @@ use StudySauce\Bundle\Entity\User;
 
         <?php foreach($tables as $table => $t) {
             $tableTotal = $table . '_total';
-            ?><div class="<?php print $table; ?>"><?php
+            ?><div class="<?php print $table; ?> paginate"><?php
                 print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $$tableTotal]);
             ?></div><?php
         } ?>
@@ -54,9 +54,14 @@ use StudySauce\Bundle\Entity\User;
         <?php } ?>
         <label class="checkbox"><input type="checkbox" name="select-all"/><i></i></label>
     </header>
-    <?php foreach ($tables as $table => $t) { ?>
-        <h2 class="<?php print $table; ?>"><a name="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a> <a href="#add-entity">+</a></h2>
-        <?php
+    <?php foreach ($tables as $table => $t) {
+        if(count($$table) > 0) {
+            ?>
+            <h2 class="<?php print $table; ?>"><a
+                    name="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a> <a
+                    href="#add-entity">+</a></h2>
+            <?php
+        }
         foreach ($$table as $e) {
             /** @var User|Group $e */
             $rowId = $table . '-id-' . $e->getId();
