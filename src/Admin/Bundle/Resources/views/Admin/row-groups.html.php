@@ -14,7 +14,7 @@ use StudySauce\Bundle\Entity\User;
             <input type="checkbox" name="groups"
                    value="<?php print $g->getId(); ?>" <?php print ($entity->hasGroup($g->getName())
                 ? 'checked="checked"'
-                : ''); ?> /><i></i><span><?php print $g->getName(); ?></span>
+                : ''); ?> /><i></i><span><?php print $view->escape($g->getName()); ?></span>
         </label>
         <?php if (method_exists($entity, 'getGroup')) { ?>
             <label class="radio">

@@ -475,6 +475,7 @@
 .pane-content a[href*="#grade-scale"]:not(.more),
 .pane-content a[href*="#manage-terms"]:not(.more),
 .pane-content a[href*="/calculator"]:not(.more),
+.results a[href^="#search-"],
 #login a[href*="/reset"]:not(.more)
 {
     padding-left:30px;
@@ -495,6 +496,7 @@
 .pane-content a[href*="#grade-scale"]:not(.more):before,
 .pane-content a[href*="#manage-terms"]:not(.more):before,
 .pane-content a[href*="/calculator"]:not(.more):before,
+.results a[href^="#search-"]:before,
 #login a[href*="/reset"]:not(.more):before
 {
     background: url(../images/menu_new_half.png) no-repeat left -302px transparent;
@@ -506,6 +508,19 @@
     position:absolute;
     left:2px;
     top:50%;
+}
+
+.results a[href^="#search-"]:before
+{
+    background-position: left -4802px;
+}
+
+.results a[href^="#search-"]:hover:before,
+.results a[href^="#search-"]:focus:before,
+.results a[href^="#search-"]:active:before,
+.results a[href^="#search-"].active:before
+{
+    background-position: left -4852px;
 }
 
 #login a[href*="/reset"]:not(.more):before

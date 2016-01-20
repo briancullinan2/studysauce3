@@ -1,84 +1,547 @@
 
-#results .search {
-    display:inline-block;
+table.results {
+    table-layout: fixed;
     width:100%;
-    margin-right:-300px;
-    padding-right:300px;
-    clear:both;
-    margin-top:35px;
+    border-spacing: 0;
+    border-collapse: separate;
 }
 
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child,
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.correct > td:last-child {
-    color:transparent;
-    position: relative;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child:before,
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.correct > td:last-child:before {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 50%;
-    margin-top: -10px;
-    margin-left: -10px;
-    left: 50%;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -1503px transparent;
-    height: 16px;
-    width: 16px;
-    font-size: 18px;
-}
-
-#results table.results > tbody > tr > td > table > tbody > tr > td > table > tbody > tr.wrong > td:last-child:before
+table.results > thead > tr > th
 {
-    content: "X";
-    background: none;
-    color: inherit;
+    background:transparent;
+    position: relative;
+    overflow: hidden;
+    padding:5px;
+    white-space: nowrap;
+    vertical-align: bottom;
 }
 
-#results table.results > tbody > tr:nth-child(even) > td > table > tbody > tr:nth-child(odd) > td:last-child,
-#results table.results > tbody > tr:nth-child(even) > td > table > tbody > tr:nth-child(odd) > td > table > tbody > tr > td:last-child {
-    text-align: center;
+.results header > *
+{
+    display:inline-block;
+    margin:0 -2px;
+    padding: 5px 2px;
+    vertical-align: bottom;
 }
 
-#results table.results > thead > tr > th.filtered > label > input,
-#results table.results > thead > tr > th.filtered > label > select
+.results header label.filtered > input,
+.results header label.filtered > select
 {
     border:3px solid #FF9900;
     padding-top:0;
 }
 
-#results table.results > tbody > tr > td .first,
-#results table.results > tbody > tr > td .last
+.results header .class-names {
+    min-width: 200px;
+    width: 200px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+    position:absolute;
+    background-color: rgba(238, 238, 238, 0);
+    transition: background-color ease-in-out .15s;
+}
+
+.results header .class-names:hover {
+    width:auto;
+    z-index: 10;
+    background-color: rgba(238, 238, 238, 1);
+}
+
+.results [class*="-row"] > *,
+table.results > tbody > tr > td
 {
-    width:50%;
-    margin: 0 -2px;
-    padding-left: 2px;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    table-layout: fixed;
+}
+
+table.results > tbody > tr > td:first-child,
+table.results > thead > tr > th:first-child {
+    padding-left:0;
+}
+
+table.results > tbody > tr > td:last-child,
+table.results > thead > tr > th:last-child {
+    padding-right:0;
+}
+
+.results [class*="-row"] > * .radio,
+table.results > tbody > tr > td .radio,
+.results [class*="-row"] > * .checkbox,
+table.results > tbody > tr > td .checkbox {
+    margin:0;
+}
+
+.results [class*="-row"] > *
+{
     display:inline-block;
+    margin:0 -2px;
+    padding: 5px 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-#results table.results > tbody > tr.loading
+.results .groups label.radio,
+.results .groups label.checkbox,
+.results .roles label.radio,
+.results .roles label.checkbox
 {
-    text-align: center;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 100%;
+    vertical-align: middle;
 }
 
-#results table.results > tbody > tr.loading div
+.results .read-only :not(.highlighted-link) label.radio input,
+.results .read-only :not(.highlighted-link) label.radio input ~ *,
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"]:checked,
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"]:checked ~ *,
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"],
+.results .read-only :not(.highlighted-link) label.radio input[value="ROLE_PAID"] ~ *,
+.results .read-only :not(.highlighted-link) label.checkbox input,
+.results .read-only :not(.highlighted-link) label.checkbox input ~ *,
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"]:checked,
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"]:checked ~ *,
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"],
+.results .read-only :not(.highlighted-link) label.checkbox input[value="ROLE_PAID"] ~ *
 {
-    max-width:200px;
-    margin:0 auto;
-}
-
-#results table.results .read-only td .checkbox input,
-#results table.results .read-only td .checkbox input ~ *,
-#results table.results .read-only td .checkbox input[value="ROLE_PAID"]:checked,
-#results table.results .read-only td .checkbox input[value="ROLE_PAID"]:checked ~ *,
-#results table.results .read-only td .checkbox input[value="ROLE_PAID"],
-#results table.results .read-only td .checkbox input[value="ROLE_PAID"] ~ * {
     display:none;
 }
 
-#results table.results .read-only td .checkbox input:checked ~ span
+.results .edit .roles label.radio,
+.results .edit .roles label.checkbox,
+.results .edit .groups label.radio,
+.results .edit .groups label.checkbox
 {
-    display:inline;
+    display:block;
 }
 
+.results .search input[name="search"]
+{
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -4752px transparent;
+    padding-left:30px;
+}
+
+.results a[href^="#search-"]
+{
+    margin:10px;
+    float:right;
+}
+
+.results .read-only .roles label.radio,
+.results .read-only .roles label.radio input:checked ~ *:not(i),
+.results .read-only .roles label.checkbox,
+.results .read-only .roles label.checkbox input:checked ~ *:not(i),
+.results .read-only .groups label.radio,
+.results .read-only .groups label.radio input:checked ~ *:not(i),
+.results .read-only .groups label.checkbox,
+.results .read-only .groups label.checkbox input:checked ~ *:not(i)
+{
+    display:inline-block;
+}
+
+.results [class*="-row"].read-only .highlighted-link > *:not(.checkbox)
+{
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity ease-in-out .15s;
+    display:inline-block;
+}
+
+.results [class*="-row"].selected .highlighted-link > *:not(.checkbox),
+.results [class*="-row"]:hover .highlighted-link > *:not(.checkbox)
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.results [class*="-row"] > *,
+table.results > tbody > tr > td > *
+{
+    vertical-align: middle;
+    line-height: 100%;
+}
+
+.results [class*="-row"] > * > label,
+.results header label,
+table.results > thead > tr > th > label,
+table.results > tbody > tr > td > label
+{
+    margin-top:0;
+    margin-bottom:0;
+}
+
+.results [class*="-row"],
+table.results > tbody > tr > td
+{
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    margin-left:-20px;
+    margin-right:-20px;
+    padding-left:20px;
+    padding-right:20px;
+}
+
+.results [class*="-row"]:hover:not(.selected):not(.edit),
+table.results > tbody > tr:hover:not(.selected):not(.edit) > td
+{
+    box-shadow: 0 1px 4px rgba(255,255,255,.25);
+    border-top: 1px solid #DDDDDD;
+    border-bottom: 1px solid #DDDDDD;
+    background-color: rgba(255,255,255,.50);
+    cursor: pointer;
+}
+
+.results.expandable > [class*="-row"]:nth-of-type(even):hover > *,
+table.results.expandable > tbody > tr:nth-child(even):hover > td
+{
+    box-shadow: none;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    background-color: transparent;
+    cursor: default;
+}
+
+.results.expandable > [class*="-row"]:nth-of-type(odd) > *:first-child,
+table.results.expandable > tbody > tr:nth-child(odd) > td:first-child
+{
+    position:relative;
+    padding-left: 30px;
+}
+
+.results.expandable > [class*="-row"]:nth-of-type(odd) > *:first-child:before,
+table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
+{
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=-3);
+    transform-origin: center center;
+    -webkit-transform-origin: center center;
+    -moz-transform-origin: center center;
+    -ms-transform-origin: center center;
+    -o-transform-origin: center center;
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px;
+    left: 10px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
+}
+
+.results [class*="-row"] a[href^="#edit-"]
+{
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
+}
+
+.results [class*="-row"] a[href^="#edit-"]:hover
+{
+    background-position: left -1602px;
+}
+
+.results [class*="-row"] a[href^="#confirm-remove-"],
+.results [class*="-row"] a[href^="#remove-"]
+{
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
+}
+
+.results [class*="-row"] a[href^="#remove-"]:hover
+{
+    background-position: left -1152px;
+}
+
+.results [class*="-row"] [value^="#save-"] {
+    padding-left: 20px;
+    padding-right:20px;
+}
+
+.results [class*="-row"].edit .highlighted-link > *:not(.checkbox),
+.results [class*="-row"].read-only .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].read-only .highlighted-link > [value^="#save-"]
+{
+    display:none;
+}
+
+.results [class*="-row"].edit .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].edit .highlighted-link > [value^="#save-"]
+{
+    display:inline-block;
+}
+
+.results [class*="-row"].read-only textarea
+{
+    height: 1em;
+}
+
+.results.expandable > [class*="-row"].selected > *:first-child:before,
+table.results.expandable > tbody > tr.selected > td:first-child:before
+{
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
+}
+
+.results.expandable > [class*="-row"] + *:nth-of-type(even),
+table.results.expandable > tbody > tr:nth-child(even)
+{
+    display:none;
+}
+
+.results.expandable > [class*="-row"].selected + *,
+table.results.expandable > tbody > tr.selected + tr
+{
+    display:table-row;
+}
+
+.results.expandable > [class*="-row"] + *:nth-of-type(even) > *,
+table.results.expandable > tbody > tr:nth-child(even) > td
+{
+    padding:0;
+}
+
+.results .pane-top {
+    position: fixed;
+    width:100%;
+    padding-right:70px;
+    top:50px;
+    z-index: 10;
+    height:130px;
+    margin-bottom:-20px;
+}
+
+.results .paginate {
+    width:300px;
+}
+
+.results h2 a:last-child {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 4px;
+    border: 2px solid #0099BB;
+    border-radius: 100%;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+    line-height: 12px;
+    margin-top:-8px;
+}
+
+.results h2 a:last-child:hover {
+    border-color: #00CCEE;
+}
+
+.results h2 {
+    padding-top:20px;
+    padding-bottom:20px;
+    margin-top:0;
+    margin-bottom:0;
+}
+
+.results header h2 {
+    padding:0 0 20px 0;
+    margin:-10px 0 -30px 0;
+}
+
+.results header > * {
+    display:none;
+    opacity: 0;
+    visibility:hidden;
+    transition: opacity ease-in-out 1s, visibility ease-in-out 1s;
+}
+
+.results header > *:first-child
+{
+    display:inline-block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.results header > *,
+.results [class*="-row"] > *
+{
+    width: 16.66%;
+}
+
+.results header > *:nth-child(1) {
+    width:100%;
+}
+
+.results header > *.id,
+.results [class*="-row"] > *:nth-child(1)
+{
+    width: 10%;
+}
+
+.results header > *.actions,
+.results [class*="-row"] > *:nth-last-child(2)
+{
+    width:15%;
+    text-align: right;
+    padding-right: 32px;
+    margin-right: -32px
+}
+
+.results .read-only .users .input,
+.results .read-only .packs .input {
+    display:none;
+}
+
+.results header > *:last-child,
+.results [class*="-row"] > *:nth-last-child(1)
+{
+    width: auto;
+    display:inline-block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.results header > *.name,
+.results [class*="-row"] > *:nth-child(2)
+{
+    width: 25%;
+}
+
+.results .ss_user-row .user-name .input:nth-child(1),
+.results .ss_user-row .user-name .input:nth-child(2)
+{
+    margin: 0 -2px;
+    padding: 0 2px;
+    width: 50%;
+    display:inline-block;
+}
+
+.results .pack-row.edit .groups .radio {
+    width: 100px;
+    display:inline-block;
+    margin: 0 -2px;
+    padding: 0 2px;
+    float:right;
+}
+
+.results .pack-row.edit .groups .checkbox
+{
+    width: 100%;
+    display:inline-block;
+    padding: 0 104px 0 2px;
+    margin: 0 -104px 0 -2px;
+}
+
+.results .pack-row.read-only .status {
+    text-align: center;
+}
+
+.results .pack-row.read-only .status select {
+    width: auto;
+}
+
+.results .groups,
+.results .users,
+.results .packs,
+.results .ss_group-row .name .input:nth-child(2) textarea,
+.results .ss_user-row .user-name .input:nth-child(3) input
+{
+    overflow: visible;
+    white-space: normal;
+    min-height: 0;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 100%;
+}
+
+.results .card-row.removed {
+    display:none;
+}
+
+.results .card-row > .correct.type-tf {
+    text-align: right;
+}
+
+.results .card-row > .correct.type-tf + .correct.type-tf {
+    text-align: left;
+}
+
+.results .card-row[class*="type"] .correct .correct:not([class*="type-"]),
+.results .correct .correct[class*="type-"],
+.results .card-row[class*="type"] .answers .answers:not([class*="type-"]),
+.results .answers .answers[class*="type-"],
+.results .card-row > .answers,
+.results .card-row[class*="type"].type-tf > .answers
+{
+    display:none;
+}
+
+.results .card-row[class*="type"] > .correct
+{
+    width:16.66%;
+}
+
+.results .card-row > .correct,
+.results .card-row[class*="type"].type-tf .correct
+{
+    width:33.33%;
+}
+
+.results .card-row.type-tf .correct.type-tf
+{
+    display:inline-block;
+    width:50%;
+    margin:0 -2px;
+    padding: 0 2px;
+}
+
+.results .card-row[class*="type"] > .answers
+{
+    display:inline-block;
+}
+
+.results .card-row.type-mc .answers.type-mc,
+.results .card-row.type-sa .answers.type-sa,
+.results .card-row.type-mc .correct.type-mc,
+.results .card-row.type-sa .correct.type-sa
+{
+    display:block;
+}
+
+.results .search {
+    display:inline-block;
+    width:100%;
+    margin-right:-300px;
+    padding-right: 300px;
+}
+
+.results .search .class-names + .input {
+    padding-left: 240px;
+}
+
+.results .search .input {
+    width: 100%;
+    display:inline-block;
+}
+
+@media (min-width: 1500px)
+{
+    .results .pane-top {
+        padding-right: 240px;
+    }
+
+}

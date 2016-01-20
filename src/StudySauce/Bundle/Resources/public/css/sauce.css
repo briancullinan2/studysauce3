@@ -279,7 +279,7 @@ html, body
     padding: 0;
     outline: 0 none;
     vertical-align: baseline;
-    text-align: justify;
+    text-align: left;
     position:relative;
     width:100%;
     left:0;

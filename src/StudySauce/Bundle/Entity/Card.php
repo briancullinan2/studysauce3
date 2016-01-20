@@ -91,6 +91,10 @@ class Card
         });
     }
 
+    public function getIndex() {
+        return $this->getPack()->getCards()->indexOf($this);
+    }
+
     /**
      * @return Answer
      */

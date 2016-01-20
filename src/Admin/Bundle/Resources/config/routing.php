@@ -18,8 +18,8 @@ $collection->add(
 $collection->add(
     'command_callback',
     new Route(
-        '/command/list',
-        ['_controller' => 'AdminBundle:Admin:index', '_format' => 'tab']
+        '/command/results',
+        ['_controller' => 'AdminBundle:Admin:results']
     )
 );
 

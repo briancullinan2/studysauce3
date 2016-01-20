@@ -7,37 +7,168 @@ $(document).ready(function () {
         searchTimeout = null,
         searchRequest = null;
 
-    function loadContent (data) {
-        var admin = jQuery('#results'),
-            content = $(data);
-        admin.find('table.results').each(function (i) {
-            $(this).find('> tbody > tr').remove();
-            content.filter('#results').find('table.results').eq(i).find('> tbody > tr').appendTo($(this).find('> tbody'));
-            $(this).find('> thead > tr > th').each(function (j) {
-                $(this).find('label:first-child > *:not(select):not(input)').remove();
-                content.filter('#results').find('table.results > thead > tr > th').eq(j).find('label:first-child > *:not(select):not(input)').prependTo($(this).find('label:first-child'));
-            });
+    var lastSelected = null;
+    var selectViable = false;
+    document.onselectstart = function () {
+        if(key.shift && selectViable) {
+            return false;
+        }
+    };
+    body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function () {
+        selectViable = false;
+        var results = $(this).parents('.results');
+        var type = (/(.*)-row/i).exec($(this).attr('class'))[1];
+        var state = !$(this).find('input[name="selected"]').prop('checked');
+        // clear selection unless shift is pressed
+        var range = $(this);
+        if (!key.shift) {
+            results.find('.selected').not($(this)).removeClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', false);
+        }
+        else {
+            // check if range is viable
+            if(lastSelected != null && lastSelected.is('.' + type + '-row')) {
+                if(lastSelected.index() < $(this).index()) {
+                    range = $.merge(range, lastSelected.nextUntil($(this)));
+                }
+                else {
+                    range = $.merge(range, $(this).nextUntil(lastSelected));
+                }
+                selectViable = true;
+            }
+        }
+        if (state) {
+            range.addClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', state);
+        }
+        else {
+            range.removeClass('selected').find('> *:last-child input[name="selected"]')
+                .prop('checked', state);
+        }
+
+        // if we just did a select, reset the last select so it takes two more clicks to do another range
+        if (selectViable) {
+            lastSelected = null;
+        }
+        else {
+            lastSelected = $(this);
+        }
+    });
+
+    body.on('click', '.results.expandable > [class*="-row"]:nth-of-type(odd), .results.expandable > tbody > tr:nth-child(odd)', function () {
+        var row = $(this);
+        if(row.is('.selected')) {
+            row.removeClass('selected');
+        }
+        else {
+            row.addClass('selected');
+        }
+    });
+
+    function resetHeader() {
+        var command = $('.results:visible');
+        var selected = $('[class*="-row"]:visible.selected').filter(function () {
+            return isElementInViewport($(this));
         });
-        admin.find('.page-total').text(content.find('.page-total').text());
+
+        if (selected.length == 0) {
+            if ($(this).is('[class*="-row"]:visible') && isElementInViewport($(this))) {
+                selected = $(this);
+            }
+            else {
+                selected = command.find('[class*="-row"]:visible').filter(function () {
+                    return isElementInViewport($(this));
+                });
+            }
+        }
+
+        var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
+        table = 'showing-' + table;
+        if(!command.is('.' + table)) {
+            command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, '')).addClass(table);
+        }
     }
+
+    body.on('show', '.panel-pane', function () {
+        if (!$(this).is('.results-loaded')) {
+            $(this).addClass('results-loaded');
+            $(this).find('header .search .checkbox').draggable();
+        }
+        resetHeader();
+    });
 
     function getData()
     {
-        var admin = jQuery('#results');
+        var admin = $('.results:visible');
         var result = {
             order: orderBy,
             search: admin.find('input[name="search"]').val().trim(),
-            page: admin.find('input[name="page"]').val().trim(),
-            group: admin.find('select[name="group"]').val().trim(),
-            last: admin.find('select[name="last"]').val().trim(),
-            completed: admin.find('select[name="completed"]').val().trim(),
+            page: admin.find('input[name="page"]').val().trim()
         };
 
-        //for(var i = 1; i <= 17; i++) {
-        //    result['lesson' + i] = admin.find('select[name="lesson' + i + '"]').val().trim();
-        //}
+        admin.find('header .input input, header .input select').each(function () {
+            result[$(this).attr('name')] = $(this).val();
+        });
 
         return result;
+    }
+
+    body.on('click', '.results .class-names .checkbox a', function (evt) {
+        evt.preventDefault();
+        var command = $('.results:visible');
+        var heading = $('[name="' + this.hash.substr(1) + '"]');
+        var topPlusPane = DASHBOARD_MARGINS.padding.top + command.find('.pane-top').outerHeight(true) - heading.outerHeight();
+        heading.scrollintoview({padding: {
+            top: topPlusPane,
+            right: 0,
+            bottom: $(window).height() - DASHBOARD_MARGINS.padding.top + command.find('.pane-top').height() - heading.outerHeight(),
+            left: 0
+        }});
+        command.find('[class*="-row"].' + this.hash.substr(1) + '-row').first().trigger('mouseover');
+    });
+
+    body.on('change', '.results .class-names .checkbox input', function () {
+        var command = $('.results:visible');
+        var table = $(this).val();
+        var heading = command.find('> h2.' + table);
+        if($(this).is(':checked')) {
+            heading.removeClass('collapsed').addClass('expanded');
+        }
+        else {
+            heading.removeClass('expanded').addClass('collapsed');
+        }
+        if($(this).is('[disabled]')) {
+            heading.hide();
+        }
+        else {
+            heading.show();
+        }
+        if (command.is('.showing-' + table) && (heading.is('.collapsed') || !heading.is(':visible'))) {
+            resetHeader();
+        }
+    });
+
+    body.on('click', '[class*="-row"] a[href^="#edit"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('[class*="-row"]');
+        row.removeClass('read-only').addClass('edit');
+    });
+
+    body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('[class*="-row"]');
+        row.removeClass('edit').addClass('read-only');
+    });
+
+    function loadContent (data) {
+        var admin = jQuery('.results:visible'),
+            content = $(data).filter('.results');
+        admin.find('.class-names .checkbox input:checked').each(function () {
+            var table = $(this).val();
+            admin.find('> .' + table + '-row, > h2.' + table).remove();
+            content.find('> .' + table + '-row, > h2.' + table).appendTo(admin);
+        });
+        //admin.find('#users .page-total').text(content.find('#users .page-total').text());
     }
 
     function loadResults() {
@@ -45,9 +176,10 @@ $(document).ready(function () {
             searchRequest.abort();
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
+
         searchTimeout = setTimeout(function () {
             searchRequest = $.ajax({
-                url: window.callbackPaths['results_callback'],
+                url: window.callbackPaths['command_callback'],
                 type: 'GET',
                 dataType: 'text',
                 data: getData(),
@@ -56,31 +188,108 @@ $(document).ready(function () {
         }, 100);
     }
 
+    body.on('mouseover click', '.results [class*="-row"]', resetHeader);
 
-    body.on('keyup change', '#results input[name="search"], #results input[name="page"]', function () {
-        if(searchTimeout != null)
-            clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(loadResults, 1000);
+    // hide any visible modals when panel changes
+    body.on('hide', '.panel-pane', function () {
+        body.find('.modal:visible').modal('hide');
+        body.find('.ui-datepicker').hide();
     });
 
-    body.on('change', '#results table.results > thead > tr > th:not(:last-child) > label > select, #results table.results > thead > tr > th:not(:last-child) > label > input', function () {
+    body.on('change', '.paginate input', function () {
+        var results = $(this).parents('.results');
+        var paginate = $(this).closest('.paginate');
+        results.find('.class-names a[href="#' + (/showing-(.*?)(\s|$)/i).exec(results.attr('class'))[1].trim() + '"]').trigger('click');
+    });
+
+    body.on('click', '.results a[href^="#search-"]', function (evt) {
+        var admin = $(this).parents('.results');
+        evt.preventDefault();
+        var search = this.hash.substring(8);
+        if (search.indexOf(':') > -1) {
+            admin.find('header input, header select').each(function () {
+                var subSearch = (new RegExp($(this).attr('name') + ':(.*?)(\s|$)', 'i')).exec(search);
+                if (subSearch) {
+                    search = search.replace(subSearch[0], '');
+                    $(this).val(subSearch[1]).trigger('change');
+                }
+            });
+        }
+        else {
+
+        }
+        $(this).parents('.results').find('.search input[name="search"]').val(search).trigger('change');
+    });
+
+    body.on('click change', '.paginate a', function (evt) {
+        evt.preventDefault();
+        var results = $(this).parents('.results'),
+            paginate = $(this).closest('.paginate'),
+            page = this.hash.match(/([0-9]*|last|prev|next|first)$/i)[0],
+            current = parseInt(paginate.find('input[name="page"]').val()),
+            last = parseInt(paginate.find('.page-total').text());
+        if(page == 'first')
+            page = 1;
+        if(page == 'next')
+            page = current + 1;
+        if(page == 'prev')
+            page = current - 1;
+        if(page == 'last')
+            page = last;
+        if(page > last)
+            page = last;
+        if(page < 1)
+            page = 1;
+        paginate.find('input[name="page"]').val(page).trigger('change');
+    });
+
+    body.on('submit', '.results header form', function (evt) {
+        evt.preventDefault();
+
+        loadResults();
+    });
+
+    body.on('change', '.results header .input > select, .results header .input > input', function (evt) {
         var that = $(this);
+        var admin = $('.results:visible');
+        var paginate = that.closest('.paginate');
 
         if(that.val() == '_ascending' || that.val() == '_descending')
         {
             orderBy = that.attr('name') + (that.val() == '_ascending' ? ' ASC' : ' DESC');
             that.val(that.data('last') || that.find('option').first().attr('value'));
         }
-        else if(that.val().trim() != '')
-        {
-            that.parents('th').removeClass('unfiltered').addClass('filtered');
+        else if(that.val().trim() != '') {
+            that.parent().removeClass('unfiltered').addClass('filtered');
             that.data('last', that.val());
         }
         else
         {
-            that.parents('th').removeClass('filtered').addClass('unfiltered');
+            that.parent().removeClass('filtered').addClass('unfiltered');
             that.data('last', that.val());
         }
+
+        var disabled = [];
+        admin.find('header .filtered').each(function () {
+            var header = $(this).parents('header > *');
+            admin.find('.class-names .checkbox input').each(function () {
+                if (!header.is('.search') && !header.is('.paginate') && !header.is('.' + $(this).val())) {
+                    disabled = $.merge($(disabled), $(this));
+                }
+            });
+        });
+        admin.find('.class-names .checkbox input').each(function () {
+            if(!$(this).is('[disabled]')) {
+                $(this).data('last', $(this).prop('checked'));
+            }
+            if($(this).is(disabled)) {
+                $(this).attr('disabled', 'disabled').prop('checked', false);
+            }
+            else {
+                $(this).removeAttr('disabled').prop('checked', $(this).data('last'))
+            }
+            $(this).trigger('change');
+        });
 
         loadResults();
     });

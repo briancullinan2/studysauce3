@@ -1,18 +1,4 @@
 
-#command .search {
-    display:inline-block;
-    width:100%;
-    margin-right:-300px;
-    padding-right:300px;
-}
-
-#command .search .input {
-    margin-left: -220px;
-    padding-left: 240px;
-    width: 100%;
-    display:inline-block;
-}
-
 #command .count-bubble
 {
     height: 100px;
@@ -48,7 +34,6 @@
 
 #command a[href*="_switch_user"]
 {
-    display: inline-block;
     height: 24px;
     width: 24px;
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -4002px transparent;
@@ -61,7 +46,6 @@
 
 #command a[href="#confirm-password-reset"]
 {
-    display: inline-block;
     height: 24px;
     width: 24px;
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -3902px transparent;
@@ -72,47 +56,11 @@
     background-position: left -3952px;
 }
 
-#command a[href^="#edit-"]
-{
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
-}
-
-#command a[href^="#edit-"]:hover
-{
-    background-position: left -1602px;
-}
-
-#command a[href="#remove-group"],
-#command a[href="#confirm-remove-user"]
-{
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
-}
-
-#command a[href="#confirm-remove-user"]:hover
-{
-    background-position: left -1702px;
-}
-
 #command a[href="#confirm-cancel-user"]
 {
-    display: inline-block;
     height: 24px;
     width: 24px;
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1102px transparent;
-}
-
-#command a[href="#confirm-remove-pack"],
-#command a[href="#remove-card"] {
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
 }
 
 #command a[href="#confirm-cancel-user"]:hover
@@ -120,27 +68,8 @@
     background-position: left -1152px;
 }
 
-#command .results [value^="#save-"] {
-    padding-left: 20px;
-    padding-right:20px;
-}
-
-#command .results .edit .highlighted-link > *:not(.checkbox),
-#command .results .read-only a[href="#cancel-edit"],
-#command .results .read-only [value^="#save-"]
-{
-    display:none;
-}
-
-#command .results .edit .highlighted-link > a[href="#cancel-edit"],
-#command .results .edit .highlighted-link > [value^="#save-"]
-{
-    display:inline-block;
-}
-
 #command .read-only a[href*="/emails"]
 {
-    display: inline-block;
     height: 24px;
     width: 24px;
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -4102px transparent;
@@ -149,37 +78,6 @@
 #command .read-only a[href*="mailto:"]:hover
 {
     background-position: left -4152px;
-}
-
-#command .pane-top {
-    position: fixed;
-    width:100%;
-    padding-right:70px;
-    top:50px;
-    z-index: 10;
-    height:130px;
-    margin-bottom:-20px;
-}
-
-#command .results .paginate {
-    width:300px;
-}
-
-#command .results h2 a:last-child {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 4px;
-    border: 2px solid #0099BB;
-    border-radius: 100%;
-    height: 30px;
-    width: 30px;
-    text-align: center;
-    line-height: 12px;
-    margin-top:-8px;
-}
-
-#command .results h2 a:last-child:hover {
-    border-color: #00CCEE;
 }
 
 #command .ui-datepicker > a
@@ -196,159 +94,9 @@
     font-weight: bold;
 }
 
-#command header label.filtered > input,
-#command header label.filtered > select
-{
-    border:3px solid #FF9900;
-    padding-top:0;
-}
-
-#command .results h2 {
-    padding-top:20px;
-    padding-bottom:20px;
-    margin-top:0;
-    margin-bottom:0;
-}
-
-#command .results header h2 {
-    padding:0 0 20px 0;
-    margin:-10px 0 -30px 0;
-}
-
-#command .results header > * {
-    display:none;
-    opacity: 0;
-    visibility:hidden;
-    transition: opacity ease-in-out 1s, visibility ease-in-out 1s;
-}
-
-#command .results header > *:first-child
-{
-    display:inline-block;
-    opacity: 1;
-    visibility: visible;
-}
-
-#command .results header > *,
-#command .results [class*="-row"] > *
-{
-    width: 16.66%;
-}
-
-#command .results header > *:nth-child(1) {
-    width:100%;
-}
-
-#command .results header > *.id,
-#command .results [class*="-row"] > *:nth-child(1)
-{
-    width: 10%;
-}
-
-#command .results header > *.actions,
-#command .results [class*="-row"] > *:nth-last-child(2)
-{
-    width:15%;
-    text-align: right;
-    padding-right: 32px;
-    margin-right: -32px
-}
-
-#command .results .read-only .users .input,
-#command .results .read-only .packs .input {
-    display:none;
-}
-
-#command .results header > *:last-child,
-#command .results [class*="-row"] > *:nth-last-child(1)
-{
-    width: auto;
-    display:inline-block;
-    opacity: 1;
-    visibility: visible;
-}
-
-#command .results header > *.name,
-#command .results [class*="-row"] > *:nth-child(2)
-{
-    width: 25%;
-}
-
-#command .ss_user-row .user-name .input:nth-child(1),
-#command .ss_user-row .user-name .input:nth-child(2)
-{
-    margin: 0 -2px;
-    padding: 0 2px;
-    width: 50%;
-    display:inline-block;
-}
-
-#command .pack-row.edit .groups .radio {
-    width: 100px;
-    display:inline-block;
-    margin: 0 -2px;
-    padding: 0 2px;
-    float:right;
-}
-
-#command .pack-row.edit .groups .checkbox
-{
-    width: 100%;
-    display:inline-block;
-    padding: 0 104px 0 2px;
-    margin: 0 -104px 0 -2px;
-}
-
-#command .class-names {
-    min-width: 200px;
-    display:inline-block;
-}
-
-#command .class-names:hover {
-
-}
-
-#command .results .groups,
-#command .results .users,
-#command .results .packs,
-#command .ss_group-row .name .input:nth-child(2) textarea,
-#command .ss_user-row .user-name .input:nth-child(3) input
-{
-    overflow: visible;
-    white-space: normal;
-    min-height: 0;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 100%;
-}
-
-#command .pack-row .status {
-    text-align: center;
-}
-
 #command a[href="#new-group"],
 #command a[href="#new-user"] {
     visibility: hidden;
-}
-
-#command .adding a[href="#add-group"],
-#command .adding a[href="#add-user"],
-#command .pane-top .results {
-    display:none;
-}
-
-#command .adding a[href="#new-group"],
-#command .adding a[href="#new-user"] {
-    visibility: visible;
-}
-
-#command .pane-top.adding .results {
-    display:block;
-}
-
-#command .read-only textarea
-{
-    height: 1em;
 }
 
 @media all and (max-width:1000px)

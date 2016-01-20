@@ -50,7 +50,7 @@ class Group extends BaseGroup implements GroupInterface
     /**
      * @ORM\ManyToMany(targetEntity="Pack", mappedBy="groups", fetch="EXTRA_LAZY")
      */
-    protected $group_packs;
+    protected $groupPacks;
 
     /**
      * @ORM\ManyToMany(targetEntity="User", mappedBy="groups", fetch="EXTRA_LAZY")
@@ -140,7 +140,7 @@ class Group extends BaseGroup implements GroupInterface
     public function __construct($name = null, $roles = array()) {
         $this->users = new ArrayCollection();
         $this->packs = new ArrayCollection();
-        $this->group_packs = new ArrayCollection();
+        $this->groupPacks = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->coupons = new ArrayCollection();
         $this->roles = [];
@@ -210,7 +210,7 @@ class Group extends BaseGroup implements GroupInterface
      */
     public function getPacks()
     {
-        return new ArrayCollection(array_merge($this->packs->toArray(), $this->group_packs->toArray()));
+        return new ArrayCollection(array_merge($this->packs->toArray(), $this->groupPacks->toArray()));
     }
 
     /**
@@ -326,35 +326,35 @@ class Group extends BaseGroup implements GroupInterface
     }
 
     /**
-     * Add group_packs
+     * Add groupPacks
      *
      * @param \StudySauce\Bundle\Entity\Pack $groupPacks
      * @return Group
      */
     public function addGroupPack(\StudySauce\Bundle\Entity\Pack $groupPacks)
     {
-        $this->group_packs[] = $groupPacks;
+        $this->groupPacks[] = $groupPacks;
 
         return $this;
     }
 
     /**
-     * Remove group_packs
+     * Remove groupPacks
      *
      * @param \StudySauce\Bundle\Entity\Pack $groupPacks
      */
     public function removeGroupPack(\StudySauce\Bundle\Entity\Pack $groupPacks)
     {
-        $this->group_packs->removeElement($groupPacks);
+        $this->groupPacks->removeElement($groupPacks);
     }
 
     /**
-     * Get group_packs
+     * Get groupPacks
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
     public function getGroupPacks()
     {
-        return $this->group_packs;
+        return $this->groupPacks;
     }
 }

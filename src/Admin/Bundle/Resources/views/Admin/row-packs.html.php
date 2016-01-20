@@ -8,9 +8,10 @@ use StudySauce\Bundle\Entity\User;
 
 <div>
     <label class="input"><input type="text" name="packs" value="" placeholder="Any Pack / Id" /></label>
-    <?php print implode(', ', array_map(function (Pack $p) {
-            return $p->getTitle();
-        }, $entity->getPacks()->slice(0, 5)))
-        . ($entity->getPacks()->count() > 5 ? (', <strong>+' . ($entity->getPacks()->count() - 5)
-            . ' more</strong>') : ''); ?>
+    <?php
+    print implode(', ', array_map(function (Pack $p) { return $p->getTitle(); }, $entity->getPacks()->slice(0, 5)));
+    if ($entity->getPacks()->count() > 5) {
+        print ' <a href="#search-users:' . $entity->getId() . '">+' . ($entity->getPacks()->count() - 5) . ' more</a>';
+    }
+    ?>
 </div>

@@ -3,17 +3,35 @@ use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\User;
 
 ?>
+<style>
+    <?php foreach($tables as $table => $t) { ?>
+    .showing-<?php print $table; ?> header > .<?php print $table; ?> {
+        display: inline-block;
+        opacity: 1;
+        visibility: visible;
+    }
+    .showing-<?php print $table; ?> header > h2.<?php print $table; ?> {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+    }
+    .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .<?php print $table; ?>-row {
+        display:none;
+    }
+    <?php } ?>
+</style>
 <div class="results collapsible">
     <header class="pane-top">
         <div class="search">
             <form action="<?php print $view['router']->generate('command'); ?>" method="post">
                 <div class="class-names">
                     <?php foreach($tables as $table => $t) { ?>
-                        <label class="checkbox"><input type="checkbox" name="packs" value="<?php print $table; ?>" checked="checked" /><i></i> <a href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
+                        <label class="checkbox">
+                            <input type="checkbox" name="tables" value="<?php print $table; ?>" checked="checked" />
+                            <i></i> <a href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
                     <?php } ?>
                 </div>
-                <label class="input"><input name="search" type="text" value=""
-                                            placeholder="Search"/></label>
+                <label class="input"><input name="search" type="text" value="" placeholder="Search"/></label>
             </form>
         </div>
 
@@ -32,9 +50,13 @@ use StudySauce\Bundle\Entity\User;
         for ($i = 0; $i < $max; $i++) {
             // TODO: build backwards so its right aligned when there are different field counts
             foreach ($tables as $table => $t) {
-                $viewName = $view->exists('AdminBundle:Admin:heading-' . $t[$i] . '-' . $table . '.html.php')
-                    ? 'AdminBundle:Admin:heading-' . $t[$i] . '-' . $table . '.html.php'
-                    : 'AdminBundle:Admin:heading-' . $t[$i] . '.html.php';
+                $field = is_array(array_values($t)[$i]) ? array_keys($t)[$i] : array_values($t)[$i];
+                if ($view->exists('AdminBundle:Admin:heading-' . $field . '-' . $table . '.html.php')) {
+                    $viewName = 'AdminBundle:Admin:heading-' . $field . '-' . $table . '.html.php';
+                }
+                else {
+                    $viewName = 'AdminBundle:Admin:heading-' . $field . '.html.php';
+                }
                 if (isset($templates[$viewName])) {
                     $templates[$viewName][] = $table;
                 } else {
@@ -47,9 +69,18 @@ use StudySauce\Bundle\Entity\User;
             ?><h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a href="#add-entity">+</a></h2><?php
         }
 
-        foreach ($templates as $k => $classes) { ?>
-            <div class="<?php print explode('.', explode('-', $k)[1])[0] . ' ' . implode(' ', $classes); ?>">
-                <?php print $view->render($k, ['groups' => $ss_group]); ?>
+        foreach ($templates as $k => $classes) {
+            $field = explode('.', explode('-', $k)[1])[0] . ' ' . implode(' ', $classes);
+            ?>
+            <div class="<?php print $field; ?>">
+                <?php
+                if ($view->exists($k)) {
+                    print $view->render($k, ['groups' => $allGroups, 'field' => $field]);
+                }
+                else {
+                    print $view->render('AdminBundle:Admin:heading.html.php', ['groups' => $allGroups, 'field' => $field, 'table' => $table]);
+                }
+                ?>
             </div>
         <?php } ?>
         <label class="checkbox"><input type="checkbox" name="select-all"/><i></i></label>
@@ -68,13 +99,15 @@ use StudySauce\Bundle\Entity\User;
             ?>
             <div class="<?php print $table; ?>-row <?php print $rowId; ?> read-only">
                 <?php
-                foreach ($tables[$table] as $field) { ?>
-                <div class="<?php print $field; ?>">
+                foreach ($tables[$table] as $f => $fields) {
+                    $field = is_array($fields) ? $f : $fields;
+                    ?>
+                    <div class="<?php print $field; ?>">
                     <?php
                     if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
-                        print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e]);
+                        print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'table' => $table]);
                     } else {
-                        print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $ss_group]);
+                        print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                     }
                     ?></div><?php
                 }
