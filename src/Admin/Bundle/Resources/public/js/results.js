@@ -82,10 +82,17 @@ $(document).ready(function () {
             }
         }
 
-        var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
-        table = 'showing-' + table;
-        if(!command.is('.' + table)) {
-            command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, '')).addClass(table);
+        command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
+        if(selected.length == 0) {
+            command.addClass('empty');
+        }
+        else {
+            command.removeClass('empty');
+            var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
+            table = 'showing-' + table;
+            if(!command.is('.' + table)) {
+                command.addClass(table);
+            }
         }
     }
 
@@ -102,6 +109,7 @@ $(document).ready(function () {
         var admin = $('.results:visible');
         var result = {
             order: orderBy,
+            tables: admin.find('.class-names input:checked').map(function () { return $(this).val(); }).toArray(),
             search: admin.find('input[name="search"]').val().trim(),
             page: admin.find('input[name="page"]').val().trim()
         };
@@ -143,7 +151,7 @@ $(document).ready(function () {
         else {
             heading.show();
         }
-        if (command.is('.showing-' + table) && (heading.is('.collapsed') || !heading.is(':visible'))) {
+        if (command.is('.showing-' + table) && (heading.is('.collapsed') || !heading.is(':visible')) || command.is('.empty')) {
             resetHeader();
         }
     });
@@ -167,8 +175,9 @@ $(document).ready(function () {
             var table = $(this).val();
             admin.find('> .' + table + '-row, > h2.' + table).remove();
             content.find('> .' + table + '-row, > h2.' + table).appendTo(admin);
+            admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
         });
-        //admin.find('#users .page-total').text(content.find('#users .page-total').text());
+        resetHeader();
     }
 
     function loadResults() {

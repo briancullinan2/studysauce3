@@ -193,12 +193,6 @@ $(document).ready(function () {
         }
     }
 
-    body.on('click', '#packs a[href="#remove-card"]', function (evt) {
-        evt.preventDefault();
-        $(this).parents('.card-row').addClass('removed');
-        packsFunc()
-    });
-
     body.on('click', '#packs a[href="#confirm-remove-pack"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('tr'),
@@ -231,15 +225,14 @@ $(document).ready(function () {
         packsFunc();
     });
 
-    body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
+    body.on('click', '.pack-row a[href="#edit-pack"]', function () {
+        var row = $(this).parents('.pack-row');
+        var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
+        var search = 'pack:' + packId;
+        $(this).parents('.results').find('.search input[name="search"]').val(search).trigger('change');
+    });
 
-    function loadContent(data) {
-        var tab = $('#packs'),
-            content = $(data);
-        tab.find('form .results').replaceWith(content.filter('#packs').find('form .results'));
-        tab.find('#all-packs > .results').replaceWith(content.filter('#packs').find('#all-packs > .results'));
-        tab.find('#membership > .results').replaceWith(content.filter('#packs').find('#membership > .results'));
-    }
+    body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
 
     body.on('click', '#packs a[href="#create-new"]', function (evt) {
         evt.preventDefault();

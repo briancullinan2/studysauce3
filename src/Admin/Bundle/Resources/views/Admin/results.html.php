@@ -29,6 +29,11 @@ use StudySauce\Bundle\Entity\User;
                         <label class="checkbox">
                             <input type="checkbox" name="tables" value="<?php print $table; ?>" checked="checked" />
                             <i></i> <a href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
+                    <?php }
+                    foreach(array_diff($allTables, array_keys($tables)) as $table) { ?>
+                        <label class="checkbox">
+                            <input type="checkbox" name="tables" value="<?php print $table; ?>" />
+                            <i></i> <a href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
                     <?php } ?>
                 </div>
                 <label class="input"><input name="search" type="text" value="" placeholder="Search"/></label>

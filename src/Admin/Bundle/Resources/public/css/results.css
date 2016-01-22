@@ -141,7 +141,8 @@ table.results > tbody > tr > td .checkbox {
 .results .read-only .groups label.checkbox,
 .results .read-only .groups label.checkbox input:checked ~ *:not(i)
 {
-    display:inline-block;
+    display:inline;
+    min-height:0;
 }
 
 .results [class*="-row"].read-only .highlighted-link > *:not(.checkbox)
@@ -290,6 +291,19 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     height: 1em;
 }
 
+.results.empty header:after {
+    content: "Nothing to show";
+    position:absolute;
+    bottom:0;
+    left:50%;
+    margin-left: -200px;
+    text-align: center;
+    width: 400px;
+    display:block;
+    top:auto;
+    font-size: 24px;
+}
+
 .results.expandable > [class*="-row"].selected > *:first-child:before,
 table.results.expandable > tbody > tr.selected > td:first-child:before
 {
@@ -329,8 +343,41 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin-bottom:-20px;
 }
 
-.results .paginate {
-    width:300px;
+.paginate {
+    display: inline-block;
+    width: 300px;
+    margin: 0 -4px;
+    padding: 0 2px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.paginate label {
+    margin: 0 -80px;
+    padding: 0 80px;
+    width:100%;
+    display: inline-block;
+}
+
+.paginate input {
+    margin-right: -50px;
+    padding-right: 50px;
+    display:inline-block;
+}
+
+.paginate a {
+    font-size: 30px;
+    padding: 0 10px;
+    background-color: #EEE;
+    border-radius: 5px;
+    line-height: 25px;
+    vertical-align: middle;
+    display: inline-block;
+    transition: background-color ease-in-out .15s;
+}
+
+.paginate a:hover {
+    background-color: #DDD;
 }
 
 .results h2 a:last-child {
@@ -413,6 +460,11 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:inline-block;
     opacity: 1;
     visibility: visible;
+}
+
+.results.empty header > *:last-child
+{
+    display:none;
 }
 
 .results header > *.name,
@@ -544,4 +596,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
         padding-right: 240px;
     }
 
+    .results.empty header:after {
+        margin-left:-320px
+    }
 }

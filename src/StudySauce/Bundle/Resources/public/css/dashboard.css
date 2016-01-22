@@ -126,43 +126,6 @@ aside + .panel-pane,
     margin-bottom:20px;
 }
 
-.paginate {
-    display: inline-block;
-    width: 300px;
-    margin: 0 -4px;
-    padding: 0 2px;
-    vertical-align: middle;
-    text-align: center;
-}
-
-.paginate label {
-    margin: 0 -80px;
-    padding: 0 80px;
-    width:100%;
-    display: inline-block;
-}
-
-.paginate input {
-    margin-right: -50px;
-    padding-right: 50px;
-    display:inline-block;
-}
-
-.paginate a {
-    font-size: 30px;
-    padding: 0 10px;
-    background-color: #EEE;
-    border-radius: 5px;
-    line-height: 100%;
-    vertical-align: middle;
-    display: inline-block;
-    transition: background-color ease-in-out .15s;
-}
-
-.paginate a:hover {
-    background-color: #DDD;
-}
-
 /*
 .big-add:active,
 .big-add:focus,
