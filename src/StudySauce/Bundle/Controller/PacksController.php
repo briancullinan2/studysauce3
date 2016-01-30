@@ -42,10 +42,9 @@ class PacksController extends Controller
         // get the groups for use in dropdown
         /** @var User $user */
         $user = $this->getUser();
-        if($user->hasRole('ROLE_ADMIN')) {
+        if ($user->hasRole('ROLE_ADMIN')) {
             $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        }
-        else {
+        } else {
             $groups = $user->getGroups()->toArray();
         }
 
@@ -77,11 +76,12 @@ class PacksController extends Controller
         }
         if ($user->hasRole('ROLE_ADMIN')) {
             $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        }
-        else {
+        } else {
             $groups = $user->getGroups()->toArray();
         }
-        $groups = array_filter($groups, function (Group $g) use ($request) {return $g->getId() == intval($request->get('group'));});
+        $groups = array_filter($groups, function (Group $g) use ($request) {
+            return $g->getId() == intval($request->get('group'));
+        });
         $newPack->setTitle($request->get('title'));
         $group = array_pop($groups);
         $newPack->setGroup(!empty($group) ? $group : null);
@@ -175,12 +175,14 @@ class PacksController extends Controller
             // remove missing answers
             foreach ($newCard->getAnswers()->toArray() as $a) {
                 /** @var Answer $a */
-                if (!in_array($a->getValue(), array_map(function (Answer $x) { return $x->getValue(); }, $answerValues))) {
+                if (!in_array($a->getValue(), array_map(function (Answer $x) {
+                    return $x->getValue();
+                }, $answerValues))
+                ) {
                     if ($a->getResponses()->count() == 0) {
                         $newCard->removeAnswer($a);
                         $orm->remove($a);
-                    }
-                    else {
+                    } else {
                         $a->setDeleted(true);
                         $orm->merge($a);
                     }
@@ -189,7 +191,7 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        return $this->forward('StudySauceBundle:Packs:index', ['pack' => $newPack->getId(), '_format' => 'tab']);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'search' => 'pack.id:' . $newPack->getId()]);
     }
 
     public function removeAction(Request $request)
@@ -217,7 +219,7 @@ class PacksController extends Controller
                     $c->removeAnswer($a);
                     $orm->remove($a);
                 }
-                foreach($c->getResponses()->toArray() as $r) {
+                foreach ($c->getResponses()->toArray() as $r) {
                     /** @var Response $r */
                     $c->removeResponse($r);
                     $r->getUser()->removeResponse($r);
@@ -238,58 +240,73 @@ class PacksController extends Controller
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
-        if(empty($user) || (!$currentUser->hasRole('ROLE_ADMIN') && !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;}))) {
-            $user = $currentUser;
-        }
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
         /** @var QueryBuilder $qb */
         $packs = array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->select('p')
-            ->andWhere('p.status != \'DELETED\'')
             ->getQuery()
-            ->getResult(), function (Pack $p) use ($user) {
+            ->getResult(), function (Pack $p) use ($currentUser) {
             /** @var UserPack $up */
-            if($p->getStatus() == 'UNPUBLISHED') {
+            $hasPack = $p->getUser() == $currentUser
+                || $currentUser->getUserPacks()
+                    ->filter(function (UserPack $up) use ($p) {
+                        return $up->getPack()->getId() == $p->getId();
+                    })
+                    ->count() > 0
+                || $currentUser->getInvites()->exists(function ($_, Invite $x) use ($p) {
+                    return !empty($x->getInvitee())
+                    && $x->getInvitee()->getUserPacks()->filter(function (UserPack $up) use ($p) {
+                        return $up->getPack()->getId() == $p->getId();
+                    })
+                        ->count() > 0;
+                });
+            $packGroups = $p->getGroups()->map(function (Group $g) {
+                return $g->getId();
+            })->toArray();
+            $hasGroups = count(array_intersect($packGroups, $currentUser->getGroups()
+                    ->map(function (Group $g) {
+                        return $g->getId();
+                    })->toArray())) > 0
+                || $currentUser->getInvites()->exists(function ($_, Invite $x) use ($packGroups) {
+                    return !empty($x->getInvitee())
+                    && count(array_intersect($packGroups, $x->getInvitee()->getGroups()
+                        ->map(function (Group $g) {
+                            return $g->getId();
+                        })->toArray())) > 0;
+                });
+            if (($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED') && $hasPack) {
                 return false;
             }
-            if($p->getStatus() == 'UNLISTED' && $p->getUserPacks()->filter(function (UserPack $up) use ($user) {return $up->getUser() == $user;})->count() > 0) {
+            if ($p->getStatus() == 'UNLISTED' && $hasPack) {
                 return true;
             }
-            if($p->getStatus() == 'GROUP' && $p->getGroups()->exists(function ($_, Group $g) use ($user) {return $user->hasGroup($g->getName());})) {
-                    // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
-                    //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
+            if ($p->getStatus() == 'GROUP' && $hasGroups) {
+                // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
+                //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
                 return true;
             }
-            if($p->getStatus() == 'PUBLIC') {
-                return true;
-            }
-            $up = $user->getUserPacks()->filter(function (UserPack $up) use ($p) {
-                return $up->getPack()->getId() == $p->getId();
-            })->first();
-            if(!empty($up)) {
+            if ($p->getStatus() == 'PUBLIC') {
                 return true;
             }
             return false;
         }));
-        $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
-            $group = $x->getGroup();
+        $response = new JsonResponse(array_map(function (Pack $x) use ($currentUser) {
 
-            $logo = !empty($group) && !empty($group->getLogo())
-                ? $group->getLogo()->getUrl()
-                : (!empty($x->getUser()) && !empty($x->getUser()->getPhoto())
-                    ? $x->getUser()->getPhoto()->getUrl()
-                    : '');
-            /** @var UserPack $up */
-            $up = $user->getUserPacks()->filter(function (UserPack $up) use ($x) {
-                return $up->getPack()->getId() == $x->getId();
-            })->first();
+            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED') {
+                return [
+                    'id' => $x->getId(),
+                    'deleted' => true
+                ];
+            }
+            $packGroups = $x->getGroups()->map(function (Group $g) {
+                return $g->getId();
+            })->toArray();
             // pack should automatically download if user is in group
-            $shouldDownload = !empty($up) || $x->getGroups()->exists(function ($_, Group $g) use ($user) {return $user->hasGroup($g->getName());});
             return [
                 'id' => $x->getId(),
-                'logo' => $logo,
+                'logo' => $x->getLogo(),
                 'title' => $x->getTitle(),
                 'creator' => $x->getCreator(),
                 'created' => $x->getCreated()->format('r'),
@@ -297,26 +314,27 @@ class PacksController extends Controller
                 'count' => $x->getCards()->filter(function (Card $c) {
                     return !$c->getDeleted();
                 })->count(),
-                'downloaded' => $shouldDownload,
-                'user_packs' => !empty($up) ? array_values($up->getPack()->getCards()
-                    ->filter(function (Card $c) use ($up) {return !$c->getDeleted() && !empty($c->getResponsesForUser($up->getUser())->count());})
-                    ->map(function (Card $c) use ($up) {
+                'users' => array_values(array_map(function (User $u) use ($x) {
                     return [
-                        'card' => $c->getId(),
-                        'responses' => array_values($c->getResponsesForUser($up->getUser())
-                            ->filter(function (Response $r) {return $r->getCreated() <= new \DateTime();})
-                            ->map(function (Response $r) {
-                                return [
-                                    'id' => $r->getId(),
-                                    'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
-                                    'correct' => $r->getCorrect() ? 1 : 0,
-                                    'value' => $r->getValue(),
-                                    'created' => $r->getCreated()->format('r'),
-                                    'user' => $r->getUser()->getId()
-                                ];
-                            })->toArray())
+                        'id' => $u->getId()
                     ];
-                })->toArray()) : null
+                }, array_filter(array_merge([$currentUser], $currentUser->getInvites()
+                    ->filter(function (Invite $i) {
+                        return !empty($i->getInvitee());
+                    })
+                    ->map(function (Invite $i) {
+                        return $i->getInvitee();
+                    })->toArray()),
+                    function (User $u) use ($x, $packGroups) {
+                        return $u->getUserPacks()
+                            ->filter(function (UserPack $up) use ($x) {
+                                return $up->getPack()->getId() == $x->getId();
+                            })->count() > 0
+                        || count(array_intersect($packGroups, $u->getGroups()
+                            ->map(function (Group $g) {
+                                return $g->getId();
+                            })->toArray())) > 0;
+                    })))
             ];
         }, $packs));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
@@ -327,7 +345,10 @@ class PacksController extends Controller
     {
         /** @var User $user */
         $currentUser = $this->getUser();
-        if(empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;})) {
+        if (empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {
+                return $x->getInvitee() == $user;
+            })
+        ) {
             $user = $currentUser;
         }
         /** @var $orm EntityManager */
@@ -392,6 +413,7 @@ class PacksController extends Controller
                 'responses' => array_values(array_map(function (Response $r) {
                     return [
                         'id' => $r->getId(),
+                        'card' => $r->getCard()->getId(),
                         'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
                         'correct' => $r->getCorrect() ? 1 : 0,
                         'value' => $r->getValue(),
@@ -410,15 +432,19 @@ class PacksController extends Controller
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
-        if(empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {return $x->getInvitee() == $user;})) {
+        if (empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {
+                return $x->getInvitee() == $user;
+            })
+        ) {
             $user = $currentUser;
         }
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        $responses = $request->get('responses');
-        if(!empty($request->get('pack')) && !empty($request->get('card')) && !empty($request->get('answer'))
-            && !empty($request->get('correct')) && !empty($request->get('created'))) {
+        $responses = $request->get('responses') ?: [];
+        if (!empty($request->get('pack')) && !empty($request->get('card')) && !empty($request->get('answer'))
+            && !empty($request->get('correct')) && !empty($request->get('created'))
+        ) {
             $responses[] = [
                 'pack' => $request->get('pack'),
                 'card' => $request->get('card'),
@@ -430,7 +456,7 @@ class PacksController extends Controller
         }
         /** @var [UserPack] $userPacks */
         $result = [];
-        foreach($responses as $r) {
+        foreach ($responses as $r) {
 
             /** @var Pack $pack */
             $card = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c')
@@ -461,9 +487,28 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        $ids = array_map(function ($r) {
-            /** @var Response $r */
-            return empty($r) ? null : $r->getId();}, $result);
+        if (!empty($request->get('since'))) {
+            $since = date_timezone_set(new \DateTime($request->get('since')), new \DateTimeZone(date_default_timezone_get()));
+            $ids = array_values(array_map(function (Response $r) {
+                return [
+                    'id' => $r->getId(),
+                    'card' => $r->getCard()->getId(),
+                    'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
+                    'correct' => $r->getCorrect() ? 1 : 0,
+                    'value' => $r->getValue(),
+                    'created' => $r->getCreated()->format('r'),
+                    'user' => $r->getUser()->getId()
+                ];
+            }, $user->getResponses()->filter(function (Response $r) use ($user, $since) {
+                return $r->getUser() == $user && $r->getCreated() <= new \DateTime() && $r->getCreated() >= $since;
+            })->toArray()));
+        }
+        else {
+            $ids = array_map(function ($r) {
+                /** @var Response $r */
+                return empty($r) ? null : $r->getId();
+            }, $result);
+        }
 
         return new JsonResponse($ids);
     }

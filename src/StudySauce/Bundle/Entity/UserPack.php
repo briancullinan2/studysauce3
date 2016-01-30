@@ -17,14 +17,14 @@ class UserPack
 {
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="userPacks")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="userPacks", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Pack", inversedBy="userPacks")
+     * @ORM\ManyToOne(targetEntity="Pack", inversedBy="userPacks", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="pack_id", referencedColumnName="id")
      */
     protected $pack;

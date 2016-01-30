@@ -1,4 +1,4 @@
-<div>
+<div class="<?php print strtolower($pack->getStatus()); ?>">
     <label class="input status">
         <select name="status">
             <option value="">Not Set</option>
@@ -9,4 +9,5 @@
             <option value="DELETED" <?php print ($pack->getStatus() == 'DELETED' ? 'selected="selected"' : ''); ?>>Deleted</option>
         </select>
     </label>
+    <img height="50" src="<?php print $pack->getLogo(); ?>" />
 </div>

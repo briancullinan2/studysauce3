@@ -142,7 +142,7 @@ class Pack
      * @return ArrayCollection
      */
     public function getUsers() {
-        return new ArrayCollection(array_merge([$this->getUser()], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())));
+        return new ArrayCollection(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())));
     }
 
     /**
@@ -151,6 +151,18 @@ class Pack
     public function setCreatedValue()
     {
         $this->created = new \DateTime();
+    }
+
+    public function getLogo()
+    {
+        $group = $this->getGroup();
+
+        $logo = !empty($group) && !empty($group->getLogo())
+            ? $group->getLogo()->getUrl()
+            : (!empty($this->getUser()) && !empty($this->getUser()->getPhoto())
+                ? $this->getUser()->getPhoto()->getUrl()
+                : '');
+        return $logo;
     }
 
     /**

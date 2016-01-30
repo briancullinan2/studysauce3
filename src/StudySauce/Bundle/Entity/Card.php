@@ -92,7 +92,7 @@ class Card
     }
 
     public function getIndex() {
-        return $this->getPack()->getCards()->indexOf($this);
+        return !empty($this->getPack()) ? $this->getPack()->getCards()->indexOf($this) : 0;
     }
 
     /**

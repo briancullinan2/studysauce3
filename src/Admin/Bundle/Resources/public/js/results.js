@@ -156,10 +156,119 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '[class*="-row"] a[href^="#edit"]', function (evt) {
+    var callbackTimeout = null;
+
+    body.on('change', '.results .users input', function () {
+
+    });
+
+    function setupUsers()
+    {
+        var row = $(this).parents('[class*="-row"]'),
+            that = row.find('.users input:not(.selectized)'),
+            field = that.parents('label');
+        that.selectize({
+            persist:false,
+            delimiter: ' ',
+            searchField: ['text', 'value', '1', '0'],
+            plugins: ['continue_editing', 'restore_on_backspace2'],
+            maxItems: 1,
+            dropdownParent:'body',
+            options: [that.val()],
+            render: {
+                option: function(item) {
+                    var desc = '<div class="entity-search">'
+                        + '<span class="title">'
+                        + '<span class="name"><i class="icon source"></i>' + item.text + '</span>'
+                        + '<span class="by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
+                        + '</span>';
+                    if (field.data('users').indexOf(item.value) > -1) {
+                        desc += '<a href="#subtract-entity">Remove</a>';
+                    }
+                    else {
+                        desc += '<a href="#insert-entity">Add</a>';
+                    }
+                    if (field.data('owner') != item.value) {
+                        desc += '<a href="#set-owner">Set owner</a>';
+                    }
+                    return desc + '</div>';
+                }
+            },
+            load: function(query, callback) {
+                if (query.length < 1) {
+                    callback();
+                    return;
+                }
+                if(callbackTimeout) {
+                    clearTimeout(callbackTimeout);
+                }
+                callbackTimeout = setTimeout(function () {
+                    $.ajax({
+                        url: window.callbackPaths['command_callback'],
+                        type: 'GET',
+                        dataType:'text',
+                        data: {
+                            tables: ['ss_user'],
+                            search: query
+                        },
+                        error: function() {
+                            callback();
+                        },
+                        success: function(content) {
+                            var results = $(content).find('.ss_user-row').map(function () {
+                                var rowId = (/ss_user-id-([0-9]*)/i).exec($(this).attr('class'))[1];
+                                return {
+                                    value: rowId,
+                                    text: $(this).find('.first input').val() + ' ' + $(this).find('.last input').val(),
+                                    0: $(this).find('.email input').val()
+                                }}).toArray();
+                            callback(results);
+                        }
+                    });
+                }, 100);
+            }
+        });
+    }
+
+    function setupFields() {
+        setupUsers.apply(this);
+    }
+
+    var radioCounter = 5000;
+
+    body.on('click', '.results a[href^="#add-"]', function (evt) {
+        evt.preventDefault();
+        var results = $(this).parents('.results');
+        var table = $(this).attr('href').substring(5);
+        var newRow = results.find('.' + table + '-row').first().clone().insertBefore(results.find('.' + table + '-row').first());
+        newRow.attr('class', newRow.attr('class').replace(new RegExp(table + '-id-[0-9]*(\s|$)', 'ig'), ''));
+        newRow.removeClass('template removed read-only historic').addClass('edit');
+        newRow.find('select, textarea, input[type="text"]').val('').trigger('change');
+        newRow.find('> *').each(function () {
+            var radio = $(this).find('input[type="radio"]').first();
+            if (radio.length > 0) {
+                $(this).find('input[type="radio"]').attr('name', radio.attr('name').split('-')[0] + '-' + radioCounter++).trigger('change');
+            }
+        });
+        newRow.find('input[type="checkbox"]').prop('checked', false).trigger('change');
+    });
+
+    body.on('click', '[class*="-row"] a[href^="#remove-"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('[class*="-row"]');
+        if($(this).is('[href^="#remove-confirm-"]')) {
+            row.addClass('removed');
+        }
+        else {
+            row.addClass('remove-confirm');
+        }
+    });
+
+    body.on('click', '[class*="-row"] a[href^="#edit-"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('[class*="-row"]');
         row.removeClass('read-only').addClass('edit');
+        setupFields.apply(this);
     });
 
     body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {
@@ -173,12 +282,26 @@ $(document).ready(function () {
             content = $(data).filter('.results');
         admin.find('.class-names .checkbox input:checked').each(function () {
             var table = $(this).val();
-            admin.find('> .' + table + '-row, > h2.' + table).remove();
-            content.find('> .' + table + '-row, > h2.' + table).appendTo(admin);
+            // leave edit rows alone
+            admin.find('> .' + table + '-row:not(.edit)').remove();
+            var keepRows = admin.find('> .' + table + '-row').map(function () {
+                var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
+                return '.' + table + '-id-' + rowId;
+            }).toArray().join(',');
+            content.find('> .' + table + '-row').not(keepRows).insertAfter(admin.find('> h2.' + table));
             admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
         });
         resetHeader();
+        admin.trigger('resulted');
     }
+    // make available to save functions that always lead back to index
+    window.loadContent = loadContent;
+
+    body.on('change', '.results input[name="group"]', function () {
+        if ($(this).prop('checked')) {
+            $(this).parents('[class*="-row"] > *').find('input[name="group"]').not(this).prop('checked', false);
+        }
+    });
 
     function loadResults() {
         if(searchRequest != null)
@@ -258,7 +381,7 @@ $(document).ready(function () {
         loadResults();
     });
 
-    body.on('change', '.results header .input > select, .results header .input > input', function (evt) {
+    body.on('change', '.results header .input > select, .results header .input > input', function () {
         var that = $(this);
         var admin = $('.results:visible');
         var paginate = that.closest('.paginate');

@@ -94,11 +94,6 @@
     font-weight: bold;
 }
 
-#command a[href="#new-group"],
-#command a[href="#new-user"] {
-    visibility: hidden;
-}
-
 @media all and (max-width:1000px)
 {
     

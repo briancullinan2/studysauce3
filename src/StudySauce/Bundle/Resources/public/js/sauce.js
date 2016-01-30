@@ -10,6 +10,79 @@ $(window).unload(function() {
     window.noError = true;
 });
 
+Selectize.define('restore_on_backspace2', function(options) {
+    var self = this;
+
+    options.text = options.text || function(option) {
+            return option[this.settings.labelField];
+        };
+
+    this.onKeyDown = (function() {
+        var original = self.onKeyDown;
+        return function(e) {
+            var index, option;
+            index = this.caretPos - 1;
+
+            if (e.keyCode === 8 && this.$control_input.val() === '' && !this.$activeItems.length) {
+                if (index >= 0 && index < this.items.length) {
+                    option = this.options[this.items[index]];
+                    // prevent from deleting google
+                    if (this.deleteSelection(e)) {
+                        this.setTextboxValue(option[this.settings.valueField]);
+                        this.refreshOptions(true);
+                    }
+                    e.preventDefault();
+                    return;
+                }
+            }
+            return original.apply(this, arguments);
+        };
+    })();
+});
+
+Selectize.define('continue_editing', function(options) {
+    var self = this;
+
+    options.text = options.text || function(option) {
+            return option[this.settings.labelField];
+        };
+
+    this.onFocus = (function() {
+        var original = self.onFocus;
+
+        return function(e) {
+            original.apply(this, arguments);
+
+            var index = this.caretPos - 1;
+            if (index >= 0 && index < this.items.length) {
+                var option = this.options[this.items[index]];
+                var currentValue = options.text.apply(this, [option]);
+                if (this.deleteSelection({keyCode: 8})) {
+                    // only remove item if it is made up and not from the server
+                    if(typeof option.alt == 'undefined')
+                        this.removeItem(currentValue);
+                    this.setTextboxValue(option[this.settings.valueField]);
+                    this.refreshOptions(true);
+                }
+            }
+        };
+    })();
+
+    this.onBlur = (function() {
+        var original = self.onBlur;
+
+        return function(e) {
+            var v = this.$control_input.val();
+            original.apply(this, arguments);
+            if(v.trim() != '') {
+                var option = this.options[v] || { value: v, text: v };
+                this.addOption(option);
+                this.setValue(option.value);
+            }
+        };
+    })();
+});
+
 function setSelectionRange(input, selectionStart, selectionEnd) {
     if (input.setSelectionRange) {
         input.focus();

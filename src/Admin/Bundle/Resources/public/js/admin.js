@@ -430,14 +430,6 @@ $(document).ready(function () {
 
     });
 
-    body.on('click', '#command a[href="#confirm-remove-user"]', function (evt) {
-        evt.preventDefault();
-        var row = $(this).parents('.user-row'),
-            userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        $('#remove-user-name').text(row.find('[name="first-name"]').val());
-        $('#confirm-remove-user').data('userId', userId);
-    });
-
     body.on('click', '#command a[href="#confirm-cancel-user"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.user-row'),

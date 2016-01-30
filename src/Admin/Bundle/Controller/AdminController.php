@@ -29,14 +29,15 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class AdminController extends Controller
 {
-    private static $paidStr = '';
     /** @var ClassMetadata[] $allTables */
-    private static $allTables;
+    public static $allTables;
     /** @var ClassMetadata[] $allTableMetadata */
-    private static $allTableMetadata;
+    public static $allTableMetadata;
     /** @var string[] $allTableClasses */
-    private static $allTableClasses;
-    private static $tables;
+    public static $allTableClasses;
+    public static $tables;
+
+    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user.deleted' => false, 'ss_group.deleted' => false, 'pack.status' => '!DELETED', 'card.deleted' => false];
 
     /**
      * @param QueryBuilder $qb
@@ -59,82 +60,96 @@ class AdminController extends Controller
                 $f = [$f];
             }
             $joinWhere = '';
-            $joinOp = '';
             foreach($f as $field) {
                 $joinSearch = null;
 
                 // search for unions in original request only
-                if (!empty($request[$field])) {
+                $op = 'AND';
+                if (isset($request[$table . '.' . $field])) {
+                    $joinSearch = $request[$table . '.' . $field];
+                }
+                else if (isset($request[$field])) {
                     $joinSearch = $request[$field];
-                    $op = 'AND';
-                    $joinOp = 'AND';
                 }
                 else if (is_array($f) && !empty($request[$k]))  {
                     $joinSearch = $request[$k];
-                    $op = 'AND';
-                    $joinOp = 'AND';
                 }
                 else if (!empty($request[$table])) {
                     $joinSearch = $request[$table];
-                    $op = 'AND';
-                    $joinOp = $joinOp == '' ? 'OR' : 'AND';
                 }
-                else if(!empty($request['search'])) {
+                else if (!empty($request['search'])) {
                     $joinSearch = $request['search'];
                     $op = 'OR';
-                    $joinOp = $joinOp == '' ? 'OR' : 'AND';
+                }
+
+                // only search joins on first connect
+                if ($table == $tableName) {
+                    $joinFields = explode('.', $field);
+                    $joinTable = $table;
+                    $joinName = $tableName;
+                    foreach($joinFields as $jf) {
+                        $associated = self::$allTables[$joinTable]->getAssociationMappings();
+                        if (isset($associated[$jf])) {
+                            $entity = $associated[$jf]['targetEntity'];
+                            $ti = array_search($entity, self::$allTableClasses);
+                            if ($ti !== false) {
+                                $joinTable = self::$allTableMetadata[$ti]->table['name'];
+                            }
+                            else {
+                                $meta = $this->get('doctrine')->getManager()->getMetadataFactory()->getMetadataFor($entity);
+                                $joinTable = $meta->table['name'];
+                            }
+                            $newName = $joinName . '_' . preg_replace('[^a-z]', '_', $jf) . $joinTable;
+                            if (!in_array($newName, $joins)) {
+                                $joins[] = $newName;
+                                $qb = $qb->leftJoin($joinName . '.' . $jf, $newName);
+                            }
+                            $joinName = $newName;
+                        }
+                        else {
+                            // join failed, don't search any other tables this round
+                            $joinName = null;
+                            break;
+                        }
+                    }
+                    // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
+                    if (!empty($joinName)) {
+                        $join = self::newSearchBuilder($qb, $joinTable, $joinName, $request, $joins);
+                        $joinWhere .= ($joinWhere == '' ? '' : (' OR ')) . (!empty($join) && empty($request['search']) ? ($joinName . ' IS NULL OR ') : '') . $join;
+                    }
                 }
 
                 // only do a join if column name is specified
-                if (!empty($joinSearch)) {
-                    // only search joins on first connect
-                    if ($table == $tableName) {
-                        $joinFields = explode('.', $field);
-                        $joinTable = $table;
-                        $joinName = $tableName;
-                        foreach($joinFields as $jf) {
-                            $associated = self::$allTables[$joinTable]->getAssociationMappings();
-                            if (isset($associated[$jf])) {
-                                $entity = $associated[$jf]['targetEntity'];
-                                $ti = array_search($entity, self::$allTableClasses);
-                                if ($ti !== false) {
-                                    $joinTable = self::$allTableMetadata[$ti]->table['name'];
-                                }
-                                else {
-                                    $meta = $this->get('doctrine')->getManager()->getMetadataFactory()->getMetadataFor($entity);
-                                    $joinTable = $meta->table['name'];
-                                }
-                                $newName = $joinName . '_' . preg_replace('[^a-z]', '_', $jf) . $joinTable;
-                                if (!in_array($newName, $joins)) {
-                                    $joins[] = $newName;
-                                    $qb = $qb->leftJoin($joinName . '.' . $jf, $newName);
-                                }
-                                $joinName = $newName;
-                            }
-                            else {
-                                // join failed, don't search any other tables this round
-                                $joinName = null;
-                                break;
-                            }
+                if ($joinSearch === null || $joinSearch === '') {
+                    continue;
+                }
+
+                $fields = self::$allTables[$table]->getFieldNames();
+                if(in_array($field, $fields)) {
+                    if (substr($joinSearch, 0, 1) == '!') {
+                        if (is_numeric(substr($joinSearch, 1)) || is_bool(substr($joinSearch, 1))) {
+                            $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' != :' . $tableName . '_field' . $field;
+                            $qb = $qb->setParameter($tableName . '_field' . $field, substr($joinSearch, 1));
                         }
-                        // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-                        if (!empty($joinName)) {
-                            $joinWhere .= ($joinWhere == '' ? '' : (' OR ')) . self::newSearchBuilder($qb, $joinTable, $joinName, ['search' => $joinSearch], $joins);
+                        else {
+                            $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' NOT LIKE :' . $tableName . '_field' . $field;
+                            $qb = $qb->setParameter($tableName . '_field' . $field, '%' . substr($joinSearch, 1) . '%');
                         }
                     }
-
-                    $fields = self::$allTables[$table]->getFieldNames();
-                    if(in_array($field, $fields)) {
+                    else if (is_numeric($joinSearch) || is_bool($joinSearch)) {
+                        $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' = :' . $tableName . '_field' . $field;
+                        $qb = $qb->setParameter($tableName . '_field' . $field, $joinSearch);
+                    }
+                    else {
                         $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' LIKE :' . $tableName . '_field' . $field;
                         $qb = $qb->setParameter($tableName . '_field' . $field, '%' . $joinSearch . '%');
                     }
-
                 }
 
             }
 
             if (!empty($joinWhere)) {
-                $where .= ($where == '' ? '' : (' ' . $joinOp . ' ')) . $joinWhere;
+                $where .= ($where == '' ? ' (' : (' AND (')) . $joinWhere . ')';
             }
         }
 
@@ -166,10 +181,10 @@ class AdminController extends Controller
 
         self::$tables = [
             // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
-            'ss_user' => ['id', 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions'],
-            'ss_group' => ['id', 'name' => ['title','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions'],
+            'ss_user' => ['id', 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
+            'ss_group' => ['id', 'name' => ['title','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions' => ['deleted']],
             'pack' => ['id', 'name' => ['title'], 'groups' => ['group','groups'], 'users' => ['user','userPacks.user'], 'status', 'actions'],
-            'card' => ['id', 'name' => ['content','pack'], 'correct', 'answers', 'response', 'actions'],
+            'card' => ['id', 'name' => ['content','pack'], 'correct', 'answers', 'response', 'actions' => ['deleted']],
             // TODO: this really generalized template
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
         ];
@@ -186,19 +201,28 @@ class AdminController extends Controller
         //array_multisort($times, SORT_NUMERIC, SORT_DESC, $entities);
 
         // default entities to show
-        $vars = ['tables' => array_intersect_key(self::$tables, ['ss_user' => 0, 'ss_group' => 1])];
-        if (!empty($request->get('tables'))) {
-            $vars['tables'] = array_intersect_key(self::$tables, array_flip($request->get('tables')));
+
+        $request = array_merge(self::$defaultSearch, $request->attributes->all(), $request->query->all());
+
+        // pull out field searches
+        $regex = '/(' . implode('|', array_map(function ($t, $table) {
+                return implode('|', array_map(function ($f, $k) use ($table) {return $table . '\.' . (is_array($f) ? $k : $f);}, $t, array_keys($t)));
+            }, self::$tables, array_keys(self::$tables))) . '):(.*)/i';
+        if (isset($request['search']) && preg_match($regex, $request['search'], $matches)) {
+            $request['search'] = str_replace($matches[0], '', $request['search']);
+            $request[$matches[1]] = $matches[2];
         }
 
+        $vars['tables'] = array_intersect_key(self::$tables, array_flip($request['tables']));
+
         foreach(self::$tables as $table => $t) {
-            if (!empty($request->get('tables')) && !in_array($table, $request->get('tables'))) {
+            if (!empty($request['tables']) && !in_array($table, $request['tables'])) {
                 continue;
             }
 
             /** @var QueryBuilder $qb */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $where = self::newSearchBuilder($qb, $table, $table, $request->query->all());
+            $where = self::newSearchBuilder($qb, $table, $table, $request);
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }
@@ -208,7 +232,8 @@ class AdminController extends Controller
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count
-            if(!empty($page = $request->get('page'))) {
+            if(isset($request['page'])) {
+                $page = $request['page'];
                 if($page == 'last') {
                     $page = $total / 25;
                 }
@@ -236,7 +261,7 @@ class AdminController extends Controller
             }
             */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $where = self::newSearchBuilder($qb, $table, $table, $request->query->all());
+            $where = self::newSearchBuilder($qb, $table, $table, $request);
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }
@@ -250,7 +275,7 @@ class AdminController extends Controller
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        $vars['allTables'] = !empty($request->get('tables')) ? $request->get('tables') : ['ss_user', 'ss_group', 'pack'];
+        $vars['allTables'] = !empty($request['tables']) ? $request['tables'] : ['ss_user', 'ss_group', 'pack'];
 
         return $this->render('AdminBundle:Admin:results.html.php', $vars);
     }

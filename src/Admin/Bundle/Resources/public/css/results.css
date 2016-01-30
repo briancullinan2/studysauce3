@@ -145,21 +145,6 @@ table.results > tbody > tr > td .checkbox {
     min-height:0;
 }
 
-.results [class*="-row"].read-only .highlighted-link > *:not(.checkbox)
-{
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity ease-in-out .15s;
-    display:inline-block;
-}
-
-.results [class*="-row"].selected .highlighted-link > *:not(.checkbox),
-.results [class*="-row"]:hover .highlighted-link > *:not(.checkbox)
-{
-    visibility: visible;
-    opacity: 1;
-}
-
 .results [class*="-row"] > *,
 table.results > tbody > tr > td > *
 {
@@ -244,28 +229,27 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 .results [class*="-row"] a[href^="#edit-"]
 {
     display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
+    height: 18px;
+    width: 18px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -1554px transparent;
 }
 
 .results [class*="-row"] a[href^="#edit-"]:hover
 {
-    background-position: left -1602px;
+    background-position: -4px -1604px;
 }
 
-.results [class*="-row"] a[href^="#confirm-remove-"],
 .results [class*="-row"] a[href^="#remove-"]
 {
     display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
+    height: 18px;
+    width: 18px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -1654px transparent;
 }
 
 .results [class*="-row"] a[href^="#remove-"]:hover
 {
-    background-position: left -1152px;
+    background-position: -4px -1704px;
 }
 
 .results [class*="-row"] [value^="#save-"] {
@@ -273,22 +257,118 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     padding-right:20px;
 }
 
+.results .card-row.edit .highlighted-link > *:not(.checkbox),
 .results [class*="-row"].edit .highlighted-link > *:not(.checkbox),
-.results [class*="-row"].read-only .highlighted-link > a[href="#cancel-edit"],
-.results [class*="-row"].read-only .highlighted-link > [value^="#save-"]
+.results [class*="-row"].edit.selected .highlighted-link > *:not(.checkbox),
+.results [class*="-row"].edit:hover .highlighted-link > *:not(.checkbox),
+.results [class*="-row"].edit .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].edit .highlighted-link > [value^="#save-"],
+.results [class*="-row"].read-only:hover .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].read-only:hover .highlighted-link > [value^="#save-"],
+.results [class*="-row"].read-only.selected .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].read-only.selected .highlighted-link > [value^="#save-"],
+.results [class*="-row"].read-only .highlighted-link > *:not(.checkbox)
 {
     display:none;
+    opacity: 0;
+    transition: opacity ease-in-out .15s;
 }
 
-.results [class*="-row"].edit .highlighted-link > a[href="#cancel-edit"],
-.results [class*="-row"].edit .highlighted-link > [value^="#save-"]
+.results [class*="-row"] ~ .highlighted-link a[href^="#save-"],
+.results .pack-row.edit ~ .highlighted-link.pack a[href^="#add-"],
+.results .pack-row.read-only ~ .highlighted-link.pack a[href^="#save-"]
 {
-    display:inline-block;
+    visibility:hidden;
+    opacity: 0;
+    transition: opacity ease-in-out .15s;
 }
 
+.results .card-row.edit.selected .highlighted-link > *:not(.checkbox),
+.results .card-row.edit:hover .highlighted-link > *:not(.checkbox),
+.results [class*="-row"].selected .highlighted-link > *:not(.checkbox),
+.results [class*="-row"]:hover .highlighted-link > *:not(.checkbox),
+.results [class*="-row"].edit.selected .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].edit.selected .highlighted-link > [value^="#save-"],
+.results [class*="-row"].edit:hover .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"].edit:hover .highlighted-link > [value^="#save-"]
+{
+    display: inline-block;
+    opacity: 1;
+}
+
+.results .pack-row.edit ~ .highlighted-link.pack a[href^="#save-"]
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.results .pack-row .status {
+    position:relative;
+}
+
+.results .pack-row .status img {
+    position:absolute;
+    max-height: 100%;
+    width:auto;
+    left:20px;
+    top:0;
+}
+
+.results .pack-row.read-only .status select {
+    visibility: hidden;
+}
+
+.results .pack-row.edit .status img {
+    display:none;
+}
+.results .pack-row.edit .status > div:before {
+    display:none;
+}
+.results .pack-row .status > div:before {
+    display: block;
+    z-index: -1;
+    border-radius: 5px;
+    position: absolute;
+    margin-top:-14px;
+    top: 50%;
+    left: auto;
+    padding: 5px;
+    font-weight: bold;
+    right: 0;
+}
+
+.results .pack-row .status .unpublished:before {
+    content: "UNPUBLISHED";
+    background-color: #FF9900;
+    z-index:0;
+}
+
+.results .pack-row .status .public:before {
+    content: "PUBLIC";
+    background-color: #11CC33;
+    z-index:0;
+}
+
+.results .pack-row .status .group:before {
+    content: "GROUP-ONLY";
+    background-color: #1199CC;
+    z-index:0;
+}
+
+.results .pack-row .status .unlisted:before {
+    content: "UNLISTED";
+    background-color: #AAAAAA;
+    z-index:0;
+}
+
+.results [class*="-row"].template {
+    display:none !important;
+}
+
+.results .card-row.type-mc .answers.type-mc textarea,
 .results [class*="-row"].read-only textarea
 {
-    height: 1em;
+    height: 27px;
 }
 
 .results.empty header:after {
@@ -363,6 +443,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin-right: -50px;
     padding-right: 50px;
     display:inline-block;
+    text-align: right;
 }
 
 .paginate a {
@@ -482,7 +563,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:inline-block;
 }
 
-.results .pack-row.edit .groups .radio {
+.results .pack-row.edit .groups .checkbox:nth-of-type(even) {
     width: 100px;
     display:inline-block;
     margin: 0 -2px;
@@ -520,15 +601,15 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     line-height: 100%;
 }
 
-.results .card-row.removed {
+.results [class*="-row"].removed {
     display:none;
 }
 
-.results .card-row > .correct.type-tf {
+.results .card-row .correct.type-tf {
     text-align: right;
 }
 
-.results .card-row > .correct.type-tf + .correct.type-tf {
+.results .card-row .correct.type-tf + .correct.type-tf {
     text-align: left;
 }
 
@@ -551,6 +632,10 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results .card-row[class*="type"].type-tf .correct
 {
     width:33.33%;
+}
+
+.results .card-row .input.type {
+    width: 75%;
 }
 
 .results .card-row.type-tf .correct.type-tf
@@ -588,6 +673,29 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results .search .input {
     width: 100%;
     display:inline-block;
+}
+
+.entity-search .title {
+    display: block;
+}
+
+.entity-search .name {
+    font-weight: bold;
+    margin-right: 5px;
+    display:block;
+}
+
+.entity-search .description {
+    display: block;
+    opacity: 0.5;
+    white-space: nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.entity-search .by {
+    opacity: 0.8;
 }
 
 @media (min-width: 1500px)

@@ -2,11 +2,11 @@
 $(document).ready(function () {
 
     var body = $('body'),
-        radioCounter = 5;
+        radioCounter = 5000;
 
     key('⌘+v, ctrl+v, command+v', function () {
         var tab = $('#packs');
-        if(tab.is(':visible')) {
+        if(tab.is(':visible') && tab.find('input:focus, select:focus, textarea:focus').parents('.results [class*="-row"]').is('.empty')) {
             // get the clipboard text
             var text = $('<textarea></textarea>')
                 .css('position', 'fixed')
@@ -17,7 +17,7 @@ $(document).ready(function () {
                 .css('width', 1).appendTo(tab).focus();
 
             setTimeout(function () {
-                var clipText = text.val(), i;
+                var clipText = text.val();
                 text.remove();
                 rowImport(clipText);
             }, 100);
@@ -49,7 +49,7 @@ $(document).ready(function () {
 
     function rowImport(clipText) {
         var tab = $('#packs'),
-            last = tab.find('.card-row').last();
+            last = tab.find('.card-row.empty').first();
 
         // split into rows
         var clipRows = clipText.split(/\n/ig);
@@ -64,7 +64,8 @@ $(document).ready(function () {
             // skip partial rows
             if(clipRows[i].length < 2)
                 continue;
-            var newRow = last.clone().insertAfter(tab.find('.card-row').last());
+            var newRow = last.clone().insertAfter(last);
+            last = newRow;
             newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
             if(newRow.find('.type select option[value="' + clipRows[i][0] + '"]').length > 0) {
                 newRow.find('.type select').val(clipRows[i][0]).trigger('change');
@@ -83,7 +84,7 @@ $(document).ready(function () {
             }
 
             newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
-            newRow.find('.answers textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
+            newRow.find('.answers textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n"));
 
             if(clipRows[i].length == 2) {
                 newRow.find('.content input').val(clipRows[i][0]);
@@ -92,7 +93,7 @@ $(document).ready(function () {
             else {
                 newRow.find('.correct.type-tf input').filter(clipRows[i][2].match(/t/i) ? '[value="true"]' : (clipRows[i][2]
                     .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
-                newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][2]).trigger('change');
+                newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][2]);
                 newRow.find('.content input').val(clipRows[i][1]);
                 newRow.find('.response input').val(clipRows[i][7]);
             }
@@ -136,12 +137,11 @@ $(document).ready(function () {
 
     body.on('change', '#packs .type select', function () {
         var row = $(this).parents('.card-row');
-        row.attr('class', row.attr('class').replace(/type-.*?(\s|$)/ig, ''));
-        if($(this).val() != '' && $(this).val() != null) {
-            row.addClass('type-' + $(this).val());
-        }
-        if($(this).val() == 'mc') {
-            row.find('.type-mc textarea').trigger('change');
+        if(!row.is('.type-' + $(this).val())) {
+            row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
+            if ($(this).val() != '' && $(this).val() != null) {
+                row.addClass('type-' + $(this).val());
+            }
         }
     });
 
@@ -166,7 +166,11 @@ $(document).ready(function () {
 
     function packsFunc () {
         var tab = $('#packs');
-        tab.find('.card-row:not(.removed)').each(function () {
+        var rows = $(this).closest('.card-row:not(.removed)');
+        if (rows.length == 0) {
+            rows = tab.find('.card-row:not(.removed)');
+        }
+        rows.each(function () {
             var row = $(this);
             if(row.find('.content input').val().trim() == '' &&
                 row.find('.response input').val().trim() == '' && (
@@ -193,51 +197,49 @@ $(document).ready(function () {
         }
     }
 
-    body.on('click', '#packs a[href="#confirm-remove-pack"]', function (evt) {
-        evt.preventDefault();
-        var row = $(this).parents('tr'),
-            packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        $('#remove-pack-name').text(row.find('td:nth-child(1)').text());
-        $('#confirm-remove-pack').data('packId', packId);
-    });
-
-    body.on('click', '#confirm-remove-pack [href="#remove-pack"]', function (evt) {
-        evt.preventDefault();
-        $.ajax({
-            url: window.callbackPaths['packs_remove'],
-            type: 'POST',
-            dataType: 'text',
-            data: {
-                id: $('#confirm-remove-pack').data('packId')
-            },
-            success: loadContent
+    body.on('click', '.results a[href="#add-pack"]', function () {
+        var results = $(this).parents('.results');
+        var row = $(this).parents('.pack-row');
+        var search = 'pack.id:0';
+        results.find('.search .input').addClass('read-only');
+        results.find('.search input[name="search"]').val(search).trigger('change');
+        results.one('resulted', function () {
+            for(var i = 0; i < 5; i++) {
+                results.find('a[href="#add-card"]').first().trigger('click');
+            }
         });
     });
 
-    body.on('click', '#packs a[href="#add-card"]', function (evt) {
-        evt.preventDefault();
-        var tab = $("#packs");
-        var newRow = tab.find('form .card-row').last().clone().insertAfter(tab.find('.card-row').last());
-        newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
-        newRow.find('.type select, .answers textarea, .correct.type-mc select, .answers.type-sa input, .content input, .response input, .correct input[type="text"]').val('').trigger('change');
-        newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
-        newRow.find('.correct.type-tf input').prop('checked', false);
-        packsFunc();
-    });
-
     body.on('click', '.pack-row a[href="#edit-pack"]', function () {
+        var results = $(this).parents('.results');
         var row = $(this).parents('.pack-row');
         var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        var search = 'pack:' + packId;
-        $(this).parents('.results').find('.search input[name="search"]').val(search).trigger('change');
+        var search = 'pack.id:' + packId;
+        results.find('.search .input').addClass('read-only');
+        results.find('.search input[name="search"]').val(search).trigger('change');
+        results.one('resulted', function () {
+            results.find('.card-row').removeClass('read-only').addClass('edit');
+            packsFunc();
+        });
+    });
+
+    body.on('click', '.pack-row a[href^="#cancel-"]', function () {
+        var results = $(this).parents('.results');
+        results.find('.search .input').removeClass('read-only');
+        results.find('.card-row').removeClass('edit').addClass('read-only');
+        results.find('.search input[name="search"]').val('').trigger('change');
     });
 
     body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
 
-    body.on('click', '#packs a[href="#create-new"]', function (evt) {
+    body.on('click', '.results a[href="#save-pack"]', function (evt) {
         evt.preventDefault();
 
         var tab = $('#packs');
+        var row = $(this).parents('.pack-row');
+        if (row.length == 0) {
+            row = tab.find('.pack-row:not(.empty):visible').first();
+        }
         if(tab.find('.highlighted-link').is('.invalid')) {
             // TODO: select incorrect row
             return;
@@ -273,16 +275,20 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'text',
             data: {
-                id: ((/\/packs\/([0-9]+)/i).exec(window.location.pathname) || [null,null])[1],
+                id: tab.find('.results .search input[name="search"]').val().split(':')[1],
                 cards: cards,
-                group: tab.find('.group select').val(),
-                status: tab.find('.status select').val(),
-                title: tab.find('.title input').val(),
-                creator: tab.find('.creator input').val()
+                group: row.find('.groups input[name="group"]:checked').val(),
+                status: row.find('.status select').val(),
+                title: row.find('.name input').val()
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
-                loadContent(data)
+                row.removeClass('edit').addClass('read-only');
+                tab.find('.card-row.valid').removeClass('edit').addClass('read-only');
+                window.loadContent(data);
+                var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.results .pack-row:visible').first().attr('class'))[1];
+                tab.find('.results .search input[name="search"]').val('pack.id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
+                tab.find('.search .input').removeClass('read-only');
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
@@ -290,7 +296,4 @@ $(document).ready(function () {
         })
     });
 
-    body.on('show', '#packs', function () {
-        packsFunc()
-    });
 });

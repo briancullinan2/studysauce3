@@ -3,7 +3,7 @@ use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
-/** @var User|Group|Pack $entity */
+/** @var Pack $pack */
 ?>
 
 <div>
@@ -12,14 +12,14 @@ use StudySauce\Bundle\Entity\User;
         ?>
         <label class="checkbox">
             <input type="checkbox" name="groups"
-                   value="<?php print $g->getId(); ?>" <?php print ($entity->hasGroup($g->getName())
+                   value="<?php print $g->getId(); ?>" <?php print ($pack->hasGroup($g->getName())
                 ? 'checked="checked"'
                 : ''); ?> /><i></i><span><?php print $view->escape($g->getName()); ?></span>
         </label>
-        <?php if (method_exists($entity, 'getGroup')) { ?>
+        <?php if (method_exists($pack, 'getGroup')) { ?>
             <label class="checkbox">
                 <input type="checkbox" name="group"
-                       value="<?php print $g->getId(); ?>" <?php print ($entity->getGroup() == $g ? 'checked="checked"' : ''); ?> /><i></i><strong>(owner)</strong>
+                       value="<?php print $g->getId(); ?>" <?php print ($pack->getGroup() == $g ? 'checked="checked"' : ''); ?> /><i></i><strong>(owner)</strong>
             </label>
         <?php }
     }?>

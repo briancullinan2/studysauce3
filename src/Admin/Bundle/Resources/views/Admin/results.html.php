@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\User;
 
@@ -71,7 +72,7 @@ use StudySauce\Bundle\Entity\User;
         }
 
         foreach($tables as $table => $t) {
-            ?><h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a href="#add-entity">+</a></h2><?php
+            ?><h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a href="#add-<?php print $table; ?>">+</a></h2><?php
         }
 
         foreach ($templates as $k => $classes) {
@@ -95,7 +96,7 @@ use StudySauce\Bundle\Entity\User;
             ?>
             <h2 class="<?php print $table; ?>"><a
                     name="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a> <a
-                    href="#add-entity">+</a></h2>
+                    href="#add-<?php print $table; ?>">+</a></h2>
             <?php
         }
         foreach ($$table as $e) {
@@ -110,7 +111,7 @@ use StudySauce\Bundle\Entity\User;
                     <div class="<?php print $field; ?>">
                     <?php
                     if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
-                        print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'table' => $table]);
+                        print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'groups' => $allGroups, 'table' => $table]);
                     } else {
                         print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                     }
@@ -119,6 +120,28 @@ use StudySauce\Bundle\Entity\User;
                 ?>
                 <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
             </div>
-        <?php }
-    } ?>
+        <?php } ?>
+        <div class="<?php print $table; ?>-row <?php print $table . '-id-'; ?> read-only template empty">
+            <?php
+            foreach ($tables[$table] as $f => $fields) {
+                $field = is_array($fields) ? $f : $fields;
+                ?>
+            <div class="<?php print $field; ?>">
+                <?php
+                $class = AdminController::$allTables[$table]->name;
+                if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
+                    print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => new $class(), 'groups' => $allGroups, 'table' => $table]);
+                } else {
+                    print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => new $class(), 'groups' => $allGroups, 'table' => $table]);
+                }
+                ?></div><?php
+            }
+            ?>
+            <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
+        </div>
+        <div class="highlighted-link form-actions invalid <?php print $table; ?>">
+            <a href="#add-<?php print $table; ?>" class="big-add">Add <span>+</span> <?php print str_replace('ss_', '', $table); ?></a>
+            <a href="#save-<?php print $table; ?>" class="more">Save <?php print str_replace('ss_', '', $table); ?></a>
+        </div>
+    <?php } ?>
 </div>

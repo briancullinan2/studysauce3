@@ -38,19 +38,12 @@ $view['slots']->stop();
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="packs">
         <div class="pane-content">
-
             <?php print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', ['tables' => ['pack', 'card']])); ?>
-
-            <div class="highlighted-link form-actions invalid">
-                <a href="#add-card" class="big-add">Add <span>+</span> card</a>
-                <a href="#create-new" class="more">Save Pack</a>
-            </div>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('sincludes');
-print $this->render('StudySauceBundle:Dialogs:confirm-remove-pack.html.php', ['id' => 'confirm-remove-pack']);
 
 $view['slots']->stop();
 
