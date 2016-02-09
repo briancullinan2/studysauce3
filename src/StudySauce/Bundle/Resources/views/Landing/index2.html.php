@@ -57,7 +57,7 @@ $view['slots']->start('body'); ?>
         <div class="banner">
             <h2>Study more effectively</h2>
                <ul><li><strong>Reduce study time</strong> – Study Sauce learns what you have already mastered and focuses on exactly what you need to study.</li>
-                <li><strong>Remember longer</strong> – Study Sauce pushes information to you before it is forgotten, aiding long term retention.</li>
+                <li><strong>Remember longer</strong> – Study Sauce pushes information to you before it is forgotten, aiding long-term retention.</li>
                 <li><strong>Access any time</strong> - View the insights of your education any time…long after graduation.</li></ul>
         </div>
         <div class="appstore"><a href="https://itunes.apple.com/us/app/study-sauce/id1065647027?ls=1&mt=8"><object data="/bundles/studysauce/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg" type="image/svg+xml">
@@ -69,7 +69,7 @@ $view['slots']->start('body'); ?>
             </div>
             <div class="content1">
                 <h2>College Students</h2>
-                <p>College students, please click below to access your Study Sauce accounts.&nbsp; <a href="https://course.studysauce.com<?php print $view['router']->generate('login'); ?>">Log in</a></p>
+                <p>College students, please click below to access your Study Sauce accounts.&nbsp; <a href="https://course.studysauce.com/">Click here</a></p>
             </div>
             <div class="content1">
                 <h2>Screen Shots</h2>

@@ -39,6 +39,25 @@ class AdminController extends Controller
 
     public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user.deleted' => false, 'ss_group.deleted' => false, 'pack.status' => '!DELETED', 'card.deleted' => false];
 
+    private function searchKeys($joinTable, $request) {
+        $searchKeys = array_map(function ($f, $k) use ($joinTable) {
+            $fields = array_map(function ($field) use ($joinTable) {
+                return [$joinTable . '.' . $field, $field]; }, is_array($f) ? $f : [$f]);
+            if (count($fields)) {
+                $fields = call_user_func_array('array_merge', $fields);
+            }
+            if (is_array($f)) {
+                $fields[] = $k;
+            }
+            return $fields;
+        }, self::$tables[$joinTable], array_keys(self::$tables[$joinTable]));
+        if (count($searchKeys) > 0) {
+            $searchKeys = call_user_func_array('array_merge', $searchKeys);
+        }
+        $searches = array_filter(array_keys($request), function ($k) use ($request, $searchKeys) { return in_array($k, $searchKeys) && isset($request[$k]); });
+        return $searches;
+    }
+
     /**
      * @param QueryBuilder $qb
      * @param string $table
@@ -60,25 +79,42 @@ class AdminController extends Controller
                 $f = [$f];
             }
             $joinWhere = '';
+            $joinOp = 'OR';
             foreach($f as $field) {
-                $joinSearch = null;
+                $search = null;
 
                 // search for unions in original request only
                 $op = 'AND';
                 if (isset($request[$table . '.' . $field])) {
-                    $joinSearch = $request[$table . '.' . $field];
+                    $search = $request[$table . '.' . $field];
                 }
-                else if (isset($request[$field])) {
-                    $joinSearch = $request[$field];
+                else if (!empty($request[$field])) {
+                    $search = $request[$field];
                 }
                 else if (is_array($f) && !empty($request[$k]))  {
-                    $joinSearch = $request[$k];
+                    $search = $request[$k];
                 }
                 else if (!empty($request[$table])) {
-                    $joinSearch = $request[$table];
+                    $search = $request[$table];
                 }
+
+                // do default searches like excluding deleted items
+                else if (isset(self::$defaultSearch[$table . '.' . $field])) {
+                    $search = self::$defaultSearch[$table . '.' . $field];
+                }
+                else if (!empty(self::$defaultSearch[$field])) {
+                    $search = self::$defaultSearch[$field];
+                }
+                else if (is_array($f) && !empty(self::$defaultSearch[$k]))  {
+                    $search = self::$defaultSearch[$k];
+                }
+                else if (!empty(self::$defaultSearch[$table])) {
+                    $search = self::$defaultSearch[$table];
+                }
+
+                // general search is ORed together
                 else if (!empty($request['search'])) {
-                    $joinSearch = $request['search'];
+                    $search = $request['search'];
                     $op = 'OR';
                 }
 
@@ -113,43 +149,50 @@ class AdminController extends Controller
                         }
                     }
                     // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-                    if (!empty($joinName)) {
+                    if (!empty($joinName) && isset(self::$tables[$joinTable])) {
                         $join = self::newSearchBuilder($qb, $joinTable, $joinName, $request, $joins);
+
+                        if (count(self::searchKeys($joinTable, $request)) > 0) {
+                            $joinOp = 'AND';
+                        }
                         $joinWhere .= ($joinWhere == '' ? '' : (' OR ')) . (!empty($join) && empty($request['search']) ? ($joinName . ' IS NULL OR ') : '') . $join;
                     }
                 }
 
                 // only do a join if column name is specified
-                if ($joinSearch === null || $joinSearch === '') {
+                if ($search === null || $search === '') {
                     continue;
                 }
 
                 $fields = self::$allTables[$table]->getFieldNames();
                 if(in_array($field, $fields)) {
-                    if (substr($joinSearch, 0, 1) == '!') {
-                        if (is_numeric(substr($joinSearch, 1)) || is_bool(substr($joinSearch, 1))) {
+                    if (substr($search, 0, 1) == '!') {
+                        if (is_numeric(substr($search, 1)) || is_bool(substr($search, 1))) {
                             $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' != :' . $tableName . '_field' . $field;
-                            $qb = $qb->setParameter($tableName . '_field' . $field, substr($joinSearch, 1));
+                            $qb = $qb->setParameter($tableName . '_field' . $field, substr($search, 1));
                         }
                         else {
                             $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' NOT LIKE :' . $tableName . '_field' . $field;
-                            $qb = $qb->setParameter($tableName . '_field' . $field, '%' . substr($joinSearch, 1) . '%');
+                            $qb = $qb->setParameter($tableName . '_field' . $field, '%' . substr($search, 1) . '%');
                         }
                     }
-                    else if (is_numeric($joinSearch) || is_bool($joinSearch)) {
+                    else if (is_numeric($search) || is_bool($search)) {
                         $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' = :' . $tableName . '_field' . $field;
-                        $qb = $qb->setParameter($tableName . '_field' . $field, $joinSearch);
+                        $qb = $qb->setParameter($tableName . '_field' . $field, $search);
                     }
                     else {
                         $where .= ($where == '' ? '' : (' ' . $op . ' ')) . $tableName . '.' . $field . ' LIKE :' . $tableName . '_field' . $field;
-                        $qb = $qb->setParameter($tableName . '_field' . $field, '%' . $joinSearch . '%');
+                        $qb = $qb->setParameter($tableName . '_field' . $field, '%' . $search . '%');
                     }
                 }
 
             }
 
             if (!empty($joinWhere)) {
-                $where .= ($where == '' ? ' (' : (' AND (')) . $joinWhere . ')';
+                if (count(self::searchKeys($table, $request)) > 0) {
+                    $joinOp = 'AND';
+                }
+                $where .= ($where == '' ? ' (' : (' ' . $joinOp . ' (')) . $joinWhere . ')';
             }
         }
 
@@ -202,7 +245,7 @@ class AdminController extends Controller
 
         // default entities to show
 
-        $request = array_merge(self::$defaultSearch, $request->attributes->all(), $request->query->all());
+        $request = array_merge($request->attributes->all(), $request->query->all());
 
         // pull out field searches
         $regex = '/(' . implode('|', array_map(function ($t, $table) {
@@ -213,6 +256,9 @@ class AdminController extends Controller
             $request[$matches[1]] = $matches[2];
         }
 
+        if (!isset($request['tables'])) {
+            $request['tables'] = self::$defaultSearch['tables'];
+        }
         $vars['tables'] = array_intersect_key(self::$tables, array_flip($request['tables']));
 
         foreach(self::$tables as $table => $t) {
@@ -364,7 +410,7 @@ class AdminController extends Controller
             }
         }
 
-        return $this->indexAction($request);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['ss_user', 'ss_group']]);
     }
 
     /**
@@ -430,7 +476,7 @@ class AdminController extends Controller
             $orm->merge($g);
         $orm->flush();
 
-        return $this->forward('AdminBundle:Admin:index', ['_format' => 'tab']);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['ss_user', 'ss_group']]);
     }
 
     /**

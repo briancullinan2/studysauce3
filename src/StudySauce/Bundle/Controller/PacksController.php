@@ -133,16 +133,16 @@ class PacksController extends Controller
                 $orm->merge($newCard);
             }
 
-            if (empty($c['answers'])) {
+            if (!isset($c['answers'])) {
                 $c['answers'] = $c['correct'];
             }
             $answers = explode("\n", $c['answers']);
             $answerValues = [];
             foreach ($answers as $a) {
-                if (empty(trim($a)))
+                if (trim($a) == '')
                     continue;
                 $newAnswer = $newCard->getAnswers()->filter(function (Answer $x) use ($a) {
-                    return trim($a) == $x->getValue();
+                    return trim(trim($a), '$^') == $x->getValue();
                 })->first();
                 if (empty($newAnswer)) {
                     $newAnswer = new Answer();
@@ -232,7 +232,7 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        return $this->forward('StudySauceBundle:Packs:index', ['_format' => 'tab']);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card']]);
     }
 
     public function listAction(User $user = null)
@@ -309,6 +309,7 @@ class PacksController extends Controller
                 'logo' => $x->getLogo(),
                 'title' => $x->getTitle(),
                 'creator' => $x->getCreator(),
+                'properties' => $x->getProperties(),
                 'created' => $x->getCreated()->format('r'),
                 'modified' => !empty($x->getModified()) ? $x->getModified()->format('r') : null,
                 'count' => $x->getCards()->filter(function (Card $c) {
@@ -326,7 +327,7 @@ class PacksController extends Controller
                         return $i->getInvitee();
                     })->toArray()),
                     function (User $u) use ($x, $packGroups) {
-                        return $u->getUserPacks()
+                        return $x->getUser() == $u || $u->getUserPacks()
                             ->filter(function (UserPack $up) use ($x) {
                                 return $up->getPack()->getId() == $x->getId();
                             })->count() > 0
@@ -487,9 +488,10 @@ class PacksController extends Controller
         }
         $orm->flush();
 
+        $responses = [];
         if (!empty($request->get('since'))) {
-            $since = date_timezone_set(new \DateTime($request->get('since')), new \DateTimeZone(date_default_timezone_get()));
-            $ids = array_values(array_map(function (Response $r) {
+            $since = intval($request->get('since'));
+            $responses = array_values(array_map(function (Response $r) {
                 return [
                     'id' => $r->getId(),
                     'card' => $r->getCard()->getId(),
@@ -500,16 +502,14 @@ class PacksController extends Controller
                     'user' => $r->getUser()->getId()
                 ];
             }, $user->getResponses()->filter(function (Response $r) use ($user, $since) {
-                return $r->getUser() == $user && $r->getCreated() <= new \DateTime() && $r->getCreated() >= $since;
+                return $r->getUser() == $user && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
             })->toArray()));
         }
-        else {
-            $ids = array_map(function ($r) {
-                /** @var Response $r */
-                return empty($r) ? null : $r->getId();
-            }, $result);
-        }
+        $ids = array_map(function ($r) {
+            /** @var Response $r */
+            return empty($r) ? null : $r->getId();
+        }, $result);
 
-        return new JsonResponse($ids);
+        return new JsonResponse(['ids' => $ids, 'responses' => $responses]);
     }
 }

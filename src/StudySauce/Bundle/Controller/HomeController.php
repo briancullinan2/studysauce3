@@ -37,6 +37,12 @@ class HomeController extends Controller
             $templateVars['id'] = $user->getId();
             $templateVars['first'] = $user->getFirst();
             $templateVars['last'] = $user->getLast();
+            $templateVars['properties'] = array_map(function ($p) {
+                if($p instanceof \DateTime) {
+                    return $p->format('r');
+                }
+                return $p;
+            }, $user->getProperties());
             $templateVars['created'] = $user->getCreated()->format('r');
             $templateVars['roles'] = implode(',', $user->getRoles());
             $templateVars['children'] = [];
@@ -50,6 +56,12 @@ class HomeController extends Controller
                         'id' => $invite->getInvitee()->getId(),
                         'first' => $invite->getFirst(),
                         'last' => $invite->getLast(),
+                        'properties' => array_map(function ($p) {
+                            if($p instanceof \DateTime) {
+                                return $p->format('r');
+                            }
+                            return $p;
+                        }, $invite->getInvitee()->getProperties()),
                         'email' => $invite->getInvitee()->getEmail(),
                         'created' => $invite->getInvitee()->getCreated()->format('r'),
                         'roles' => implode(',', $invite->getInvitee()->getRoles())

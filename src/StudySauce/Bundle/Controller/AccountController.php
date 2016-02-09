@@ -458,7 +458,9 @@ class AccountController extends Controller
             // send welcome email
             $emails = new EmailsController();
             $emails->setContainer($this->container);
-            if ($user->hasRole('ROLE_PARTNER')) {
+            if ($user->hasRole('ROLE_PARENT')) {
+                $emails->welcomeParentAction($user);
+            } elseif ($user->hasRole('ROLE_PARTNER')) {
                 $emails->welcomePartnerAction($user);
             } else {
                 $emails->welcomeStudentAction($user);

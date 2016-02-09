@@ -241,7 +241,7 @@ $(document).ready(function () {
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);
         var newRow = results.find('.' + table + '-row').first().clone().insertBefore(results.find('.' + table + '-row').first());
-        newRow.attr('class', newRow.attr('class').replace(new RegExp(table + '-id-[0-9]*(\s|$)', 'ig'), ''));
+        newRow.attr('class', newRow.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
         newRow.removeClass('template removed read-only historic').addClass('edit');
         newRow.find('select, textarea, input[type="text"]').val('').trigger('change');
         newRow.find('> *').each(function () {
@@ -274,7 +274,7 @@ $(document).ready(function () {
     body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('[class*="-row"]');
-        row.removeClass('edit').addClass('read-only');
+        row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
     function loadContent (data) {

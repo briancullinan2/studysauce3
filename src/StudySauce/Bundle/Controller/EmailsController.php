@@ -56,6 +56,44 @@ class EmailsController extends Controller
      * @param User $user
      * @return \Symfony\Component\HttpFoundation\Response
      */
+    public function welcomeParentAction(User $user = null)
+    {
+        /** @var $user User */
+        if(empty($user))
+            $user = $this->getUser();
+
+        /** @var Invite $groupInvite */
+        $groupInvite = $user->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
+
+        /** @var Group $group */
+        if (!empty($groupInvite)) {
+            $group = $groupInvite->getInvitee()->getGroups()->first();
+        }
+
+        /** @var Swift_Mime_Message $message */
+        $message = Swift_Message::newInstance()
+            ->setSubject((!empty($group) ? ($group->getDescription() . ' + ') : '') . 'Study Sauce welcomes you!')
+            ->setFrom('admin@studysauce.com')
+            ->setTo($user->getEmail())
+            ->setBody($this->renderView('StudySauceBundle:Emails:welcome-parent.html.php', [
+                'name' => $user,
+                'link' => false,
+                'group' => !empty($group) ? $group->getDescription() : '',
+                'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
+                'child' => !empty($groupInvite) ? $groupInvite->getInvitee()->getFirst() : '',
+                'greeting' => (empty($user->getFirst()) ? 'Howdy partner' : ('Hello ' . $user->getFirst())) . ','
+            ]), 'text/html');
+        $headers = $message->getHeaders();
+        $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode(['category' => ['welcome-parent']])));
+        $this->send($message);
+
+        return new Response();
+    }
+
+    /**
+     * @param User $user
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function welcomeStudentAction(User $user = null)
     {
         /** @var $user User */

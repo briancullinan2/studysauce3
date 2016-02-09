@@ -36,11 +36,13 @@ $email_base = $view['router']->generate('_welcome', [], true) . 'bundles/studysa
 
     <p style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; ">
         <?php if(empty($view['slots']->get('salutation'))) { ?>
-        Keep studying!<br/>
-        The Study Sauce Team
+            Thank you,<br/>
+            The Study Sauce Team<br/>
+            <br/>
+            P.S. If you have any questions, please reach out to us at admin@studysauce.com.
         <?php } else {
             $view['slots']->output('salutation');
-        }?>
+        } ?>
     </p>
     <p style="text-align: center; font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; ">
         <a href="https://www.facebook.com/pages/Study-Sauce/519825501425670?ref=stream"

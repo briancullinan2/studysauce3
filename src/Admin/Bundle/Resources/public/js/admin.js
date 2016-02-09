@@ -75,11 +75,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#command a[href="#add-user"], #command a[href="#add-group"]', function (evt) {
-        evt.preventDefault();
-        $(this).parents('.pane-top').addClass('adding');
-    });
-
     body.on('change focus blur mousedown mouseup keydown keyup', '#command .group-row input, #command .group-row select', function () {
         var tab = $('#command');
         var row = $(this).parents('.group-row');
@@ -100,7 +95,7 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#command #groups a[href="#remove-group"]', function (evt) {
+    body.on('click', '#command a[href="#remove-confirm-group"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.group-row');
         var groupId = ((/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
@@ -116,13 +111,10 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '#command a[href="#new-group"], #command a[href="#save-group"]', function (evt) {
+    body.on('click', '#command [value="#save-group"]', function (evt) {
         evt.preventDefault();
         var that = $(this);
-        var row = that.parents('.user-row');
-        if(row.length == 0) {
-            row = $('#groups').find('.group-row');
-        }
+        var row = that.parents('.ss_group-row').removeClass('edit').addClass('read-only');
         if(that.parents('.highlighted-link').is('.invalid'))
             return;
         loadingAnimation(that);
@@ -132,20 +124,12 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'text',
             data: {
-                groupName: row.find('input[name="groupName"]').val().trim(),
+                groupName: row.find('input[name="name"]').val().trim(),
                 description: row.find('textarea[name="description"]').val().trim(),
                 roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                groupId: ((/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1]
+                groupId: ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1]
             },
-            success: function (response) {
-                that.find('.squiggle').stop().remove();
-                var dialog = $('#groups').find('.pane-top');
-                dialog.find('input[name="groupName"], textarea[name="description"]').val('');
-                dialog.find('input[name="roles"]').prop('checked', false);
-
-                // update group select in heading
-                loadContent(response);
-            },
+            success: loadContent,
             error: function () {
                 that.find('.squiggle').stop().remove();
             }
@@ -204,23 +188,23 @@ $(document).ready(function () {
         });
     });
 
-    body.on('submit', '#command #users > form', function (evt) {
+    body.on('click', '.results [value="#save-user"]', function (evt) {
         evt.preventDefault();
-        var data = getData(),
-            admin = $(this);
+        var data = {};
+        var row = $(this).parents('.ss_user-row');
         data['users'] = [];
-        admin.find('.user-row.edit:not(.invalid)').each(function () {
-            var row = $(this);
+        //admin.find('.ss_user-row.edit:not(.invalid)').each(function () {
+        //    var row = $(this);
             row.removeClass('edit').addClass('read-only');
             data['users'][data['users'].length] = {
                 groups : row.find('input[name="groups"]:checked').map(function () {return $(this).val();}).toArray().join(','),
                 roles : row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                firstName : row.find('input[name="first-name"]').val().trim(),
-                lastName : row.find('input[name="last-name"]').val().trim(),
+                firstName : row.find('input[name="first"]').val().trim(),
+                lastName : row.find('input[name="last"]').val().trim(),
                 email : row.find('input[name="email"]').val().trim(),
                 userId : (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1]
             };
-        });
+        //});
         $.ajax({
             url: window.callbackPaths['save_user'],
             type: 'POST',

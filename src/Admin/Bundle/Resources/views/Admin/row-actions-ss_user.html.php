@@ -13,5 +13,6 @@ use StudySauce\Bundle\Entity\User;
        href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=<?php print $ss_user->getEmail(); ?>"></a>
     <a title="Reset password" href="#confirm-password-reset"></a>
     <a title="Edit" href="#edit-user"></a>
-    <a title="Remove user" href="#remove-confirm-user"></a>
+    <a title="Remove user" href="#remove-user"></a>
+    <a href="#remove-confirm-user" class="more">Remove</a>
 </div>

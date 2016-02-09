@@ -24,6 +24,7 @@ $(document).ready(function () {
         }
     });
 
+
     function setFontSize() {
         var words = $(this).find('.inner').text().split(/\s+/ig),
             size = 12;
@@ -135,16 +136,6 @@ $(document).ready(function () {
         row.find('.correct.type-mc select').val(newVal.attr('value'));
     });
 
-    body.on('change', '#packs .type select', function () {
-        var row = $(this).parents('.card-row');
-        if(!row.is('.type-' + $(this).val())) {
-            row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
-            if ($(this).val() != '' && $(this).val() != null) {
-                row.addClass('type-' + $(this).val());
-            }
-        }
-    });
-
     body.on('mousedown click focus', '#packs .type select', function () {
         $(this).find('option').each(function () {
             if($(this).attr('data-text') != null) {
@@ -187,6 +178,13 @@ $(document).ready(function () {
                 row.removeClass('valid empty').addClass('invalid');
             }
             row.find('.answers textarea').height(row.find('.answers textarea')[0].scrollHeight - 4);
+            var type = row.find('.type select').val();
+            if(!row.is('.type-' + type)) {
+                row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
+                if (type != '' && type != null) {
+                    row.addClass('type-' + type);
+                }
+            }
         });
         if(tab.find('.card-row.invalid:not(.removed)').length == 0 && (
             tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0)) {
@@ -217,13 +215,18 @@ $(document).ready(function () {
         var search = 'pack.id:' + packId;
         results.find('.search .input').addClass('read-only');
         results.find('.search input[name="search"]').val(search).trigger('change');
-        results.one('resulted', function () {
-            results.find('.card-row').removeClass('read-only').addClass('edit');
-            packsFunc();
-        });
     });
 
-    body.on('click', '.pack-row a[href^="#cancel-"]', function () {
+    body.on('resulted', '.results', function () {
+        var results = $(this);
+        var pack = results.find('.pack-row.edit');
+        if (pack.length > 0) {
+            results.find('.card-row').removeClass('read-only').addClass('edit');
+        }
+        packsFunc();
+    });
+
+    body.on('click', '.pack-row.edit a[href^="#cancel-"]', function () {
         var results = $(this).parents('.results');
         results.find('.search .input').removeClass('read-only');
         results.find('.card-row').removeClass('edit').addClass('read-only');
@@ -232,7 +235,22 @@ $(document).ready(function () {
 
     body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
 
-    body.on('click', '.results a[href="#save-pack"]', function (evt) {
+    body.on('click', '.results [href="#remove-confirm-pack"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('.pack-row');
+        var rowId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'))[1];
+        $.ajax({
+            url: window.callbackPaths['packs_remove'],
+            type: 'POST',
+            dataType: 'text',
+            data: {
+                id: rowId
+            },
+            success: loadContent
+        });
+    });
+
+    body.on('click', '.results a[href="#save-pack"], .results [value="#save-pack"]', function (evt) {
         evt.preventDefault();
 
         var tab = $('#packs');
@@ -262,10 +280,10 @@ $(document).ready(function () {
                 cards[cards.length] = {
                     id: rowId != null ? rowId[1] : null,
                     type: $(this).find('.type select').val(),
-                    content: $(this).find('.content:visible input').val(),
-                    response: $(this).find('.response:visible input').val(),
-                    answers: $(this).find('.answers:visible textarea, .answers:visible input').val(),
-                    correct: $(this).find('.correct:visible input:not([type="radio"]), .correct:visible select, .correct:visible input[type="radio"]:checked').val()
+                    content: $(this).find('.input.content:visible input').val(),
+                    response: $(this).find('.input.response:visible input').val(),
+                    answers: $(this).find('.input.answers:visible textarea, .input.answers:visible input').val(),
+                    correct: $(this).find('.radio.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked').val()
                 };
             }
         });

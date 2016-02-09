@@ -229,49 +229,52 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 .results [class*="-row"] a[href^="#edit-"]
 {
     display: inline-block;
-    height: 18px;
-    width: 18px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -1554px transparent;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
 }
 
 .results [class*="-row"] a[href^="#edit-"]:hover
 {
-    background-position: -4px -1604px;
+    background-position: left -1602px;
 }
 
-.results [class*="-row"] a[href^="#remove-"]
+.results [class*="-row"] a[href^="#remove-"]:not(.more)
 {
     display: inline-block;
-    height: 18px;
-    width: 18px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -1654px transparent;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
 }
 
-.results [class*="-row"] a[href^="#remove-"]:hover
+.results [class*="-row"] a[href^="#remove-"]:not(.more):hover
 {
-    background-position: -4px -1704px;
+    background-position: left -1702px;
 }
 
-.results [class*="-row"] [value^="#save-"] {
-    padding-left: 20px;
-    padding-right:20px;
+.results [class*="-row"].read-only .highlighted-link > *
+{
+    margin: -3px 0;
 }
 
-.results .card-row.edit .highlighted-link > *:not(.checkbox),
-.results [class*="-row"].edit .highlighted-link > *:not(.checkbox),
-.results [class*="-row"].edit.selected .highlighted-link > *:not(.checkbox),
-.results [class*="-row"].edit:hover .highlighted-link > *:not(.checkbox),
-.results [class*="-row"].edit .highlighted-link > a[href="#cancel-edit"],
-.results [class*="-row"].edit .highlighted-link > [value^="#save-"],
-.results [class*="-row"].read-only:hover .highlighted-link > a[href="#cancel-edit"],
-.results [class*="-row"].read-only:hover .highlighted-link > [value^="#save-"],
-.results [class*="-row"].read-only.selected .highlighted-link > a[href="#cancel-edit"],
-.results [class*="-row"].read-only.selected .highlighted-link > [value^="#save-"],
-.results [class*="-row"].read-only .highlighted-link > *:not(.checkbox)
+.results .card-row.edit .highlighted-link > *,
+.results [class*="-row"].edit .highlighted-link > *,
+.results [class*="-row"].edit .highlighted-link > *:not(.more),
+.results [class*="-row"].edit.selected .highlighted-link > *,
+.results [class*="-row"].edit:hover .highlighted-link > *,
+.results [class*="-row"].read-only .highlighted-link > *:not(.more),
+.results [class*="-row"].read-only .highlighted-link > *.more,
+.results [class*="-row"].read-only:hover .highlighted-link > a[href^="#cancel-"],
+.results [class*="-row"].read-only:hover .highlighted-link > .more,
+.results [class*="-row"].read-only.selected .highlighted-link > a[href^="#cancel-"],
+.results [class*="-row"].read-only.selected .highlighted-link > .more,
+.results [class*="-row"][class*="-confirm"] .highlighted-link > *:not(.more),
+.results [class*="-row"][class*="-confirm"].read-only:hover .highlighted-link > *:not(.more),
+.results [class*="-row"][class*="-confirm"].read-only.selected .highlighted-link > *:not(.more)
 {
     display:none;
-    opacity: 0;
-    transition: opacity ease-in-out .15s;
+    /* opacity: 0; */
+    /* transition: opacity ease-in-out .15s; */
 }
 
 .results [class*="-row"] ~ .highlighted-link a[href^="#save-"],
@@ -279,21 +282,46 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 .results .pack-row.read-only ~ .highlighted-link.pack a[href^="#save-"]
 {
     visibility:hidden;
-    opacity: 0;
-    transition: opacity ease-in-out .15s;
+    /* opacity: 0; */
+    /* transition: opacity ease-in-out .15s; */
 }
 
-.results .card-row.edit.selected .highlighted-link > *:not(.checkbox),
-.results .card-row.edit:hover .highlighted-link > *:not(.checkbox),
-.results [class*="-row"].selected .highlighted-link > *:not(.checkbox),
-.results [class*="-row"]:hover .highlighted-link > *:not(.checkbox),
+.results .card-row.edit.selected .highlighted-link > *:not(.more),
+.results .card-row.edit:hover .highlighted-link > *:not(.more),
+.results [class*="-row"].read-only.selected .highlighted-link > *:not(.more),
+.results [class*="-row"].read-only:hover .highlighted-link > *:not(.more),
 .results [class*="-row"].edit.selected .highlighted-link > a[href="#cancel-edit"],
 .results [class*="-row"].edit.selected .highlighted-link > [value^="#save-"],
 .results [class*="-row"].edit:hover .highlighted-link > a[href="#cancel-edit"],
-.results [class*="-row"].edit:hover .highlighted-link > [value^="#save-"]
+.results [class*="-row"].edit:hover .highlighted-link > [value^="#save-"],
+.results [class*="-row"][class*="-confirm"] .highlighted-link > a[href^="#remove-confirm-"].more,
+.results [class*="-row"][class*="-confirm"] .highlighted-link > a[href="#cancel-edit"],
+.results [class*="-row"][class*="-confirm"].read-only:hover .highlighted-link > a[href="#cancel-edit"]:not(.more),
+.results [class*="-row"][class*="-confirm"].read-only.selected .highlighted-link > a[href="#cancel-edit"]:not(.more)
 {
     display: inline-block;
-    opacity: 1;
+    /* opacity: 1; */
+}
+
+.results .remove-confirm {
+    position:relative;
+}
+
+.results .remove-confirm:before {
+    content: " ";
+    display:block;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    z-index: 10;
+    background-color: rgba(255,0,0,0.5);
+}
+
+.results .remove-confirm .highlighted-link > a[href="#cancel-edit"],
+.results .remove-confirm .highlighted-link > a[href^="#remove-confirm-"] {
+    z-index:12;
 }
 
 .results .pack-row.edit ~ .highlighted-link.pack a[href^="#save-"]

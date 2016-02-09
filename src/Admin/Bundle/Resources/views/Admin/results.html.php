@@ -118,9 +118,13 @@ use StudySauce\Bundle\Entity\User;
                     ?></div><?php
                 }
                 ?>
-                <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
+                <label class="checkbox"><input type="checkbox" name="selected" /><i></i></label>
             </div>
-        <?php } ?>
+        <?php }
+
+        $class = AdminController::$allTables[$table]->name;
+        $entity = new $class();
+        ?>
         <div class="<?php print $table; ?>-row <?php print $table . '-id-'; ?> read-only template empty">
             <?php
             foreach ($tables[$table] as $f => $fields) {
@@ -128,11 +132,10 @@ use StudySauce\Bundle\Entity\User;
                 ?>
             <div class="<?php print $field; ?>">
                 <?php
-                $class = AdminController::$allTables[$table]->name;
                 if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
-                    print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => new $class(), 'groups' => $allGroups, 'table' => $table]);
+                    print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $entity, 'groups' => $allGroups, 'table' => $table]);
                 } else {
-                    print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => new $class(), 'groups' => $allGroups, 'table' => $table]);
+                    print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
                 }
                 ?></div><?php
             }
