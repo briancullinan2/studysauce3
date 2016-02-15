@@ -198,7 +198,7 @@ $(document).ready(function () {
     body.on('click', '.results a[href="#add-pack"]', function () {
         var results = $(this).parents('.results');
         var row = $(this).parents('.pack-row');
-        var search = 'pack.id:0';
+        var search = 'pack-id:0';
         results.find('.search .input').addClass('read-only');
         results.find('.search input[name="search"]').val(search).trigger('change');
         results.one('resulted', function () {
@@ -212,7 +212,7 @@ $(document).ready(function () {
         var results = $(this).parents('.results');
         var row = $(this).parents('.pack-row');
         var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        var search = 'pack.id:' + packId;
+        var search = 'pack-id:' + packId;
         results.find('.search .input').addClass('read-only');
         results.find('.search input[name="search"]').val(search).trigger('change');
     });
@@ -305,7 +305,7 @@ $(document).ready(function () {
                 tab.find('.card-row.valid').removeClass('edit').addClass('read-only');
                 window.loadContent(data);
                 var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.results .pack-row:visible').first().attr('class'))[1];
-                tab.find('.results .search input[name="search"]').val('pack.id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
+                tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
                 tab.find('.search .input').removeClass('read-only');
             },
             error: function () {

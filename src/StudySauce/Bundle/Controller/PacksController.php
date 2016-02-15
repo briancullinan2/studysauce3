@@ -488,23 +488,25 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        $responses = [];
+        $since = 0;
         if (!empty($request->get('since'))) {
             $since = intval($request->get('since'));
-            $responses = array_values(array_map(function (Response $r) {
-                return [
-                    'id' => $r->getId(),
-                    'card' => $r->getCard()->getId(),
-                    'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
-                    'correct' => $r->getCorrect() ? 1 : 0,
-                    'value' => $r->getValue(),
-                    'created' => $r->getCreated()->format('r'),
-                    'user' => $r->getUser()->getId()
-                ];
-            }, $user->getResponses()->filter(function (Response $r) use ($user, $since) {
-                return $r->getUser() == $user && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
-            })->toArray()));
         }
+
+        $responses = array_values(array_map(function (Response $r) {
+            return [
+                'id' => $r->getId(),
+                'card' => $r->getCard()->getId(),
+                'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
+                'correct' => $r->getCorrect() ? 1 : 0,
+                'value' => $r->getValue(),
+                'created' => $r->getCreated()->format('r'),
+                'user' => $r->getUser()->getId()
+            ];
+        }, $user->getResponses()->filter(function (Response $r) use ($user, $since) {
+            return $r->getUser() == $user && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
+        })->toArray()));
+
         $ids = array_map(function ($r) {
             /** @var Response $r */
             return empty($r) ? null : $r->getId();

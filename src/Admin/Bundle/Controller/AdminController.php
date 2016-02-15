@@ -42,7 +42,7 @@ class AdminController extends Controller
     private function searchKeys($joinTable, $request) {
         $searchKeys = array_map(function ($f, $k) use ($joinTable) {
             $fields = array_map(function ($field) use ($joinTable) {
-                return [$joinTable . '.' . $field, $field]; }, is_array($f) ? $f : [$f]);
+                return [$joinTable . '-' . $field, $field]; }, is_array($f) ? $f : [$f]);
             if (count($fields)) {
                 $fields = call_user_func_array('array_merge', $fields);
             }
@@ -85,8 +85,8 @@ class AdminController extends Controller
 
                 // search for unions in original request only
                 $op = 'AND';
-                if (isset($request[$table . '.' . $field])) {
-                    $search = $request[$table . '.' . $field];
+                if (isset($request[$table . '-' . $field])) {
+                    $search = $request[$table . '-' . $field];
                 }
                 else if (!empty($request[$field])) {
                     $search = $request[$field];
@@ -99,8 +99,8 @@ class AdminController extends Controller
                 }
 
                 // do default searches like excluding deleted items
-                else if (isset(self::$defaultSearch[$table . '.' . $field])) {
-                    $search = self::$defaultSearch[$table . '.' . $field];
+                else if (isset(self::$defaultSearch[$table . '-' . $field])) {
+                    $search = self::$defaultSearch[$table . '-' . $field];
                 }
                 else if (!empty(self::$defaultSearch[$field])) {
                     $search = self::$defaultSearch[$field];
@@ -154,8 +154,11 @@ class AdminController extends Controller
 
                         if (count(self::searchKeys($joinTable, $request)) > 0) {
                             $joinOp = 'AND';
+                            $joinWhere .= ($joinWhere == '' ? '' : (' OR ')) . $join;
                         }
-                        $joinWhere .= ($joinWhere == '' ? '' : (' OR ')) . (!empty($join) && empty($request['search']) ? ($joinName . ' IS NULL OR ') : '') . $join;
+                        else {
+                            $joinWhere .= ($joinWhere == '' ? '' : (' OR ')) . (!empty($join) && empty($request['search']) ? ($joinName . ' IS NULL OR ') : '') . $join;
+                        }
                     }
                 }
 
@@ -248,12 +251,16 @@ class AdminController extends Controller
         $request = array_merge($request->attributes->all(), $request->query->all());
 
         // pull out field searches
+        // TODO: fix this to do all occurrences and table names and other formats of searches specified above
         $regex = '/(' . implode('|', array_map(function ($t, $table) {
-                return implode('|', array_map(function ($f, $k) use ($table) {return $table . '\.' . (is_array($f) ? $k : $f);}, $t, array_keys($t)));
-            }, self::$tables, array_keys(self::$tables))) . '):(.*)/i';
-        if (isset($request['search']) && preg_match($regex, $request['search'], $matches)) {
-            $request['search'] = str_replace($matches[0], '', $request['search']);
-            $request[$matches[1]] = $matches[2];
+                return implode('|', array_map(function ($f, $k) use ($table) {
+                    return (is_array($f) ? $k : ($table . '-' . $f));}, $t, array_keys($t)));
+            }, self::$tables, array_keys(self::$tables))) . '|' . implode('|', array_keys(self::$tables)) . '):(.*)/i';
+        if (isset($request['search']) && preg_match_all($regex, $request['search'], $matches)) {
+            foreach($matches[0] as $i => $m) {
+                $request['search'] = str_replace($m, '', $request['search']);
+                $request[$matches[1][$i]] = $matches[2][$i];
+            }
         }
 
         if (!isset($request['tables'])) {
@@ -278,8 +285,8 @@ class AdminController extends Controller
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count
-            if(isset($request['page'])) {
-                $page = $request['page'];
+            if(isset($request['page-' . $table])) {
+                $page = $request['page-' . $table];
                 if($page == 'last') {
                     $page = $total / 25;
                 }

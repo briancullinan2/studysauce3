@@ -14,7 +14,7 @@ use StudySauce\Bundle\Entity\User;
             return $u->getFirst() . ' ' . $u->getLast() . (method_exists($entity, 'getUser') ? ($u == $entity->getUser() ? ' <strong>(owner)</strong>' : '') : '');
         }, $entity->getUsers()->slice(0, 5)));
     if ($entity->getUsers()->count() > 5) {
-        print ' <a href="#search-packs:' . $entity->getId() . '">+' . ($entity->getUsers()->count() - 5) . ' more</a>';
+        print ' <a href="#search-' . $table . ':' . $entity->getId() . '">+' . ($entity->getUsers()->count() - 5) . ' more</a>';
     }
     ?>
 </div>

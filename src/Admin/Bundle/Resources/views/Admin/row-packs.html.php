@@ -11,7 +11,7 @@ use StudySauce\Bundle\Entity\User;
     <?php
     print implode(', ', array_map(function (Pack $p) { return $p->getTitle(); }, $entity->getPacks()->slice(0, 5)));
     if ($entity->getPacks()->count() > 5) {
-        print ' <a href="#search-users:' . $entity->getId() . '">+' . ($entity->getPacks()->count() - 5) . ' more</a>';
+        print ' <a href="#search-' . $table . ':' . $entity->getId() . '">+' . ($entity->getPacks()->count() - 5) . ' more</a>';
     }
     ?>
 </div>

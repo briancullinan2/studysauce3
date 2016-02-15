@@ -111,8 +111,12 @@ $(document).ready(function () {
             order: orderBy,
             tables: admin.find('.class-names input:checked').map(function () { return $(this).val(); }).toArray(),
             search: admin.find('input[name="search"]').val().trim(),
-            page: admin.find('input[name="page"]').val().trim()
         };
+
+        admin.find('input[name="page"]').each(function () {
+            var table = $(this).parents('.paginate > .paginate').parent().attr('class').replace('paginate', '').trim();
+            result['page-' + table] = $(this).val();
+        });
 
         admin.find('header .input input, header .input select').each(function () {
             result[$(this).attr('name')] = $(this).val();

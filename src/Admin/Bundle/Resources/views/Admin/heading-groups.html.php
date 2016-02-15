@@ -1,5 +1,5 @@
 <label class="input">
-    <select name="groups">
+    <select name="ss_group-id">
         <option value="">Group</option>
         <option value="_ascending">Ascending (A-Z)</option>
         <option value="_descending">Descending (Z-A)</option>
