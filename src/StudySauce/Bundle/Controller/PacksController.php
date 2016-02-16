@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use StudySauce\Bundle\Entity\Answer;
@@ -75,16 +76,24 @@ class PacksController extends Controller
             $newPack->setUser($user);
         }
         if ($user->hasRole('ROLE_ADMIN')) {
-            $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+            $groups = new ArrayCollection($orm->getRepository('StudySauceBundle:Group')->findAll());
         } else {
-            $groups = $user->getGroups()->toArray();
+            $groups = $user->getGroups();
         }
-        $groups = array_filter($groups, function (Group $g) use ($request) {
+        $group = $groups->filter(function (Group $g) use ($request) {
             return $g->getId() == intval($request->get('group'));
-        });
+        })->first();
         $newPack->setTitle($request->get('title'));
-        $group = array_pop($groups);
         $newPack->setGroup(!empty($group) ? $group : null);
+        foreach ($groups->toArray() as $g) {
+            /** @var Group $g */
+            if (in_array($g->getId(), $request->get('groups') ?: []) && !$newPack->hasGroup($g->getName())) {
+                $newPack->addGroup($g);
+            }
+            else if ($newPack->hasGroup($g->getName()) && !in_array($g->getId(), $request->get('groups') ?: [])) {
+                $newPack->removeGroup($g);
+            }
+        }
         $newPack->setStatus($request->get('status'));
         if (empty($newPack->getId())) {
             $orm->persist($newPack);
@@ -238,12 +247,14 @@ class PacksController extends Controller
     /**
      * @return Pack[]
      */
-    private function getPacksForUser() {
+    private function getPacksForUser($user = null) {
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
         /** @var User $currentUser */
-        $currentUser = $this->getUser();
+        if ($user == null) {
+            $currentUser = $this->getUser();
+        }
 
         return array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->select('p')
@@ -297,12 +308,14 @@ class PacksController extends Controller
 
     public function listAction(User $user = null)
     {
-        /** @var User $currentUser */
-        $currentUser = $this->getUser();
+
+        if(!$this->getUser()->hasRole('ROLE_ADMIN')) {
+            $user = $this->getUser();
+        }
 
         /** @var QueryBuilder $qb */
         $packs = self::getPacksForUser();
-        $response = new JsonResponse(array_map(function (Pack $x) use ($currentUser) {
+        $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
 
             if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED') {
                 return [
@@ -329,7 +342,7 @@ class PacksController extends Controller
                     return [
                         'id' => $u->getId()
                     ];
-                }, array_filter(array_merge([$currentUser], $currentUser->getInvites()
+                }, array_filter(array_merge([$user], $user->getInvites()
                     ->filter(function (Invite $i) {
                         return !empty($i->getInvitee());
                     })

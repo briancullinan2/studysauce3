@@ -296,6 +296,7 @@ $(document).ready(function () {
                 id: tab.find('.results .search input[name="search"]').val().split(':')[1],
                 cards: cards,
                 group: row.find('.groups input[name="group"]:checked').val(),
+                groups: row.find('.groups input[name="groups"]:checked').map(function () {return $(this).val();}).toArray(),
                 status: row.find('.status select').val(),
                 title: row.find('.name input').val()
             },
