@@ -252,23 +252,23 @@ class PacksController extends Controller
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        /** @var User $currentUser */
+        /** @var User $user */
         if ($user == null) {
-            $currentUser = $this->getUser();
+            $user = $this->getUser();
         }
 
         return array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->select('p')
             ->getQuery()
-            ->getResult(), function (Pack $p) use ($currentUser) {
+            ->getResult(), function (Pack $p) use ($user) {
             /** @var UserPack $up */
-            $hasPack = $p->getUser() == $currentUser
-                || $currentUser->getUserPacks()
+            $hasPack = $p->getUser() == $user
+                || $user->getUserPacks()
                     ->filter(function (UserPack $up) use ($p) {
                         return $up->getPack()->getId() == $p->getId();
                     })
                     ->count() > 0
-                || $currentUser->getInvites()->exists(function ($_, Invite $x) use ($p) {
+                || $user->getInvites()->exists(function ($_, Invite $x) use ($p) {
                     return !empty($x->getInvitee())
                     && $x->getInvitee()->getUserPacks()->filter(function (UserPack $up) use ($p) {
                         return $up->getPack()->getId() == $p->getId();
@@ -278,11 +278,11 @@ class PacksController extends Controller
             $packGroups = $p->getGroups()->map(function (Group $g) {
                 return $g->getId();
             })->toArray();
-            $hasGroups = count(array_intersect($packGroups, $currentUser->getGroups()
+            $hasGroups = count(array_intersect($packGroups, $user->getGroups()
                     ->map(function (Group $g) {
                         return $g->getId();
                     })->toArray())) > 0
-                || $currentUser->getInvites()->exists(function ($_, Invite $x) use ($packGroups) {
+                || $user->getInvites()->exists(function ($_, Invite $x) use ($packGroups) {
                     return !empty($x->getInvitee())
                     && count(array_intersect($packGroups, $x->getInvitee()->getGroups()
                         ->map(function (Group $g) {
