@@ -289,7 +289,10 @@ class PacksController extends Controller
                             return $g->getId();
                         })->toArray())) > 0;
                 });
-            if (($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED') && $hasPack) {
+            if (($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus()))) {
+                if ($hasPack) {
+                    return true;
+                }
                 return false;
             }
             if ($p->getStatus() == 'UNLISTED' && $hasPack) {
@@ -307,10 +310,14 @@ class PacksController extends Controller
         }));
     }
 
+    /**
+     * @param User|null $user
+     * @return JsonResponse
+     */
     public function listAction(User $user = null)
     {
 
-        if(!$this->getUser()->hasRole('ROLE_ADMIN')) {
+        if(!$this->getUser()->hasRole('ROLE_ADMIN') || $user == null) {
             $user = $this->getUser();
         }
 
@@ -318,7 +325,7 @@ class PacksController extends Controller
         $packs = self::getPacksForUser($user);
         $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
 
-            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED') {
+            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus())) {
                 return [
                     'id' => $x->getId(),
                     'deleted' => true
