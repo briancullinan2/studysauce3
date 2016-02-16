@@ -502,6 +502,7 @@ class PacksController extends Controller
         if (!empty($request->get('since'))) {
             $since = intval($request->get('since'));
         }
+        $packs = array_filter($user->getPacks()->toArray(), function (Pack $p) {return !$p->getDeleted()});
 
         $responses = array_values(array_map(function (Response $r) {
             return [
@@ -513,8 +514,8 @@ class PacksController extends Controller
                 'created' => $r->getCreated()->format('r'),
                 'user' => $r->getUser()->getId()
             ];
-        }, $user->getResponses()->filter(function (Response $r) use ($user, $since) {
-            return $r->getUser() == $user && !$r->getCard()->getDeleted() && in_array($r->getCard()->getPack(), $user->getPacks()->toArray())
+        }, $user->getResponses()->filter(function (Response $r) use ($user, $since, $packs) {
+            return $r->getUser() == $user && !$r->getCard()->getDeleted() && in_array($r->getCard()->getPack(), $packs)
                 && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
         })->toArray()));
 
