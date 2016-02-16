@@ -502,7 +502,7 @@ class PacksController extends Controller
         if (!empty($request->get('since'))) {
             $since = intval($request->get('since'));
         }
-        $packs = array_filter($user->getPacks()->toArray(), function (Pack $p) {return !$p->getDeleted()});
+        $packs = array_filter($user->getPacks()->toArray(), function (Pack $p) {return !$p->getDeleted();});
 
         $responses = array_values(array_map(function (Response $r) {
             return [
