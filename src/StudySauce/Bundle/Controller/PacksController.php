@@ -358,7 +358,7 @@ class PacksController extends Controller
                         return $i->getInvitee();
                     })->toArray()),
                     function (User $u) use ($x, $packGroups) {
-                        return $x->getUser() == $u
+                        return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED')
                         || $u->getUserPacks()
                             ->filter(function (UserPack $up) use ($x) {
                                 return $up->getPack()->getId() == $x->getId();

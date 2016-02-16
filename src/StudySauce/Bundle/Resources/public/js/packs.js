@@ -177,7 +177,6 @@ $(document).ready(function () {
             else {
                 row.removeClass('valid empty').addClass('invalid');
             }
-            row.find('.answers textarea').height(row.find('.answers textarea')[0].scrollHeight - 4);
             var type = row.find('.type select').val();
             if(!row.is('.type-' + type)) {
                 row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
@@ -279,11 +278,11 @@ $(document).ready(function () {
             else {
                 cards[cards.length] = {
                     id: rowId != null ? rowId[1] : null,
-                    type: $(this).find('.type select').val(),
-                    content: $(this).find('.input.content:visible input').val(),
+                    type:     $(this).find('.type select').val(),
+                    content:  $(this).find('.input.content:visible input').val(),
                     response: $(this).find('.input.response:visible input').val(),
-                    answers: $(this).find('.input.answers:visible textarea, .input.answers:visible input').val(),
-                    correct: $(this).find('.radio.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked').val()
+                    answers:  $(this).find('.input.answers:visible textarea, .input.answers:visible input').val(),
+                    correct:  $(this).find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked').val()
                 };
             }
         });

@@ -67,6 +67,9 @@ $(document).ready(function () {
 
     function resetHeader() {
         var command = $('.results:visible');
+        if (command.length == 0) {
+            return;
+        }
         var selected = $('[class*="-row"]:visible.selected').filter(function () {
             return isElementInViewport($(this));
         });
@@ -99,7 +102,7 @@ $(document).ready(function () {
     body.on('show', '.panel-pane', function () {
         if (!$(this).is('.results-loaded')) {
             $(this).addClass('results-loaded');
-            $(this).find('header .search .checkbox').draggable();
+            $(this).find('.results header .search .checkbox').draggable();
         }
         resetHeader();
     });

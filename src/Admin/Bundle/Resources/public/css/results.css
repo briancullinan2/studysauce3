@@ -122,7 +122,9 @@ table.results > tbody > tr > td .checkbox {
 
 .results .search input[name="search"]
 {
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -4752px transparent;
+    background-image: url(../../studysauce/images/menu_new_half.png);
+    background-repeat: no-repeat;
+    background-position: left -4752px;
     padding-left:30px;
 }
 
@@ -393,10 +395,14 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     display:none !important;
 }
 
-.results .card-row.type-mc .answers.type-mc textarea,
+.results [class*="-row"] textarea
+{
+    height: 1.7em;
+}
+
 .results [class*="-row"].read-only textarea
 {
-    height: 27px;
+    height: 1.2em;
 }
 
 .results.empty header:after {
