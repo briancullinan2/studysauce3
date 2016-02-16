@@ -103,7 +103,7 @@ class PacksController extends Controller
                 $newCard->setPack($newPack);
                 $newPack->addCard($newCard);
             } // remove cards
-            elseif (!empty($c['remove']) && $c['remove'] == 'true') {
+            elseif (!empty($c['remove']) && $c['remove']) {
                 if ($newCard->getResponses()->count() == 0) {
                     foreach ($newCard->getAnswers()->toArray() as $a) {
                         /** @var Answer $a */
