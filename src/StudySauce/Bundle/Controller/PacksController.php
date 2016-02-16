@@ -245,7 +245,8 @@ class PacksController extends Controller
     }
 
     /**
-     * @return Pack[]
+     * @param null $user
+     * @return \StudySauce\Bundle\Entity\Pack[]
      */
     private function getPacksForUser($user = null) {
         /** @var $orm EntityManager */
@@ -314,7 +315,7 @@ class PacksController extends Controller
         }
 
         /** @var QueryBuilder $qb */
-        $packs = self::getPacksForUser();
+        $packs = self::getPacksForUser($user);
         $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
 
             if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED') {
@@ -350,7 +351,8 @@ class PacksController extends Controller
                         return $i->getInvitee();
                     })->toArray()),
                     function (User $u) use ($x, $packGroups) {
-                        return $x->getUser() == $u || $u->getUserPacks()
+                        return $x->getUser() == $u
+                        || $u->getUserPacks()
                             ->filter(function (UserPack $up) use ($x) {
                                 return $up->getPack()->getId() == $x->getId();
                             })->count() > 0
