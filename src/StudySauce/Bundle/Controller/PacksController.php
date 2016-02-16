@@ -191,7 +191,7 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'search' => 'pack.id:' . $newPack->getId()]);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'search' => 'pack-id:' . $newPack->getId()]);
     }
 
     public function removeAction(Request $request)

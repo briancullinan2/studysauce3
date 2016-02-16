@@ -110,7 +110,7 @@ $(document).ready(function () {
         var result = {
             order: orderBy,
             tables: admin.find('.class-names input:checked').map(function () { return $(this).val(); }).toArray(),
-            search: admin.find('input[name="search"]').val().trim(),
+            search: admin.find('input[name="search"]').val().trim()
         };
 
         admin.find('input[name="page"]').each(function () {
