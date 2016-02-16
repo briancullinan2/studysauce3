@@ -247,9 +247,9 @@ $(document).ready(function () {
         evt.preventDefault();
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);
-        var newRow = results.find('.' + table + '-row').first().clone().insertBefore(results.find('.' + table + '-row').first());
+        var newRow = results.find('.' + table + '-row').first().clone();
         newRow.attr('class', newRow.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
-        newRow.removeClass('template removed read-only historic').addClass('edit');
+        newRow.removeClass('template removed read-only historic').addClass('edit blank');
         newRow.find('select, textarea, input[type="text"]').val('').trigger('change');
         newRow.find('> *').each(function () {
             var radio = $(this).find('input[type="radio"]').first();
@@ -258,6 +258,7 @@ $(document).ready(function () {
             }
         });
         newRow.find('input[type="checkbox"]').prop('checked', false).trigger('change');
+        newRow.insertBefore(results.find('.' + table + '-row').first());
     });
 
     body.on('click', '[class*="-row"] a[href^="#remove-"]', function (evt) {

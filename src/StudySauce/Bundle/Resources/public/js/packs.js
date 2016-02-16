@@ -65,7 +65,9 @@ $(document).ready(function () {
             // skip partial rows
             if(clipRows[i].length < 2)
                 continue;
-            var newRow = last.clone().insertAfter(last);
+
+            tab.find('[href="#add-card"]').first().trigger('click');
+            var newRow = tab.find('.card-row.empty').first().detach().insertAfter(last);
             last = newRow;
             newRow.attr('class', newRow.attr('class').replace(/card-id-[0-9]*(\s|$)/ig, ''));
             if(newRow.find('.type select option[value="' + clipRows[i][0] + '"]').length > 0) {
@@ -81,11 +83,11 @@ $(document).ready(function () {
                 newRow.find('.type select').val('sa').trigger('change');
             }
             else {
-                newRow.find('.type select').val('');
+                newRow.find('.type select').val('').trigger('change');
             }
 
             newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
-            newRow.find('.answers textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n"));
+            newRow.find('.answers textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
 
             if(clipRows[i].length == 2) {
                 newRow.find('.content input').val(clipRows[i][0]);
@@ -94,7 +96,7 @@ $(document).ready(function () {
             else {
                 newRow.find('.correct.type-tf input').filter(clipRows[i][2].match(/t/i) ? '[value="true"]' : (clipRows[i][2]
                     .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
-                newRow.find('.correct.type-mc select, .answers.type-sa input, .correct:not([class*="type-"]) input').val(clipRows[i][2]);
+                newRow.find('.correct.type-mc select, .answers.type-sa input, .input.correct:not([class*="type-"]) input').val(clipRows[i][2]);
                 newRow.find('.content input').val(clipRows[i][1]);
                 newRow.find('.response input').val(clipRows[i][7]);
             }

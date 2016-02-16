@@ -107,12 +107,11 @@ class PacksController extends Controller
             $newCard = $newPack->getCards()->filter(function (Card $x) use ($c) {
                 return $c['id'] == $x->getId() && !empty($x->getId());
             })->first();
-            if (empty($newCard)) {
-                $newCard = new Card();
-                $newCard->setPack($newPack);
-                $newPack->addCard($newCard);
-            } // remove cards
-            elseif (!empty($c['remove']) && $c['remove']) {
+            // remove cards
+            if (!empty($c['remove']) && $c['remove']) {
+                if (empty($newCard)) {
+                    continue;
+                }
                 if ($newCard->getResponses()->count() == 0) {
                     foreach ($newCard->getAnswers()->toArray() as $a) {
                         /** @var Answer $a */
@@ -126,6 +125,11 @@ class PacksController extends Controller
                     $orm->merge($newCard);
                 }
                 continue;
+            }
+            else if (empty($newCard)) {
+                $newCard = new Card();
+                $newCard->setPack($newPack);
+                $newPack->addCard($newCard);
             }
 
             if (empty($c['content'])) {
