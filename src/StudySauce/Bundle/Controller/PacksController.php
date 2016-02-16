@@ -235,16 +235,17 @@ class PacksController extends Controller
         return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card']]);
     }
 
-    public function listAction(User $user = null)
-    {
-        /** @var User $currentUser */
-        $currentUser = $this->getUser();
-
+    /**
+     * @return Pack[]
+     */
+    private function getPacksForUser() {
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        /** @var QueryBuilder $qb */
-        $packs = array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        return array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->select('p')
             ->getQuery()
             ->getResult(), function (Pack $p) use ($currentUser) {
@@ -292,6 +293,15 @@ class PacksController extends Controller
             }
             return false;
         }));
+    }
+
+    public function listAction(User $user = null)
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        /** @var QueryBuilder $qb */
+        $packs = self::getPacksForUser();
         $response = new JsonResponse(array_map(function (Pack $x) use ($currentUser) {
 
             if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED') {
@@ -492,6 +502,7 @@ class PacksController extends Controller
         if (!empty($request->get('since'))) {
             $since = intval($request->get('since'));
         }
+        $packs = array_map(function (Pack $p) { return $p->getId(); }, self::getPacksForUser());
 
         $responses = array_values(array_map(function (Response $r) {
             return [
@@ -503,8 +514,9 @@ class PacksController extends Controller
                 'created' => $r->getCreated()->format('r'),
                 'user' => $r->getUser()->getId()
             ];
-        }, $user->getResponses()->filter(function (Response $r) use ($user, $since) {
-            return $r->getUser() == $user && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
+        }, $user->getResponses()->filter(function (Response $r) use ($user, $since, $packs) {
+            return $r->getUser() == $user && !$r->getCard()->getDeleted() && in_array($r->getCard()->getPack()->getId(), $packs)
+                && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
         })->toArray()));
 
         $ids = array_map(function ($r) {
