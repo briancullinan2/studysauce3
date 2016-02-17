@@ -167,7 +167,7 @@ class AdminController extends Controller
             if (is_bool($search)) {
                 return [$tableName . '.' . $field . ' != :' . $searchField . '_bool_not', $searchField . '_bool_not', boolval($search)];
             }
-            else if (is_numeric($search) && is_int($search)) {
+            else if (is_numeric($search)) {
                 return [$tableName . '.' . $field . ' != :' . $searchField . '_int_not', $searchField . '_int_not', intval($search)];
             }
             else {
@@ -177,7 +177,7 @@ class AdminController extends Controller
         else if (is_bool($search)) {
             return [$tableName . '.' . $field . ' = :' . $searchField . '_bool', $searchField . '_bool', boolval($search)];
         }
-        else if (is_numeric($search) && is_int($search)) {
+        else if (is_numeric($search)) {
             return [$tableName . '.' . $field . ' = :' . $searchField . '_int', $searchField . '_int', intval($search)];
         }
         else {
