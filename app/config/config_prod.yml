@@ -35,4 +35,12 @@ monolog:
         console:
             type:  console
 
+swiftmailer:
+    transport: smtp
+    encryption: ssl
+    auth_mode: login
+    host:      smtp.sendgrid.net
+    username:  Study Sauce
+    password:  2StudyBetter#
+    spool:     { type: db }
 
