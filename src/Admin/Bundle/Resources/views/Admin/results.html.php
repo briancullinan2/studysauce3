@@ -37,7 +37,7 @@ use StudySauce\Bundle\Entity\User;
                             <i></i> <a href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
                     <?php } ?>
                 </div>
-                <label class="input"><input name="search" type="text" value="" placeholder="Search" title="<?php print $view->escape(SqlFormatter::format($search)); ?>" /></label>
+                <label class="input"><input name="search" type="text" value="" placeholder="Search" /></label>
             </form>
         </div>
 
