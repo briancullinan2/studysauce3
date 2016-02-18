@@ -164,41 +164,109 @@ $(document).ready(function () {
     });
 
     var callbackTimeout = null;
+    var owner = false;
+    body.on('change', '.results .users input.selectized', function () {
+        if ($(this).val().trim() == '') {
+            return;
+        }
+        var id = parseInt($(this).val());
+        createUsersRow.apply($(this).parents('label'), [id]);
+        $(this).val('');
+        this.selectize.setValue('');
+    });
 
-    body.on('change', '.results .users input', function () {
+    body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"], a[href="#set-owner"]', function (evt) {
+        evt.preventDefault();
+        var field = $(this).parents('.users').find('label.input');
+        var id = parseInt($(this).parents('label').find('input').val());
+        createUsersRow.apply(field, [id]);
+    });
 
+    function createUsersRow(id) {
+        var field = $(this);
+        var selectize = field.find('input')[0].selectize;
+        var users = field.parents('.users');
+        var i = users.find('.checkbox').length;
+        var existing = users.find('.checkbox [value="' + id + '"]');
+        var newRow;
+        if (existing.length > 0) {
+            if (existing.attr('name') != 'user') {
+                i = (/users\[([0-9]*)]/i).exec(existing.attr('name'))[1];
+            }
+            existing.parents('label').replaceWith(newRow = users.find('.template').clone());
+        }
+        else {
+            newRow = users.find('.template').clone().insertBefore(users.find('label.checkbox').first());
+        }
+
+        newRow.find('span').text(selectize.options[id].text);
+        newRow.find('input').attr('name', 'users[' + i + '][id]').val(id);
+
+        if (owner) {
+            newRow.find('[href="#insert-entity"]').remove();
+            newRow.find('input').attr('name', 'user');
+            field.data('owner', id);
+        }
+        else if (field.data('users').indexOf(id) > -1) {
+            // remove user
+            newRow.addClass('buttons-2');
+            newRow.find('[href="#subtract-entity"]').remove();
+            $('<input type="hidden" name="' + newRow.find('input').attr('name').replace('[id]', '[remove]') + '" value="true" />').insertAfter(newRow.find('input'));
+            field.data('users', field.data('users').filter(function (e) {return e != id;}));
+        }
+        else {
+            // add user
+            newRow.addClass('buttons-2');
+            newRow.find('[href="#insert-entity"]').remove();
+            field.data('users', $.merge(field.data('users'), [id]));
+        }
+        if (owner || field.data('owner') == '') {
+            newRow.find('[href="#set-owner"]').remove();
+            newRow.removeClass('buttons-2');
+        }
+        owner = false;
+        newRow.removeClass('template');
+    }
+
+    body.on('mouseover', 'a[href="#set-owner"]', function () {
+        owner = true;
+    });
+
+    body.on('mouseout', 'a[href="#set-owner"]', function () {
+        owner = false;
     });
 
     function setupUsers()
     {
         var row = $(this).parents('[class*="-row"]'),
-            that = row.find('.users input:not(.selectized)'),
+            that = row.find('.users input[type="text"]:not(.selectized)'),
             field = that.parents('label');
         that.selectize({
             persist:false,
             delimiter: ' ',
-            searchField: ['text', 'value', '1', '0'],
+            searchField: ['text', 'value', '0'],
             plugins: ['continue_editing', 'restore_on_backspace2'],
             maxItems: 1,
             dropdownParent:'body',
-            options: [that.val()],
+            options: [],
             render: {
                 option: function(item) {
-                    var desc = '<div class="entity-search">'
-                        + '<span class="title">'
+                    var desc = '<span class="title">'
                         + '<span class="name"><i class="icon source"></i>' + item.text + '</span>'
                         + '<span class="by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
                         + '</span>';
+                    var buttons = 1;
                     if (field.data('users').indexOf(item.value) > -1) {
-                        desc += '<a href="#subtract-entity">Remove</a>';
+                        desc += '<a href="#subtract-entity" title="Remove user"></a>';
                     }
                     else {
-                        desc += '<a href="#insert-entity">Add</a>';
+                        desc += '<a href="#insert-entity" title="Add user"></a>';
                     }
-                    if (field.data('owner') != item.value) {
-                        desc += '<a href="#set-owner">Set owner</a>';
+                    if (field.data('owner') != item.value && field.data('owner') != '') {
+                        desc += '<a href="#set-owner" title="Set as owner"></a>';
+                        buttons++;
                     }
-                    return desc + '</div>';
+                    return '<div class="entity-search buttons-' + buttons + '">' + desc + '</div>';
                 }
             },
             load: function(query, callback) {
@@ -222,10 +290,10 @@ $(document).ready(function () {
                             callback();
                         },
                         success: function(content) {
-                            var results = $(content).find('.ss_user-row').map(function () {
+                            var results = $(content).find('.ss_user-row:not(.empty)').map(function () {
                                 var rowId = (/ss_user-id-([0-9]*)/i).exec($(this).attr('class'))[1];
                                 return {
-                                    value: rowId,
+                                    value: parseInt(rowId),
                                     text: $(this).find('.first input').val() + ' ' + $(this).find('.last input').val(),
                                     0: $(this).find('.email input').val()
                                 }}).toArray();
@@ -235,6 +303,10 @@ $(document).ready(function () {
                 }, 100);
             }
         });
+        var existing = field.data('options');
+        for (var i in existing) {
+            that[0].selectize.addOption(existing[i]);
+        }
     }
 
     function setupFields() {

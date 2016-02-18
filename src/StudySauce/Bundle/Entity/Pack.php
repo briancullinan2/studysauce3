@@ -142,7 +142,7 @@ class Pack
      * @return ArrayCollection
      */
     public function getUsers() {
-        return new ArrayCollection(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())));
+        return new ArrayCollection(array_values(array_unique(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())))));
     }
 
     /**

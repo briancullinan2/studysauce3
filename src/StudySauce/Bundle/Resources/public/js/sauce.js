@@ -59,8 +59,9 @@ Selectize.define('continue_editing', function(options) {
                 var currentValue = options.text.apply(this, [option]);
                 if (this.deleteSelection({keyCode: 8})) {
                     // only remove item if it is made up and not from the server
-                    if(typeof option.alt == 'undefined')
+                    if(typeof option[0] == 'undefined') {
                         this.removeItem(currentValue);
+                    }
                     this.setTextboxValue(option[this.settings.valueField]);
                     this.refreshOptions(true);
                 }

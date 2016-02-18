@@ -501,6 +501,11 @@ h4, h2
     margin-top: -16px;
 }
 
+.selectize-dropdown [data-selectable], .selectize-dropdown .optgroup-header
+{
+    padding:0;
+}
+
 .ui-datepicker .ui-datepicker-next:before {
     border-left-color: #CCC;
     border-width: 16px;

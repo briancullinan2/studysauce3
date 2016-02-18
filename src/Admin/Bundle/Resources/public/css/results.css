@@ -85,10 +85,8 @@ table.results > tbody > tr > td .checkbox {
     white-space: nowrap;
 }
 
-.results .groups label.radio,
-.results .groups label.checkbox,
-.results .roles label.radio,
-.results .roles label.checkbox
+.results label.radio,
+.results label.checkbox
 {
     font-weight: normal;
     font-size: 12px;
@@ -134,14 +132,10 @@ table.results > tbody > tr > td .checkbox {
     float:right;
 }
 
-.results .read-only .roles label.radio,
-.results .read-only .roles label.radio input:checked ~ *:not(i),
-.results .read-only .roles label.checkbox,
-.results .read-only .roles label.checkbox input:checked ~ *:not(i),
-.results .read-only .groups label.radio,
-.results .read-only .groups label.radio input:checked ~ *:not(i),
-.results .read-only .groups label.checkbox,
-.results .read-only .groups label.checkbox input:checked ~ *:not(i)
+.results .read-only label.radio,
+.results .read-only label.radio input:checked ~ *:not(i),
+.results .read-only label.checkbox,
+.results .read-only label.checkbox input:checked ~ *:not(i)
 {
     display:inline;
     min-height:0;
@@ -710,7 +704,125 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 }
 
 .entity-search .title {
-    display: block;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.entity-search.buttons-1 .title {
+    padding:5px 50px 5px 10px;
+    margin-right:-40px;
+    width:100%;
+}
+
+.entity-search.buttons-2 .title {
+    padding:5px 90px 5px 10px;
+    margin-right:-80px;
+    width:100%;
+}
+
+a[href="#insert-entity"],
+a[href="#set-owner"],
+a[href="#subtract-entity"] {
+    width: 40px;
+    vertical-align: middle;
+    background-color: #ddd;
+    position: relative;
+    height: 50px;
+    display: inline-block;
+    color: white;
+    text-align: center;
+}
+
+.edit .users label.checkbox.template {
+    display:none;
+}
+
+.read-only a[href="#insert-entity"],
+.read-only a[href="#set-owner"],
+.read-only a[href="#subtract-entity"] {
+    display: none !important;
+}
+
+.checkbox > a[href="#insert-entity"],
+.checkbox > a[href="#set-owner"],
+.checkbox > a[href="#subtract-entity"] {
+    height: 40px;
+}
+
+.checkbox > a[href="#insert-entity"]:before,
+.checkbox > a[href="#set-owner"]:before,
+.checkbox > a[href="#subtract-entity"]:before {
+    line-height: 40px;
+}
+
+.edit .users label.checkbox {
+    display:block;
+}
+
+.edit .users label.checkbox span {
+    width: 100%;
+    margin-right: -40px;
+    padding-right: 50px;
+    display: inline-block;
+    padding-left: 34px;
+    margin-left: -34px;
+}
+
+.edit .users label.checkbox.buttons-2 span {
+    margin-right:-80px;
+    padding-right: 90px;
+}
+
+a[href="#insert-entity"]:before,
+a[href="#set-owner"]:before,
+a[href="#subtract-entity"]:before {
+    font-size:50px;
+    line-height: 50px;
+    vertical-align: middle;
+    transition: background-color ease-in-out .15s;
+}
+
+a[href="#insert-entity"]:before {
+    content: "+";
+}
+
+a[href="#insert-entity"] {
+    background-color: #dfd;
+}
+
+.entity-search .title:hover + a[href="#insert-entity"],
+a[href="#insert-entity"]:hover {
+    background-color: #afa;
+}
+
+a[href="#subtract-entity"]:before {
+    content: "-";
+}
+
+a[href="#subtract-entity"] {
+    background-color: #fdd;
+}
+
+.entity-search .title:hover + a[href="#subtract-entity"],
+a[href="#subtract-entity"]:hover {
+    background-color: #faa;
+}
+
+a[href="#set-owner"]:before {
+    content: "O";
+    font-size: 30px;
+}
+
+a[href="#set-owner"] {
+    background-color: #ddf;
+}
+
+.entity-search .title:hover + a[href="#set-owner"],
+a[href="#set-owner"]:hover {
+    background-color: #aaf;
 }
 
 .entity-search .name {

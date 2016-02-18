@@ -16,6 +16,7 @@ use StudySauce\Bundle\Entity\User;
         opacity: 1;
         visibility: visible;
     }
+    .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .highlighted-link.<?php print $table; ?>,
     .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .<?php print $table; ?>-row {
         display:none;
     }

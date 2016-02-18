@@ -2,7 +2,7 @@ imports:
     - { resource: config.yml }
 
 parameters:
-    defer_all_emails: "admin@studysauce.com"
+    defer_all_emails: false
 
 doctrine:
     dbal:
