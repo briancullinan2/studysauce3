@@ -737,7 +737,7 @@ a[href="#subtract-entity"] {
 }
 
 .edit .users label.checkbox.template {
-    display:none;
+    display:none !important;
 }
 
 .read-only a[href="#insert-entity"],

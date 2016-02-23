@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\Security\Acl\Exception\Exception;
 
 
 /**
@@ -55,6 +56,42 @@ class PacksController extends Controller
             'groups' => $groups,
             'pack' => $pack
         ]);
+    }
+
+    public function sendNotification($message, $deviceToken) {
+        $body['aps'] = array(
+            'alert' => $message,
+            'badge' => 18
+        );
+
+//$body['category'] = 'message';
+//$body['category'] = 'profile';
+//$body['category'] = 'dates';
+//$body['category'] = 'daily_dates';
+//$body['sender'] = 'jamesHAW';
+        $body['sender'] = 'StudySauce';
+
+//Server stuff
+        $passphrase = '';
+        $ctx = stream_context_create();
+        stream_context_set_option($ctx, 'ssl', 'local_cert', 'ipad_sandbox.pem');
+        stream_context_set_option($ctx, 'ssl', 'passphrase', $passphrase);
+        $fp = stream_socket_client(
+            'ssl://gateway.sandbox.push.apple.com:2195', $err,
+            $errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
+        if (!$fp)
+            throw new Exception("Failed to connect: $err $errstr" . PHP_EOL);
+        $this->get('logger')->debug('Connected to APNS' . PHP_EOL);
+        $payload = json_encode($body);
+// Build the binary notification
+        $msg = chr(0) . pack('n', 32) . pack('H*', $deviceToken) . pack('n', strlen($payload)) . $payload;
+// Send it to the server
+        $result = fwrite($fp, $msg, strlen($msg));
+        if (!$result)
+            throw new Exception('Message not delivered' . PHP_EOL);
+        else
+            $this->get('logger')->debug('Message successfully delivered' . PHP_EOL);
+        fclose($fp);
     }
 
     public function createAction(Request $request)

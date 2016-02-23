@@ -68,9 +68,18 @@ class AccountController extends Controller
         $userManager = $this->get('fos_user.user_manager');
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
-
         /** @var $user User */
         $user = $this->getUser();
+
+        // update notification token
+        if(!empty($request->get('device'))) {
+            $user->setDevices(array_unique(array_merge([$request->get('device')], $user->getDevices() ?: [])));
+            $userManager->updateUser($user);
+            //$orm->merge($user);
+            //$orm->flush();
+            return new JsonResponse(true);
+        }
+
         $user->setFirst($request->get('first'));
         $user->setLast($request->get('last'));
         if (!empty($request->get('email'))) {
@@ -88,8 +97,9 @@ class AccountController extends Controller
                 $user->setEmail($request->get('email'));
                 $user->setUsername($request->get('email'));
                 $userManager->updateCanonicalFields($user);
-                $orm->merge($user);
-                $orm->flush();
+                $userManager->updateUser($user);
+                //$orm->merge($user);
+                //$orm->flush();
             } else {
                 throw new AccessDeniedHttpException('Incorrect password while updating user');
             }

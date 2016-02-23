@@ -143,6 +143,9 @@ class User extends BaseUser implements EncoderAwareInterface
     /** @ORM\Column(name="gcal_access_token", type="string", length=255, nullable=true) */
     protected $gcal_access_token;
 
+    /** @ORM\Column(name="devices", type="simple_array", nullable=true) */
+    protected $devices;
+
     /**
      * @ORM\ManyToMany(targetEntity="Group")
      * @ORM\JoinTable(name="ss_user_group",
@@ -880,5 +883,28 @@ class User extends BaseUser implements EncoderAwareInterface
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * Set devices
+     *
+     * @param array $devices
+     * @return User
+     */
+    public function setDevices($devices)
+    {
+        $this->devices = $devices;
+
+        return $this;
+    }
+
+    /**
+     * Get devices
+     *
+     * @return array 
+     */
+    public function getDevices()
+    {
+        return $this->devices;
     }
 }

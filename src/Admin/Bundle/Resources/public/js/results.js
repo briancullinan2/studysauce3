@@ -205,6 +205,7 @@ $(document).ready(function () {
         if (owner) {
             newRow.find('[href="#insert-entity"]').remove();
             newRow.find('input').attr('name', 'user');
+            newRow.find('span').html(newRow.find('span').text() + ' <strong>owner</strong>');
             field.data('owner', id);
         }
         else if (field.data('users').indexOf(id) > -1) {
@@ -245,7 +246,6 @@ $(document).ready(function () {
             persist:false,
             delimiter: ' ',
             searchField: ['text', 'value', '0'],
-            plugins: ['continue_editing', 'restore_on_backspace2'],
             maxItems: 1,
             dropdownParent:'body',
             options: [],

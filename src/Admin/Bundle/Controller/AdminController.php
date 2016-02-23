@@ -73,8 +73,7 @@ class AdminController extends Controller
                     $joinTable = self::$allTableMetadata[$ti]->table['name'];
                 }
                 else {
-                    $meta = $this->get('doctrine')->getManager()->getMetadataFactory()->getMetadataFor($entity);
-                    $joinTable = $meta->table['name'];
+                    continue;
                 }
                 $newName = $joinName . '_' . preg_replace('[^a-z]', '_', $jf) . $joinTable;
                 if (!in_array($newName, $joins)) {
