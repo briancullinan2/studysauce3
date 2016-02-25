@@ -5,6 +5,7 @@ namespace StudySauce\Bundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use StudySauce\Bundle\Command\CronSauceCommand;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Group;
@@ -58,40 +59,48 @@ class PacksController extends Controller
         ]);
     }
 
-    public function sendNotification($message, $deviceToken) {
-        $body['aps'] = array(
-            'alert' => $message,
-            'badge' => 18
-        );
+    public function sendNotification($message, $count, $deviceToken) {
+        try {
+            $body['aps'] = array(
+                'alert' => $message,
+                'badge' => $count
+            );
 
-//$body['category'] = 'message';
-//$body['category'] = 'profile';
-//$body['category'] = 'dates';
-//$body['category'] = 'daily_dates';
-//$body['sender'] = 'jamesHAW';
-        $body['sender'] = 'StudySauce';
+            //$body['category'] = 'message';
+            //$body['category'] = 'profile';
+            //$body['category'] = 'dates';
+            //$body['category'] = 'daily_dates';
+            //$body['sender'] = 'jamesHAW';
+            $body['sender'] = 'web.StudySauce';
 
-//Server stuff
-        $passphrase = '';
-        $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'local_cert', 'ipad_sandbox.pem');
-        stream_context_set_option($ctx, 'ssl', 'passphrase', $passphrase);
-        $fp = stream_socket_client(
-            'ssl://gateway.sandbox.push.apple.com:2195', $err,
-            $errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
-        if (!$fp)
-            throw new Exception("Failed to connect: $err $errstr" . PHP_EOL);
-        $this->get('logger')->debug('Connected to APNS' . PHP_EOL);
-        $payload = json_encode($body);
-// Build the binary notification
-        $msg = chr(0) . pack('n', 32) . pack('H*', $deviceToken) . pack('n', strlen($payload)) . $payload;
-// Send it to the server
-        $result = fwrite($fp, $msg, strlen($msg));
-        if (!$result)
-            throw new Exception('Message not delivered' . PHP_EOL);
-        else
-            $this->get('logger')->debug('Message successfully delivered' . PHP_EOL);
-        fclose($fp);
+            //Server stuff
+            $passphrase = '';
+            $ctx = stream_context_create();
+            stream_context_set_option($ctx, 'ssl', 'local_cert', __DIR__ . '/' . 'com.studysauce.companyapp.pem');
+            //stream_context_set_option($ctx, 'ssl', 'passphrase', $passphrase);
+            $fp = stream_socket_client(
+                'ssl://gateway.sandbox.push.apple.com:2195', $err,
+                $errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
+            if (!$fp)
+                throw new Exception("Failed to connect: $err $errstr" . PHP_EOL);
+            $this->get('logger')->debug('Connected to APNS' . PHP_EOL);
+            $payload = json_encode($body);
+
+            // Build the binary notification
+            $msg = chr(0) . pack('n', 32) . pack('H*', $deviceToken) . pack('n', strlen($payload)) . $payload;
+
+            // Send it to the server
+            $result = fwrite($fp, $msg, strlen($msg));
+            if (!$result)
+                throw new Exception('Message not delivered' . PHP_EOL);
+            else
+                $this->get('logger')->debug('Message successfully delivered' . PHP_EOL);
+            fclose($fp);
+        }
+        catch (Exception $e) {
+            $this->get('logger')->debug($e);
+        }
+
     }
 
     public function createAction(Request $request)
@@ -102,6 +111,7 @@ class PacksController extends Controller
         /** @var User $user */
         $user = $this->getUser();
 
+        $shouldNotify = false;
         /** @var Pack $newPack */
         $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->where('p.id = :id')
@@ -130,6 +140,7 @@ class PacksController extends Controller
             else if ($newPack->hasGroup($g->getName()) && !in_array($g->getId(), $request->get('groups') ?: [])) {
                 $newPack->removeGroup($g);
             }
+            $shouldNotify = true;
         }
         $newPack->setStatus($request->get('status'));
         if (empty($newPack->getId())) {
@@ -241,6 +252,12 @@ class PacksController extends Controller
         }
         $orm->flush();
 
+        if($shouldNotify) {
+            $cron = new CronSauceCommand();
+            $cron->setContainer($this->container);
+            $cron->sendNotifications();
+        }
+
         return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'search' => 'pack-id:' . $newPack->getId()]);
     }
 
@@ -289,7 +306,7 @@ class PacksController extends Controller
      * @param null $user
      * @return \StudySauce\Bundle\Entity\Pack[]
      */
-    private function getPacksForUser($user = null) {
+    public function getPacksForUser($user = null) {
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
@@ -351,6 +368,31 @@ class PacksController extends Controller
         }));
     }
 
+    public function getChildUsersForPack(Pack $x, User $user) {
+        $packGroups = $x->getGroups()->map(function (Group $g) {
+            return $g->getId();
+        })->toArray();
+
+        return array_filter(array_merge([$user], $user->getInvites()
+            ->filter(function (Invite $i) {
+                return !empty($i->getInvitee());
+            })
+            ->map(function (Invite $i) {
+                return $i->getInvitee();
+            })->toArray()),
+            function (User $u) use ($x, $packGroups) {
+                return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED')
+                || $u->getUserPacks()
+                    ->filter(function (UserPack $up) use ($x) {
+                        return $up->getPack()->getId() == $x->getId();
+                    })->count() > 0
+                || count(array_intersect($packGroups, $u->getGroups()
+                    ->map(function (Group $g) {
+                        return $g->getId();
+                    })->toArray())) > 0;
+            });
+    }
+
     /**
      * @param User|null $user
      * @return JsonResponse
@@ -360,6 +402,14 @@ class PacksController extends Controller
 
         if(!$this->getUser()->hasRole('ROLE_ADMIN') || $user == null) {
             $user = $this->getUser();
+        }
+        else {
+            // select the parent account so the rest of this works right
+            /** @var Invite $parents */
+            $parents = $user->getInvitees()->filter(function (Invite $i) { return $i->getUser()->hasRole('ROLE_PARENT');})->first();
+            if (!empty($parents)) {
+                $user = $parents->getUser();
+            }
         }
 
         /** @var QueryBuilder $qb */
@@ -372,9 +422,6 @@ class PacksController extends Controller
                     'deleted' => true
                 ];
             }
-            $packGroups = $x->getGroups()->map(function (Group $g) {
-                return $g->getId();
-            })->toArray();
             // pack should automatically download if user is in group
             return [
                 'id' => $x->getId(),
@@ -388,27 +435,13 @@ class PacksController extends Controller
                     return !$c->getDeleted();
                 })->count(),
                 'users' => array_values(array_map(function (User $u) use ($x) {
+                    /** @var UserPack $up */
+                    $up = $u->getUserPacks()->filter(function (UserPack $up) use ($x) {return $up->getPack() == $x;})->first();
                     return [
-                        'id' => $u->getId()
+                        'id' => $u->getId(),
+                        'created' => empty($up) || empty($up->getCreated()) ? null : $up->getCreated()->format('r')
                     ];
-                }, array_filter(array_merge([$user], $user->getInvites()
-                    ->filter(function (Invite $i) {
-                        return !empty($i->getInvitee());
-                    })
-                    ->map(function (Invite $i) {
-                        return $i->getInvitee();
-                    })->toArray()),
-                    function (User $u) use ($x, $packGroups) {
-                        return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED')
-                        || $u->getUserPacks()
-                            ->filter(function (UserPack $up) use ($x) {
-                                return $up->getPack()->getId() == $x->getId();
-                            })->count() > 0
-                        || count(array_intersect($packGroups, $u->getGroups()
-                            ->map(function (Group $g) {
-                                return $g->getId();
-                            })->toArray())) > 0;
-                    })))
+                }, self::getChildUsersForPack($x, $user)))
             ];
         }, $packs));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
@@ -565,7 +598,13 @@ class PacksController extends Controller
         if (!empty($request->get('since'))) {
             $since = intval($request->get('since'));
         }
-        $packs = array_filter($user->getPacks()->toArray(), function (Pack $p) {return !$p->getDeleted();});
+        // only sync responses for specific pack
+        if (!empty($request->get('pack'))) {
+            $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getId() == intval($request->get('pack'));})->toArray();
+        }
+        else {
+            $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
+        }
 
         $responses = array_values(array_map(function (Response $r) {
             return [

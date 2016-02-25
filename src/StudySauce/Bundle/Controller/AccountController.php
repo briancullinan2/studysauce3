@@ -66,14 +66,19 @@ class AccountController extends Controller
     {
         /** @var $userManager UserManager */
         $userManager = $this->get('fos_user.user_manager');
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
+        //** @var $orm EntityManager */
+        //$orm = $this->get('doctrine')->getManager();
         /** @var $user User */
         $user = $this->getUser();
+        if (empty($user)) {
+            throw new AccessDeniedHttpException('Not logged in');
+        }
 
         // update notification token
         if(!empty($request->get('device'))) {
-            $user->setDevices(array_unique(array_merge([$request->get('device')], $user->getDevices() ?: [])));
+            $existingDevices = $user->getDevices() ?: [];
+            $allDevices = array_unique(array_merge([$request->get('device')], $existingDevices));
+            $user->setDevices($allDevices);
             $userManager->updateUser($user);
             //$orm->merge($user);
             //$orm->flush();

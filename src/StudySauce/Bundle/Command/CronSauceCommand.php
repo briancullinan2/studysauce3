@@ -4,7 +4,12 @@ namespace StudySauce\Bundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Controller\EmailsController;
+use StudySauce\Bundle\Controller\PacksController;
 use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\Pack;
+use StudySauce\Bundle\Entity\Response;
+use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 use Swift_Mailer;
 use Swift_Transport;
 use Swift_Transport_SpoolTransport;
@@ -117,6 +122,42 @@ EOF
 
     }
 
+    public function sendNotifications() {
+        /** @var $orm EntityManager */
+        $orm = $this->getContainer()->get('doctrine')->getManager();
+
+        $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
+            ->where('u.devices != \'\' AND u.devices IS NOT NULL')
+            ->getQuery()->getResult();
+
+        foreach($users as $u) {
+            /** @var User $u */
+            $controller = new PacksController();
+            $controller->setContainer($this->getContainer());
+            $packs = $controller->getPacksForUser($u);
+
+            $notify = [];
+            // loop through packs and determine if they have already been downloaded by the user
+            foreach($packs as $p) {
+                /** @var Pack $p */
+                $children = $controller->getChildUsersForPack($p, $u);
+                foreach($children as $c) {
+                    /** @var User $c */
+                    if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {return $up->getUser() == $c || empty($up->getDownloaded());})->count() == 0
+                        || empty($u->getResponses()->filter(function (Response $r) use ($p) {
+                                return $r->getCard()->getPack() == $p && $r->getCreated() <= new \DateTime();
+                            })->count() == 0)) {
+                        $notify[] = $p;
+                    }
+                }
+            }
+
+            if (count($notify)) {
+                $controller->sendNotification('You have new packs!', count($notify), $u->getDevices()[0]);
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -124,7 +165,7 @@ EOF
     {
         // set the timeout to 4 and a half minutes
         set_time_limit(60*6);
-        if(!$input->getOption('sync')) {
+        if(empty($input->getOptions()) || $input->getOption('emails')) {
             try {
                 $this->sendReminders();
                 //$this->send3DayMarketing();
@@ -140,8 +181,11 @@ EOF
                 $error = $e;
             }
         }
-        if(!$input->getOption('emails')) {
+        if(empty($input->getOptions()) || $input->getOption('sync')) {
 
+        }
+        if(empty($input->getOptions()) || $input->getOption('notify')) {
+            //$this->sendNotifications();
         }
         if(!empty($error))
             throw $error;
