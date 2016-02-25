@@ -170,7 +170,7 @@ EOF
     {
         // set the timeout to 4 and a half minutes
         set_time_limit(60*6);
-        if(empty($input->getOptions()) || $input->getOption('emails')) {
+        if(empty($input->getOptions()) || isset($input->getOptions()['emails'])) {
             try {
                 $this->sendReminders();
                 //$this->send3DayMarketing();
@@ -186,10 +186,10 @@ EOF
                 $error = $e;
             }
         }
-        if(empty($input->getOptions()) || $input->getOption('sync')) {
+        if(empty($input->getOptions()) || isset($input->getOptions()['sync'])) {
 
         }
-        if(empty($input->getOptions()) || $input->getOption('notify')) {
+        if(empty($input->getOptions()) || isset($input->getOptions()['notify'])) {
             //$this->sendNotifications();
         }
         if(!empty($error))
