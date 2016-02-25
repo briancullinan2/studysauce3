@@ -8,6 +8,7 @@ use StudySauce\Bundle\Entity\Deadline;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\GroupInvite;
 use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\ParentInvite;
 use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\Payment;
@@ -1143,6 +1144,43 @@ class EmailsController extends Controller
                 }
                 break;
         }
+    }
+
+    /**
+     * @param User $user
+     * @param Pack[] $notify
+     * @return Response
+     */
+    public function sendNewPacksNotification(User $user = null, $notify)
+    {
+        /** @var $user User */
+        if(empty($user))
+            $user = $this->getUser();
+
+        /** @var Invite $groupInvite */
+        $groupInvite = $user->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
+
+        /** @var Group $group */
+        if (!empty($groupInvite)) {
+            $group = $groupInvite->getInvitee()->getGroups()->first();
+        }
+
+        /** @var \Swift_Mime_Message $message */
+        $message = Swift_Message::newInstance()
+            ->setSubject(!empty($group) ? ($group->getDescription() . ' has added [study pack name] to Study Sauce') : 'We have added [pack] to Study Sauce')
+            ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
+            ->setTo($user->getEmail())
+            ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
+                'greeting' => 'Dear ' . $user->getFirst() . ',',
+                'link' => '<a href="' . $link . '" class="cloak" style="color: #555555; text-decoration: none;">Set up your goals <span class="reveal" style="color: #FF9900;">here</span> and achieve them this term!</a>',
+                'user' => $user
+            ]), 'text/html' );
+        $headers = $message->getHeaders();
+        $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
+            'category' => ['inactivity-goals']])));
+        $this->send($message);
+
+        return new Response();
     }
 
 

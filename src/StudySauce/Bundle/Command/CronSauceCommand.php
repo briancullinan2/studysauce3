@@ -130,10 +130,13 @@ EOF
             ->where('u.devices != \'\' AND u.devices IS NOT NULL')
             ->getQuery()->getResult();
 
+        $controller = new PacksController();
+        $controller->setContainer($this->getContainer());
+        $emails = new EmailsController();
+        $emails->setContainer($this->getContainer());
+
         foreach($users as $u) {
             /** @var User $u */
-            $controller = new PacksController();
-            $controller->setContainer($this->getContainer());
             $packs = $controller->getPacksForUser($u);
 
             $notify = [];
@@ -154,6 +157,8 @@ EOF
 
             if (count($notify)) {
                 $controller->sendNotification('You have new packs!', count($notify), $u->getDevices()[0]);
+
+                //$emails->sendNewPacksNotification();
             }
         }
     }
