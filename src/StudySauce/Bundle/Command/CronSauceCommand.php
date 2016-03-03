@@ -157,16 +157,15 @@ EOF
                 }
             }
 
+            /** @var Pack[] $difference */
             $difference = [];
             foreach($notify as $p) {
                 if (!in_array($p->getId(), $u->getProperty('notified') ?: [])) {
-                    $difference[] = $p->getId();
+                    $difference[] = $p;
                 }
             }
 
             if (count($difference) > 0) {
-                /** @var Pack $firstNewPack */
-                $firstNewPack = array_filter($notify, function (Pack $p) use ($difference) {return in_array($p->getId(), $difference);})[0];
 
                 $u->setProperty('notified', array_map(function (Pack $p) {return $p->getId(); }, $notify));
                 $orm->merge($u);
@@ -182,10 +181,10 @@ EOF
 
                 foreach($u->getDevices() as $d) {
                     if (!empty($group)) {
-                        $controller->sendNotification($group->getDescription() . ' added a new pack, "' . $firstNewPack->getTitle() . '"!', count($notify), $d);
+                        $controller->sendNotification($group->getDescription() . ' added a new pack, "' . $difference[0]->getTitle() . '"!', count($notify), $d);
                     }
                     else {
-                        $controller->sendNotification('You have a new pack "' . $firstNewPack->getTitle() . '" on Study Sauce!', count($notify), $d);
+                        $controller->sendNotification('You have a new pack "' . $difference[0]->getTitle() . '" on Study Sauce!', count($notify), $d);
                     }
                 }
 
