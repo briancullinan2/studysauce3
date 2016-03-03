@@ -143,6 +143,11 @@ EOF
             $notify = [];
             // loop through packs and determine if they have already been downloaded by the user
             foreach($packs as $p) {
+                
+                if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus())) {
+                    continue;
+                }
+
                 /** @var Pack $p */
                 $children = $controller->getChildUsersForPack($p, $u);
                 foreach($children as $c) {
