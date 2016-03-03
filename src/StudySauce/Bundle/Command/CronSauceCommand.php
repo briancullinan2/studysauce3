@@ -147,10 +147,11 @@ EOF
                 $children = $controller->getChildUsersForPack($p, $u);
                 foreach($children as $c) {
                     /** @var User $c */
-                    if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {return $up->getUser() == $c && !empty($up->getDownloaded());})->count() == 0
-                        || empty($u->getResponses()->filter(function (Response $r) use ($p) {
+                    if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {
+                            return $up->getUser() == $c && !empty($up->getDownloaded());})->count() == 0
+                        || $u->getResponses()->filter(function (Response $r) use ($p) {
                                 return $r->getCard()->getPack() == $p && $r->getCreated() <= new \DateTime();
-                            })->count() == 0)) {
+                            })->count() == 0) {
                         $notify[] = $p;
                     }
                 }
@@ -163,6 +164,8 @@ EOF
                 $firstNewPack = array_filter($notify, function (Pack $p) use ($difference) {return in_array($p->getId(), $difference);})[0];
 
                 $u->setProperty('notified', array_map(function (Pack $p) {return $p->getId(); }, $notify));
+                $orm->merge($u);
+                $orm->flush();
 
                 /** @var Invite $groupInvite */
                 $groupInvite = $u->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
