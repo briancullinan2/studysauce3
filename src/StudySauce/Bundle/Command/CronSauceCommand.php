@@ -157,7 +157,12 @@ EOF
                 }
             }
 
-            $difference = array_diff(array_map(function (Pack $p) {return $p->getId(); }, $notify), $u->getProperty('notified') ?: []);
+            $difference = [];
+            foreach($notify as $p) {
+                if (!in_array($p->getId(), $u->getProperty('notified') ?: [])) {
+                    $difference[] = $p->getId();
+                }
+            }
 
             if (count($difference) > 0) {
                 /** @var Pack $firstNewPack */
