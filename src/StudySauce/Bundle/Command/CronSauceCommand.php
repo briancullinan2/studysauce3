@@ -5,6 +5,7 @@ namespace StudySauce\Bundle\Command;
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Controller\EmailsController;
 use StudySauce\Bundle\Controller\PacksController;
+use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\Response;
@@ -155,10 +156,29 @@ EOF
                 }
             }
 
-            if (array_diff(array_map(function (Pack $p) {return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])) {
+            $difference = array_diff(array_map(function (Pack $p) {return $p->getId(); }, $notify), $u->getProperty('notified') ?: []);
+
+            if (count($difference) > 0) {
+                /** @var Pack $firstNewPack */
+                $firstNewPack = array_filter($notify, function (Pack $p) use ($difference) {return in_array($p->getId(), $difference);})[0];
+
                 $u->setProperty('notified', array_map(function (Pack $p) {return $p->getId(); }, $notify));
+
+                /** @var Invite $groupInvite */
+                $groupInvite = $u->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
+
+                /** @var Group $group */
+                if (!empty($groupInvite)) {
+                    $group = $groupInvite->getInvitee()->getGroups()->first();
+                }
+
                 foreach($u->getDevices() as $d) {
-                    $controller->sendNotification('You have new packs!', count($notify), $d);
+                    if (!empty($group)) {
+                        $controller->sendNotification($group->getDescription() . ' added a new pack, "' . $firstNewPack->getTitle() . '"!', count($notify), $d);
+                    }
+                    else {
+                        $controller->sendNotification('You have a new pack "' . $firstNewPack->getTitle() . '" on Study Sauce!', count($notify), $d);
+                    }
                 }
 
                 //$emails->sendNewPacksNotification();
