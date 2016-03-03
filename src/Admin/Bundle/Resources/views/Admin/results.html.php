@@ -73,7 +73,8 @@ use StudySauce\Bundle\Entity\User;
         }
 
         foreach($tables as $table => $t) {
-            ?><h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a href="#add-<?php print $table; ?>">+</a></h2><?php
+            $tableTotal = $table . '_total';
+            ?><h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a href="#add-<?php print $table; ?>">+</a> <small>(<?php print $$tableTotal; ?>)</small></h2><?php
         }
 
         foreach ($templates as $k => $classes) {
@@ -94,10 +95,11 @@ use StudySauce\Bundle\Entity\User;
     </header>
     <?php foreach ($tables as $table => $t) {
         if(count($$table) > 0) {
+            $tableTotal = $table . '_total';
             ?>
             <h2 class="<?php print $table; ?>"><a
                     name="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a> <a
-                    href="#add-<?php print $table; ?>">+</a></h2>
+                    href="#add-<?php print $table; ?>">+</a> <small>(<?php print $$tableTotal; ?>)</small></h2>
             <?php
         }
         foreach ($$table as $e) {

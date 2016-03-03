@@ -489,7 +489,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     background-color: #DDD;
 }
 
-.results h2 a:last-child {
+.results h2 a[href^="#add-"] {
     display: inline-block;
     vertical-align: middle;
     padding: 4px;
@@ -502,7 +502,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin-top:-8px;
 }
 
-.results h2 a:last-child:hover {
+.results h2 a[href^="#add-"]:hover {
     border-color: #00CCEE;
 }
 

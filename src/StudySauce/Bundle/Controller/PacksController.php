@@ -74,10 +74,8 @@ class PacksController extends Controller
             $body['sender'] = 'web.StudySauce';
 
             //Server stuff
-            $passphrase = '';
             $ctx = stream_context_create();
             stream_context_set_option($ctx, 'ssl', 'local_cert', __DIR__ . '/' . 'com.studysauce.companyapp.pem');
-            //stream_context_set_option($ctx, 'ssl', 'passphrase', $passphrase);
             $fp = stream_socket_client(
                 'ssl://gateway' . ($this->get('kernel')->getEnvironment() == 'prod' ? '' : '.sandbox') . '.push.apple.com:2195', $err,
                 $errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);

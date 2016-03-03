@@ -146,7 +146,7 @@ EOF
                 $children = $controller->getChildUsersForPack($p, $u);
                 foreach($children as $c) {
                     /** @var User $c */
-                    if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {return $up->getUser() == $c || empty($up->getDownloaded());})->count() == 0
+                    if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {return $up->getUser() == $c && !empty($up->getDownloaded());})->count() == 0
                         || empty($u->getResponses()->filter(function (Response $r) use ($p) {
                                 return $r->getCard()->getPack() == $p && $r->getCreated() <= new \DateTime();
                             })->count() == 0)) {
@@ -155,8 +155,11 @@ EOF
                 }
             }
 
-            if (count($notify)) {
-                $controller->sendNotification('You have new packs!', count($notify), $u->getDevices()[0]);
+            if (array_diff(array_map(function (Pack $p) {return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])) {
+                $u->setProperty('notified', array_map(function (Pack $p) {return $p->getId(); }, $notify));
+                foreach($u->getDevices() as $d) {
+                    $controller->sendNotification('You have new packs!', count($notify), $d);
+                }
 
                 //$emails->sendNewPacksNotification();
             }
