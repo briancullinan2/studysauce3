@@ -143,7 +143,7 @@ EOF
             $notify = [];
             // loop through packs and determine if they have already been downloaded by the user
             foreach($packs as $p) {
-                
+
                 if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus())) {
                     continue;
                 }
@@ -154,7 +154,7 @@ EOF
                     /** @var User $c */
                     if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {
                             return $up->getUser() == $c && !empty($up->getDownloaded());})->count() == 0
-                        || $u->getResponses()->filter(function (Response $r) use ($p) {
+                        || $c->getResponses()->filter(function (Response $r) use ($p) {
                                 return $r->getCard()->getPack() == $p && $r->getCreated() <= new \DateTime();
                             })->count() == 0) {
                         $notify[] = $p;
