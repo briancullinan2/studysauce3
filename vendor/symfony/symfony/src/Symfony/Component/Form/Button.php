@@ -194,9 +194,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param string $modelData
-     *
-     * @throws BadMethodCallException
+     * @param mixed $modelData
      */
     public function setData($modelData)
     {
@@ -334,6 +332,13 @@ class Button implements \IteratorAggregate, FormInterface
     public function isSynchronized()
     {
         return true;
+    }
+
+    /**
+     * Unsupported method.
+     */
+    public function getTransformationFailure()
+    {
     }
 
     /**

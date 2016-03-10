@@ -18,13 +18,12 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * Definition represents a service definition.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Definition
 {
     private $class;
     private $file;
+    private $factory;
     private $factoryClass;
     private $factoryMethod;
     private $factoryService;
@@ -47,13 +46,39 @@ class Definition
      *
      * @param string|null $class     The service class
      * @param array       $arguments An array of arguments to pass to the service constructor
-     *
-     * @api
      */
     public function __construct($class = null, array $arguments = array())
     {
         $this->class = $class;
         $this->arguments = $arguments;
+    }
+
+    /**
+     * Sets a factory.
+     *
+     * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
+     *
+     * @return Definition The current instance
+     */
+    public function setFactory($factory)
+    {
+        if (is_string($factory) && strpos($factory, '::') !== false) {
+            $factory = explode('::', $factory, 2);
+        }
+
+        $this->factory = $factory;
+
+        return $this;
+    }
+
+    /**
+     * Gets the factory.
+     *
+     * @return string|array The PHP function or an array containing a class/Reference and a method to call
+     */
+    public function getFactory()
+    {
+        return $this->factory;
     }
 
     /**
@@ -64,10 +89,12 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @api
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryClass($factoryClass)
     {
+        @trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryClass), E_USER_DEPRECATED);
+
         $this->factoryClass = $factoryClass;
 
         return $this;
@@ -78,10 +105,14 @@ class Definition
      *
      * @return string|null The factory class name
      *
-     * @api
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryClass()
+    public function getFactoryClass($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->factoryClass;
     }
 
@@ -92,10 +123,12 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @api
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryMethod($factoryMethod)
     {
+        @trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryMethod), E_USER_DEPRECATED);
+
         $this->factoryMethod = $factoryMethod;
 
         return $this;
@@ -141,10 +174,14 @@ class Definition
      *
      * @return string|null The factory method name
      *
-     * @api
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryMethod()
+    public function getFactoryMethod($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->factoryMethod;
     }
 
@@ -155,10 +192,14 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @api
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function setFactoryService($factoryService)
+    public function setFactoryService($factoryService, $triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryService), E_USER_DEPRECATED);
+        }
+
         $this->factoryService = $factoryService;
 
         return $this;
@@ -169,10 +210,14 @@ class Definition
      *
      * @return string|null The factory service id
      *
-     * @api
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryService()
+    public function getFactoryService($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->factoryService;
     }
 
@@ -182,8 +227,6 @@ class Definition
      * @param string $class The service class
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setClass($class)
     {
@@ -196,8 +239,6 @@ class Definition
      * Gets the service class.
      *
      * @return string|null The service class
-     *
-     * @api
      */
     public function getClass()
     {
@@ -210,8 +251,6 @@ class Definition
      * @param array $arguments An array of arguments
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setArguments(array $arguments)
     {
@@ -220,9 +259,6 @@ class Definition
         return $this;
     }
 
-    /**
-     * @api
-     */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
@@ -230,17 +266,11 @@ class Definition
         return $this;
     }
 
-    /**
-     * @api
-     */
     public function getProperties()
     {
         return $this->properties;
     }
 
-    /**
-     * @api
-     */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
@@ -254,8 +284,6 @@ class Definition
      * @param mixed $argument An argument
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function addArgument($argument)
     {
@@ -273,8 +301,6 @@ class Definition
      * @return Definition The current instance
      *
      * @throws OutOfBoundsException When the replaced argument does not exist
-     *
-     * @api
      */
     public function replaceArgument($index, $argument)
     {
@@ -291,8 +317,6 @@ class Definition
      * Gets the arguments to pass to the service constructor/factory method.
      *
      * @return array The array of arguments
-     *
-     * @api
      */
     public function getArguments()
     {
@@ -307,8 +331,6 @@ class Definition
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
-     *
-     * @api
      */
     public function getArgument($index)
     {
@@ -325,8 +347,6 @@ class Definition
      * @param array $calls An array of method calls
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setMethodCalls(array $calls = array())
     {
@@ -347,8 +367,6 @@ class Definition
      * @return Definition The current instance
      *
      * @throws InvalidArgumentException on empty $method param
-     *
-     * @api
      */
     public function addMethodCall($method, array $arguments = array())
     {
@@ -366,8 +384,6 @@ class Definition
      * @param string $method The method name to remove
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function removeMethodCall($method)
     {
@@ -387,8 +403,6 @@ class Definition
      * @param string $method The method name to search for
      *
      * @return bool
-     *
-     * @api
      */
     public function hasMethodCall($method)
     {
@@ -405,8 +419,6 @@ class Definition
      * Gets the methods to call after service initialization.
      *
      * @return array An array of method calls
-     *
-     * @api
      */
     public function getMethodCalls()
     {
@@ -419,8 +431,6 @@ class Definition
      * @param array $tags
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setTags(array $tags)
     {
@@ -433,8 +443,6 @@ class Definition
      * Returns all tags.
      *
      * @return array An array of tags
-     *
-     * @api
      */
     public function getTags()
     {
@@ -447,8 +455,6 @@ class Definition
      * @param string $name The tag name
      *
      * @return array An array of attributes
-     *
-     * @api
      */
     public function getTag($name)
     {
@@ -462,8 +468,6 @@ class Definition
      * @param array  $attributes An array of attributes
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function addTag($name, array $attributes = array())
     {
@@ -478,8 +482,6 @@ class Definition
      * @param string $name
      *
      * @return bool
-     *
-     * @api
      */
     public function hasTag($name)
     {
@@ -495,9 +497,7 @@ class Definition
      */
     public function clearTag($name)
     {
-        if (isset($this->tags[$name])) {
-            unset($this->tags[$name]);
-        }
+        unset($this->tags[$name]);
 
         return $this;
     }
@@ -506,8 +506,6 @@ class Definition
      * Clears the tags for this definition.
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function clearTags()
     {
@@ -522,8 +520,6 @@ class Definition
      * @param string $file A full pathname to include
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFile($file)
     {
@@ -536,8 +532,6 @@ class Definition
      * Gets the file to require before creating the service.
      *
      * @return string|null The full pathname to include
-     *
-     * @api
      */
     public function getFile()
     {
@@ -550,8 +544,6 @@ class Definition
      * @param string $scope Whether the service must be shared or not
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setScope($scope)
     {
@@ -564,8 +556,6 @@ class Definition
      * Returns the scope of the service.
      *
      * @return string
-     *
-     * @api
      */
     public function getScope()
     {
@@ -578,8 +568,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setPublic($boolean)
     {
@@ -592,8 +580,6 @@ class Definition
      * Whether this service is public facing.
      *
      * @return bool
-     *
-     * @api
      */
     public function isPublic()
     {
@@ -607,10 +593,14 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @api
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
-    public function setSynchronized($boolean)
+    public function setSynchronized($boolean, $triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         $this->synchronized = (bool) $boolean;
 
         return $this;
@@ -621,10 +611,14 @@ class Definition
      *
      * @return bool
      *
-     * @api
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
-    public function isSynchronized()
+    public function isSynchronized($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->synchronized;
     }
 
@@ -659,8 +653,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setSynthetic($boolean)
     {
@@ -674,8 +666,6 @@ class Definition
      * container, but dynamically injected.
      *
      * @return bool
-     *
-     * @api
      */
     public function isSynthetic()
     {
@@ -689,8 +679,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setAbstract($boolean)
     {
@@ -704,8 +692,6 @@ class Definition
      * template for other definitions.
      *
      * @return bool
-     *
-     * @api
      */
     public function isAbstract()
     {
@@ -718,8 +704,6 @@ class Definition
      * @param callable $callable A PHP callable
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setConfigurator($callable)
     {
@@ -732,8 +716,6 @@ class Definition
      * Gets the configurator to call after the service is fully initialized.
      *
      * @return callable|null The PHP callable to call
-     *
-     * @api
      */
     public function getConfigurator()
     {

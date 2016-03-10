@@ -88,7 +88,7 @@ jQuery(document).ready(function() {
         loadingAnimation($(this).find('[value="#user-register"]'));
         var hash = getHash();
         jQuery.ajax({
-            url:window.callbackPaths['account_create'],
+            url: Routing.generate('account_create'),
             type: 'POST',
             dataType: 'json',
             data: {
@@ -139,7 +139,7 @@ jQuery(document).ready(function() {
         account.find('.form-actions').removeClass('valid').addClass('invalid');
         loadingAnimation($(this).find('[value="#reset-password"]'));
         jQuery.ajax({
-            url:window.callbackPaths['password_reset'],
+            url: Routing.generate('password_reset'),
             type: 'POST',
             dataType: 'json',
             data: {

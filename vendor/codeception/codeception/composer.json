@@ -18,20 +18,21 @@
         "php": ">=5.4.0",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "phpunit/phpunit": "~4.5.0",
-        "facebook/webdriver": "~0.4|~0.5",
-        "guzzlehttp/guzzle": "~4.0|~5.0",
-        "symfony/finder": "~2.4",
-        "symfony/console": "~2.4",
-        "symfony/event-dispatcher": "~2.4",
-        "symfony/yaml": "~2.4",
-        "symfony/browser-kit": "~2.4",
-        "symfony/css-selector": "~2.4",
-        "symfony/dom-crawler": "~2.4,!=2.4.5"
+        "phpunit/phpunit": "~4.8.0",
+        "facebook/webdriver": ">=1.0.1",
+        "guzzlehttp/guzzle": ">=4.1.4 <7.0",
+        "guzzlehttp/psr7": "~1.0",
+        "symfony/finder": ">=2.4|<3.1",
+        "symfony/console": ">=2.4|<3.1",
+        "symfony/event-dispatcher": ">=2.4|<3.1",
+        "symfony/yaml": ">=2.4|<3.1",
+        "symfony/browser-kit": ">=2.4|<3.1",
+        "symfony/css-selector": ">=2.4|<3.1",
+        "symfony/dom-crawler": ">=2.4|<3.1"
     },
     "require-dev": {
         "monolog/monolog": "~1.8",
-        "facebook/php-sdk": "~3.2",
+        "facebook/php-sdk-v4": "~4.0",
         "videlalvaro/php-amqplib": "~2.4",
         "codeception/specify": "~0.3",
         "pda/pheanstalk": "~2.0",
@@ -46,14 +47,17 @@
     },
 
     "autoload":{
-        "psr-0":{
-            "Codeception":"src"
+        "psr-4":{
+            "Codeception\\": "src\\Codeception",
+            "Codeception\\Extension\\": "ext"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
         }
     },
-    "bin":["codecept"]
+    "bin":["codecept"],
+    "config": {
+        "platform": {}
+    }
 }

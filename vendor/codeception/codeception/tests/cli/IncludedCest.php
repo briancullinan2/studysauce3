@@ -58,14 +58,15 @@ class IncludedCest {
         $I->seeFileFound('report.html');
         $I->seeInThisFile('Codeception Results');
         $I->seeInThisFile('Jazz.functional Tests');
-        $I->seeInThisFile('check that jazz musicians can add numbers');
+        $I->seeInThisFile('Check that jazz musicians can add numbers');
         $I->seeInThisFile('Jazz\Pianist.functional Tests');
-        $I->seeInThisFile('check that jazz pianists can add numbers');
+        $I->seeInThisFile('Check that jazz pianists can add numbers');
         $I->seeInThisFile('Shire.functional Tests');
     }
 
     /**
      * @before moveToIncluded
+     * @group coverage
      * @param CliGuy $I
      */
     public function runIncludedWithCoverage(\CliGuy $I)

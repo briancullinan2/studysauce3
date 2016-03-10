@@ -1,8 +1,8 @@
 <?php
 namespace Codeception\TestCase\Interfaces;
 
-interface ScenarioDriven {
-
+interface ScenarioDriven
+{
     public function getFeature();
 
     /**
@@ -13,4 +13,6 @@ interface ScenarioDriven {
     public function getScenarioText($format = 'text');
 
     public function preload();
+
+    public function getRawBody();
 }

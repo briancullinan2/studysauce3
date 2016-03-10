@@ -175,7 +175,7 @@
                 <target>Высота изображения слишком мала ({{ height }}px). Минимально допустимая высота {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Значение должно быть текущим паролем пользователя.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -297,6 +297,18 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>Изображение в портретной ориентации ({{ width }}x{{ height }}px). Изображения в портретной ориентации не разрешены.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Пустые файлы не разрешены.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Имя хоста не может быть разрешено.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Значение не совпадает с ожидаемой {{ charset }} кодировкой.</target>
             </trans-unit>
         </body>
     </file>

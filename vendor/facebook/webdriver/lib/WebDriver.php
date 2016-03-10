@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
 /**
  * The interface for WebDriver.
  */
@@ -28,6 +30,7 @@ interface WebDriver extends WebDriverSearchContext {
   /**
    * Load a new web page in the current browser window.
    *
+   * @param string $url
    * @return WebDriver The current instance.
    */
   public function get($url);
@@ -91,6 +94,8 @@ interface WebDriver extends WebDriverSearchContext {
    *     WebDriverExpectedCondition::titleIs('WebDriver Page')
    *   );
    *
+   * @param int $timeout_in_second
+   * @param int $interval_in_millisecond
    * @return WebDriverWait
    */
   public function wait(

@@ -56,7 +56,7 @@ class RouterMatchCommand extends ContainerAwareCommand
                 new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
   <info>php %command.full_name% /foo</info>
@@ -98,7 +98,7 @@ EOF
             } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {
                 $output->writeln(sprintf('<fg=green>Route "%s" matches</>', $trace['name']));
 
-                $routerDebugcommand = $this->getApplication()->find('router:debug');
+                $routerDebugcommand = $this->getApplication()->find('debug:router');
                 $output->writeln('');
                 $routerDebugcommand->run(new ArrayInput(array('name' => $trace['name'])), $output);
 

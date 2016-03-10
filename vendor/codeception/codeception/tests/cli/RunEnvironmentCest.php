@@ -1,6 +1,4 @@
 <?php
-use \CliGuy;
-
 class RunEnvironmentCest
 {
 
@@ -45,9 +43,9 @@ class RunEnvironmentCest
     {
         $I->amInPath('tests/data/sandbox');
         $I->executeCommand('run powers MageGuildCest.php  --env whisky');
-        $I->seeInShellOutput('Trying to red label (MageGuildCest::redLabel)');
-        $I->seeInShellOutput('Trying to black label (MageGuildCest::blackLabel)');
-        $I->seeInShellOutput('Trying to power of the universe (MageGuildCest::powerOfTheUniverse)');
+        $I->seeInShellOutput('Red label (MageGuildCest::redLabel)');
+        $I->seeInShellOutput('Black label (MageGuildCest::blackLabel)');
+        $I->seeInShellOutput('Power of the universe (MageGuildCest::powerOfTheUniverse)');
         $I->seeInShellOutput('OK (3 tests, 3 assertions)');
     }
 
@@ -55,8 +53,78 @@ class RunEnvironmentCest
     {
         $I->amInPath('tests/data/sandbox');
         $I->executeCommand('run powers MageGuildCest.php  --env dev');
-        $I->seeInShellOutput('Trying to power of the universe (MageGuildCest::powerOfTheUniverse)');
+        $I->seeInShellOutput('Power of the universe (MageGuildCest::powerOfTheUniverse)');
         $I->seeInShellOutput('OK (1 test, 1 assertion)');
     }
 
+    public function testEnvFileLoading(CliGuy $I)
+    {
+        $I->wantTo('test that env configuration files are loaded correctly');
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('run messages MessageCest.php:allMessages -vv --env env2');
+        $I->seeInShellOutput('message1: MESSAGE1 FROM ENV2-DIST.');
+        $I->seeInShellOutput('message2: MESSAGE2 FROM ENV2.');
+        $I->seeInShellOutput('message3: MESSAGE3 FROM SUITE.');
+        $I->seeInShellOutput('message4: DEFAULT MESSAGE4.');
+    }
+
+    public function testEnvMerging(CliGuy $I)
+    {
+        $I->wantTo('test that given environments are merged properly');
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('run messages MessageCest.php:allMessages -vv --env env1,env2');
+        $I->seeInShellOutput('message1: MESSAGE1 FROM ENV2-DIST.');
+        $I->seeInShellOutput('message4: MESSAGE4 FROM SUITE-ENV1.');
+        $I->executeCommand('run messages MessageCest.php:allMessages -vv --env env2,env1');
+        $I->seeInShellOutput('message1: MESSAGE1 FROM SUITE-ENV1.');
+        $I->seeInShellOutput('message4: MESSAGE4 FROM SUITE-ENV1.');
+    }
+
+    public function runTestForMultipleEnvironments(CliGuy $I)
+    {
+        $I->wantTo('check that multiple required environments are taken into account');
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('run messages MessageCest.php:multipleEnvRequired -vv --env env1');
+        $I->dontSeeInShellOutput('Multiple env given');
+        $I->executeCommand('run messages MessageCest.php:multipleEnvRequired -vv --env env2');
+        $I->dontSeeInShellOutput('Multiple env given');
+        $I->executeCommand('run messages MessageCest.php:multipleEnvRequired -vv --env env1,env2');
+        $I->seeInShellOutput('Multiple env given');
+        $I->executeCommand('run messages MessageCest.php:multipleEnvRequired -vv --env env2,env1');
+        $I->seeInShellOutput('Multiple env given');
+    }
+
+    public function generateEnvConfig(CliGuy $I)
+    {
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('g:env firefox');
+        $I->seeInShellOutput('firefox config was created');
+        $I->seeFileFound('tests/_envs/firefox.yml');
+    }
+
+    public function runEnvironmentForCept(CliGuy $I)
+    {
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('run messages --env email');
+        $I->seeInShellOutput('Test emails');
+        $I->dontSeeInShellOutput('Multiple env given');
+        $I->executeCommand('run messages --env env1');
+        $I->dontSeeInShellOutput('Test emails');
+    }
+
+    public function showExceptionForUnconfiguredEnvironment(CliGuy $I)
+    {
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('run skipped NoEnvironmentCept --no-exit');
+        $I->seeInShellOutput("Environment nothing was not configured but used");
+        $I->seeInShellOutput('WARNING');
+    }
+
+    public function environmentsFromSubfolders(CliGuy $I)
+    {
+        $I->amInPath('tests/data/sandbox');
+        $I->executeCommand('run messages MessageCest.php:allMessages -vv --env env3');
+        $I->seeInShellOutput('MESSAGE2 FROM ENV3');
+
+    }
 }

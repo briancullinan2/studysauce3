@@ -93,7 +93,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $proc = $pb->getProcess();
 
-        $this->assertContains("second", $proc->getCommandLine());
+        $this->assertContains('second', $proc->getCommandLine());
     }
 
     public function testPrefixIsPrependedToAllGeneratedProcess()
@@ -215,7 +215,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings.
+     * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings or stream resources.
      */
     public function testInvalidInput()
     {

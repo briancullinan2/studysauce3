@@ -1,6 +1,4 @@
-# Yii1 Module
 
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Yii1.php)**
 
 
 This module provides integration with Yii framework (http://www.yiiframework.com/) (1.1.14dev).
@@ -10,7 +8,7 @@ The following configurations are available for this module:
 <li>appPath - full path to the application, include index.php</li>
 <li>url - full url to the index.php entry script</li>
 </ul>
-In your index.php you must return array with correct configuration for the application:
+In your index.php you must return an array with correct configuration for the application:
 
 For the simple created yii application index.php will be like this:
 <pre>
@@ -24,8 +22,8 @@ defined('YII_DEBUG') or define('YII_DEBUG',true);
 defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
 require_once($yii);
 return array(
-	'class' => 'CWebApplication',
-	'config' => $config,
+       'class' => 'CWebApplication',
+       'config' => $config,
 );
 </pre>
 
@@ -67,6 +65,102 @@ Do not forget that after adding module in your functional.suite.yml you must run
 @property Codeception\Lib\Connector\Yii1 $client
 
 
+### _findElements
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Locates element using available Codeception locator types:
+
+* XPath
+* CSS
+* Strict Locator
+
+Use it in Helpers or GroupObject or Extension classes:
+
+```php
+<?php
+$els = $this->getModule('Yii1')->_findElements('.items');
+$els = $this->getModule('Yii1')->_findElements(['name' => 'username']);
+
+$editLinks = $this->getModule('Yii1')->_findElements(['link' => 'Edit']);
+// now you can iterate over $editLinks and check that all them have valid hrefs
+```
+
+WebDriver module returns `Facebook\WebDriver\Remote\RemoteWebElement` instances
+PhpBrowser and Framework modules return `Symfony\Component\DomCrawler\Crawler` instances
+
+ * `param` $locator
+ * `return` array of interactive elements
+
+
+### _loadPage
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Opens a page with arbitrary request parameters.
+Useful for testing multi-step forms on a specific step.
+
+```php
+<?php
+// in Helper class
+public function openCheckoutFormStep2($orderId) {
+    $this->getModule('Yii1')->_loadPage('POST', '/checkout/step2', ['order' => $orderId]);
+}
+?>
+```
+
+ * `param` $method
+ * `param` $uri
+ * `param array` $parameters
+ * `param array` $files
+ * `param array` $server
+ * `param null` $content
+
+
+### _request
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Send custom request to a backend using method, uri, parameters, etc.
+Use it in Helpers to create special request actions, like accessing API
+Returns a string with response body.
+
+```php
+<?php
+// in Helper class
+public function createUserByApi($name) {
+    $userData = $this->getModule('Yii1')->_request('POST', '/api/v1/users', ['name' => $name]);
+    $user = json_decode($userData);
+    return $user->id;
+}
+?>
+```
+Does not load the response into the module so you can't interact with response page (click, fill forms).
+To load arbitrary page for interaction, use `_loadPage` method.
+
+ * `param` $method
+ * `param` $uri
+ * `param array` $parameters
+ * `param array` $files
+ * `param array` $server
+ * `param null` $content
+ * `return` mixed|Crawler
+ * `throws`  ExternalUrlException
+ * `see`  `_loadPage`
+
+
+### _savePageSource
+
+*hidden API method, expected to be used from Helper classes*
+ 
+Saves page source of to a file
+
+```php
+$this->getModule('Yii1')->_savePageSource(codecept_output_dir().'page.html');
+```
+ * `param` $filename
+
+
 ### amHttpAuthenticated
  
 Authenticates user for HTTP_AUTH
@@ -98,7 +192,7 @@ Attaches a file relative to the Codeception data directory to the given file upl
 ``` php
 <?php
 // file is stored in 'tests/_data/prices.xls'
-$I->attachFile('input[@type="file"]', 'prices.xls');
+$I->attachFile('input[ * `type="file"]',`  'prices.xls');
 ?>
 ```
 
@@ -140,7 +234,7 @@ $I->click('Submit');
 // CSS button
 $I->click('#form input[type=submit]');
 // XPath
-$I->click('//form/*[@type=submit]');
+$I->click('//form/*[ * `type=submit]');` 
 // link in context
 $I->click('Logout', '#nav');
 // using strict locator
@@ -264,13 +358,56 @@ $I->dontSeeInField('Body','Type your comment here');
 $I->dontSeeInField('form textarea[name=body]','Type your comment here');
 $I->dontSeeInField('form input[type=hidden]','hidden_value');
 $I->dontSeeInField('#searchform input','Search');
-$I->dontSeeInField('//form/*[@name=search]','Search');
+$I->dontSeeInField('//form/*[ * `name=search]','Search');` 
 $I->dontSeeInField(['name' => 'search'], 'Search');
 ?>
 ```
 
  * `param` $field
  * `param` $value
+
+
+### dontSeeInFormFields
+ 
+Checks if the array of form parameters (name => value) are not set on the form matched with
+the passed selector.
+
+``` php
+<?php
+$I->dontSeeInFormFields('form[name=myform]', [
+     'input1' => 'non-existent value',
+     'input2' => 'other non-existent value',
+]);
+?>
+```
+
+To check that an element hasn't been assigned any one of many values, an array can be passed
+as the value:
+
+``` php
+<?php
+$I->dontSeeInFormFields('.form-class', [
+     'fieldName' => [
+         'This value shouldn\'t be set',
+         'And this value shouldn\'t be set',
+     ],
+]);
+?>
+```
+
+Additionally, checkbox values can be checked with a boolean.
+
+``` php
+<?php
+$I->dontSeeInFormFields('#form-id', [
+     'checkbox1' => true,        // fails if checked
+     'checkbox2' => false,       // fails if unchecked
+]);
+?>
+```
+
+ * `param` $formSelector
+ * `param` $params
 
 
 ### dontSeeInTitle
@@ -318,8 +455,8 @@ Fills a text field or textarea with the given string.
 
 ``` php
 <?php
-$I->fillField("//input[@type='text']", "Hello World!");
-$I->fillField(['name' => 'email'], 'jon@mail.com');
+$I->fillField("//input[ * `type='text']",`  "Hello World!");
+$I->fillField(['name' => 'email'], 'jon * `mail.com');` 
 ?>
 ```
 
@@ -371,6 +508,32 @@ $uri = $I->grabFromCurrentUrl();
  * `internal param` $url
 
 
+### grabMultiple
+ 
+Grabs either the text content, or attribute values, of nodes
+matched by $cssOrXpath and returns them as an array.
+
+```html
+<a href="#first">First</a>
+<a href="#second">Second</a>
+<a href="#third">Third</a>
+```
+
+```php
+<?php
+// would return ['First', 'Second', 'Third']
+$aLinkText = $I->grabMultiple('a');
+
+// would return ['#first', '#second', '#third']
+$aLinks = $I->grabMultiple('a', 'href');
+?>
+```
+
+ * `param` $cssOrXpath
+ * `param` $attribute
+ * `return` string[]
+
+
 ### grabTextFrom
  
 Finds and returns the text contents of the given element.
@@ -392,7 +555,7 @@ $value = $I->grabTextFrom('~<input value=(.*?)]~sgi'); // match with a regex
  
  * `param` $field
 
-@return array|mixed|null|string
+ * `return` array|mixed|null|string
 
 
 ### resetCookie
@@ -430,7 +593,7 @@ Checks that the specified checkbox is checked.
 <?php
 $I->seeCheckboxIsChecked('#agree'); // I suppose user agreed to terms
 $I->seeCheckboxIsChecked('#signup_form input[type=checkbox]'); // I suppose user agreed to terms, If there is only one checkbox in form.
-$I->seeCheckboxIsChecked('//form/input[@type=checkbox and @name=agree]');
+$I->seeCheckboxIsChecked('//form/input[ * `type=checkbox`  and  * `name=agree]');` 
 ?>
 ```
 
@@ -500,7 +663,7 @@ $I->seeElement(['css' => 'form input'], ['name' => 'login']);
 
  * `param` $selector
  * `param array` $attributes
-@return
+ * `return` 
 
 
 ### seeInCurrentUrl
@@ -521,7 +684,7 @@ $I->seeInCurrentUrl('/users/');
 
 ### seeInField
  
-Checks that the given input field or textarea contains the given value. 
+Checks that the given input field or textarea contains the given value.
 For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
 
 ``` php
@@ -530,13 +693,76 @@ $I->seeInField('Body','Type your comment here');
 $I->seeInField('form textarea[name=body]','Type your comment here');
 $I->seeInField('form input[type=hidden]','hidden_value');
 $I->seeInField('#searchform input','Search');
-$I->seeInField('//form/*[@name=search]','Search');
+$I->seeInField('//form/*[ * `name=search]','Search');` 
 $I->seeInField(['name' => 'search'], 'Search');
 ?>
 ```
 
  * `param` $field
  * `param` $value
+
+
+### seeInFormFields
+ 
+Checks if the array of form parameters (name => value) are set on the form matched with the
+passed selector.
+
+``` php
+<?php
+$I->seeInFormFields('form[name=myform]', [
+     'input1' => 'value',
+     'input2' => 'other value',
+]);
+?>
+```
+
+For multi-select elements, or to check values of multiple elements with the same name, an
+array may be passed:
+
+``` php
+<?php
+$I->seeInFormFields('.form-class', [
+     'multiselect' => [
+         'value1',
+         'value2',
+     ],
+     'checkbox[]' => [
+         'a checked value',
+         'another checked value',
+     ],
+]);
+?>
+```
+
+Additionally, checkbox values can be checked with a boolean.
+
+``` php
+<?php
+$I->seeInFormFields('#form-id', [
+     'checkbox1' => true,        // passes if checked
+     'checkbox2' => false,       // passes if unchecked
+]);
+?>
+```
+
+Pair this with submitForm for quick testing magic.
+
+``` php
+<?php
+$form = [
+     'field1' => 'value',
+     'field2' => 'another value',
+     'checkbox1' => true,
+     // ...
+];
+$I->submitForm('//form[ * `id=my-form]',`  $form, 'submitButton');
+// $I->amOnPage('/path/to/form-page') may be needed
+$I->seeInFormFields('//form[ * `id=my-form]',`  $form);
+?>
+```
+
+ * `param` $formSelector
+ * `param` $params
 
 
 ### seeInTitle
@@ -580,9 +806,9 @@ $I->seeNumberOfElements('tr', [0,10]); //between 0 and 10 elements
 ?>
 ```
  * `param` $selector
- * `param mixed` $expected:
+ * `param mixed` $expected :
 - string: strict number
-- array: range of numbers [0,10]  
+- array: range of numbers [0,10]
 
 
 ### seeOptionIsSelected
@@ -621,7 +847,7 @@ Selects an option in a select tag or in radio button group.
 <?php
 $I->selectOption('form select[name=account]', 'Premium');
 $I->selectOption('form input[name=payment]', 'Monthly');
-$I->selectOption('//form/select[@name=account]', 'Monthly');
+$I->selectOption('//form/select[ * `name=account]',`  'Monthly');
 ?>
 ```
 
@@ -704,15 +930,13 @@ $I->setCookie('PHPSESSID', 'el4ukv0kqbvoirg7nkp4dncpk3');
  * `param` $name
  * `param` $val
  * `param array` $params
- * `internal param` $cookie
- * `internal param` $value
 
 
 
 ### submitForm
  
-Submits the given form on the page, optionally with the given form values.
-Give the form fields values as an array.
+Submits the given form on the page, optionally with the given form
+values.  Give the form fields values as an array.
 
 Skipped fields will be filled by their values from the page.
 You don't need to click the 'Submit' button afterwards.
@@ -727,9 +951,15 @@ Examples:
 
 ``` php
 <?php
-$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
+$I->submitForm('#login', [
+    'login' => 'davert',
+    'password' => '123456'
+]);
 // or
-$I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
+$I->submitForm('#login', [
+    'login' => 'davert',
+    'password' => '123456'
+], 'submitButtonName');
 
 ```
 
@@ -737,10 +967,17 @@ For example, given this sample "Sign Up" form:
 
 ``` html
 <form action="/sign_up">
-    Login: <input type="text" name="user[login]" /><br/>
-    Password: <input type="password" name="user[password]" /><br/>
-    Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
-    Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
+    Login:
+    <input type="text" name="user[login]" /><br/>
+    Password:
+    <input type="password" name="user[password]" /><br/>
+    Do you agree to our terms?
+    <input type="checkbox" name="user[agree]" /><br/>
+    Select pricing plan:
+    <select name="plan">
+        <option value="1">Free</option>
+        <option value="2" selected="selected">Paid</option>
+    </select>
     <input type="submit" name="submitButton" value="Submit" />
 </form>
 ```
@@ -749,22 +986,127 @@ You could write the following to submit it:
 
 ``` php
 <?php
-$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
-
+$I->submitForm(
+    '#userForm',
+    [
+        'user' => [
+            'login' => 'Davert',
+            'password' => '123456',
+            'agree' => true
+        ]
+    ],
+    'submitButton'
+);
 ```
-Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+Note that "2" will be the submitted value for the "plan" field, as it is
+the selected option.
 
-You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
+You can also emulate a JavaScript submission by not specifying any
+buttons in the third parameter to submitForm.
 
 ```php
 <?php
-$I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
+$I->submitForm(
+    '#userForm',
+    [
+        'user' => [
+            'login' => 'Davert',
+            'password' => '123456',
+            'agree' => true
+        ]
+    ]
+);
+```
 
+Pair this with seeInFormFields for quick testing magic.
+
+``` php
+<?php
+$form = [
+     'field1' => 'value',
+     'field2' => 'another value',
+     'checkbox1' => true,
+     // ...
+];
+$I->submitForm('//form[ * `id=my-form]',`  $form, 'submitButton');
+// $I->amOnPage('/path/to/form-page') may be needed
+$I->seeInFormFields('//form[ * `id=my-form]',`  $form);
+?>
+```
+
+Parameter values can be set to arrays for multiple input fields
+of the same name, or multi-select combo boxes.  For checkboxes,
+either the string value can be used, or boolean values which will
+be replaced by the checkbox's value in the DOM.
+
+``` php
+<?php
+$I->submitForm('#my-form', [
+     'field1' => 'value',
+     'checkbox' => [
+         'value of first checkbox',
+         'value of second checkbox,
+     ],
+     'otherCheckboxes' => [
+         true,
+         false,
+         false
+     ],
+     'multiselect' => [
+         'first option value',
+         'second option value'
+     ]
+]);
+?>
+```
+
+Mixing string and boolean values for a checkbox's value is not supported
+and may produce unexpected results.
+
+Field names ending in "[]" must be passed without the trailing square 
+bracket characters, and must contain an array for its value.  This allows
+submitting multiple values with the same name, consider:
+
+```php
+$I->submitForm('#my-form', [
+    'field[]' => 'value',
+    'field[]' => 'another value', // 'field[]' is already a defined key
+]);
+```
+
+The solution is to pass an array value:
+
+```php
+// this way both values are submitted
+$I->submitForm('#my-form', [
+    'field' => [
+        'value',
+        'another value',
+    ]
+]);
 ```
 
  * `param` $selector
  * `param` $params
  * `param` $button
+
+
+### switchToIframe
+ 
+Switch to iframe or frame on the page.
+
+Example:
+``` html
+<iframe name="another_frame" src="http://example.com">
+```
+
+``` php
+<?php
+# switch to iframe
+$I->switchToIframe("another_frame");
+```
+
+ * `param string` $name
 
 
 ### uncheckOption
@@ -779,4 +1121,4 @@ $I->uncheckOption('#notify');
 
  * `param` $option
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Yii1.php">Help us to improve documentation. Edit module reference</a></div>
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/Yii1.php">Help us to improve documentation. Edit module reference</a></div>

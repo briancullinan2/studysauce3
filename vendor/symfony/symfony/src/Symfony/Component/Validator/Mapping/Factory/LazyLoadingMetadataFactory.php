@@ -14,8 +14,9 @@ namespace Symfony\Component\Validator\Mapping\Factory;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
  * Creates new {@link ClassMetadataInterface} instances.
@@ -29,7 +30,7 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
  * Whenever a new metadata instance is created, it is passed to the loader,
  * which can configure the metadata based on configuration loaded from the
  * filesystem or a database. If you want to use multiple loaders, wrap them in a
- * {@link Loader\LoaderChain}.
+ * {@link LoaderChain}.
  *
  * You can also optionally pass a {@link CacheInterface} instance to the
  * constructor. This cache will be used for persisting the generated metadata
@@ -40,21 +41,21 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
 class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 {
     /**
-     * The loader for loading the class metadata
+     * The loader for loading the class metadata.
      *
-     * @var LoaderInterface
+     * @var LoaderInterface|null
      */
     protected $loader;
 
     /**
-     * The cache for caching class metadata
+     * The cache for caching class metadata.
      *
-     * @var CacheInterface
+     * @var CacheInterface|null
      */
     protected $cache;
 
     /**
-     * The loaded metadata, indexed by class name
+     * The loaded metadata, indexed by class name.
      *
      * @var ClassMetadata[]
      */
@@ -74,7 +75,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * Returns the metadata for the given class name or object.
+     * {@inheritdoc}
      *
      * If the method was called with the same class name (or an object of that
      * class) before, the same metadata instance is returned.
@@ -87,12 +88,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      * configured with a loader, the metadata is passed to the
      * {@link LoaderInterface::loadClassMetadata()} method for further
      * configuration. At last, the new object is returned.
-     *
-     * @param string|object $value A class name or an object
-     *
-     * @return MetadataInterface The metadata for the value
-     *
-     * @throws NoSuchMetadataException If no metadata exists for the given value
      */
     public function getMetadataFor($value)
     {
@@ -141,12 +136,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * Returns whether the factory is able to return metadata for the given
-     * class name or object.
-     *
-     * @param string|object $value A class name or an object
-     *
-     * @return bool Whether metadata can be returned for that class
+     * {@inheritdoc}
      */
     public function hasMetadataFor($value)
     {

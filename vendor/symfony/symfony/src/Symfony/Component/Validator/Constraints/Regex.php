@@ -18,14 +18,12 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Regex extends Constraint
 {
     public $message = 'This value is not valid.';
     public $pattern;
-    public $htmlPattern = null;
+    public $htmlPattern;
     public $match = true;
 
     /**

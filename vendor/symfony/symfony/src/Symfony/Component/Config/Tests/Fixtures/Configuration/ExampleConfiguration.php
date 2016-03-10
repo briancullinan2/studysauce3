@@ -34,6 +34,7 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->scalarNode('scalar_array_empty')->defaultValue(array())->end()
                 ->scalarNode('scalar_array_defaults')->defaultValue(array('elem1', 'elem2'))->end()
                 ->scalarNode('scalar_required')->isRequired()->end()
+                ->enumNode('enum_with_default')->values(array('this', 'that'))->defaultValue('this')->end()
                 ->enumNode('enum')->values(array('this', 'that'))->end()
                 ->arrayNode('array')
                     ->info('some info')
@@ -45,7 +46,7 @@ class ExampleConfiguration implements ConfigurationInterface
                             ->info(
                                 "this is a long\n".
                                 "multi-line info text\n".
-                                "which should be indented"
+                                'which should be indented'
                             )
                             ->example('example setting')
                         ->end()

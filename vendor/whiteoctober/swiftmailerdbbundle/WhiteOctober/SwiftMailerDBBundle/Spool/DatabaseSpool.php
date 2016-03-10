@@ -43,7 +43,7 @@ class DatabaseSpool extends \Swift_ConfigurableSpool
      */
     public function __construct(RegistryInterface $doc, $entityClass, $environment, $keepSentMessages = false)
     {
-        $this->doc               = $doc;
+        $this->doc              = $doc;
         $this->keepSentMessages = $keepSentMessages;
 
         $obj = new $entityClass;
@@ -130,12 +130,14 @@ class DatabaseSpool extends \Swift_ConfigurableSpool
         $time = time();
         foreach ($emails as $email) {
             $email->setStatus(EmailInterface::STATUS_PROCESSING);
+            $this->doc->getManager()->persist($email);
             $this->doc->getManager()->flush();
 
             $message = unserialize($email->getMessage());
             $count += $transport->send($message, $failedRecipients);
             if ($this->keepSentMessages === true) {
                 $email->setStatus(EmailInterface::STATUS_COMPLETE);
+                $this->doc->getManager()->persist($email);
             } else {
                 $this->doc->getManager()->remove($email);
             }

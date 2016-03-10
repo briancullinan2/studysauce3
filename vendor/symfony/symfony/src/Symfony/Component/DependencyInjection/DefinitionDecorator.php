@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * This definition decorates another definition.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @api
  */
 class DefinitionDecorator extends Definition
 {
@@ -30,8 +28,6 @@ class DefinitionDecorator extends Definition
      * Constructor.
      *
      * @param string $parent The id of Definition instance to decorate.
-     *
-     * @api
      */
     public function __construct($parent)
     {
@@ -44,8 +40,6 @@ class DefinitionDecorator extends Definition
      * Returns the Definition being decorated.
      *
      * @return string
-     *
-     * @api
      */
     public function getParent()
     {
@@ -56,8 +50,6 @@ class DefinitionDecorator extends Definition
      * Returns all changes tracked for the Definition object.
      *
      * @return array An array of changes for this Definition
-     *
-     * @api
      */
     public function getChanges()
     {
@@ -66,8 +58,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setClass($class)
     {
@@ -78,8 +68,16 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
+     */
+    public function setFactory($callable)
+    {
+        $this->changes['factory'] = true;
+
+        return parent::setFactory($callable);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function setFactoryClass($class)
     {
@@ -90,8 +88,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setFactoryMethod($method)
     {
@@ -102,20 +98,16 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
-    public function setFactoryService($service)
+    public function setFactoryService($service, $triggerDeprecationError = true)
     {
         $this->changes['factory_service'] = true;
 
-        return parent::setFactoryService($service);
+        return parent::setFactoryService($service, $triggerDeprecationError);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setConfigurator($callable)
     {
@@ -126,8 +118,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setFile($file)
     {
@@ -138,8 +128,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setPublic($boolean)
     {
@@ -150,14 +138,22 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setLazy($boolean)
     {
         $this->changes['lazy'] = true;
 
         return parent::setLazy($boolean);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDecoratedService($id, $renamedId = null)
+    {
+        $this->changes['decorated_service'] = true;
+
+        return parent::setDecoratedService($id, $renamedId);
     }
 
     /**
@@ -171,8 +167,6 @@ class DefinitionDecorator extends Definition
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
-     *
-     * @api
      */
     public function getArgument($index)
     {
@@ -203,8 +197,6 @@ class DefinitionDecorator extends Definition
      * @return DefinitionDecorator the current instance
      *
      * @throws InvalidArgumentException when $index isn't an integer
-     *
-     * @api
      */
     public function replaceArgument($index, $value)
     {

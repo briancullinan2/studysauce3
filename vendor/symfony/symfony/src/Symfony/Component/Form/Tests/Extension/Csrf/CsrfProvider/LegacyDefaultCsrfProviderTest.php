@@ -16,8 +16,9 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
 /**
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
+ * @group legacy
  */
-class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
+class LegacyDefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $provider;
 
@@ -25,7 +26,6 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
     {
         ini_set('session.save_handler', 'files');
         ini_set('session.save_path', sys_get_temp_dir());
-        ini_set('error_reporting', -1 & ~E_USER_DEPRECATED);
     }
 
     protected function setUp()
@@ -47,13 +47,12 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(sha1('SECRET'.'foo'.session_id()), $token);
     }
 
+    /**
+     * @requires PHP 5.4
+     */
     public function testGenerateCsrfTokenOnUnstartedSession()
     {
         session_id('touti');
-
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('This test requires PHP >= 5.4');
-        }
 
         $this->assertSame(PHP_SESSION_NONE, session_status());
 

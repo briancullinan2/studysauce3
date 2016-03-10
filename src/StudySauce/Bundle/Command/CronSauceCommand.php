@@ -172,7 +172,7 @@ EOF
 
             if (count($difference) > 0) {
 
-                $u->setProperty('notified', array_map(function (Pack $p) {return $p->getId(); }, $notify));
+                $u->setProperty('notified', array_unique(array_merge(array_map(function (Pack $p) {return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
                 $orm->merge($u);
                 $orm->flush();
 

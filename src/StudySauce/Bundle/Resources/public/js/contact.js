@@ -57,7 +57,7 @@ $(document).ready(function () {
         contact.removeClass('valid').addClass('invalid');
 
         jQuery.ajax({
-            url: window.callbackPaths['contact_send'],
+            url: Routing.generate('contact_send'),
             type: 'POST',
             dataType: 'json',
             data: {
@@ -147,7 +147,7 @@ $(document).ready(function () {
         contact.find('.highlighted-link').removeClass('valid').addClass('invalid');
 
         jQuery.ajax({
-            url: window.callbackPaths['contact_send'],
+            url: Routing.generate('contact_send'),
             type: 'POST',
             dataType: 'json',
             data: {
@@ -206,7 +206,7 @@ $(document).ready(function () {
             data['yourEmail'] = contact.find('.your-email input').val().trim();
         }
         jQuery.ajax({
-            url: window.callbackPaths['contact_parents'],
+            url: Routing.generate('contact_parents'),
             type: 'POST',
             dataType: 'json',
             data: data,
@@ -316,7 +316,7 @@ $(document).ready(function () {
             data['yourEmail'] = contact.find('.your-email input').val().trim();
         }
         jQuery.ajax({
-            url: window.callbackPaths['contact_students'],
+            url: Routing.generate('contact_students'),
             type: 'POST',
             dataType: 'json',
             data: data,

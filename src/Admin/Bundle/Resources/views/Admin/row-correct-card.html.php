@@ -14,12 +14,6 @@ use StudySauce\Bundle\Entity\Card;
             <option value="<?php print $a->getValue(); ?>" <?php print ($a->getCorrect() ? 'selected="selected"' : ''); ?>><?php print $a->getValue(); ?></option>
         <?php } ?></select>
 </label>
-<label class="input correct type-sa">
-    <select>
-        <option value="exactly" <?php print (!empty($card->getCorrect()) && substr($card->getCorrect()->getValue(), 0, 1) == '^' ? 'selected="selected"' : ''); ?>>Matches exactly</option>
-        <option value="contains" <?php print (!empty($card->getCorrect()) && substr($card->getCorrect()->getValue(), 0, 1) != '^' ? 'selected="selected"' : ''); ?>>Contains</option>
-    </select>
-</label>
 <label class="radio correct type-tf">
     <span>True</span>
     <input type="radio" name="correct-<?php print $card->getId(); ?>" value="true" <?php print (!empty($card->getCorrect()) && preg_match('/t/i', $card->getCorrect()->getValue()) ? 'checked="checked"' : ''); ?> />
@@ -29,5 +23,8 @@ use StudySauce\Bundle\Entity\Card;
     <input type="radio" name="correct-<?php print $card->getId(); ?>" value="false" <?php print (!empty($card->getCorrect()) && preg_match('/f/i', $card->getCorrect()->getValue()) ? 'checked="checked"' : ''); ?> />
     <i></i>
     <span>False</span>
+</label>
+<label class="input correct type-sa">
+    <input type="text" name="correct" placeholder="fill in the blank" value="<?php print (!empty($card->getCorrect()) ? trim($card->getCorrect()->getValue(), '$^') : ''); ?>" />
 </label>
 

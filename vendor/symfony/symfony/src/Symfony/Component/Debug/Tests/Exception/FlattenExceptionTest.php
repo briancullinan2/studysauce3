@@ -132,6 +132,20 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @requires PHP 7.0
+     */
+    public function testPreviousError()
+    {
+        $exception = new \Exception('test', 123, new \ParseError('Oh noes!', 42));
+
+        $flattened = FlattenException::create($exception)->getPrevious();
+
+        $this->assertEquals($flattened->getMessage(), 'Parse error: Oh noes!', 'The message is copied from the original exception.');
+        $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
+        $this->assertEquals($flattened->getClass(), 'Symfony\Component\Debug\Exception\FatalThrowableError', 'The class is set to the class of the original exception');
+    }
+
+    /**
      * @dataProvider flattenDataProvider
      */
     public function testLine(\Exception $exception)
@@ -189,9 +203,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     public function testTooBigArray()
     {
         $a = array();
-        for ($i = 0; $i < 20; $i++) {
-            for ($j = 0; $j < 50; $j++) {
-                for ($k = 0; $k < 10; $k++) {
+        for ($i = 0; $i < 20; ++$i) {
+            for ($j = 0; $j < 50; ++$j) {
+                for ($k = 0; $k < 10; ++$k) {
                     $a[$i][$j][$k] = 'value';
                 }
             }

@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
 /**
  * Representations of pressable keys that aren't text.
  * These are stored in the Unicode PUA (Private Use Area) code points.
@@ -86,7 +88,7 @@ class WebDriverKeys {
 
   /**
    * Encode input of `sendKeys()`.
-   * @params string|array $keys
+   * @param string|array $keys
    * @return array
    */
   public static function encode($keys) {

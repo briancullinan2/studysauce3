@@ -322,7 +322,7 @@ $view['slots']->start('body'); ?>
                                                 ?>
                                                 <tr>
                                                     <td colspan="3"><?php print $up->getUser()->getFirst(); ?> <?php print $up->getUser()->getLast(); ?></td>
-                                                    <td><?php print $up->getDownloaded()->format('j M'); ?></td>
+                                                    <td><?php print (!empty($up->getDownloaded()) ? $up->getDownloaded()->format('j M') : $up->getCreated()->format('j M')); ?></td>
                                                     <td><?php print round($correct * 100.0 / $up->getPack()->getCards()->count()); ?>%</td>
                                                 </tr>
                                                 <tr>

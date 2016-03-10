@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -245,7 +246,7 @@ modified';
 $heredoc = <<<HD
 
 
-Heredoc should not be   modified
+Heredoc should not be   modified {$a[1+$b]}
 
 
 HD;
@@ -281,7 +282,7 @@ modified';
 $heredoc = <<<HD
 
 
-Heredoc should not be   modified
+Heredoc should not be   modified {$a[1+$b]}
 
 
 HD;
@@ -312,21 +313,30 @@ EOF;
         $this->assertEquals($expected, $output);
     }
 
-    public function testIsClassInActiveBundleFalse()
+    /**
+     * @group legacy
+     */
+    public function testLegacyIsClassInActiveBundleFalse()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
 
         $this->assertFalse($kernel->isClassInActiveBundle('Not\In\Active\Bundle'));
     }
 
-    public function testIsClassInActiveBundleFalseNoNamespace()
+    /**
+     * @group legacy
+     */
+    public function testLegacyIsClassInActiveBundleFalseNoNamespace()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
 
         $this->assertFalse($kernel->isClassInActiveBundle('NotNamespacedClass'));
     }
 
-    public function testIsClassInActiveBundleTrue()
+    /**
+     * @group legacy
+     */
+    public function testLegacyIsClassInActiveBundleTrue()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
 
@@ -756,7 +766,7 @@ EOF;
     }
 
     /**
-     * Returns a mock for the BundleInterface
+     * Returns a mock for the BundleInterface.
      *
      * @return BundleInterface
      */

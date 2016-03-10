@@ -15,19 +15,17 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Bundle\TwigBundle\Node\RenderNode;
 
+/**
+ * @group legacy
+ */
 class LegacyRenderTokenParserTest extends TestCase
 {
-    public function setUp()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-    }
-
     /**
      * @dataProvider getTestsForRender
      */
     public function testCompile($source, $expected)
     {
-        $env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $env->addTokenParser(new RenderTokenParser());
         $stream = $env->tokenize($source);
         $parser = new \Twig_Parser($env);

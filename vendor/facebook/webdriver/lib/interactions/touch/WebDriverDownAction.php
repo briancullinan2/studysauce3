@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions\Touch;
+
+use Facebook\WebDriver\WebDriverAction;
+
 class WebDriverDownAction
   extends WebDriverTouchAction
   implements WebDriverAction {
@@ -20,6 +24,11 @@ class WebDriverDownAction
   private $x;
   private $y;
 
+  /**
+   * @param WebDriverTouchScreen $touch_screen
+   * @param int $x
+   * @param int $y
+   */
   public function __construct(WebDriverTouchScreen $touch_screen, $x, $y) {
     $this->x = $x;
     $this->y = $y;

@@ -33,7 +33,7 @@ function setupSelectize()
                 clearTimeout(callbackTimeout);
             callbackTimeout = setTimeout(function () {
                 $.ajax({
-                    url: window.callbackPaths['emails_search'],
+                    url: Routing.generate('emails_search'),
                     dataType:'json',
                     data: {
                         alt: row.find('.selectized').not(that).map(function () {return $(this).attr('name');}).toArray().join(','),
@@ -97,7 +97,7 @@ $(document).ready(function () {
             clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function () {
             searchRequest = $.ajax({
-                url: window.callbackPaths['emails_callback'],
+                url: Routing.generate('emails_callback'),
                 type: 'GET',
                 dataType: 'text',
                 data: getData(),
@@ -232,7 +232,7 @@ $(document).ready(function () {
     body.on('change', '#send-email select[name="template"]', function () {
         var email = $('#send-email');
         if($(this).val() != '')
-            email.find('.preview').replaceWith($('<iframe class="preview" src="' + window.callbackPaths['emails_template'] + '/' + $(this).val() + '" height="400" width="100%" frameborder="0"></iframe>'));
+            email.find('.preview').replaceWith($('<iframe class="preview" src="' + Routing.generate('emails_template', {_email: $(this).val()}) + '" height="400" width="100%" frameborder="0"></iframe>'));
     });
 
     body.on('click', '#send-email a[href="#add-line"]', function (evt) {
@@ -452,7 +452,7 @@ $(document).ready(function () {
     body.on('click', '#send-confirm a[href="#confirm-send"]', function () {
         var email = $('#send-email');
         $.ajax({
-            url: window.callbackPaths['emails_send'] + '/' + email.find('select[name="template"]').val(),
+            url: Routing.generate('emails_send', {_email: email.find('select[name="template"]').val()}),
             dataType: 'text',
             type: 'POST',
             data: {
@@ -476,7 +476,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var email = $('#send-email');
         $.ajax({
-            url: window.callbackPaths['emails_save'],
+            url: Routing.generate('emails_save'),
             dataType: 'text',
             type: 'POST',
             data: {

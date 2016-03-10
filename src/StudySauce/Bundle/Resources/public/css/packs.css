@@ -1,0 +1,222 @@
+
+.results .pack-row a[href="#upload-image"] {
+    padding-left: 30px;
+    position: relative;
+    display:inline-block;
+}
+
+.results .pack-row a[href="#upload-image"]:before,
+.results .card-row a[href="#upload-audio"],
+.results .card-row a[href="#upload-video"],
+.results .card-row a[href="#upload-image"]
+{
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new2_half.png) no-repeat left -2px transparent;
+    vertical-align: middle;
+}
+
+.results .pack-row a[href="#upload-image"]:before {
+    content: " ";
+    display:block;
+    margin-top:-12px;
+    position:absolute;
+    left:2px;
+    top:50%;
+}
+
+.results .card-row a[href="#upload-audio"].active,
+.results .card-row a[href="#upload-video"].active,
+.results .card-row a[href="#upload-image"].active
+{
+    background-color:#09B;
+}
+
+.results .card-row a[href="#upload-image"] {
+    background-position: left -52px;
+}
+
+.results .card-row a[href="#upload-audio"] {
+    background-position: left -102px;
+}
+
+.results .card-row.edit .highlighted-link > *
+{
+    display:none;
+}
+
+.results .pack-row.edit ~ .highlighted-link.pack a[href^="#add-"],
+.results .pack-row.read-only ~ .highlighted-link.pack a[href^="#save-"]
+{
+    visibility: hidden;
+}
+
+.results .card-row.edit.selected .highlighted-link > *:not(.more),
+.results .card-row.edit:hover .highlighted-link > *:not(.more)
+{
+    display: inline-block;
+}
+
+.results .pack-row.edit ~ .highlighted-link.pack a[href^="#cancel-"],
+.results .pack-row.edit ~ .highlighted-link.pack a[href^="#save-"]
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.results .pack-row.read-only .properties {
+    display:none;
+}
+
+.results .pack-row .id {
+    text-align: center;
+}
+
+.results .pack-row.read-only .id img[alt="Upload"], .results .pack-row.read-only .id img[alt="Upload"] ~ *, .results .pack-row.read-only .id a[href="#upload-image"] {
+    display:none;
+}
+
+.results .pack-row .status {
+    position:relative;
+}
+
+.results .pack-row .status .unpublished select {
+    background-color: #FF9900;
+}
+
+.results .pack-row .status .public select {
+    background-color: #11CC33;
+}
+
+.results .pack-row .status .group select {
+    background-color: #1199CC;
+}
+
+.results .pack-row .status .unlisted select {
+    background-color: #AAAAAA;
+}
+
+.results .pack-row.edit > *:nth-child(2) {
+    width: 50%;
+}
+
+.results .pack-row.edit > .status {
+    width: 40%;
+}
+
+.results .pack-row.edit > .groups {
+    padding-left:10%;
+    width:35%;
+}
+
+.results .pack-row.edit > .properties,
+.results .pack-row.edit > .users {
+    width: 25%;
+}
+
+.results .pack-row.edit .groups .checkbox:nth-of-type(even) {
+    width: 100px;
+    display:inline-block;
+    margin: 0 -2px;
+    padding: 0 2px;
+    float:right;
+}
+
+.results .pack-row.edit .groups .checkbox
+{
+    width: 100%;
+    display:inline-block;
+    padding: 0 104px 0 2px;
+    margin: 0 -104px 0 -2px;
+}
+
+.results .pack-row.read-only .status {
+    text-align: center;
+}
+
+.results .pack-row.read-only .status select {
+    width: auto;
+}
+
+.results .card-row > * {
+    width: 20%;
+}
+
+.results .card-row .id {
+    width: 15%;
+}
+
+.results .card-row > *:nth-child(2) {
+    width: 30%;
+}
+
+.results .card-row .correct.type-tf {
+    text-align: right;
+}
+
+.results .card-row .correct.type-tf + .correct.type-tf {
+    text-align: left;
+}
+
+.results .card-row[class*="type"] .correct .correct:not([class*="type-"]),
+.results .correct .correct[class*="type-"],
+.results .card-row[class*="type"] .answers .answers:not([class*="type-"]),
+.results .answers .answers[class*="type-"],
+.results .card-row > .answers,
+.results .card-row[class*="type"].type-tf > .answers
+{
+    display:none;
+}
+
+.results .card-row[class*="type"] > .correct
+{
+    width:20%;
+}
+
+.results .card-row > .correct,
+.results .card-row[class*="type"].type-tf .correct
+{
+    width:40%;
+}
+
+.results .card-row .input.type {
+    margin-right:-100px;
+    display:inline-block;
+    padding-left:40px;
+    padding-right:100px;
+    width:100%;
+    position:relative;
+    vertical-align: middle;
+}
+
+.results .card-row .input.type span {
+    width:40px;
+    display:block;
+    margin-right:-4px;
+    position:absolute;
+    left:0;
+    top:50%;
+    margin-top:-12px;
+}
+
+.results .card-row.type-tf .correct.type-tf
+{
+    display:inline-block;
+    width:50%;
+    margin:0 -2px;
+    padding: 0 2px;
+}
+
+.results .card-row[class*="type"] > .answers
+{
+    display:inline-block;
+}
+
+.results .card-row.type-mc .answers.type-mc,
+.results .card-row.type-sa .answers.type-sa,
+.results .card-row.type-mc .correct.type-mc,
+.results .card-row.type-sa .correct.type-sa
+{
+    display:block;
+}

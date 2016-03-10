@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 /** @var GlobalVariables $app */
 /** @var $view TimedPhpEngine */
 /** @var $user User */
-/** @var Pack $pack */
+/** @var Pack $entity */
 
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
@@ -36,14 +36,22 @@ foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/p
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="packs">
+    <div class="panel-pane" id="packs<?php print (!empty($entity) ? ('-pack' . $entity->getId()) : ''); ?>">
         <div class="pane-content">
-            <?php print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', ['tables' => ['pack', 'card']])); ?>
+            <?php
+            $tables = ['tables' => ['pack', 'card']];
+            if(!empty($entity)) {
+                $tables['pack-id'] = $entity->getId();
+                $tables['headers'] = false;
+                $tables['edit'] = true;
+                $tables['expandable'] = ['card' => ['preview']];
+            }
+            print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)); ?>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('sincludes');
-
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
 $view['slots']->stop();
 

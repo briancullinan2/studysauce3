@@ -13,18 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class WebDriverDoubleClickActionTest extends PHPUnit_Framework_TestCase {
-  /**
-   * @type WebDriverDoubleClickAction
-   */
-  private $webDriverDoubleClickAction;
+namespace Facebook\WebDriver\Interactions\Internal;
 
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverMouse;
+
+class WebDriverDoubleClickActionTest extends \PHPUnit_Framework_TestCase {
+  /** @var WebDriverDoubleClickAction */
+  private $webDriverDoubleClickAction;
+  /** @var WebDriverMouse|\PHPUnit_Framework_MockObject_MockObject */
   private $webDriverMouse;
+  /** @var WebDriverLocatable|\PHPUnit_Framework_MockObject_MockObject  */
   private $locationProvider;
 
   public function setUp() {
-    $this->webDriverMouse = $this->getMock('WebDriverMouse');
-    $this->locationProvider = $this->getMock('WebDriverLocatable');
+    $this->webDriverMouse = $this->getMock('Facebook\WebDriver\WebDriverMouse');
+    $this->locationProvider = $this->getMock('Facebook\WebDriver\Internal\WebDriverLocatable');
     $this->webDriverDoubleClickAction = new WebDriverDoubleClickAction(
       $this->webDriverMouse,
       $this->locationProvider
@@ -32,7 +36,8 @@ class WebDriverDoubleClickActionTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testPerformSendsDoubleClickCommand() {
-    $coords = $this->getMockBuilder('WebDriverCoordinates')->disableOriginalConstructor()->getMock();
+    $coords = $this->getMockBuilder('Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates')
+      ->disableOriginalConstructor()->getMock();
     $this->webDriverMouse->expects($this->once())->method('doubleClick')->with($coords);
     $this->locationProvider->expects($this->once())->method('getCoordinates')->will($this->returnValue($coords));
     $this->webDriverDoubleClickAction->perform();

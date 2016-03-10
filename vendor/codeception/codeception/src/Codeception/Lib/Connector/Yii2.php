@@ -1,15 +1,14 @@
 <?php
-
 namespace Codeception\Lib\Connector;
 
-use Yii;
-use yii\web\HttpException;
-use yii\base\ExitException;
-use yii\web\Response as YiiResponse;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\BrowserKit\Client;
-use Symfony\Component\BrowserKit\Response;
 use Codeception\Util\Debug;
+use Symfony\Component\BrowserKit\Client;
+use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\BrowserKit\Response;
+use Yii;
+use yii\base\ExitException;
+use yii\web\HttpException;
+use yii\web\Response as YiiResponse;
 
 class Yii2 extends Client
 {
@@ -19,11 +18,38 @@ class Yii2 extends Client
      * @var string application config file
      */
     public $configFile;
+
     /**
      * @var array
      */
     public $headers;
     public $statusCode;
+
+    /**
+     * @var \yii\web\Application
+     */
+    private $app;
+
+    /**
+     * @var \yii\db\Connection
+     */
+    public static $db; // remember the db instance
+
+    /**
+     * @return \yii\web\Application
+     */
+    public function getApplication()
+    {
+        if (!isset($this->app)) {
+            $this->app = $this->startApp();
+        }
+        return $this->app;
+    }
+
+    public function resetApplication()
+    {
+        $this->app = null;
+    }
 
     public function startApp()
     {
@@ -32,9 +58,15 @@ class Yii2 extends Client
             $config['class'] = 'yii\web\Application';
         }
         /** @var \yii\web\Application $app */
-        return Yii::createObject($config);
+        $app = Yii::createObject($config);
+        // always use the same DB connection
+        if (isset(static::$db)) {
+            $app->set('db', static::$db);
+        } elseif ($app->has('db')) {
+            static::$db = $app->get('db');
+        }
+        return $app;
     }
-
 
     /**
      *
@@ -44,24 +76,23 @@ class Yii2 extends Client
      */
     public function doRequest($request)
     {
-        $_COOKIE  = $request->getCookies();
-        $_SERVER  = $request->getServer();
-        $_FILES   = $this->remapFiles($request->getFiles());
+        $_COOKIE = $request->getCookies();
+        $_SERVER = $request->getServer();
+        $_FILES = $this->remapFiles($request->getFiles());
         $_REQUEST = $this->remapRequestParameters($request->getParameters());
-        $_POST    = $_GET = array();
+        $_POST = $_GET = [];
 
         if (strtoupper($request->getMethod()) == 'GET') {
             $_GET = $_REQUEST;
         } else {
             $_POST = $_REQUEST;
-            $_POST[Yii::$app->getRequest()->methodParam] = $request->getMethod();
         }
 
         $uri = $request->getUri();
 
-        $pathString                = parse_url($uri, PHP_URL_PATH);
-        $queryString               = parse_url($uri, PHP_URL_QUERY);
-        $_SERVER['REQUEST_URI']    = $queryString === null ? $pathString : $pathString . '?' . $queryString;
+        $pathString = parse_url($uri, PHP_URL_PATH);
+        $queryString = parse_url($uri, PHP_URL_QUERY);
+        $_SERVER['REQUEST_URI'] = $queryString === null ? $pathString : $pathString . '?' . $queryString;
         $_SERVER['REQUEST_METHOD'] = strtoupper($request->getMethod());
 
         parse_str($queryString, $params);
@@ -69,9 +100,9 @@ class Yii2 extends Client
             $_GET[$k] = $v;
         }
 
-        $app = $this->startApp();
+        $app = $this->getApplication();
 
-        $app->getResponse()->on(YiiResponse::EVENT_AFTER_PREPARE, array($this, 'processResponse'));
+        $app->getResponse()->on(YiiResponse::EVENT_AFTER_PREPARE, [$this, 'processResponse']);
 
         // disabling logging. Logs are slowing test execution down
         foreach ($app->log->targets as $target) {
@@ -83,8 +114,18 @@ class Yii2 extends Client
 
         ob_start();
 
+        $yiiRequest = $app->getRequest();
+        if ($request->getContent() !== null) {
+            $yiiRequest->setRawBody($request->getContent());
+            $yiiRequest->setBodyParams(null);
+        } else {
+            $yiiRequest->setRawBody(null);
+            $yiiRequest->setBodyParams($_POST);
+        }
+        $yiiRequest->setQueryParams($_GET);
+
         try {
-            $app->handleRequest($app->getRequest())->send();
+            $app->handleRequest($yiiRequest)->send();
         } catch (\Exception $e) {
             if ($e instanceof HttpException) {
                 // we shouldn't discard existing output as PHPUnit preform output level verification since PHPUnit 4.2.
@@ -94,6 +135,7 @@ class Yii2 extends Client
                 // nothing to do
             } else {
                 // for exceptions not related to Http, we pass them to Codeception
+                $this->resetApplication();
                 throw $e;
             }
         }
@@ -106,18 +148,20 @@ class Yii2 extends Client
             Debug::debug("[Headers] " . json_encode($this->headers));
         }
 
+        $this->resetApplication();
+
         return new Response($content, $this->statusCode, $this->headers);
     }
 
     public function processResponse($event)
     {
         /** @var \yii\web\Response $response */
-        $response      = $event->sender;
-        $request       = Yii::$app->getRequest();
+        $response = $event->sender;
+        $request = Yii::$app->getRequest();
         $this->headers = $response->getHeaders()->toArray();
         $response->getHeaders()->removeAll();
         $this->statusCode = $response->getStatusCode();
-        $cookies          = $response->getCookies();
+        $cookies = $response->getCookies();
 
         if ($request->enableCookieValidation) {
             $validationKey = $request->cookieValidationKey;
@@ -127,7 +171,8 @@ class Yii2 extends Client
             /** @var \yii\web\Cookie $cookie */
             $value = $cookie->value;
             if ($cookie->expire != 1 && isset($validationKey)) {
-                $value = Yii::$app->security->hashData(serialize($value), $validationKey);
+                $data = version_compare(Yii::getVersion(), '2.0.2', '>') ? [$cookie->name, $cookie->value] : $cookie->value;
+                $value = Yii::$app->security->hashData(serialize($data), $validationKey);
             }
             $c = new Cookie($cookie->name, $value, $cookie->expire, $cookie->path, $cookie->domain, $cookie->secure, $cookie->httpOnly);
             $this->getCookieJar()->set($c);

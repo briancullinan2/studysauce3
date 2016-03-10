@@ -13,18 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class WebDriverButtonReleaseActionTest extends PHPUnit_Framework_TestCase {
-  /**
-   * @type WebDriverButtonReleaseAction
-   */
-  private $webDriverButtonReleaseAction;
+namespace Facebook\WebDriver\Interactions\Internal;
 
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverMouse;
+
+class WebDriverButtonReleaseActionTest extends \PHPUnit_Framework_TestCase {
+  /** @var WebDriverButtonReleaseAction */
+  private $webDriverButtonReleaseAction;
+  /** @var WebDriverMouse|\PHPUnit_Framework_MockObject_MockObject */
   private $webDriverMouse;
+  /** @var WebDriverLocatable|\PHPUnit_Framework_MockObject_MockObject */
   private $locationProvider;
 
   public function setUp() {
-    $this->webDriverMouse = $this->getMock('WebDriverMouse');
-    $this->locationProvider = $this->getMock('WebDriverLocatable');
+    $this->webDriverMouse = $this->getMock('Facebook\WebDriver\WebDriverMouse');
+    $this->locationProvider = $this->getMock('Facebook\WebDriver\Internal\WebDriverLocatable');
     $this->webDriverButtonReleaseAction = new WebDriverButtonReleaseAction(
       $this->webDriverMouse,
       $this->locationProvider
@@ -32,7 +36,8 @@ class WebDriverButtonReleaseActionTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testPerformSendsMouseUpCommand() {
-    $coords = $this->getMockBuilder('WebDriverCoordinates')->disableOriginalConstructor()->getMock();
+    $coords = $this->getMockBuilder('Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates')
+      ->disableOriginalConstructor()->getMock();
     $this->webDriverMouse->expects($this->once())->method('mouseUp')->with($coords);
     $this->locationProvider->expects($this->once())->method('getCoordinates')->will($this->returnValue($coords));
     $this->webDriverButtonReleaseAction->perform();

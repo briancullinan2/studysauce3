@@ -13,10 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\WebDriverBrowserType;
+use Facebook\WebDriver\Remote\WebDriverCapabilityType;
+
 /**
  * The base class for test cases.
  */
-class WebDriverTestCase extends PHPUnit_Framework_TestCase {
+class WebDriverTestCase extends \PHPUnit_Framework_TestCase {
 
   /** @var RemoteWebDriver $driver */
   protected $driver;
@@ -33,11 +39,16 @@ class WebDriverTestCase extends PHPUnit_Framework_TestCase {
   }
   
   protected function tearDown() {
-    $this->driver->quit();
+    if ($this->driver) {
+	    $this->driver->quit();
+	  }
   }
 
   /**
    * Get the URL of the test html.
+   *
+   * @param $path
+   * @return string
    */
   protected function getTestPath($path) {
     return 'file:///'.dirname(__FILE__).'/html/'.$path;

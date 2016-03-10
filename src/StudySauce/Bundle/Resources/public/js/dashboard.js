@@ -11,10 +11,19 @@ $(document).ready(function () {
 
     function activateMenu(path, noPush) {
         var that = $(this);
-        var i = window.callbackUri.indexOf(path),
-            panel = $('#' + window.callbackKeys[i] + '.panel-pane'),
+        var routes = Routing.match(path),
+            subKey = routes[0].name,
+            subPath = Routing.generate(subKey),
+            key = Routing.match(subPath)[0].name;
+        // add route parameter to tab id if loading a specific page like /packs/2 or /adviser/1
+        for(var r in routes[0].route.requirements) {
+            if (routes[0].route.requirements.hasOwnProperty(r) && r != '_format' && routes[0].route.requirements[r] == '[0-9]*' || routes[0].route.requirements[r] == '[0-9]+') {
+                key += '-' + r + routes[0].params[r];
+            }
+        }
+        var panel = $('#' + key + '.panel-pane'),
             panelIds = body.find('.panel-pane').map(function () {return $(this).attr('id');}).toArray(),
-            item = body.find('.main-menu a[href^="' + window.callbackUri[window.callbackKeys.indexOf(window.callbackKeys[i].replace(/-step[0-9]+/g, ''))] + '"]').first();
+            item = body.find('.main-menu a[href^="' + subPath + '"]').first();
 
         // activate the menu
         body.find('.main-menu .active').removeClass('active');
@@ -25,7 +34,7 @@ $(document).ready(function () {
             var a = document.createElement('a');
             a.href = path;
             visits[visits.length] = {path: a.pathname, query: a.search, hash: a.hash, time: (new Date()).toJSON()};
-            window.history.pushState(window.callbackKeys[i], "", path);
+            window.history.pushState(key, "", path);
         }
         // expand menu groups
         if(item.length > 0) {
@@ -47,9 +56,9 @@ $(document).ready(function () {
                 }, 1000);
                 return;
             }
-            setTimeout(function () {window.sincluding[window.sincluding.length] = window.callbackPaths[window.callbackKeys[i]];}, 15);
+            setTimeout(function () {window.sincluding[window.sincluding.length] = path;}, 15);
             $.ajax({
-                url: window.callbackPaths[window.callbackKeys[i]],
+                url: Routing.generate(subKey, $.extend({_format: 'tab'}, routes[0].params)),
                 type: 'GET',
                 dataType: 'text',
                 success: function (tab) {
@@ -71,7 +80,7 @@ $(document).ready(function () {
                         });
                         panes.hide().insertBefore(body.find('.footer'));
                         content.not(panes).insertBefore(body.find('.footer'));
-                        var newPane = content.filter('#' + window.callbackKeys[i]);
+                        var newPane = content.filter('#' + key);
                         if (newPane.length == 0) {
                             newPane = content.filter('.panel-pane').first();
                         }
@@ -186,7 +195,7 @@ $(document).ready(function () {
         var that = $(this),
             el = that[0],
             path = $(this).attr('href'),
-            callback = window.callbackUri.indexOf(path);
+            routes = Routing.match(path);
         if(!expandMenu.apply(this, [evt]))
             return;
         if($(this).is('.invalid a.more'))
@@ -197,9 +206,10 @@ $(document).ready(function () {
         }
 
         // the path is not a callback so just return normally
-        if(typeof window.history == 'undefined' || typeof window.history.pushState == 'undefined' ||
+        if(typeof window.history == 'undefined' || typeof window.history.pushState == 'undefined'
             // check if there is a tab with the selected url
-            callback == -1) {
+            || typeof routes[0] == 'undefined' || typeof routes[0].route.requirements._format == 'undefined'
+            || routes[0].route.requirements['_format'].indexOf('tab') == -1) {
             visits[visits.length] = {path: el.pathname, query: el.search, hash: el.hash, time:(new Date()).toJSON()};
             collapseMenu.apply(this, [evt]);
         }
@@ -207,8 +217,8 @@ $(document).ready(function () {
         else
         {
             evt.preventDefault();
-            if(window.callbackKeys[callback] == '_welcome') {
-                path = window.callbackUri[window.callbackKeys.indexOf('home')];
+            if(routes[0].name == '_welcome') {
+                path = Routing.generate(routes[0].name);
             }
             activateMenu.apply(this, [path]);
         }
@@ -221,71 +231,30 @@ $(document).ready(function () {
     body.filter('.dashboard-home').on('click dblclick dragstart', 'a[href]:not(.accordion-toggle)', handleLink);
 
     window.onpopstate = function(e){
-        if(window.callbackKeys.indexOf(e.state) > -1) {
-            activateMenu(window.callbackUri[window.callbackKeys.indexOf(e.state)], true);
+        var routes = Routing.match(e.state);
+        if (typeof routes[0] == 'undefined') {
+            routes = Routing.match(window.location.pathname);
         }
-        else if (window.callbackUri.indexOf(window.location.pathname) > -1) {
-            activateMenu(window.location.pathname, true);
+        if (typeof routes[0] != 'undefined') {
+            activateMenu(Routing.generate(routes[0].name, $.extend({_format: 'tab'}, routes[0].params)), true);
         }
     };
 
     window.onpushstate = function(e){
-        if(window.callbackKeys.indexOf(e.state) > -1) {
-            activateMenu(window.callbackUri[window.callbackKeys.indexOf(e.state)], true);
+        var routes = Routing.match(e.state) || Routing.match(window.location.pathname);
+        if (typeof routes[0] == 'undefined') {
+            routes = Routing.match(window.location.pathname);
         }
-        else if (window.callbackUri.indexOf(window.location.pathname) > -1) {
-            activateMenu(window.location.pathname, true);
+        if (typeof routes[0] != 'undefined') {
+            activateMenu(Routing.generate(routes[0].name, $.extend({_format: 'tab'}, routes[0].params)), true);
         }
     };
-
-    // -------------- Player --------------- //
-    window.musicIndex = 0;
-    if(typeof $.fn.jPlayer == 'function') {
-        var jp = jQuery('#jquery_jplayer');
-        window.musicIndex = Math.floor(Math.random() * window.musicLinks.length);
-        jp.jPlayer({
-            swfPath: window.callbackPaths['_welcome'] + 'bundles/studysauce/js',
-            solution: 'html,flash',
-            supplied: 'm4a,mp3,oga',
-            preload: 'metadata',
-            volume: 0.8,
-            muted: false,
-            cssSelectorAncestor: '#' + $('#checkin:visible,#home:visible').attr('id'),
-            cssSelector: {
-                play: '.minplayer-default-play',
-                pause: '.minplayer-default-pause'
-            },
-            ready: function() {
-                var index = ++window.musicIndex % window.musicLinks.length;
-                $(this).jPlayer( "setMedia", {
-                    mp3: window.musicLinks[index],
-                    m4a: window.musicLinks[index].substr(0, window.musicLinks[index].length - 4) + '.mp4',
-                    oga: window.musicLinks[index].substr(0, window.musicLinks[index].length - 4) + '.ogg'
-                });
-            }
-        });
-
-        jp.bind($.jPlayer.event.ended, function () {
-            if(window.musicIndex == -1) {
-                window.musicIndex = Math.floor(Math.random() * window.musicLinks.length);
-                return;
-            }
-            var index = ++window.musicIndex % window.musicLinks.length;
-            jp.jPlayer("setMedia", {
-                mp3: window.musicLinks[index],
-                m4a: window.musicLinks[index].substr(0, window.musicLinks[index].length - 4) + '.mp4',
-                oga: window.musicLinks[index].substr(0, window.musicLinks[index].length - 4) + '.ogg'
-            });
-            $(this).jPlayer("play");
-        });
-    }
-    // -------------- END Player --------------- //
 
     $(window).unload(function () {
         if(typeof checkedInBtn != 'undefined' && body.find(checkedInBtn).length == 0 &&
             window.visits.length > 0)
         {
-            $.ajax({url: window.callbackPaths['_visit'] + '?close'});
+            $.ajax({url: Routing.generate('_visit') + '?close'});
         }
     });
 
@@ -296,7 +265,7 @@ $(document).ready(function () {
         if(visits.length > 0) {
             visiting = true;
             $.ajax({
-                url: window.callbackPaths['_visit'] + '?sync',
+                url: Routing.generate('_visit') + '?sync',
                 type: 'GET',
                 data: {},
                 success: function () {
@@ -308,5 +277,67 @@ $(document).ready(function () {
             });
         }
     }, 10000);
+
+    body.on('click', 'a[data-target="#upload-file"], a[href="#upload-file"]', function () {
+        var dialog = $('#upload-file');
+
+        if(dialog.find('.plupload').is('.init'))
+            return;
+        var upload = new plupload.Uploader({
+            chunk_size: '5MB',
+            runtimes : 'html5,flash,silverlight,html4',
+            drop_element : 'upload-file',
+            browse_button : 'file-upload-select', // you can pass in id...
+            container: dialog.find('.plupload')[0], // ... or DOM Element itself
+            url : Routing.generate('file_create'),
+            unique_names: true,
+            max_files: 0,
+            multipart: false,
+            multiple_queues: true,
+            urlstream_upload: false,
+            filters : {
+                max_file_size : '1gb',
+                mime_types: [
+                    {
+//                        title : "Video files",
+//                        extensions : "mov,avi,mpg,mpeg,wmv,mp4,webm,flv,m4v,mkv,ogv,ogg,rm,rmvb,m4v"
+                        title : "Image files",
+                        extensions : "jpg,jpeg,gif,png,bmp,tiff"
+                    }
+                ]
+            },
+            flash_swf_url : Routing.generate('_welcome') + 'bundles/studysauce/js/plupload/js/Moxie.swf',
+            silverlight_xap_url : Routing.generate('_welcome') + 'bundles/studysauce/js/plupload/js/Moxie.xap',
+            init: {
+                PostInit: function(up) {
+                    dialog.find('.plupload').addClass('init');
+                    dialog.find('#file-upload-select').on('click', function () {
+                        up.splice();
+                    });
+                },
+                FilesAdded: function(up) {
+                    up.start();
+                },
+                UploadProgress: function(up) {
+                    var squiggle;
+                    if((squiggle = dialog.find('.squiggle')).length == 0)
+                        squiggle = $('<small class="squiggle">&nbsp;</small>').appendTo(dialog.find('.plup-filelist'));
+                    squiggle.stop().animate({width: up.total.percent + '%'}, 1000, 'swing');
+                },
+                FileUploaded: function(up, file, response) {
+                    var data = JSON.parse(response.response);
+                    dialog.find('input[type="hidden"]').val(data.fid);
+                    dialog.find('.plup-filelist .squiggle').stop().remove();
+                    dialog.find('.plupload img').attr('src', data.src);
+                },
+                Error: function(up, err) {
+                }
+            }
+        });
+
+        setTimeout(function () {upload.init();}, 200);
+
+    });
+
 
 });

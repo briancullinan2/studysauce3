@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageSelector;
@@ -27,7 +26,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->deleteTmpDir();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->deleteTmpDir();
     }
@@ -78,6 +77,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // do it another time as the cache is primed now
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader->expects($this->never())->method('load');
+
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
         $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
@@ -96,90 +97,51 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransWithCachingWithInvalidLocale()
     {
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
         $translator->setLocale('invalid locale');
 
         $this->setExpectedException('\InvalidArgumentException');
         $translator->trans('foo');
     }
 
-    /**
-     * @dataProvider getGetLocaleData
-     */
-    public function testGetLocale($inRequestScope)
+    public function testLoadResourcesWithoutCaching()
     {
-        $requestStack = new RequestStack();
-        if ($inRequestScope) {
-            $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-            $request
-                ->expects($this->any())
-                ->method('getLocale')
-                ->will($this->returnValue('en'))
-            ;
-
-            $requestStack->push($request);
-        }
-
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with('request_stack')
-            ->will($this->returnValue($requestStack))
-        ;
-
-        $translator = new Translator($container, new MessageSelector());
-
-        if ($inRequestScope) {
-            $this->assertSame('en', $translator->getLocale());
-        } else {
-            $this->assertNull($translator->getLocale());
-        }
-    }
-
-    public function getGetLocaleData()
-    {
-        return array(
-            array(false),
-            array(true),
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = array(
+            'fr' => array(
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ),
         );
+
+        $translator = $this->getTranslator($loader, array('resource_files' => $resourceFiles), 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    public function testGetLocaleWithInvalidLocale()
+    public function testGetDefaultLocale()
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-
-        $request
-            ->expects($this->any())
-            ->method('getLocale')
-            ->will($this->returnValue('foo bar'))
-        ;
-        $request
-            ->expects($this->once())
-            ->method('getDefaultLocale')
-            ->will($this->returnValue('en-US'))
-        ;
-
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
             ->expects($this->once())
-            ->method('get')
-            ->with('request_stack')
-            ->will($this->returnValue($requestStack))
+            ->method('getParameter')
+            ->with('kernel.default_locale')
+            ->will($this->returnValue('en'))
         ;
 
         $translator = new Translator($container, new MessageSelector());
-        $this->assertSame('en-US', $translator->getLocale());
+
+        $this->assertSame('en', $translator->getLocale());
     }
 
-    protected function getCatalogue($locale, $messages)
+    protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
             $catalogue->set($key, $translation);
+        }
+        foreach ($resources as $resource) {
+            $catalogue->addResource($resource);
         }
 
         return $catalogue;
@@ -255,24 +217,56 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    public function getTranslator($loader, $options = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
-        $translator = new $translatorClass(
-            $this->getContainer($loader),
-            new MessageSelector(),
-            array('loader' => array('loader')),
-            $options
-        );
+        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat);
 
-        $translator->addResource('loader', 'foo', 'fr');
-        $translator->addResource('loader', 'foo', 'en');
-        $translator->addResource('loader', 'foo', 'es');
-        $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
-        $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
-        $translator->addResource('loader', 'foo', 'fr.UTF-8');
-        $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+        if ('loader' === $loaderFomat) {
+            $translator->addResource('loader', 'foo', 'fr');
+            $translator->addResource('loader', 'foo', 'en');
+            $translator->addResource('loader', 'foo', 'es');
+            $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
+            $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
+            $translator->addResource('loader', 'foo', 'fr.UTF-8');
+            $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+        }
 
         return $translator;
+    }
+
+    public function testWarmup()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = array(
+            'fr' => array(
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ),
+        );
+
+        // prime the cache
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
+        $translator->setFallbackLocales(array('fr'));
+        $translator->warmup($this->tmpDir);
+
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader
+            ->expects($this->never())
+            ->method('load');
+
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
+        $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
+        $this->assertEquals('répertoire', $translator->trans('folder'));
+    }
+
+    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader')
+    {
+        return new $translatorClass(
+            $this->getContainer($loader),
+            new MessageSelector(),
+            array($loaderFomat => array($loaderFomat)),
+            $options
+        );
     }
 }
 

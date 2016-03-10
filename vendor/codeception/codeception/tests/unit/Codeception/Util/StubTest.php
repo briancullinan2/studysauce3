@@ -129,16 +129,46 @@ class StubTest extends \PHPUnit_Framework_TestCase
     public function testStubsFromObject()
     {
         $dummy = Stub::make(new \DummyClass());
+        $this->assertInstanceOf(
+            '\PHPUnit_Framework_MockObject_MockObject',
+            $dummy
+        );
+        $dummy = Stub::make(new \DummyOverloadableClass());
         $this->assertTrue(isset($dummy->__mocked));
         $dummy = Stub::makeEmpty(new \DummyClass());
+        $this->assertInstanceOf(
+            '\PHPUnit_Framework_MockObject_MockObject',
+            $dummy
+        );
+        $dummy = Stub::makeEmpty(new \DummyOverloadableClass());
         $this->assertTrue(isset($dummy->__mocked));
         $dummy = Stub::makeEmptyExcept(new \DummyClass(),'helloWorld');
+        $this->assertInstanceOf(
+            '\PHPUnit_Framework_MockObject_MockObject',
+            $dummy
+        );
+        $dummy = Stub::makeEmptyExcept(new \DummyOverloadableClass(), 'helloWorld');
         $this->assertTrue(isset($dummy->__mocked));
         $dummy = Stub::construct(new \DummyClass());
+        $this->assertInstanceOf(
+            '\PHPUnit_Framework_MockObject_MockObject',
+            $dummy
+        );
+        $dummy = Stub::construct(new \DummyOverloadableClass());
         $this->assertTrue(isset($dummy->__mocked));
         $dummy = Stub::constructEmpty(new \DummyClass());
+        $this->assertInstanceOf(
+            '\PHPUnit_Framework_MockObject_MockObject',
+            $dummy
+        );
+        $dummy = Stub::constructEmpty(new \DummyOverloadableClass());
         $this->assertTrue(isset($dummy->__mocked));
         $dummy = Stub::constructEmptyExcept(new \DummyClass(),'helloWorld');
+        $this->assertInstanceOf(
+            '\PHPUnit_Framework_MockObject_MockObject',
+            $dummy
+        );
+        $dummy = Stub::constructEmptyExcept(new \DummyOverloadableClass(), 'helloWorld');
         $this->assertTrue(isset($dummy->__mocked));
     }
 
@@ -312,5 +342,57 @@ class StubTest extends \PHPUnit_Framework_TestCase
 
         // Expected null value when no more values
         $this->assertNull($dummy->helloWorld());
+    }
+    
+    public function testStubPrivateProperties()
+    {
+        $tester = Stub::construct(
+            'myClassWithPrivateProperties', 
+            ['name' => 'gamma'], 
+            [
+                 'randomName' => 'chicken',
+                 't' => 'ticky2', 
+                 'getRandomName' => function () {
+                     return "randomstuff";
+                 }
+            ]
+        );
+        $this->assertEquals('gamma', $tester->getName());
+        $this->assertEquals('randomstuff', $tester->getRandomName());
+        $this->assertEquals('ticky2', $tester->getT());
+    }
+    
+    public function testStubMakeEmptyInterface()
+    {
+        $stub = Stub::makeEmpty('\Countable', ['count' => 5]);
+        $this->assertEquals(5, $stub->count());
+    }
+}
+
+class myClassWithPrivateProperties
+{
+
+    private $name;
+    private $randomName = "gaia";
+    private $t          = "ticky";
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getRandomName()
+    {
+        return $this->randomName;
+    }
+
+    public function getT()
+    {
+        return $this->t;
     }
 }

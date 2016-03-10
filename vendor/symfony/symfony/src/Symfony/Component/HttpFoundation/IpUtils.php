@@ -57,14 +57,19 @@ class IpUtils
      * @param string $requestIp IPv4 address to check
      * @param string $ip        IPv4 address or subnet in CIDR notation
      *
-     * @return bool Whether the IP is valid
+     * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet.
      */
     public static function checkIp4($requestIp, $ip)
     {
         if (false !== strpos($ip, '/')) {
             list($address, $netmask) = explode('/', $ip, 2);
 
-            if ($netmask < 1 || $netmask > 32) {
+            if ($netmask === '0') {
+                // Ensure IP is valid - using ip2long below implicitly validates, but we need to do it manually here
+                return filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+            }
+
+            if ($netmask < 0 || $netmask > 32) {
                 return false;
             }
         } else {
@@ -107,11 +112,11 @@ class IpUtils
             $netmask = 128;
         }
 
-        $bytesAddr = unpack("n*", inet_pton($address));
-        $bytesTest = unpack("n*", inet_pton($requestIp));
+        $bytesAddr = unpack('n*', inet_pton($address));
+        $bytesTest = unpack('n*', inet_pton($requestIp));
 
-        for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
-            $left = $netmask - 16 * ($i-1);
+        for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; ++$i) {
+            $left = $netmask - 16 * ($i - 1);
             $left = ($left <= 16) ? $left : 16;
             $mask = ~(0xffff >> $left) & 0xffff;
             if (($bytesAddr[$i] & $mask) != ($bytesTest[$i] & $mask)) {

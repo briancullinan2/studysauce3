@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
+use Facebook\WebDriver\Remote\DriverCommand;
+
 /**
  * An abstraction allowing the driver to manipulate the javascript alerts
  */
@@ -56,6 +60,7 @@ class WebDriverAlert {
   /**
    * Send keystrokes to javascript prompt() dialog
    *
+   * @param string $value
    * @return WebDriverAlert
    */
   public function sendKeys($value) {

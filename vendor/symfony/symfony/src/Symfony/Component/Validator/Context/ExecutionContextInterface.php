@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Context;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -56,6 +57,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * results later on.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ExecutionContextInterface extends LegacyExecutionContextInterface
@@ -135,6 +137,16 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      *           code.
      */
     public function setGroup($group);
+
+    /**
+     * Sets the currently validated constraint.
+     *
+     * @param Constraint $constraint The validated constraint
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function setConstraint(Constraint $constraint);
 
     /**
      * Marks an object as validated in a specific validation group.

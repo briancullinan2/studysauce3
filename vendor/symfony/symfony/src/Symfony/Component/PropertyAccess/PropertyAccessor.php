@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess;
 
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -20,11 +20,79 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  * Default implementation of {@link PropertyAccessorInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {
+    /**
+     * @internal
+     */
     const VALUE = 0;
+
+    /**
+     * @internal
+     */
     const IS_REF = 1;
+
+    /**
+     * @internal
+     */
+    const IS_REF_CHAINED = 2;
+
+    /**
+     * @internal
+     */
+    const ACCESS_HAS_PROPERTY = 0;
+
+    /**
+     * @internal
+     */
+    const ACCESS_TYPE = 1;
+
+    /**
+     * @internal
+     */
+    const ACCESS_NAME = 2;
+
+    /**
+     * @internal
+     */
+    const ACCESS_REF = 3;
+
+    /**
+     * @internal
+     */
+    const ACCESS_ADDER = 4;
+
+    /**
+     * @internal
+     */
+    const ACCESS_REMOVER = 5;
+
+    /**
+     * @internal
+     */
+    const ACCESS_TYPE_METHOD = 0;
+
+    /**
+     * @internal
+     */
+    const ACCESS_TYPE_PROPERTY = 1;
+
+    /**
+     * @internal
+     */
+    const ACCESS_TYPE_MAGIC = 2;
+
+    /**
+     * @internal
+     */
+    const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
+
+    /**
+     * @internal
+     */
+    const ACCESS_TYPE_NOT_FOUND = 4;
 
     /**
      * @var bool
@@ -37,8 +105,21 @@ class PropertyAccessor implements PropertyAccessorInterface
     private $ignoreInvalidIndices;
 
     /**
+     * @var array
+     */
+    private $readPropertyCache = array();
+
+    /**
+     * @var array
+     */
+    private $writePropertyCache = array();
+
+    /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
+     *
+     * @param bool $magicCall
+     * @param bool $throwExceptionOnInvalidIndex
      */
     public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
@@ -51,18 +132,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
-        $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
+        $propertyValues = &$this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -72,45 +146,55 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
-        $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
-        $overwrite = true;
+        $propertyValues = &$this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
 
         // Add the root object to the list
         array_unshift($propertyValues, array(
             self::VALUE => &$objectOrArray,
             self::IS_REF => true,
+            self::IS_REF_CHAINED => true,
         ));
 
-        for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
-            $objectOrArray = & $propertyValues[$i][self::VALUE];
+        $propertyMaxIndex = count($propertyValues) - 1;
 
-            if ($overwrite) {
-                if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                    throw new UnexpectedTypeException($objectOrArray, 'object or array');
-                }
+        for ($i = $propertyMaxIndex; $i >= 0; --$i) {
+            $objectOrArray = &$propertyValues[$i][self::VALUE];
 
-                $property = $propertyPath->getElement($i);
+            $property = $propertyPath->getElement($i);
 
+            // You only need set value for current element if:
+            // 1. it's the parent of the last index element
+            // OR
+            // 2. its child is not passed by reference
+            //
+            // This may avoid uncessary value setting process for array elements.
+            // For example:
+            // '[a][b][c]' => 'old-value'
+            // If you want to change its value to 'new-value',
+            // you only need set value for '[a][b][c]' and it's safe to ignore '[a][b]' and '[a]'
+            //
+            if ($i === $propertyMaxIndex || !$propertyValues[$i + 1][self::IS_REF]) {
                 if ($propertyPath->isIndex($i)) {
                     $this->writeIndex($objectOrArray, $property, $value);
                 } else {
                     $this->writeProperty($objectOrArray, $property, $value);
                 }
+
+                // if current element is an object
+                // OR
+                // if current element's reference chain is not broken - current element
+                // as well as all its ancients in the property path are all passed by reference,
+                // then there is no need to continue the value setting process
+                if (is_object($propertyValues[$i][self::VALUE]) || $propertyValues[$i][self::IS_REF_CHAINED]) {
+                    return;
+                }
             }
 
-            $value = & $objectOrArray;
-            $overwrite = !$propertyValues[$i][self::IS_REF];
+            $value = &$objectOrArray;
         }
     }
 
@@ -119,24 +203,15 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isReadable($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         try {
             $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
             return true;
-        } catch (NoSuchIndexException $e) {
-            return false;
-        } catch (NoSuchPropertyException $e) {
+        } catch (AccessException $e) {
             return false;
         } catch (UnexpectedTypeException $e) {
             return false;
@@ -148,55 +223,44 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isWritable($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         try {
             $propertyValues = $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
-            $overwrite = true;
 
             // Add the root object to the list
             array_unshift($propertyValues, array(
                 self::VALUE => $objectOrArray,
                 self::IS_REF => true,
+                self::IS_REF_CHAINED => true,
             ));
 
             for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
                 $objectOrArray = $propertyValues[$i][self::VALUE];
 
-                if ($overwrite) {
-                    if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+                $property = $propertyPath->getElement($i);
+
+                if ($propertyPath->isIndex($i)) {
+                    if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
                         return false;
                     }
-
-                    $property = $propertyPath->getElement($i);
-
-                    if ($propertyPath->isIndex($i)) {
-                        if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
-                            return false;
-                        }
-                    } else {
-                        if (!$this->isPropertyWritable($objectOrArray, $property)) {
-                            return false;
-                        }
+                } else {
+                    if (!$this->isPropertyWritable($objectOrArray, $property)) {
+                        return false;
                     }
                 }
 
-                $overwrite = !$propertyValues[$i][self::IS_REF];
+                if (is_object($propertyValues[$i][self::VALUE]) || $propertyValues[$i][self::IS_REF_CHAINED]) {
+                    return true;
+                }
             }
 
             return true;
-        } catch (NoSuchIndexException $e) {
+        } catch (AccessException $e) {
             return false;
-        } catch (NoSuchPropertyException $e) {
+        } catch (UnexpectedTypeException $e) {
             return false;
         }
     }
@@ -217,13 +281,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $ignoreInvalidIndices = true)
     {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, $propertyPath, 0);
+        }
+
         $propertyValues = array();
 
         for ($i = 0; $i < $lastIndex; ++$i) {
-            if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
-            }
-
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
 
@@ -238,8 +302,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                     if (!is_array($objectOrArray)) {
                         if (!$objectOrArray instanceof \Traversable) {
                             throw new NoSuchIndexException(sprintf(
-                                'Cannot read property "%s".',
-                                $property
+                                'Cannot read index "%s" while trying to traverse path "%s".',
+                                $property,
+                                (string) $propertyPath
                             ));
                         }
 
@@ -247,24 +312,39 @@ class PropertyAccessor implements PropertyAccessorInterface
                     }
 
                     throw new NoSuchIndexException(sprintf(
-                        'Cannot read property "%s". Available properties are "%s"',
+                        'Cannot read index "%s" while trying to traverse path "%s". Available indices are "%s".',
                         $property,
+                        (string) $propertyPath,
                         print_r(array_keys($objectOrArray), true)
                     ));
                 }
 
-                $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
+                if ($i + 1 < $propertyPath->getLength()) {
+                    $objectOrArray[$property] = array();
+                }
             }
 
             if ($isIndex) {
-                $propertyValue = & $this->readIndex($objectOrArray, $property);
+                $propertyValue = &$this->readIndex($objectOrArray, $property);
             } else {
-                $propertyValue = & $this->readProperty($objectOrArray, $property);
+                $propertyValue = &$this->readProperty($objectOrArray, $property);
             }
 
-            $objectOrArray = & $propertyValue[self::VALUE];
+            $objectOrArray = &$propertyValue[self::VALUE];
 
-            $propertyValues[] = & $propertyValue;
+            // the final value of the path must not be validated
+            if ($i + 1 < $propertyPath->getLength() && !is_object($objectOrArray) && !is_array($objectOrArray)) {
+                throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i + 1);
+            }
+
+            // Set the IS_REF_CHAINED flag to true if:
+            // current property is passed by reference and
+            // it is the first element in the property path or
+            // the IS_REF_CHAINED flag of its parent element is true
+            // Basically, this flag is true only when the reference chain from the top element to current element is not broken
+            $propertyValue[self::IS_REF_CHAINED] = $propertyValue[self::IS_REF] && (0 === $i || $propertyValues[$i - 1][self::IS_REF_CHAINED]);
+
+            $propertyValues[] = &$propertyValue;
         }
 
         return $propertyValues;
@@ -283,7 +363,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function &readIndex(&$array, $index)
     {
         if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchIndexException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
+            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_class($array)));
         }
 
         // Use an array instead of an object since performance is very crucial here
@@ -294,7 +374,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if (isset($array[$index])) {
             if (is_array($array)) {
-                $result[self::VALUE] = & $array[$index];
+                $result[self::VALUE] = &$array[$index];
                 $result[self::IS_REF] = true;
             } else {
                 $result[self::VALUE] = $array[$index];
@@ -327,54 +407,34 @@ class PropertyAccessor implements PropertyAccessorInterface
         );
 
         if (!is_object($object)) {
-            throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
+            throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%s]" instead.', $property, $property));
         }
 
-        $camelized = $this->camelize($property);
-        $reflClass = new \ReflectionClass($object);
-        $getter = 'get'.$camelized;
-        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
-        $isser = 'is'.$camelized;
-        $hasser = 'has'.$camelized;
-        $classHasProperty = $reflClass->hasProperty($property);
+        $access = $this->getReadAccessInfo($object, $property);
 
-        if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
-            $result[self::VALUE] = $object->$getter();
-        } elseif ($this->isMethodAccessible($reflClass, $getsetter, 0)) {
-            $result[self::VALUE] = $object->$getsetter();
-        } elseif ($reflClass->hasMethod($isser) && $reflClass->getMethod($isser)->isPublic()) {
-            $result[self::VALUE] = $object->$isser();
-        } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
-            $result[self::VALUE] = $object->$hasser();
-        } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
-            $result[self::VALUE] = $object->$property;
-        } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
-            $result[self::VALUE] = & $object->$property;
-            $result[self::IS_REF] = true;
-        } elseif (!$classHasProperty && property_exists($object, $property)) {
+        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
+        } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
+            if ($access[self::ACCESS_REF]) {
+                $result[self::VALUE] = &$object->{$access[self::ACCESS_NAME]};
+                $result[self::IS_REF] = true;
+            } else {
+                $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
+            }
+        } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
-            // exclude $classHasProperty, otherwise if in the previous clause
+            // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
             // a *protected* property was found on the class, property_exists()
             // returns true, consequently the following line will result in a
             // fatal error.
-            $result[self::VALUE] = & $object->$property;
-            $result[self::IS_REF] = true;
-        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
-            // we call the getter and hope the __call do the job
-            $result[self::VALUE] = $object->$getter();
-        } else {
-            $methods = array($getter, $getsetter, $isser, $hasser, '__get');
-            if ($this->magicCall) {
-                $methods[] = '__call';
-            }
 
-            throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods "%s()" '.
-                'exist and have public access in class "%s".',
-                $property,
-                implode('()", "', $methods),
-                $reflClass->name
-            ));
+            $result[self::VALUE] = &$object->$property;
+            $result[self::IS_REF] = true;
+        } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
+            // we call the getter and hope the __call do the job
+            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
+        } else {
+            throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
 
         // Objects are always passed around by reference
@@ -383,6 +443,77 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Guesses how to read the property value.
+     *
+     * @param string $object
+     * @param string $property
+     *
+     * @return array
+     */
+    private function getReadAccessInfo($object, $property)
+    {
+        $key = get_class($object).'::'.$property;
+
+        if (isset($this->readPropertyCache[$key])) {
+            $access = $this->readPropertyCache[$key];
+        } else {
+            $access = array();
+
+            $reflClass = new \ReflectionClass($object);
+            $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
+            $camelProp = $this->camelize($property);
+            $getter = 'get'.$camelProp;
+            $getsetter = lcfirst($camelProp); // jQuery style, e.g. read: last(), write: last($item)
+            $isser = 'is'.$camelProp;
+            $hasser = 'has'.$camelProp;
+
+            if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                $access[self::ACCESS_NAME] = $getter;
+            } elseif ($reflClass->hasMethod($getsetter) && $reflClass->getMethod($getsetter)->isPublic()) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                $access[self::ACCESS_NAME] = $getsetter;
+            } elseif ($reflClass->hasMethod($isser) && $reflClass->getMethod($isser)->isPublic()) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                $access[self::ACCESS_NAME] = $isser;
+            } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                $access[self::ACCESS_NAME] = $hasser;
+            } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
+                $access[self::ACCESS_NAME] = $property;
+                $access[self::ACCESS_REF] = false;
+            } elseif ($access[self::ACCESS_HAS_PROPERTY] && $reflClass->getProperty($property)->isPublic()) {
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
+                $access[self::ACCESS_NAME] = $property;
+                $access[self::ACCESS_REF] = true;
+            } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+                // we call the getter and hope the __call do the job
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
+                $access[self::ACCESS_NAME] = $getter;
+            } else {
+                $methods = array($getter, $getsetter, $isser, $hasser, '__get');
+                if ($this->magicCall) {
+                    $methods[] = '__call';
+                }
+
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
+                $access[self::ACCESS_NAME] = sprintf(
+                    'Neither the property "%s" nor one of the methods "%s()" '.
+                    'exist and have public access in class "%s".',
+                    $property,
+                    implode('()", "', $methods),
+                    $reflClass->name
+                );
+            }
+
+            $this->readPropertyCache[$key] = $access;
+        }
+
+        return $access;
     }
 
     /**
@@ -397,7 +528,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeIndex(&$array, $index, $value)
     {
         if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchIndexException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
+            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
         }
 
         $array[$index] = $value;
@@ -419,55 +550,26 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
 
-        $reflClass = new \ReflectionClass($object);
-        $camelized = $this->camelize($property);
-        $singulars = (array) StringUtil::singularify($camelized);
+        $access = $this->getWriteAccessInfo($object, $property, $value);
 
-        if (is_array($value) || $value instanceof \Traversable) {
-            $methods = $this->findAdderAndRemover($reflClass, $singulars);
-
-            // Use addXxx() and removeXxx() to write the collection
-            if (null !== $methods) {
-                $this->writeCollection($object, $property, $value, $methods[0], $methods[1]);
-
-                return;
-            }
-        }
-
-        $setter = 'set'.$camelized;
-        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
-        $classHasProperty = $reflClass->hasProperty($property);
-
-        if ($this->isMethodAccessible($reflClass, $setter, 1)) {
-            $object->$setter($value);
-        } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)) {
-            $object->$getsetter($value);
-        } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {
-            $object->$property = $value;
-        } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
-            $object->$property = $value;
-        } elseif (!$classHasProperty && property_exists($object, $property)) {
+        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+            $object->{$access[self::ACCESS_NAME]}($value);
+        } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
+            $object->{$access[self::ACCESS_NAME]} = $value;
+        } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
+            $this->writeCollection($object, $property, $value, $access[self::ACCESS_ADDER], $access[self::ACCESS_REMOVER]);
+        } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
-            // exclude $classHasProperty, otherwise if in the previous clause
+            // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
             // a *protected* property was found on the class, property_exists()
             // returns true, consequently the following line will result in a
             // fatal error.
+
             $object->$property = $value;
-        } elseif ($this->magicCall && $this->isMethodAccessible($reflClass, '__call', 2)) {
-            // we call the getter and hope the __call do the job
-            $object->$setter($value);
+        } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
+            $object->{$access[self::ACCESS_NAME]}($value);
         } else {
-            throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods %s"%s()", "%s()", '.
-                '"__set()" or "__call()" exist and have public access in class "%s".',
-                $property,
-                implode('', array_map(function ($singular) {
-                    return '"add'.$singular.'()"/"remove'.$singular.'()", ';
-                }, $singulars)),
-                $setter,
-                $getsetter,
-                $reflClass->name
-            ));
+            throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
     }
 
@@ -488,8 +590,10 @@ class PropertyAccessor implements PropertyAccessorInterface
         // see https://github.com/symfony/symfony/issues/4670
         $itemsToAdd = is_object($collection) ? iterator_to_array($collection) : $collection;
         $itemToRemove = array();
-        $propertyValue = $this->readProperty($object, $property);
+        $propertyValue = &$this->readProperty($object, $property);
         $previousValue = $propertyValue[self::VALUE];
+        // remove reference to avoid modifications
+        unset($propertyValue);
 
         if (is_array($previousValue) || $previousValue instanceof \Traversable) {
             foreach ($previousValue as $previousItem) {
@@ -515,6 +619,81 @@ class PropertyAccessor implements PropertyAccessorInterface
         foreach ($itemsToAdd as $item) {
             $object->{$addMethod}($item);
         }
+    }
+
+    /**
+     * Guesses how to write the property value.
+     *
+     * @param string $object
+     * @param string $property
+     * @param mixed  $value
+     *
+     * @return array
+     */
+    private function getWriteAccessInfo($object, $property, $value)
+    {
+        $key = get_class($object).'::'.$property;
+
+        if (isset($this->writePropertyCache[$key])) {
+            $access = $this->writePropertyCache[$key];
+        } else {
+            $access = array();
+
+            $reflClass = new \ReflectionClass($object);
+            $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
+            $camelized = $this->camelize($property);
+            $singulars = (array) StringUtil::singularify($camelized);
+
+            if (is_array($value) || $value instanceof \Traversable) {
+                $methods = $this->findAdderAndRemover($reflClass, $singulars);
+
+                if (null !== $methods) {
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
+                    $access[self::ACCESS_ADDER] = $methods[0];
+                    $access[self::ACCESS_REMOVER] = $methods[1];
+                }
+            }
+
+            if (!isset($access[self::ACCESS_TYPE])) {
+                $setter = 'set'.$camelized;
+                $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
+
+                if ($this->isMethodAccessible($reflClass, $setter, 1)) {
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                    $access[self::ACCESS_NAME] = $setter;
+                } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)) {
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                    $access[self::ACCESS_NAME] = $getsetter;
+                } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
+                    $access[self::ACCESS_NAME] = $property;
+                } elseif ($access[self::ACCESS_HAS_PROPERTY] && $reflClass->getProperty($property)->isPublic()) {
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
+                    $access[self::ACCESS_NAME] = $property;
+                } elseif ($this->magicCall && $this->isMethodAccessible($reflClass, '__call', 2)) {
+                    // we call the getter and hope the __call do the job
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
+                    $access[self::ACCESS_NAME] = $setter;
+                } else {
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
+                    $access[self::ACCESS_NAME] = sprintf(
+                        'Neither the property "%s" nor one of the methods %s"%s()", "%s()", '.
+                        '"__set()" or "__call()" exist and have public access in class "%s".',
+                        $property,
+                        implode('', array_map(function ($singular) {
+                            return '"add'.$singular.'()"/"remove'.$singular.'()", ';
+                        }, $singulars)),
+                        $setter,
+                        $getsetter,
+                        $reflClass->name
+                    );
+                }
+            }
+
+            $this->writePropertyCache[$key] = $access;
+        }
+
+        return $access;
     }
 
     /**
@@ -579,8 +758,6 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
-        $exception = null;
-
         foreach ($singulars as $singular) {
             $addMethod = 'add'.$singular;
             $removeMethod = 'remove'.$singular;

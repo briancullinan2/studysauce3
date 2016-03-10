@@ -13,19 +13,22 @@ namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 /**
  * The context used and created by {@link ExecutionContextFactory}.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see ExecutionContextInterface
@@ -88,7 +91,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * The current validation metadata.
      *
-     * @var MetadataInterface
+     * @var MetadataInterface|null
      */
     private $metadata;
 
@@ -98,6 +101,13 @@ class ExecutionContext implements ExecutionContextInterface
      * @var string|null
      */
     private $group;
+
+    /**
+     * The currently validated constraint.
+     *
+     * @var Constraint|null
+     */
+    private $constraint;
 
     /**
      * Stores which objects have been validated in which group.
@@ -165,17 +175,31 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
+    public function setConstraint(Constraint $constraint)
+    {
+        $this->constraint = $constraint;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addViolation($message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         // The parameters $invalidValue and following are ignored by the new
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
         if (func_num_args() > 2) {
-            throw new BadMethodCallException(
-                'The parameters $invalidValue, $pluralization and $code are '.
-                'not supported anymore as of Symfony 2.5. Please use '.
-                'buildViolation() instead or enable the legacy mode.'
-            );
+            @trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+
+            $this
+                ->buildViolation($message, $parameters)
+                ->setInvalidValue($invalidValue)
+                ->setPlural($plural)
+                ->setCode($code)
+                ->addViolation()
+            ;
+
+            return;
         }
 
         $this->violations->add(new ConstraintViolation(
@@ -186,7 +210,8 @@ class ExecutionContext implements ExecutionContextInterface
             $this->propertyPath,
             $this->value,
             null,
-            null
+            null,
+            $this->constraint
         ));
     }
 
@@ -197,6 +222,7 @@ class ExecutionContext implements ExecutionContextInterface
     {
         return new ConstraintViolationBuilder(
             $this->violations,
+            $this->constraint,
             $message,
             $parameters,
             $this->root,
@@ -292,10 +318,26 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
-        throw new BadMethodCallException(
-            'addViolationAt() is not supported anymore as of Symfony 2.5. '.
-            'Please use buildViolation() instead or enable the legacy mode.'
-        );
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+
+        if (func_num_args() > 2) {
+            $this
+                ->buildViolation($message, $parameters)
+                ->atPath($subPath)
+                ->setInvalidValue($invalidValue)
+                ->setPlural($plural)
+                ->setCode($code)
+                ->addViolation()
+            ;
+
+            return;
+        }
+
+        $this
+            ->buildViolation($message, $parameters)
+            ->atPath($subPath)
+            ->addViolation()
+        ;
     }
 
     /**
@@ -303,10 +345,37 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
-        throw new BadMethodCallException(
-            'validate() is not supported anymore as of Symfony 2.5. '.
-            'Please use getValidator() instead or enable the legacy mode.'
-        );
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator() method instead.', E_USER_DEPRECATED);
+
+        if (is_array($value)) {
+            // The $traverse flag is ignored for arrays
+            $constraint = new Valid(array('traverse' => true, 'deep' => $deep));
+
+            return $this
+                ->getValidator()
+                ->inContext($this)
+                ->atPath($subPath)
+                ->validate($value, $constraint, $groups)
+            ;
+        }
+
+        if ($traverse && $value instanceof \Traversable) {
+            $constraint = new Valid(array('traverse' => true, 'deep' => $deep));
+
+            return $this
+                ->getValidator()
+                ->inContext($this)
+                ->atPath($subPath)
+                ->validate($value, $constraint, $groups)
+            ;
+        }
+
+        return $this
+            ->getValidator()
+            ->inContext($this)
+            ->atPath($subPath)
+            ->validate($value, null, $groups)
+        ;
     }
 
     /**
@@ -314,10 +383,14 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
-        throw new BadMethodCallException(
-            'validateValue() is not supported anymore as of Symfony 2.5. '.
-            'Please use getValidator() instead or enable the legacy mode.'
-        );
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator() method instead.', E_USER_DEPRECATED);
+
+        return $this
+            ->getValidator()
+            ->inContext($this)
+            ->atPath($subPath)
+            ->validate($value, $constraints, $groups)
+        ;
     }
 
     /**
@@ -325,11 +398,16 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getMetadataFactory()
     {
-        throw new BadMethodCallException(
-            'getMetadataFactory() is not supported anymore as of Symfony 2.5. '.
-            'Please use getValidator() in combination with getMetadataFor() '.
-            'or hasMetadataFor() instead or enable the legacy mode.'
-        );
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext::getValidator method in combination with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+
+        $validator = $this->getValidator();
+
+        if ($validator instanceof LegacyValidatorInterface) {
+            return $validator->getMetadataFactory();
+        }
+
+        // The ValidatorInterface extends from the deprecated MetadataFactoryInterface, so return it when we don't have the factory instance itself
+        return $validator;
     }
 
     /**

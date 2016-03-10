@@ -72,7 +72,6 @@
     padding:50px 50px 0 0;
     box-sizing: border-box;
     position:relative;
-    background: url(../images/noise_white.png) #FFFFFF;
 }
 
 .admin aside + .panel-pane,
@@ -282,7 +281,7 @@ a[href="#remove-deadline"]:hover
     background-color:#EE5588;
 }
 
-.plupload
+#upload-file .plupload
 {
     padding:0 2px;
     margin:0 -2px;
@@ -291,11 +290,15 @@ a[href="#remove-deadline"]:hover
     overflow: hidden;
     text-align: center;
     position:relative;
+    width:50%;
 }
 
-.plupload .plup-select
+#upload-file .modal-body {
+    text-align: center;
+}
+
+#upload-file .plupload .plup-select
 {
-    position: absolute;
     top: 0;
     height: 100%;
     width: 100%;
@@ -303,10 +306,9 @@ a[href="#remove-deadline"]:hover
     font-weight: bold;
     color:#555555;
     z-index: 10;
-    padding-top:40%;
 }
 
-.plupload input
+#upload-file .plupload input
 {
     font-size: 999px;
     position: absolute;
@@ -319,30 +321,31 @@ a[href="#remove-deadline"]:hover
     left:0;
 }
 
-.plup-filelist
+#upload-file .plup-filelist
 {
     padding-bottom:100%;
     position:relative;
 }
 
-.plupload video,
-.plupload img
+#upload-file .plupload video,
+#upload-file .plupload img
 {
-    margin: 0 auto;
     display:block;
     position:absolute;
     min-width:100%;
     max-width: none;
-    height: 100%;
+    height: 33%;
+    width: auto;
+    margin: 33% auto 0;
 }
 
-.plupload video
+#upload-file .plupload video
 {
     max-width:100%;
 }
 
-.uploaded .plup-select,
-.uploaded .moxie-shim
+#upload-file .uploaded .plup-select,
+#upload-file .uploaded .moxie-shim
 {
     display: none;
 }

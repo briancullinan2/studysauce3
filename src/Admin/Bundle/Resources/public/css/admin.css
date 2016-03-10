@@ -94,6 +94,15 @@
     font-weight: bold;
 }
 
+.results .ss_user-row .user-name .input:nth-child(1),
+.results .ss_user-row .user-name .input:nth-child(2)
+{
+    margin: 0 -2px;
+    padding: 0 2px;
+    width: 50%;
+    display:inline-block;
+}
+
 @media all and (max-width:1000px)
 {
     

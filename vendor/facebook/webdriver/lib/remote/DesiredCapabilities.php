@@ -13,6 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
+use Exception;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Firefox\FirefoxDriver;
+use Facebook\WebDriver\Firefox\FirefoxPreferences;
+use Facebook\WebDriver\Firefox\FirefoxProfile;
+use Facebook\WebDriver\WebDriverCapabilities;
+use Facebook\WebDriver\WebDriverPlatform;
+
 class DesiredCapabilities implements WebDriverCapabilities {
 
   private $capabilities;
@@ -29,6 +39,7 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $browser_name
    * @return DesiredCapabilities
    */
   public function setBrowserName($browser_name) {
@@ -44,6 +55,7 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $version
    * @return DesiredCapabilities
    */
   public function setVersion($version) {
@@ -52,13 +64,16 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $name
    * @return mixed The value of a capability.
    */
   public function getCapability($name) {
-    $this->get($name);
+    return $this->get($name);
   }
 
   /**
+   * @param string $name
+   * @param mixed $value
    * @return DesiredCapabilities
    */
   public function setCapability($name, $value) {
@@ -74,6 +89,7 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $platform
    * @return DesiredCapabilities
    */
   public function setPlatform($platform) {
@@ -82,10 +98,11 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $capability_name
    * @return bool Whether the value is not null and not false.
    */
   public function is($capability_name) {
-    return (bool)$this->get($capability_name);
+    return (bool) $this->get($capability_name);
   }
 
   /**
@@ -98,6 +115,8 @@ class DesiredCapabilities implements WebDriverCapabilities {
   /**
    * This is a htmlUnit-only option.
    *
+   * @param bool $enabled
+   * @throws Exception
    * @return DesiredCapabilities
    * @see https://code.google.com/p/selenium/wiki/DesiredCapabilities#Read-write_capabilities
    */
@@ -134,6 +153,8 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $key
+   * @param mixed $value
    * @return DesiredCapabilities
    */
   private function set($key, $value) {
@@ -142,6 +163,8 @@ class DesiredCapabilities implements WebDriverCapabilities {
   }
 
   /**
+   * @param string $key
+   * @param mixed $default
    * @return mixed
    */
   private function get($key, $default = null) {
@@ -174,10 +197,17 @@ class DesiredCapabilities implements WebDriverCapabilities {
    * @return DesiredCapabilities
    */
   public static function firefox() {
-    return new DesiredCapabilities(array(
+    $caps = new DesiredCapabilities(array(
       WebDriverCapabilityType::BROWSER_NAME => WebDriverBrowserType::FIREFOX,
       WebDriverCapabilityType::PLATFORM => WebDriverPlatform::ANY,
     ));
+
+    // disable the "Reader View" help tooltip, which can hide elements in the window.document
+    $profile = new FirefoxProfile();
+    $profile->setPreference(FirefoxPreferences::READER_PARSE_ON_LOAD_ENABLED, false);
+    $caps->setCapability(FirefoxDriver::PROFILE, $profile);
+
+    return $caps;
   }
 
   /**

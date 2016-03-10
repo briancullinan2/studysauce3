@@ -1,5 +1,4 @@
 <?php
-use \CliGuy;
 
 class ExtensionsCest
 {
@@ -9,18 +8,20 @@ class ExtensionsCest
         $I->wantTo('use alternative formatter delivered through extensions');
         $I->amInPath('tests/data/sandbox');
         $I->executeCommand('run tests/dummy/FileExistsCept.php -c codeception_extended.yml');
-        $I->dontSeeInShellOutput("Trying to check config");
-        $I->seeInShellOutput('[+] check config');        
+        $I->dontSeeInShellOutput("Check config");
+        $I->seeInShellOutput('[+] check config');
+        $I->seeInShellOutput('Modules used: Filesystem, DumbHelper');
     }
 
     public function reRunFailedTests(CliGuy $I)
     {
+        $ds = DIRECTORY_SEPARATOR;
         $I->amInPath('tests/data/sandbox');
         $I->executeCommand('run unit FailingTest.php -c codeception_extended.yml --no-exit');
         $I->seeInShellOutput('FAILURES');
-        $I->seeFileFound('failed','tests/_log');
+        $I->seeFileFound('failed','tests/_output');
         $I->seeFileContentsEqual(<<<EOF
-tests/unit/FailingTest.php:testMe
+tests{$ds}unit{$ds}FailingTest.php:testMe
 EOF
 );
         $I->executeCommand('run -g failed -c codeception_extended.yml --no-exit');

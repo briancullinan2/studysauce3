@@ -13,6 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
+use Facebook\WebDriver\Exception\UnexpectedTagNameException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\UnsupportedOperationException;
+
 /**
  * Models a SELECT tag, providing helper methods to select and deselect options.
  */
@@ -42,14 +48,14 @@ class WebDriverSelect {
   }
 
   /**
-   * @return array All options belonging to this select tag.
+   * @return WebDriverElement[] All options belonging to this select tag.
    */
   public function getOptions() {
     return $this->element->findElements(WebDriverBy::tagName('option'));
   }
 
   /**
-   * @return array All selected options belonging to this select tag.
+   * @return WebDriverElement[] All selected options belonging to this select tag.
    */
   public function getAllSelectedOptions() {
     $selected_options = array();
@@ -62,6 +68,8 @@ class WebDriverSelect {
   }
 
   /**
+   * @throws NoSuchElementException
+   *
    * @return WebDriverElement The first selected option in this select tag (or
    *                          the currently selected option in a normal select)
    */
@@ -77,6 +85,8 @@ class WebDriverSelect {
 
   /**
    * Deselect all options in multiple select tag.
+   *
+   * @throws UnsupportedOperationException
    *
    * @return void
    */
@@ -98,6 +108,9 @@ class WebDriverSelect {
    * Select the option at the given index.
    *
    * @param int $index The index of the option. (0-based)
+   *
+   * @throws NoSuchElementException
+   *
    * @return void
    */
   public function selectByIndex($index) {
@@ -127,6 +140,9 @@ class WebDriverSelect {
    * <option value="foo">Bar</option>;
    *
    * @param string $value The value to match against.
+   *
+   * @throws NoSuchElementException
+   *
    * @return void
    */
   public function selectByValue($value) {
@@ -158,6 +174,9 @@ class WebDriverSelect {
    * <option value="foo">Bar</option>;
    *
    * @param string $text The visible text to match against.
+   *
+   * @throws NoSuchElementException
+   *
    * @return void
    */
   public function selectByVisibleText($text) {
@@ -259,7 +278,7 @@ class WebDriverSelect {
    * @return string The escaped string.
    */
   protected function escapeQuotes($to_escape) {
-    if (strpos($to_escape, '"') !== false && strpos($to_escape, "'" != false)) {
+    if (strpos($to_escape, '"') !== false && strpos($to_escape, "'") !== false) {
       $substrings = explode('"', $to_escape);
 
       $escaped = "concat(";
@@ -274,7 +293,7 @@ class WebDriverSelect {
       return $escaped;
     }
 
-    if (strpos($to_escape, '"' !== false)) {
+    if (strpos($to_escape, '"') !== false) {
       return sprintf("'%s'", $to_escape);
     }
 

@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Net;
+
+use Exception;
+use Facebook\WebDriver\Exception\TimeOutException;
+
 class URLChecker {
 
   const POLL_INTERVAL_MS = 500;
@@ -33,8 +38,6 @@ class URLChecker {
       $url,
       $timeout_in_ms
     ));
-
-    return $this;
   }
 
   public function waitUntilUnavailable($timeout_in_ms, $url) {

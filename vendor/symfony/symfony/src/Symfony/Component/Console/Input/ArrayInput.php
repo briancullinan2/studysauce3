@@ -19,8 +19,6 @@ namespace Symfony\Component\Console\Input;
  *     $input = new ArrayInput(array('name' => 'foo', '--bar' => 'foobar'));
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ArrayInput extends Input
 {
@@ -31,8 +29,6 @@ class ArrayInput extends Input
      *
      * @param array           $parameters An array of parameters
      * @param InputDefinition $definition A InputDefinition instance
-     *
-     * @api
      */
     public function __construct(array $parameters, InputDefinition $definition = null)
     {
@@ -100,8 +96,10 @@ class ArrayInput extends Input
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
-            if (is_int($k) && in_array($v, $values)) {
-                return true;
+            if (is_int($k)) {
+                if (in_array($v, $values)) {
+                    return true;
+                }
             } elseif (in_array($k, $values)) {
                 return $v;
             }

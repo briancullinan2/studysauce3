@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  * Collection of routes.
  *
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @internal
  */
 class DumperCollection implements \IteratorAggregate
 {
@@ -50,7 +52,7 @@ class DumperCollection implements \IteratorAggregate
      */
     public function add($child)
     {
-        if ($child instanceof DumperCollection) {
+        if ($child instanceof self) {
             $child->setParent($this);
         }
         $this->children[] = $child;
@@ -64,7 +66,7 @@ class DumperCollection implements \IteratorAggregate
     public function setAll(array $children)
     {
         foreach ($children as $child) {
-            if ($child instanceof DumperCollection) {
+            if ($child instanceof self) {
                 $child->setParent($this);
             }
         }

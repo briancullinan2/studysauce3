@@ -284,7 +284,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testCollection()
     {
-        $form = $this->factory->createNamed('name', 'collection', array('a', 'b'), array(
+        $form = $this->factory->createNamed('names', 'collection', array('a', 'b'), array(
             'type' => 'text',
         ));
 
@@ -306,7 +306,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             array('title' => 'a'),
             array('title' => 'b'),
         );
-        $form = $this->factory->createNamed('name', 'collection', $data, array(
+        $form = $this->factory->createNamed('names', 'collection', $data, array(
             'type' => new AlternatingRowType(),
         ));
 
@@ -324,13 +324,13 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testEmptyCollection()
     {
-        $form = $this->factory->createNamed('name', 'collection', array(), array(
+        $form = $this->factory->createNamed('names', 'collection', array(), array(
             'type' => 'text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
-    [./input[@type="hidden"][@id="name__token"]]
+    [./input[@type="hidden"][@id="names__token"]]
     [count(./div)=0]
 '
         );
@@ -671,7 +671,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testCollectionRowWithCustomBlock()
     {
         $collection = array('one', 'two', 'three');
-        $form = $this->factory->createNamedBuilder('name', 'collection', $collection)
+        $form = $this->factory->createNamedBuilder('names', 'collection', $collection)
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -681,6 +681,189 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]
         /following-sibling::div[./label[.="Custom label: [trans]2[/trans]"]]
     ]
+'
+        );
+    }
+
+    /**
+     * The block "_name_c_entry_label" should be overridden in the theme of the
+     * implemented driver.
+     */
+    public function testChoiceRowWithCustomBlock()
+    {
+        $form = $this->factory->createNamedBuilder('name_c', 'choice', 'a', array(
+                'choices' => array('ChoiceA' => 'a', 'ChoiceB' => 'b'),
+                'choices_as_values' => true,
+                'expanded' => true,
+            ))
+            ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./label[.="Custom name label: [trans]ChoiceA[/trans]"]
+        /following-sibling::label[.="Custom name label: [trans]ChoiceB[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedWithLabelsAsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
+            'choices_as_values' => true,
+            'choice_label' => false,
+            'multiple' => false,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/div
+    [
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=3]
+    [count(./label)=1]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedWithLabelsSetByCallable()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
+            'choices_as_values' => true,
+            'choice_label' => function ($choice, $label, $value) {
+                if ('&b' === $choice) {
+                    return false;
+                }
+
+                return 'label.'.$value;
+            },
+            'multiple' => false,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/div
+    [
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::label[@for="name_0"][.="[trans]label.&a[/trans]"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_2"][@value="&c"][not(@checked)]
+        /following-sibling::label[@for="name_2"][.="[trans]label.&c[/trans]"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=4]
+    [count(./label)=3]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedWithLabelsSetFalseByCallable()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
+            'choices_as_values' => true,
+            'choice_label' => function () {
+                return false;
+            },
+            'multiple' => false,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/div
+    [
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=3]
+    [count(./label)=1]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpandedWithLabelsAsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
+            'choices_as_values' => true,
+            'choice_label' => false,
+            'multiple' => true,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=3]
+    [count(./label)=1]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpandedWithLabelsSetByCallable()
+    {
+        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
+            'choices_as_values' => true,
+            'choice_label' => function ($choice, $label, $value) {
+                if ('&b' === $choice) {
+                    return false;
+                }
+
+                return 'label.'.$value;
+            },
+            'multiple' => true,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::label[@for="name_0"][.="[trans]label.&a[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@value="&c"][not(@checked)]
+        /following-sibling::label[@for="name_2"][.="[trans]label.&c[/trans]"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=4]
+    [count(./label)=3]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpandedWithLabelsSetFalseByCallable()
+    {
+        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
+            'choices_as_values' => true,
+            'choice_label' => function () {
+                return false;
+            },
+            'multiple' => true,
+            'expanded' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=3]
+    [count(./label)=1]
 '
         );
     }

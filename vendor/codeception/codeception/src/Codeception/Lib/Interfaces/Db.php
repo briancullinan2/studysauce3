@@ -1,11 +1,10 @@
 <?php
-
 namespace Codeception\Lib\Interfaces;
 
 interface Db
 {
     /**
-     * Checks if a row with given column values exists.
+     * Asserts that a row with the given column values exists.
      * Provide table name and column values.
      *
      * Example:
@@ -25,12 +24,12 @@ interface Db
      * @param       $table
      * @param array $criteria
      */
-    public function seeInDatabase($table, $criteria = array());
+    public function seeInDatabase($table, $criteria = []);
 
     /**
      * Effect is opposite to ->seeInDatabase
      *
-     * Checks if there is no record with such column values in database.
+     * Asserts that there is no record with the given column values in a database.
      * Provide table name and column values.
      *
      * Example:
@@ -50,7 +49,7 @@ interface Db
      * @param       $table
      * @param array $criteria
      */
-    public function dontSeeInDatabase($table, $criteria = array());
+    public function dontSeeInDatabase($table, $criteria = []);
 
     /**
      * Fetches a single column value from a database.
@@ -72,5 +71,5 @@ interface Db
      *
      * @return mixed
      */
-    public function grabFromDatabase($table, $column, $criteria = array());
+    public function grabFromDatabase($table, $column, $criteria = []);
 }

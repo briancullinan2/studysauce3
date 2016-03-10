@@ -13,11 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
 /**
  * All the browsers supported by selenium
  */
 class WebDriverBrowserType {
-
   const FIREFOX = "firefox";
   const FIREFOX_2 = "firefox2";
   const FIREFOX_3 = "firefox3";
@@ -40,4 +41,8 @@ class WebDriverBrowserType {
   const IPHONE = "iphone";
   const IPAD = "iPad";
   const PHANTOMJS = "phantomjs";
+
+  private function __construct()
+  {
+  }
 }

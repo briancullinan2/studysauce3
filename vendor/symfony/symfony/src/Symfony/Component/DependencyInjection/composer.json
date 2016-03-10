@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony DependencyInjection Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,16 +12,19 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.9"
     },
     "require-dev": {
         "symfony/yaml": "~2.1",
         "symfony/config": "~2.2",
-        "symfony/expression-language": "~2.4,>=2.4.10"
+        "symfony/expression-language": "~2.6"
+    },
+    "conflict": {
+        "symfony/expression-language": "<2.6"
     },
     "suggest": {
         "symfony/yaml": "",
@@ -29,13 +32,15 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DependencyInjection\\": "" }
+        "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
-    "target-dir": "Symfony/Component/DependencyInjection",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

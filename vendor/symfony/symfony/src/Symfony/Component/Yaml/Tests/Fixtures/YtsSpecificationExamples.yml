@@ -515,7 +515,7 @@ yaml: |
 php: |
   array(
     'canonical' => 12345,
-    'decimal' => 12345,
+    'decimal' => 12345.0,
     'octal' => 014,
     'hexadecimal' => 0xC
   )
@@ -529,6 +529,7 @@ yaml: |
   fixed: 1,230.15
   negative infinity: -.inf
   not a number: .NaN
+  float as whole number: !!float 1
 php: |
   array(
     'canonical' => 1230.15,
@@ -536,6 +537,7 @@ php: |
     'fixed' => 1230.15,
     'negative infinity' => log(0),
     'not a number' => -log(0),
+    'float as whole number' => (float) 1
   )
 ---
 test: Miscellaneous
@@ -752,7 +754,7 @@ yaml: |
     Billsmer @ 338-4338.
 php: |
   array(
-     'invoice' => 34843, 'date' => mktime(0, 0, 0, 1, 23, 2001),
+     'invoice' => 34843, 'date' => gmmktime(0, 0, 0, 1, 23, 2001),
      'bill-to' =>
       array( 'given' => 'Chris', 'family' => 'Dumars', 'address' => array( 'lines' => "458 Walkman Dr.\nSuite #292\n", 'city' => 'Royal Oak', 'state' => 'MI', 'postal' => 48046 ) )
      , 'ship-to' =>
@@ -877,7 +879,7 @@ yaml: |
 php: |
    array(
       'invoice' => 34843,
-      'date' => mktime(0, 0, 0, 1, 23, 2001),
+      'date' => gmmktime(0, 0, 0, 1, 23, 2001),
       'total' => 4443.52
    )
 ---
@@ -1536,7 +1538,7 @@ yaml: |
 php: |
    array(
      'canonical' => 12345,
-     'decimal' => 12345,
+     'decimal' => 12345.0,
      'octal' => 12,
      'hexadecimal' => 12
    )

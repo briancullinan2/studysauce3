@@ -34,6 +34,7 @@ use Symfony\Component\Validator\Util\PropertyPath;
  * Recursive implementation of {@link ContextualValidatorInterface}.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class RecursiveContextualValidator implements ContextualValidatorInterface
@@ -42,6 +43,16 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @var ExecutionContextInterface
      */
     private $context;
+
+    /**
+     * @var string
+     */
+    private $defaultPropertyPath;
+
+    /**
+     * @var array
+     */
+    private $defaultGroups;
 
     /**
      * @var MetadataFactoryInterface
@@ -526,7 +537,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 } elseif ($metadata->isGroupSequenceProvider()) {
                     // The group sequence is dynamically obtained from the validated
                     // object
-                    /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
+                    /* @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
                     $group = $object->getGroupSequence();
                     $defaultOverridden = true;
 
@@ -590,9 +601,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $object,
                     $cacheKey.':'.$propertyName,
                     $propertyMetadata,
-                    $propertyPath
-                        ? $propertyPath.'.'.$propertyName
-                        : $propertyName,
+                    PropertyPath::append($propertyPath, $propertyName),
                     $groups,
                     $cascadedGroups,
                     TraversalStrategy::IMPLICIT,
@@ -855,6 +864,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
                 $context->markConstraintAsValidated($cacheKey, $constraintHash);
             }
+
+            $context->setConstraint($constraint);
 
             $validator = $this->validatorFactory->getInstance($constraint);
             $validator->initialize($context);

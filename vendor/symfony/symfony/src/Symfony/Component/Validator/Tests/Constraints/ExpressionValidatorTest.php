@@ -29,18 +29,32 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testNullIsValid()
+    public function testExpressionIsEvaluatedWithNullValue()
     {
-        $this->validator->validate(null, new Expression('value == 1'));
+        $constraint = new Expression(array(
+            'expression' => 'false',
+            'message' => 'myMessage',
+        ));
 
-        $this->assertNoViolation();
+        $this->validator->validate(null, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'null')
+            ->assertRaised();
     }
 
-    public function testEmptyStringIsValid()
+    public function testExpressionIsEvaluatedWithEmptyStringValue()
     {
-        $this->validator->validate('', new Expression('value == 1'));
+        $constraint = new Expression(array(
+            'expression' => 'false',
+            'message' => 'myMessage',
+        ));
 
-        $this->assertNoViolation();
+        $this->validator->validate('', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '""')
+            ->assertRaised();
     }
 
     public function testSucceedingExpressionAtObjectLevel()
@@ -160,7 +174,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
     /**
      * When validatePropertyValue() is called with a class name
-     * https://github.com/symfony/symfony/pull/11498
+     * https://github.com/symfony/symfony/pull/11498.
      */
     public function testSucceedingExpressionAtPropertyLevelWithoutRoot()
     {
@@ -177,7 +191,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
     /**
      * When validatePropertyValue() is called with a class name
-     * https://github.com/symfony/symfony/pull/11498
+     * https://github.com/symfony/symfony/pull/11498.
      */
     public function testFailingExpressionAtPropertyLevelWithoutRoot()
     {

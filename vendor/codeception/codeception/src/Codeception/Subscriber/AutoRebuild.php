@@ -1,10 +1,10 @@
 <?php
 namespace Codeception\Subscriber;
 
-use Codeception\Events;
+use Codeception\Configuration;
 use Codeception\Event\SuiteEvent;
-use Codeception\Lib\Generator\Actor;
-use Codeception\SuiteManager;
+use Codeception\Events;
+use Codeception\Lib\Generator\Actions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AutoRebuild implements EventSubscriberInterface
@@ -12,33 +12,50 @@ class AutoRebuild implements EventSubscriberInterface
     use Shared\StaticEvents;
 
     static $events = [
-        Events::SUITE_INIT => 'updateGuy'
+        Events::SUITE_INIT => 'updateActor'
     ];
 
-    public function updateGuy(SuiteEvent $e)
+    public function updateActor(SuiteEvent $e)
     {
         $settings = $e->getSettings();
-        $guyFile = $settings['path'] . $settings['class_name'] . '.php';
+        $modules = $e->getSuite()->getModules();
 
-        // load guy class to see hash
-        $handle = fopen($guyFile, "r");
-        if ($handle) {
-            $line = fgets($handle);
+        $actorActionsFile = Configuration::supportDir() . '_generated' . DIRECTORY_SEPARATOR
+            . $settings['class_name'] . 'Actions.php';
+
+        if (!file_exists($actorActionsFile)) {
+            codecept_debug("Generating {$settings['class_name']}Actions...");
+            $this->generateActorActions($actorActionsFile, $settings);
+            return;
+        }
+        
+        // load actor class to see hash
+        $handle = @fopen($actorActionsFile, "r");
+        if ($handle and is_writable($actorActionsFile)) {
+            $line = @fgets($handle);
             if (preg_match('~\[STAMP\] ([a-f0-9]*)~', $line, $matches)) {
                 $hash = $matches[1];
-                $currentHash = Actor::genHash(SuiteManager::$actions, $settings);
+                $currentHash = Actions::genHash($modules, $settings);
 
-                // regenerate guy class when hashes do not match
+                // regenerate actor class when hashes do not match
                 if ($hash != $currentHash) {
                     codecept_debug("Rebuilding {$settings['class_name']}...");
-                    $guyGenerator = new Actor($settings);
-                    fclose($handle);
-                    $generated = $guyGenerator->produce();
-                    file_put_contents($guyFile, $generated);
+                    @fclose($handle);
+                    $this->generateActorActions($actorActionsFile, $settings);
                     return;
                 }
             }
-            fclose($handle);
+            @fclose($handle);
         }
+    }
+
+    protected function generateActorActions($actorActionsFile, $settings)
+    {
+        if (!file_exists(Configuration::supportDir() . '_generated')) {
+            @mkdir(Configuration::supportDir() . '_generated');
+        }
+        $actionsGenerator = new Actions($settings);
+        $generated = $actionsGenerator->produce();
+        @file_put_contents($actorActionsFile, $generated);
     }
 }

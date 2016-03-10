@@ -1,8 +1,7 @@
 <?php
-
 namespace Codeception\Util;
 
-use Symfony\Component\CssSelector\CssSelector;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 use Symfony\Component\CssSelector\Exception\ParseException;
 use Symfony\Component\CssSelector\XPath\Translator;
 
@@ -114,7 +113,7 @@ class Locator
     protected static function toXPath($selector)
     {
         try {
-            $xpath = CssSelector::toXPath($selector);
+            $xpath = (new CssSelectorConverter())->toXPath($selector);
             return $xpath;
         } catch (ParseException $e) {
             if (self::isXPath($selector)) {
@@ -136,7 +135,7 @@ class Locator
      */
     public static function find($element, array $attributes)
     {
-        $operands = array();
+        $operands = [];
         foreach ($attributes as $attribute => $value) {
             if (is_int($attribute)) {
                 $operands[] = '@' . $value;
@@ -154,7 +153,7 @@ class Locator
     public static function isCSS($selector)
     {
         try {
-            CssSelector::toXPath($selector);
+            (new CssSelectorConverter())->toXPath($selector);
         } catch (ParseException $e) {
             return false;
         }
@@ -170,7 +169,7 @@ class Locator
     public static function isXPath($locator)
     {
         $document = new \DOMDocument('1.0', 'UTF-8');
-        $xpath    = new \DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         return @$xpath->evaluate($locator, $document) !== false;
     }
 
@@ -181,5 +180,25 @@ class Locator
     public static function isID($id)
     {
         return (bool)preg_match('~^#[\w\.\-\[\]\=\^\~\:]+$~', $id);
+    }
+
+    public static function humanReadableString($selector)
+    {
+       if (is_string($selector)) {
+          return "'$selector'";
+       }
+       if (is_array($selector)) {
+          $type = strtolower(key($selector));
+          $locator = $selector[$type];
+          return "$type '$locator'";
+       }
+       if (class_exists('\Facebook\WebDriver\WebDriverBy')) {
+          if ($selector instanceof \Facebook\WebDriver\WebDriverBy) {
+             $type = $selector->getMechanism();
+             $locator = $selector->getValue();
+             return "$type '$locator'";
+          }
+       }
+       throw new \InvalidArgumentException("Unrecognized selector");
     }
 }

@@ -18,8 +18,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class CollectionValidator extends ConstraintValidator
 {
@@ -50,7 +48,6 @@ class CollectionValidator extends ConstraintValidator
         // remove the initialize() method and pass the context as last argument
         // to validate() instead.
         $context = $this->context;
-        $group = $context->getGroup();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             // bug fix issue #2779
@@ -63,29 +60,49 @@ class CollectionValidator extends ConstraintValidator
                         $context->getValidator()
                             ->inContext($context)
                             ->atPath('['.$field.']')
-                            ->validate($value[$field], $fieldConstraint->constraints, $group);
+                            ->validate($value[$field], $fieldConstraint->constraints);
                     } else {
                         // 2.4 API
-                        $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']', $group);
+                        $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']');
                     }
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
-                    ->atPath('['.$field.']')
-                    ->setParameter('{{ field }}', $this->formatValue($field))
-                    ->setInvalidValue(null)
-                    ->addViolation();
+                if ($context instanceof ExecutionContextInterface) {
+                    $context->buildViolation($constraint->missingFieldsMessage)
+                        ->atPath('['.$field.']')
+                        ->setParameter('{{ field }}', $this->formatValue($field))
+                        ->setInvalidValue(null)
+                        ->setCode(Collection::MISSING_FIELD_ERROR)
+                        ->addViolation();
+                } else {
+                    $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
+                        ->atPath('['.$field.']')
+                        ->setParameter('{{ field }}', $this->formatValue($field))
+                        ->setInvalidValue(null)
+                        ->setCode(Collection::MISSING_FIELD_ERROR)
+                        ->addViolation();
+                }
             }
         }
 
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
-                        ->atPath('['.$field.']')
-                        ->setParameter('{{ field }}', $this->formatValue($field))
-                        ->setInvalidValue($fieldValue)
-                        ->addViolation();
+                    if ($context instanceof ExecutionContextInterface) {
+                        $context->buildViolation($constraint->extraFieldsMessage)
+                            ->atPath('['.$field.']')
+                            ->setParameter('{{ field }}', $this->formatValue($field))
+                            ->setInvalidValue($fieldValue)
+                            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
+                            ->addViolation();
+                    } else {
+                        $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
+                            ->atPath('['.$field.']')
+                            ->setParameter('{{ field }}', $this->formatValue($field))
+                            ->setInvalidValue($fieldValue)
+                            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
+                            ->addViolation();
+                    }
                 }
             }
         }

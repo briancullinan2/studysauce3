@@ -13,20 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class WebDriverKeyUpActionTest extends PHPUnit_Framework_TestCase {
-  /**
-   * @type WebDriverKeyUpAction
-   */
-  private $webDriverKeyUpAction;
+namespace Facebook\WebDriver\Interactions\Internal;
 
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverKeyboard;
+use Facebook\WebDriver\WebDriverMouse;
+
+class WebDriverKeyUpActionTest extends \PHPUnit_Framework_TestCase {
+  /** @var WebDriverKeyUpAction */
+  private $webDriverKeyUpAction;
+  /** @var WebDriverKeyboard|\PHPUnit_Framework_MockObject_MockObject */
   private $webDriverKeyboard;
+  /** @var WebDriverMouse|\PHPUnit_Framework_MockObject_MockObject */
   private $webDriverMouse;
+  /** @var WebDriverLocatable|\PHPUnit_Framework_MockObject_MockObject  */
   private $locationProvider;
 
   public function setUp() {
-    $this->webDriverKeyboard = $this->getMock('WebDriverKeyboard');
-    $this->webDriverMouse = $this->getMock('WebDriverMouse');
-    $this->locationProvider = $this->getMock('WebDriverLocatable');
+    $this->webDriverKeyboard = $this->getMock('Facebook\WebDriver\WebDriverKeyboard');
+    $this->webDriverMouse = $this->getMock('Facebook\WebDriver\WebDriverMouse');
+    $this->locationProvider = $this->getMock('Facebook\WebDriver\Internal\WebDriverLocatable');
+
     $this->webDriverKeyUpAction = new WebDriverKeyUpAction(
       $this->webDriverKeyboard,
       $this->webDriverMouse,
@@ -36,7 +43,8 @@ class WebDriverKeyUpActionTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testPerformFocusesOnElementAndSendPressKeyCommand() {
-    $coords = $this->getMockBuilder('WebDriverCoordinates')->disableOriginalConstructor()->getMock();
+    $coords = $this->getMockBuilder('Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates')
+      ->disableOriginalConstructor()->getMock();
     $this->webDriverMouse->expects($this->once())->method('click')->with($coords);
     $this->locationProvider->expects($this->once())->method('getCoordinates')->will($this->returnValue($coords));
     $this->webDriverKeyboard->expects($this->once())->method('releaseKey')->with('a');

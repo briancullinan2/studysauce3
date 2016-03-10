@@ -3,7 +3,6 @@ namespace Codeception\Lib\Driver;
 
 class Db
 {
-
     /**
      * @var \PDO
      */
@@ -13,6 +12,9 @@ class Db
      * @var string
      */
     protected $dsn;
+
+    protected $user;
+    protected $password;
 
     /**
      * @var string
@@ -24,7 +26,7 @@ class Db
      *
      * @var array
      */
-    protected $primaryColumns = [];
+    protected $primaryKeys = [];
 
     public static function connect($dsn, $user, $password)
     {
@@ -41,7 +43,7 @@ class Db
      * @param $user
      * @param $password
      *
-     * @return Db|MsSql|MySql|Oracle|PostgreSql|Sqlite
+     * @return Db|SqlSrv|MySql|Oci|PostgreSql|Sqlite
      */
     public static function create($dsn, $user, $password)
     {
@@ -55,9 +57,7 @@ class Db
             case 'pgsql':
                 return new PostgreSql($dsn, $user, $password);
             case 'mssql':
-                return new MsSql($dsn, $user, $password);
-            case 'oracle':
-                return new Oracle($dsn, $user, $password);
+            case 'dblib':
             case 'sqlsrv':
                 return new SqlSrv($dsn, $user, $password);
             case 'oci':
@@ -77,8 +77,8 @@ class Db
         $this->dbh = new \PDO($dsn, $user, $password);
         $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-        $this->dsn      = $dsn;
-        $this->user     = $user;
+        $this->dsn = $dsn;
+        $this->user = $user;
         $this->password = $password;
     }
 
@@ -104,13 +104,13 @@ class Db
 
     public function load($sql)
     {
-        $query           = '';
-        $delimiter       = ';';
+        $query = '';
+        $delimiter = ';';
         $delimiterLength = 1;
 
         foreach ($sql as $sqlLine) {
             if (preg_match('/DELIMITER ([\;\$\|\\\\]+)/i', $sqlLine, $match)) {
-                $delimiter       = $match[1];
+                $delimiter = $match[1];
                 $delimiterLength = strlen($delimiter);
                 continue;
             }
@@ -133,40 +133,60 @@ class Db
     public function insert($tableName, array &$data)
     {
         $columns = array_map(
-          [$this, 'getQuotedName'],
-          array_keys($data)
+            [$this, 'getQuotedName'],
+            array_keys($data)
         );
 
         return sprintf(
-          "INSERT INTO %s (%s) VALUES (%s)",
-          $this->getQuotedName($tableName),
-          implode(', ', $columns),
-          implode(', ', array_fill(0, count($data), '?'))
+            "INSERT INTO %s (%s) VALUES (%s)",
+            $this->getQuotedName($tableName),
+            implode(', ', $columns),
+            implode(', ', array_fill(0, count($data), '?'))
         );
     }
 
     public function select($column, $table, array &$criteria)
     {
-        $where  = $criteria ? "where %s" : '';
-        $query  = "select %s from `%s` $where";
-        $params = [];
-        foreach ($criteria as $k => $v) {
-            $k = $this->getQuotedName($k);
-            if ($v === null) {
-                $params[] = "$k IS ?";
-            } else {
-                $params[] = "$k = ?";
-            }
-        }
-        $params = implode(' AND ', $params);
+        $where = $this->generateWhereClause($criteria);
 
-        return sprintf($query, $column, $table, $params);
+        $query = "select %s from %s %s";
+        return sprintf($query, $column, $this->getQuotedName($table), $where);
     }
 
+    protected function generateWhereClause(array &$criteria)
+    {
+        if (empty($criteria)) {
+            return '';
+        }
+
+        $params = [];
+        foreach ($criteria as $k => $v) {
+            if ($v === null) {
+                $params[] = $this->getQuotedName($k) . " IS NULL ";
+                unset($criteria[$k]);
+            } else {
+                $params[] = $this->getQuotedName($k) . " = ? ";
+            }
+        }
+
+        return 'WHERE ' . implode('AND ', $params);
+    }
+
+    /**
+     * @deprecated use deleteQueryByCriteria instead
+     */
     public function deleteQuery($table, $id, $primaryKey = 'id')
     {
-        $query = 'DELETE FROM ' . $table . ' WHERE ' . $primaryKey . ' = ' . $id;
-        $this->sqlQuery($query);
+        $query = 'DELETE FROM ' . $this->getQuotedName($table) . ' WHERE ' . $this->getQuotedName($primaryKey) . ' = ?';
+        $this->executeQuery($query, [$id]);
+    }
+
+    public function deleteQueryByCriteria($table, array $criteria)
+    {
+        $where = $this->generateWhereClause($criteria);
+
+        $query = 'DELETE FROM ' . $this->getQuotedName($table) . ' ' . $where;
+        $this->executeQuery($query, array_values($criteria));
     }
 
     public function lastInsertId($table)
@@ -176,22 +196,17 @@ class Db
 
     public function getQuotedName($name)
     {
-        return $name;
+        return '"' . str_replace('.', '"."', $name) . '"';
     }
 
     protected function sqlLine($sql)
     {
-        if (trim($sql) == "") {
-            return true;
-        }
-        if (trim($sql) == ";") {
-            return true;
-        }
-        if (preg_match('~^((--.*?)|(#))~s', $sql)) {
-            return true;
-        }
-
-        return false;
+        $sql = trim($sql);
+        return (
+            $sql === ''
+            || $sql === ';'
+            || preg_match('~^((--.*?)|(#))~s', $sql)
+        );
     }
 
     protected function sqlQuery($query)
@@ -199,26 +214,44 @@ class Db
         $this->dbh->exec($query);
     }
 
+    public function executeQuery($query, array $params)
+    {
+        $sth = $this->dbh->prepare($query);
+        if (!$sth) {
+            throw new \Exception("Query '$query' can't be prepared.");
+        }
+
+        $sth->execute($params);
+        return $sth;
+    }
+
     /**
      * @param string $tableName
      *
      * @return string
      * @throws \Exception
+     * @deprecated use getPrimaryKey instead
      */
     public function getPrimaryColumn($tableName)
     {
-        if (false === isset($this->primaryColumns[$tableName])) {
-            $stmt = $this->getDbh()->query('SHOW KEYS FROM `' . $tableName . '` WHERE Key_name = "PRIMARY"');
-            $columnInformation = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (true === empty($columnInformation)) { // Need a primary key
-                throw new \Exception('Table ' . $tableName . ' is not valid or doesn\'t have no primary key');
-            }
-
-            $this->primaryColumns[$tableName] = $columnInformation['Column_name'];
+        $primaryKey = $this->getPrimaryKey($tableName);
+        if (empty($primaryKey)) {
+            return null;
+        } elseif (count($primaryKey) > 1) {
+            throw new \Exception('getPrimaryColumn method does not support composite primary keys, use getPrimaryKey instead');
         }
 
-        return $this->primaryColumns[$tableName];
+        return $primaryKey[0];
+    }
+
+    /**
+     * @param string $tableName
+     *
+     * @return array[string]
+     */
+    public function getPrimaryKey($tableName)
+    {
+        return [];
     }
 
     /**
@@ -226,8 +259,8 @@ class Db
      */
     protected function flushPrimaryColumnCache()
     {
-        $this->primaryColumns = [];
+        $this->primaryKeys = [];
 
-        return empty($this->primaryColumns);
+        return empty($this->primaryKeys);
     }
 }

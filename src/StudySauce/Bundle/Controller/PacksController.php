@@ -55,7 +55,7 @@ class PacksController extends Controller
             'packs' => $packs,
             'total' => $total,
             'groups' => $groups,
-            'pack' => $pack
+            'entity' => $pack
         ]);
     }
 
@@ -184,7 +184,12 @@ class PacksController extends Controller
             $newCard->setContent($c['content']);
             $newCard->setResponseContent($c['response']);
             if (!empty($c['type'])) {
-                $newCard->setResponseType($c['type']);
+                if ($c['type'] == 'sa exactly' || $c['type'] == 'sa contains') {
+                    $newCard->setResponseType('sa');
+                }
+                else {
+                    $newCard->setResponseType($c['type']);
+                }
             }
             if (empty($newCard->getId())) {
                 $orm->persist($newCard);
@@ -216,10 +221,10 @@ class PacksController extends Controller
                     if (strtolower(trim($a)) == strtolower(trim($c['correct']))) {
                         $newAnswer->setCorrect(true);
                     }
-                    if ($c['correct'] == 'contains') {
+                    if (strpos($c['type'], 'contains') > -1) {
                         $newAnswer->setCorrect(true);
                     }
-                    if ($c['correct'] == 'exactly') {
+                    if (strpos($c['type'], 'exactly') > -1) {
                         $newAnswer->setCorrect(true);
                         $newAnswer->setValue('^' . trim($a) . '$');
                     }

@@ -2,6 +2,8 @@
 
 namespace Evernote;
 
+use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use EDAM\Error\EDAMNotFoundException;
 use EDAM\Error\EDAMSystemException;
 use EDAM\Error\EDAMUserException;
@@ -27,6 +29,9 @@ class Client
     /** @var  boolean */
     protected $sandbox;
 
+    /** @var  boolean */
+    protected $china;
+
     /** @var  \EDAM\NoteStore\NoteStoreClient */
     protected $userNoteStore;
 
@@ -41,6 +46,9 @@ class Client
 
     /** @var  \EDAM\UserStore\AuthenticationResult */
     protected $businessAuth;
+
+    /** @var \Psr\Log\LoggerInterface */
+    protected $logger;
 
     /**
      * Personal scope for the getNote and getNotebook methods
@@ -137,13 +145,18 @@ class Client
      * @param string|null $token
      * @param bool $sandbox
      * @param \Evernote\AdvancedClient|null $advancedClient
+     * @param \Psr\Log\LoggerInterface|null $logger
+     * @param bool $china
      */
-    public function __construct($token = null, $sandbox = true, $advancedClient = null)
+    public function __construct($token = null, $sandbox = true, $advancedClient = null, LoggerInterface $logger = null, $china = false)
     {
         $this->token          = $token;
         $this->sandbox        = $sandbox;
         $this->advancedClient = $advancedClient;
+        $this->logger         = $logger ?: new NullLogger;
+        $this->china          = $china;
     }
+
 
     /**
      * Returns a boolean indicating if the user has a business account
@@ -291,7 +304,7 @@ class Client
 
                 /**
                  * b. Get the business's linked notebooks. Some of these will match to shared notebooks in (a), providing a
-                //      complete authorization story for the notebook.
+                 *    complete authorization story for the notebook.
                  */
                 $businessNotebooks = $this->getBusinessLinkedNotebooks();
 
@@ -323,7 +336,9 @@ class Client
                     try {
                         $resultNotebooks[] = $this->getNoteBookByLinkedNotebook($linkedNotebook);
                     } catch (\Exception $e) {
+                        $e = ExceptionFactory::create($e);
 
+                        $this->logger->error('An error occured while fetching a linked notebook as a business user', array('exception' => $e, 'token' => $this->getToken()));
                     }
                 };
             }
@@ -437,6 +452,7 @@ class Client
         $edamNote->title      = $note->title;
         $edamNote->content    = $note->content;
         $edamNote->attributes = $note->attributes;
+        $edamNote->created    = $note->created;
         $edamNote->resources  = $note->resources;
         $edamNote->tagNames   = $note->tagNames;
 
@@ -538,7 +554,7 @@ class Client
 
         try {
             // We don't have credentials so we assume it's a personal note
-            return $this->getUserNotestore()->deleteNote($this->token, $note->guid);
+            return $this->getUserNotestore()->shareNote($this->token, $note->guid);
 
         } catch (EDAMNotFoundException $e) {
             // The note's not in a personal notebook. We'll need to find it
@@ -761,10 +777,6 @@ class Client
         $resultSpec->includeCreated           = true;
         $resultSpec->includeUpdated           = true;
         $resultSpec->includeUpdateSequenceNum = true;
-        $resultSpec->includeTagGuids          = true;
-        $resultSpec->includeAttributes        = true;
-        $resultSpec->includeLargestResourceMime = true;
-        $resultSpec->includeLargestResourceSize = true;
 
         $noteFilter = new NoteFilter();
         $noteFilter->words = $noteSearch->getSearchString();
@@ -837,7 +849,7 @@ class Client
     public function getAdvancedClient()
     {
         if (null === $this->advancedClient) {
-            $this->advancedClient = new AdvancedClient($this->getToken(), $this->sandbox);
+            $this->advancedClient = new AdvancedClient($this->getToken(), $this->sandbox, null, $this->logger, $this->china);
         }
 
         return $this->advancedClient;
@@ -862,6 +874,26 @@ class Client
     {
         return $this->sandbox;
     }
+
+    /**
+     * Sets the china flag to true or false
+     *
+     * @param boolean $china
+     */
+    public function setChina($china)
+    {
+        $this->china = $china;
+    }
+
+    /**
+     * Gets the current china flag
+     *
+     * @return boolean
+     */
+    public function getChina()
+    {
+        return $this->china;
+    } 
 
     /**
      * Sets the authentication token
@@ -1189,7 +1221,6 @@ class Client
             $result->created           = $metadata->created;
             $result->updated           = $metadata->updated;
             $result->updateSequenceNum = $metadata->updateSequenceNum;
-            $result->tagGuids          = $metadata->tagGuids;
 
             $findNotesResults[] = $result;
 

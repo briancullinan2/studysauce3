@@ -87,17 +87,16 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function getOneCharset()
     {
-        if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
-            $this->markTestSkipped('Mbstring or iconv is required for this test.');
-        }
-
         return array(
-            array("é", "utf8", true),
-            array("\xE9", "CP1252", true),
-            array("\xE9", "XXX", false),
-            array("\xE9", "utf8", false),
+            array('é', 'utf8', true),
+            array("\xE9", 'CP1252', true),
+            array("\xE9", 'XXX', false),
+            array("\xE9", 'utf8', false),
         );
     }
 
@@ -151,6 +150,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 
@@ -171,6 +171,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
     }
 
@@ -192,6 +193,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 
@@ -213,6 +215,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
     }
 

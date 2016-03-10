@@ -25,6 +25,7 @@ That's ok for now. But what files should be present in final coverage report? Yo
 
 ``` yaml
 coverage:
+    enabled: true
     whitelist:
         include:
             - app/*
@@ -66,10 +67,10 @@ The basic codecoverage can be collected for functional and unit tests.
 If you performed configuration steps from above, you are ready to go.
 All you need is to execute codeception with `--coverage` option.
 
-To generate a clover xml report or a tasty html report append also `--xml` and `--html` options.
+To generate a clover xml report or a tasty html report append also `--coverage-xml` and `--coverage-html` options.
 
 ``` yaml
-codecept run --coverage --xml --html
+codecept run --coverage --coverage-xml --coverage-html
 ```
 
 XML and HTML reports are stored to the `_output` directory. The best way to review report is to open `index.html` from `tests/_output/coverage` in your browser.

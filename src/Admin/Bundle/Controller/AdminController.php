@@ -208,8 +208,8 @@ class AdminController extends Controller
             // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
             'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
             'ss_group' => ['id' => ['created', 'id'], 'name' => ['title','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions' => ['deleted']],
-            'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title'], 'groups' => ['group','groups'], 'users' => ['user','userPacks.user'], 'status', 'actions'],
-            'card' => ['id', 'name' => ['content','pack'], 'correct', 'answers', 'response', 'actions' => ['deleted']],
+            'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title'], 'status', 'groups' => ['group','groups'], 'users' => ['user','userPacks.user'], 'properties', 'actions'],
+            'card' => ['id', 'name' => ['content','pack'], 'correct', 'answers', 'actions' => ['deleted']],
             // TODO: this really generalized template
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
         ];

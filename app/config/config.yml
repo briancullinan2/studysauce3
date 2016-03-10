@@ -21,7 +21,7 @@ services:
 
     session.handler.pdo:
         class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
-        arguments: ["@pdo", {db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time}]
+        arguments: ["@pdo", {db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time, db_lifetime_col: session_lifetime}]
 
     my_user_provider:
         class: StudySauce\Bundle\Security\UserProvider
@@ -221,6 +221,7 @@ hwi_oauth:
         ignore_errors: false # Setting allowing you to easier debug request errors, by default: true
         max_redirects: 1 # Number of HTTP redirection request after which library will shutdown request,
 
-
-
+fos_js_routing:
+    routes_to_expose:
+        - ".*"
 

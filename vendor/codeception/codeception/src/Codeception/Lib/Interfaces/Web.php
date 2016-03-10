@@ -1,5 +1,4 @@
 <?php
-
 namespace Codeception\Lib\Interfaces;
 
 interface Web
@@ -13,7 +12,6 @@ interface Web
      * $I->amOnPage('/');
      * // opens /register page
      * $I->amOnPage('/register');
-     * ?>
      * ```
      *
      * @param $page
@@ -21,16 +19,31 @@ interface Web
     public function amOnPage($page);
 
     /**
-     * Checks that the current page contains the given string.
-     * Specify a locator as the second parameter to match a specific region.
+     * Checks that the current page contains the given string (case insensitive).
+     * 
+     * You can specify a specific HTML element (via CSS or XPath) as the second 
+     * parameter to only search within that element.
      *
      * ``` php
      * <?php
-     * $I->see('Logout'); // I can suppose user is logged in
-     * $I->see('Sign Up','h1'); // I can suppose it's a signup page
-     * $I->see('Sign Up','//body/h1'); // with XPath
-     * ?>
+     * $I->see('Logout');                 // I can suppose user is logged in
+     * $I->see('Sign Up', 'h1');          // I can suppose it's a signup page
+     * $I->see('Sign Up', '//body/h1');   // with XPath
      * ```
+     * 
+     * Note that the search is done after stripping all HTML tags from the body,
+     * so `$I->see('strong')` will return true for strings like:
+     * 
+     *   - `<p>I am Stronger than thou</p>`
+     *   - `<script>document.createElement('strong');</script>`
+     * 
+     * But will *not* be true for strings like:
+     * 
+     *   - `<strong>Home</strong>`
+     *   - `<div class="strong">Home</strong>`
+     *   - `<!-- strong -->`
+     * 
+     * For checking the raw source code, use `seeInSource()`.
      *
      * @param      $text
      * @param null $selector
@@ -38,42 +51,100 @@ interface Web
     public function see($text, $selector = null);
 
     /**
-     * Checks that the current page doesn't contain the text specified.
+     * Checks that the current page doesn't contain the text specified (case insensitive).
      * Give a locator as the second parameter to match a specific region.
      *
      * ```php
      * <?php
-     * $I->dontSee('Login'); // I can suppose user is already logged in
-     * $I->dontSee('Sign Up','h1'); // I can suppose it's not a signup page
-     * $I->dontSee('Sign Up','//body/h1'); // with XPath
-     * ?>
+     * $I->dontSee('Login');                    // I can suppose user is already logged in
+     * $I->dontSee('Sign Up','h1');             // I can suppose it's not a signup page
+     * $I->dontSee('Sign Up','//body/h1');      // with XPath
      * ```
+     * 
+     * Note that the search is done after stripping all HTML tags from the body,
+     * so `$I->dontSee('strong')` will fail on strings like:
+     * 
+     *   - `<p>I am Stronger than thou</p>`
+     *   - `<script>document.createElement('strong');</script>`
+     * 
+     * But will ignore strings like:
+     * 
+     *   - `<strong>Home</strong>`
+     *   - `<div class="strong">Home</strong>`
+     *   - `<!-- strong -->`
+     * 
+     * For checking the raw source code, use `seeInSource()`.
      *
      * @param      $text
      * @param null $selector
      */
     public function dontSee($text, $selector = null);
+    
+    /**
+     * Checks that the current page contains the given string in its
+     * raw source code.
+     *
+     * ``` php
+     * <?php
+     * $I->seeInSource('<h1>Green eggs &amp; ham</h1>');
+     * ```
+     *
+     * @param      $raw
+     */
+    public function seeInSource($raw);
 
     /**
-     * Submits the given form on the page, optionally with the given form values.
-     * Give the form fields values as an array.
+     * Checks that the current page contains the given string in its
+     * raw source code.
      *
-     * Skipped fields will be filled by their values from the page.
+     * ```php
+     * <?php
+     * $I->dontSeeInSource('<h1>Green eggs &amp; ham</h1>');
+     * ```
+     *
+     * @param      $raw
+     */
+    public function dontSeeInSource($raw);
+
+    /**
+     * Submits the given form on the page, optionally with the given form
+     * values.  Pass the form field's values as an array in the second
+     * parameter.
+     *
+     * Although this function can be used as a short-hand version of 
+     * `fillField()`, `selectOption()`, `click()` etc. it has some important 
+     * differences:
+     * 
+     *  * Only field *names* may be used, not CSS/XPath selectors nor field labels
+     *  * If a field is sent to this function that does *not* exist on the page,
+     *    it will silently be added to the HTTP request.  This is helpful for testing
+     *    some types of forms, but be aware that you will *not* get an exception
+     *    like you would if you called `fillField()` or `selectOption()` with
+     *    a missing field.
+     * 
+     * Fields that are not provided will be filled by their values from the page, 
+     * or from any previous calls to `fillField()`, `selectOption()` etc.
      * You don't need to click the 'Submit' button afterwards.
      * This command itself triggers the request to form's action.
      *
-     * You can optionally specify what button's value to include
-     * in the request with the last parameter as an alternative to
-     * explicitly setting its value in the second parameter, as
+     * You can optionally specify which button's value to include
+     * in the request with the last parameter (as an alternative to
+     * explicitly setting its value in the second parameter), as
      * button values are not otherwise included in the request.
-     * 
+     *
      * Examples:
      *
      * ``` php
      * <?php
-     * $I->submitForm('#login', array('login' => 'davert', 'password' => '123456'));
+     * $I->submitForm('#login', [
+     *     'login' => 'davert',
+     *     'password' => '123456'
+     * ]);
      * // or
-     * $I->submitForm('#login', array('login' => 'davert', 'password' => '123456'), 'submitButtonName');
+     * $I->submitForm('#login', [
+     *     'login' => 'davert',
+     *     'password' => '123456'
+     * ], 'submitButtonName');
      *
      * ```
      *
@@ -81,10 +152,17 @@ interface Web
      *
      * ``` html
      * <form action="/sign_up">
-     *     Login: <input type="text" name="user[login]" /><br/>
-     *     Password: <input type="password" name="user[password]" /><br/>
-     *     Do you agree to out terms? <input type="checkbox" name="user[agree]" /><br/>
-     *     Select pricing plan <select name="plan"><option value="1">Free</option><option value="2" selected="selected">Paid</option></select>
+     *     Login:
+     *     <input type="text" name="user[login]" /><br/>
+     *     Password:
+     *     <input type="password" name="user[password]" /><br/>
+     *     Do you agree to our terms?
+     *     <input type="checkbox" name="user[agree]" /><br/>
+     *     Select pricing plan:
+     *     <select name="plan">
+     *         <option value="1">Free</option>
+     *         <option value="2" selected="selected">Paid</option>
+     *     </select>
      *     <input type="submit" name="submitButton" value="Submit" />
      * </form>
      * ```
@@ -93,24 +171,113 @@ interface Web
      *
      * ``` php
      * <?php
-     * $I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)), 'submitButton');
-     *
+     * $I->submitForm(
+     *     '#userForm',
+     *     [
+     *         'user' => [
+     *             'login' => 'Davert',
+     *             'password' => '123456',
+     *             'agree' => true
+     *         ]
+     *     ],
+     *     'submitButton'
+     * );
      * ```
-     * Note that "2" will be the submitted value for the "plan" field, as it is the selected option.
+     * Note that "2" will be the submitted value for the "plan" field, as it is
+     * the selected option.
      * 
-     * You can also emulate a JavaScript submission by not specifying any buttons in the third parameter to submitForm.
+     * You can also emulate a JavaScript submission by not specifying any
+     * buttons in the third parameter to submitForm.
      * 
      * ```php
      * <?php
-     * $I->submitForm('#userForm', array('user' => array('login' => 'Davert', 'password' => '123456', 'agree' => true)));
+     * $I->submitForm(
+     *     '#userForm',
+     *     [
+     *         'user' => [
+     *             'login' => 'Davert',
+     *             'password' => '123456',
+     *             'agree' => true
+     *         ]
+     *     ]
+     * );
+     * ```
      * 
+     * This function works well when paired with `seeInFormFields()` 
+     * for quickly testing CRUD interfaces and form validation logic.
+     * 
+     * ``` php
+     * <?php
+     * $form = [
+     *      'field1' => 'value',
+     *      'field2' => 'another value',
+     *      'checkbox1' => true,
+     *      // ...
+     * ];
+     * $I->submitForm('#my-form', $form, 'submitButton');
+     * // $I->amOnPage('/path/to/form-page') may be needed
+     * $I->seeInFormFields('#my-form', $form);
      * ```
      *
+     * Parameter values can be set to arrays for multiple input fields
+     * of the same name, or multi-select combo boxes.  For checkboxes,
+     * you can use either the string value or boolean `true`/`false` which will
+     * be replaced by the checkbox's value in the DOM.
+     *
+     * ``` php
+     * <?php
+     * $I->submitForm('#my-form', [
+     *      'field1' => 'value',
+     *      'checkbox' => [
+     *          'value of first checkbox',
+     *          'value of second checkbox',
+     *      ],
+     *      'otherCheckboxes' => [
+     *          true,
+     *          false,
+     *          false
+     *      ],
+     *      'multiselect' => [
+     *          'first option value',
+     *          'second option value'
+     *      ]
+     * ]);
+     * ```
+     *
+     * Mixing string and boolean values for a checkbox's value is not supported
+     * and may produce unexpected results.
+     * 
+     * Field names ending in `[]` must be passed without the trailing square 
+     * bracket characters, and must contain an array for its value.  This allows
+     * submitting multiple values with the same name, consider:
+     * 
+     * ```php
+     * <?php
+     * // This will NOT work correctly
+     * $I->submitForm('#my-form', [
+     *     'field[]' => 'value',
+     *     'field[]' => 'another value',  // 'field[]' is already a defined key
+     * ]);
+     * ```
+     * 
+     * The solution is to pass an array value:
+     * 
+     * ```php
+     * <?php
+     * // This way both values are submitted
+     * $I->submitForm('#my-form', [
+     *     'field' => [
+     *         'value',
+     *         'another value',
+     *     ]
+     * ]);
+     * ```
+     * 
      * @param $selector
      * @param $params
      * @param $button
      */
-    public function submitForm($selector, $params, $button = null);
+    public function submitForm($selector, array $params, $button = null);
 
     /**
      * Perform a click on a link or a button, given by a locator.
@@ -277,7 +444,6 @@ interface Web
      *
      * @param null $uri
      *
-     * @internal param $url
      * @return mixed
      */
     public function grabFromCurrentUrl($uri = null);
@@ -312,7 +478,7 @@ interface Web
     public function dontSeeCheckboxIsChecked($checkbox);
 
     /**
-     * Checks that the given input field or textarea contains the given value. 
+     * Checks that the given input field or textarea contains the given value.
      * For fuzzy locators, fields are matched by label text, the "name" attribute, CSS, and XPath.
      *
      * ``` php
@@ -350,6 +516,112 @@ interface Web
      * @param $value
      */
     public function dontSeeInField($field, $value);
+
+    /**
+     * Checks if the array of form parameters (name => value) are set on the form matched with the
+     * passed selector.
+     * 
+     * ``` php
+     * <?php
+     * $I->seeInFormFields('form[name=myform]', [
+     *      'input1' => 'value',
+     *      'input2' => 'other value',
+     * ]);
+     * ?>
+     * ```
+     * 
+     * For multi-select elements, or to check values of multiple elements with the same name, an
+     * array may be passed:
+     * 
+     * ``` php
+     * <?php
+     * $I->seeInFormFields('.form-class', [
+     *      'multiselect' => [
+     *          'value1',
+     *          'value2',
+     *      ],
+     *      'checkbox[]' => [
+     *          'a checked value',
+     *          'another checked value',
+     *      ],
+     * ]);
+     * ?>
+     * ```
+     *
+     * Additionally, checkbox values can be checked with a boolean.
+     * 
+     * ``` php
+     * <?php
+     * $I->seeInFormFields('#form-id', [
+     *      'checkbox1' => true,        // passes if checked
+     *      'checkbox2' => false,       // passes if unchecked
+     * ]);
+     * ?>
+     * ```
+     * 
+     * Pair this with submitForm for quick testing magic.
+     * 
+     * ``` php
+     * <?php
+     * $form = [
+     *      'field1' => 'value',
+     *      'field2' => 'another value',
+     *      'checkbox1' => true,
+     *      // ...
+     * ];
+     * $I->submitForm('//form[@id=my-form]', $form, 'submitButton');
+     * // $I->amOnPage('/path/to/form-page') may be needed
+     * $I->seeInFormFields('//form[@id=my-form]', $form);
+     * ?>
+     * ```
+     * 
+     * @param $formSelector
+     * @param $params
+     */
+    public function seeInFormFields($formSelector, array $params);
+
+    /**
+     * Checks if the array of form parameters (name => value) are not set on the form matched with
+     * the passed selector.
+     * 
+     * ``` php
+     * <?php
+     * $I->dontSeeInFormFields('form[name=myform]', [
+     *      'input1' => 'non-existent value',
+     *      'input2' => 'other non-existent value',
+     * ]);
+     * ?>
+     * ```
+     * 
+     * To check that an element hasn't been assigned any one of many values, an array can be passed
+     * as the value:
+     * 
+     * ``` php
+     * <?php
+     * $I->dontSeeInFormFields('.form-class', [
+     *      'fieldName' => [
+     *          'This value shouldn\'t be set',
+     *          'And this value shouldn\'t be set',
+     *      ],
+     * ]);
+     * ?>
+     * ```
+     *
+     * Additionally, checkbox values can be checked with a boolean.
+     * 
+     * ``` php
+     * <?php
+     * $I->dontSeeInFormFields('#form-id', [
+     *      'checkbox1' => true,        // fails if checked
+     *      'checkbox2' => false,       // fails if unchecked
+     * ]);
+     * ?>
+     * ```
+     * 
+     * @param $formSelector
+     * @param $params
+     */
+    public function dontSeeInFormFields($formSelector, array $params);
 
     /**
      * Selects an option in a select tag or in radio button group.
@@ -482,10 +754,36 @@ interface Web
      *
      * @param $cssOrXpath
      * @param $attribute
-     * @internal param $element
+     *
      * @return mixed
      */
     public function grabAttributeFrom($cssOrXpath, $attribute);
+    
+    /**
+     * Grabs either the text content, or attribute values, of nodes
+     * matched by $cssOrXpath and returns them as an array.
+     * 
+     * ```html
+     * <a href="#first">First</a>
+     * <a href="#second">Second</a>
+     * <a href="#third">Third</a>
+     * ```
+     * 
+     * ```php
+     * <?php
+     * // would return ['First', 'Second', 'Third']
+     * $aLinkText = $I->grabMultiple('a');
+     * 
+     * // would return ['#first', '#second', '#third']
+     * $aLinks = $I->grabMultiple('a', 'href');
+     * ?>
+     * ```
+     * 
+     * @param $cssOrXpath
+     * @param $attribute
+     * @return string[]
+     */
+    public function grabMultiple($cssOrXpath, $attribute = null);
 
     /**
      * Checks that the given element exists on the page and is visible.
@@ -507,7 +805,7 @@ interface Web
      * @param array $attributes
      * @return
      */
-    public function seeElement($selector, $attributes = array());
+    public function seeElement($selector, $attributes = []);
 
     /**
      * Checks that the given element is invisible or not present on the page.
@@ -525,11 +823,11 @@ interface Web
      * @param $selector
      * @param array $attributes
      */
-    public function dontSeeElement($selector, $attributes = array());
+    public function dontSeeElement($selector, $attributes = []);
 
-   /**
+    /**
      * Checks that there are a certain number of elements matched by the given locator on the page.
-     * 
+     *
      * ``` php
      * <?php
      * $I->seeNumberOfElements('tr', 10);
@@ -537,12 +835,12 @@ interface Web
      * ?>
      * ```
      * @param $selector
-     * @param mixed $expected:
+     * @param mixed $expected :
      * - string: strict number
-     * - array: range of numbers [0,10]  
+     * - array: range of numbers [0,10]
      */
-    public function seeNumberOfElements($selector, $expected);    
-    
+    public function seeNumberOfElements($selector, $expected);
+
     /**
      * Checks that the given option is selected.
      *
@@ -628,7 +926,7 @@ interface Web
 
     /**
      * Sets a cookie with the given name and value.
-     * You can set additional cookie params like `domain`, `path`, `expire`, `secure` in array passed as last argument.
+     * You can set additional cookie params like `domain`, `path`, `expires`, `secure` in array passed as last argument.
      *
      * ``` php
      * <?php
@@ -639,8 +937,6 @@ interface Web
      * @param $name
      * @param $val
      * @param array $params
-     * @internal param $cookie
-     * @internal param $value
      *
      * @return mixed
      */

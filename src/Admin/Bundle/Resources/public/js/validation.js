@@ -11,7 +11,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var validation = $('#validation');
         $.ajax({
-            url: window.callbackPaths['validation_test'],
+            url: Routing.generate('validation_test'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -41,7 +41,7 @@ $(document).ready(function () {
             return;
         }
         $.ajax({
-            url: window.callbackPaths['validation_result'],
+            url: Routing.generate('validation_result'),
             type: 'POST',
             dataType: 'json',
             data: {
@@ -85,7 +85,7 @@ $(document).ready(function () {
         var validation = $('#validation'),
             suite = (/suite-(.*?)(\s|$)/ig).exec($(this).attr('class'))[1];
         $.ajax({
-            url: window.callbackPaths['validation_test'],
+            url: Routing.generate('validation_test'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -342,7 +342,7 @@ $(document).ready(function () {
             tooltips.close();
             sigma.plugins.killTooltips(s);
             s.kill();
-            sigma.parsers.json(window.callbackPaths['validation_refresh'], graphConfig, createGraph);
+            sigma.parsers.json(Routing.generate('validation_refresh'), graphConfig, createGraph);
         });
 
         /*
@@ -438,7 +438,7 @@ $(document).ready(function () {
             sigma.renderers.def = sigma.renderers.canvas;
 
             sigma.parsers.json(
-                window.callbackPaths['validation_refresh'], graphConfig, createGraph);
+                Routing.generate('validation_refresh'), graphConfig, createGraph);
         }
     });
 

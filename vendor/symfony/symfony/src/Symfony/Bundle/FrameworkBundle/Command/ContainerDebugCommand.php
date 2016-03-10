@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * A console command for retrieving information about services.
@@ -38,7 +39,10 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('container:debug')
+            ->setName('debug:container')
+            ->setAliases(array(
+                'container:debug',
+            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
@@ -46,11 +50,11 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
             ->setDescription('Displays current services for an application')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
   <info>php %command.full_name%</info>
@@ -90,6 +94,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "container:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:container" instead.</comment>');
+        }
+
         $this->validateInput($input);
 
         if ($input->getOption('parameters')) {
@@ -106,6 +114,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $object = $this->getContainerBuilder();
+            $name = $this->findProperServiceName($input, $output, $object, $name);
             $options = array('id' => $name);
         } else {
             $object = $this->getContainerBuilder();
@@ -116,6 +125,10 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
         $helper->describe($output, $object, $options);
+
+        if (!$input->getArgument('name') && $input->isInteractive()) {
+            $output->writeln('To search for a service, re-run this command with a search term. <comment>debug:container log</comment>');
+        }
     }
 
     /**
@@ -132,7 +145,7 @@ EOF
         $optionsCount = 0;
         foreach ($options as $option) {
             if ($input->getOption($option)) {
-                $optionsCount++;
+                ++$optionsCount;
             }
         }
 
@@ -153,6 +166,10 @@ EOF
      */
     protected function getContainerBuilder()
     {
+        if ($this->containerBuilder) {
+            return $this->containerBuilder;
+        }
+
         if (!$this->getApplication()->getKernel()->isDebug()) {
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
         }
@@ -166,6 +183,38 @@ EOF
         $loader = new XmlFileLoader($container, new FileLocator());
         $loader->load($cachedFile);
 
-        return $container;
+        return $this->containerBuilder = $container;
+    }
+
+    private function findProperServiceName(InputInterface $input, OutputInterface $output, ContainerBuilder $builder, $name)
+    {
+        if ($builder->has($name) || !$input->isInteractive()) {
+            return $name;
+        }
+
+        $matchingServices = $this->findServiceIdsContaining($builder, $name);
+        if (empty($matchingServices)) {
+            throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
+        }
+
+        $question = new ChoiceQuestion('Choose a number for more information on the service', $matchingServices);
+        $question->setErrorMessage('Service %s is invalid.');
+
+        return $this->getHelper('question')->ask($input, $output, $question);
+    }
+
+    private function findServiceIdsContaining(ContainerBuilder $builder, $name)
+    {
+        $serviceIds = $builder->getServiceIds();
+        $foundServiceIds = array();
+        $name = strtolower($name);
+        foreach ($serviceIds as $serviceId) {
+            if (false === strpos($serviceId, $name)) {
+                continue;
+            }
+            $foundServiceIds[] = $serviceId;
+        }
+
+        return $foundServiceIds;
     }
 }

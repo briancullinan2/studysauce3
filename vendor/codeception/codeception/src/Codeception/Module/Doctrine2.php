@@ -1,20 +1,45 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Module as CodeceptionModule;
+use Codeception\Exception\ModuleConfigException;
+use Codeception\Lib\Interfaces\DependsOnModule;
+use Codeception\Lib\Interfaces\DoctrineProvider;
+use Codeception\TestCase;
+use Doctrine\ORM\EntityManager;
+use Codeception\Util\Stub;
+
 /**
  * Allows integration and testing for projects with Doctrine2 ORM.
- *
  * Doctrine2 uses EntityManager to perform all database operations.
- * As the module uses active connection and active entity manager, instance of this object should be passed to this module.
  *
- * It can be done in bootstrap file, by setting static $em property:
- *
- * ``` php
- * <?php
- *
- * \Codeception\Module\Doctrine2::$em = $em
+ * When using with Zend Framework 2 or Symfony2 Doctrine connection is automatically retrieved from Service Locator.
+ * In this case you should include either **Symfony2** or **ZF2** module and specify it as dependent for Doctrine:
  *
  * ```
+ * modules:
+ *     enabled:
+ *         - Symfony2
+ *         - Doctrine2:
+ *             depends: Symfony2
+ * ```
+ *
+ * If you don't use any of frameworks above, you should specify a callback function to receive entity manager:
+ *
+ * ```
+ * modules:
+ *     enabled:
+ *         - Doctrine2:
+ *             connection_callback: ['MyDb', 'createEntityManager']
+ *
+ * ```
+ *
+ * This will use static method of `MyDb::createEntityManager()` to establish EntityManager.
+ *
+ * By default module will wrap everything into transaction for each test and rollback it afterwards. By doing this
+ * tests won't write anything to database, and so will run much faster and will be isolate dfrom each other.
+ * This behavior can be changed by specifying `cleanup: false` in config.
+ *
  * ## Status
  *
  * * Maintainer: **davert**
@@ -23,91 +48,142 @@ namespace Codeception\Module;
  *
  * ## Config
  *
- * * auto_connect: true - tries to get EntityManager through connected frameworks. If none found expects the $em values specified as described above.
  * * cleanup: true - all doctrine queries will be run in transaction, which will be rolled back at the end of test.
+ * * connection_callback: - callable that will return an instance of EntityManager. This is a must if you run Doctrine without Zend2 or Symfony2 frameworks
  *
  *  ### Example (`functional.suite.yml`)
- * 
+ *
  *      modules:
  *         enabled: [Doctrine2]
  *         config:
  *            Doctrine2:
  *               cleanup: false
+ *
+ * ## Public Properties
+ *
+ * * `em` - Entity Manager
  */
 
-class Doctrine2 extends \Codeception\Module
+class Doctrine2 extends CodeceptionModule implements DependsOnModule
 {
 
-    protected $config = array('cleanup' => true, 'auto_connect' => true);
+    protected $config = [
+        'cleanup' => true,
+        'connection_callback' => false,
+        'depends' => null
+    ];
+
+    protected $dependencyMessage = <<<EOF
+Provide connection_callback function to establish database connection and get Entity Manager:
+
+modules:
+    enabled:
+        - Doctrine2:
+            connection_callback: [My\ConnectionClass, getEntityManager]
+
+Or set a dependent module, which can be either Symfony2 or ZF2 to get EM from service locator:
+
+modules:
+    enabled:
+        - Doctrine2:
+            depends: Symfony2
+EOF;
 
     /**
      * @var \Doctrine\ORM\EntityManager
      */
-    public static $em = null;
-    
-    public function _before(\Codeception\TestCase $test)
+    public $em = null;
+
+    /**
+     * @var \Codeception\Lib\Interfaces\DoctrineProvider
+     */
+    private $dependentModule;
+
+    public function _depends()
     {
-        // trying to connect to Symfony2 and get event manager
-        if ($this->config['auto_connect']) {
-            if ($this->hasModule('Symfony2')) {
-                $symfonyModule = $this->getModule('Symfony2');
-                $kernel = $symfonyModule->kernel;
-                if ($kernel->getContainer()->has('doctrine')) {
-                    self::$em = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-                    $symfonyModule->client->persistentServices[] = 'doctrine.orm.entity_manager';
-                    $symfonyModule->client->persistentServices[] = 'doctrine.orm.default_entity_manager';
-                }
-            }
-            if ($this->hasModule('ZF2')) {
-                $zf2Module = $this->getModule('ZF2');
-                $application = $zf2Module->application;
-                $serviceLocator = $application->getServiceManager();
-                if ($entityManager = $serviceLocator->get('Doctrine\ORM\EntityManager')) {
-                    self::$em = $entityManager;
-                }
-            }
-       }
+        if ($this->config['connection_callback']) {
+            return [];
+        }
+        return ['Codeception\Lib\Interfaces\DoctrineProvider' => $this->dependencyMessage];
+    }
 
-        if (!self::$em) throw new \Codeception\Exception\ModuleConfig(__CLASS__,
-            "Doctrine2 module requires EntityManager explicitly set.\n" .
-            "You can use your bootstrap file to assign the EntityManager:\n\n" .
-            '\Codeception\Module\Doctrine2::$em = $em');
+    public function _inject(DoctrineProvider $dependentModule = null)
+    {
+        $this->dependentModule = $dependentModule;
+    }
 
-        if (!self::$em instanceof \Doctrine\ORM\EntityManager) throw new \Codeception\Exception\ModuleConfig(__CLASS__,
-                    "Entity Manager was not properly set.\n" .
-                    "You can use your bootstrap file to assign the EntityManager:\n\n" .
-                    '\Codeception\Module\Doctrine2::$em = $em');
+    public function _beforeSuite($settings = [])
+    {
+        $this->retrieveEntityManager();
+    }
 
-        self::$em->getConnection()->connect();
+    public function _before(TestCase $test)
+    {
+        $this->retrieveEntityManager();
         if ($this->config['cleanup']) {
-            self::$em->getConnection()->beginTransaction();
+            $this->em->getConnection()->beginTransaction();
         }
     }
 
-    public function _after(\Codeception\TestCase $test)
+    protected function retrieveEntityManager()
     {
-        if (!self::$em) throw new \Codeception\Exception\ModuleConfig(__CLASS__,
-            "Doctrine2 module requires EntityManager explicitly set.\n" .
-            "You can use your bootstrap file to assign the EntityManager:\n\n" .
-            '\Codeception\Module\Doctrine2::$em = $em');
+        if ($this->dependentModule) {
+            $this->em = $this->dependentModule->_getEntityManager();
+        } else {
+            if (is_callable($this->config['connection_callback'])) {
+                $this->em = call_user_func($this->config['connection_callback']);
+            }
+        }
 
-        if ($this->config['cleanup'] && self::$em->getConnection()->isTransactionActive()) {
-            self::$em->getConnection()->rollback();
+        if (!$this->em) {
+            throw new ModuleConfigException(
+                __CLASS__,
+                "EntityManager can't be obtained.\n \n"
+                . "Please specify either `connection_callback` config option\n"
+                . "with callable which will return instance of EntityManager or\n"
+                . "pass a dependent module which are Symfony2 or ZF2\n"
+                . "to connect to Doctrine using Dependency Injection Container"
+            );
+        }
+
+
+        if (!($this->em instanceof \Doctrine\ORM\EntityManager)) {
+            throw new ModuleConfigException(
+                __CLASS__,
+                "Connection object is not an instance of \\Doctrine\\ORM\\EntityManager.\n"
+                . "Use `connection_callback` or dependent framework modules to specify one"
+            );
+        }
+
+        $this->em->getConnection()->connect();
+    }
+
+    public function _after(TestCase $test)
+    {
+        if (!$this->em instanceof \Doctrine\ORM\EntityManager) {
+            return;
+        }
+        if ($this->config['cleanup'] && $this->em->getConnection()->isTransactionActive()) {
+            try {
+                $this->em->getConnection()->rollback();
+            } catch (\PDOException $e) {
+            }
         }
         $this->clean();
+        $this->em->getConnection()->close();
     }
 
     protected function clean()
     {
-        $em = self::$em;
+        $em = $this->em;
 
         $reflectedEm = new \ReflectionClass($em);
         if ($reflectedEm->hasProperty('repositories')) {
             $property = $reflectedEm->getProperty('repositories');
             $property->setAccessible(true);
-            $property->setValue($em, array());
+            $property->setValue($em, []);
         }
-        self::$em->clear();
+        $this->em->clear();
     }
 
 
@@ -116,7 +192,7 @@ class Doctrine2 extends \Codeception\Module
      */
     public function flushToDatabase()
     {
-        self::$em->flush();
+        $this->em->flush();
     }
 
 
@@ -134,7 +210,8 @@ class Doctrine2 extends \Codeception\Module
      * @param $obj
      * @param array $values
      */
-    public function persistEntity($obj, $values = array()) {
+    public function persistEntity($obj, $values = [])
+    {
 
         if ($values) {
             $reflectedObj = new \ReflectionClass($obj);
@@ -145,8 +222,8 @@ class Doctrine2 extends \Codeception\Module
             }
         }
 
-        self::$em->persist($obj);
-        self::$em->flush();
+        $this->em->persist($obj);
+        $this->em->flush();
     }
 
     /**
@@ -169,26 +246,35 @@ class Doctrine2 extends \Codeception\Module
      * @param $classname
      * @param array $methods
      */
-    public function haveFakeRepository($classname, $methods = array())
+    public function haveFakeRepository($classname, $methods = [])
     {
-        $em = self::$em;
+        $em = $this->em;
 
         $metadata = $em->getMetadataFactory()->getMetadataFor($classname);
         $customRepositoryClassName = $metadata->customRepositoryClassName;
 
-        if (!$customRepositoryClassName) $customRepositoryClassName = '\Doctrine\ORM\EntityRepository';
+        if (!$customRepositoryClassName) {
+            $customRepositoryClassName = '\Doctrine\ORM\EntityRepository';
+        }
 
-        $mock = \Codeception\Util\Stub::make($customRepositoryClassName, array_merge(array('_entityName' => $metadata->name,
-                                                                          '_em'         => $em,
-                                                                          '_class'      => $metadata), $methods));
+        $mock = Stub::make(
+            $customRepositoryClassName, array_merge(
+                [
+                    '_entityName' => $metadata->name,
+                    '_em' => $em,
+                    '_class' => $metadata
+                ],
+                $methods
+            )
+        );
         $em->clear();
         $reflectedEm = new \ReflectionClass($em);
         if ($reflectedEm->hasProperty('repositories')) {
             $property = $reflectedEm->getProperty('repositories');
             $property->setAccessible(true);
-            $property->setValue($em, array_merge($property->getValue($em), array($classname => $mock)));
+            $property->setValue($em, array_merge($property->getValue($em), [$classname => $mock]));
         } else {
-            $this->debugSection('Warning','Repository can\'t be mocked, the EventManager class doesn\'t have "repositories" property');
+            $this->debugSection('Warning', 'Repository can\'t be mocked, the EventManager class doesn\'t have "repositories" property');
         }
     }
 
@@ -207,15 +293,15 @@ class Doctrine2 extends \Codeception\Module
         $reflectedEntity = new \ReflectionClass($entity);
         $entityObject = $reflectedEntity->newInstance();
         foreach ($reflectedEntity->getProperties() as $property) {
-            /** @var $property \ReflectionProperty  */
+            /** @var $property \ReflectionProperty */
             if (!isset($data[$property->name])) {
                 continue;
             }
             $property->setAccessible(true);
             $property->setValue($entityObject, $data[$property->name]);
         }
-        self::$em->persist($entityObject);
-        self::$em->flush();
+        $this->em->persist($entityObject);
+        $this->em->flush();
 
         if (method_exists($entityObject, 'getId')) {
             $id = $entityObject->getId();
@@ -244,7 +330,8 @@ class Doctrine2 extends \Codeception\Module
      * @param $entity
      * @param array $params
      */
-    public function seeInRepository($entity, $params = array()) {
+    public function seeInRepository($entity, $params = [])
+    {
         $res = $this->proceedSeeInRepository($entity, $params);
         $this->assert($res);
     }
@@ -255,22 +342,23 @@ class Doctrine2 extends \Codeception\Module
      * @param $entity
      * @param array $params
      */
-    public function dontSeeInRepository($entity, $params = array()) {
+    public function dontSeeInRepository($entity, $params = [])
+    {
         $res = $this->proceedSeeInRepository($entity, $params);
         $this->assertNot($res);
     }
 
-    protected function proceedSeeInRepository($entity, $params = array())
+    protected function proceedSeeInRepository($entity, $params = [])
     {
         // we need to store to database...
-        self::$em->flush();
-        $data = self::$em->getClassMetadata($entity);
-        $qb = self::$em->getRepository($entity)->createQueryBuilder('s');
-        $this->buildAssociationQuery($qb,$entity, 's', $params);
+        $this->em->flush();
+        $data = $this->em->getClassMetadata($entity);
+        $qb = $this->em->getRepository($entity)->createQueryBuilder('s');
+        $this->buildAssociationQuery($qb, $entity, 's', $params);
         $this->debug($qb->getDQL());
         $res = $qb->getQuery()->getArrayResult();
 
-        return array('True', (count($res) > 0), "$entity with " . json_encode($params));
+        return ['True', (count($res) > 0), "$entity with " . json_encode($params)];
     }
 
     /**
@@ -292,14 +380,14 @@ class Doctrine2 extends \Codeception\Module
      * @param array $params
      * @return array
      */
-    public function grabFromRepository($entity, $field, $params = array())
+    public function grabFromRepository($entity, $field, $params = [])
     {
         // we need to store to database...
-        self::$em->flush();
-        $data = self::$em->getClassMetadata($entity);
-        $qb = self::$em->getRepository($entity)->createQueryBuilder('s');
-        $qb->select('s.'.$field);
-        $this->buildAssociationQuery($qb,$entity, 's', $params);
+        $this->em->flush();
+        $data = $this->em->getClassMetadata($entity);
+        $qb = $this->em->getRepository($entity)->createQueryBuilder('s');
+        $qb->select('s.' . $field);
+        $this->buildAssociationQuery($qb, $entity, 's', $params);
         $this->debug($qb->getDQL());
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -314,7 +402,7 @@ class Doctrine2 extends \Codeception\Module
      */
     protected function buildAssociationQuery($qb, $assoc, $alias, $params)
     {
-        $data = self::$em->getClassMetadata($assoc);
+        $data = $this->em->getClassMetadata($assoc);
         foreach ($params as $key => $val) {
             if (isset($data->associationMappings)) {
                 if ($map = array_key_exists($key, $data->associationMappings)) {
@@ -325,7 +413,7 @@ class Doctrine2 extends \Codeception\Module
                                 $this->buildAssociationQuery($qb, $map['targetEntity'], $column, $v);
                                 continue;
                             }
-                            $paramname = $key.'__'.$column;
+                            $paramname = $key . '__' . $column;
                             $qb->andWhere("$key.$column = :$paramname");
                             $qb->setParameter($paramname, $v);
                         }
@@ -336,11 +424,10 @@ class Doctrine2 extends \Codeception\Module
             if ($val === null) {
                 $qb->andWhere("s.$key IS NULL");
             } else {
-                $paramname = "s__$key";
+                $paramname = str_replace(".", "", "s_$key");
                 $qb->andWhere("s.$key = :$paramname");
                 $qb->setParameter($paramname, $val);
             }
-
         }
     }
 }

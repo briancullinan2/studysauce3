@@ -114,7 +114,7 @@ $(document).ready(function () {
             row.removeClass('status_green status_yellow status_red');
             row.addClass('status_' + status);
             jQuery.ajax({
-                url: window.callbackPaths['userlist_status'],
+                url: Routing.generate('userlist_status'),
                 type: 'POST',
                 dataType: 'json',
                 data: {

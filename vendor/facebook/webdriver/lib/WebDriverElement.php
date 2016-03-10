@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
 /**
  * Interface for an HTML element in the WebDriver framework.
  */
@@ -52,7 +54,7 @@ interface WebDriverElement extends WebDriverSearchContext {
   /**
    * Get the location of element relative to the top-left corner of the page.
    *
-   * @return WebDriverLocation The location of the element.
+   * @return WebDriverPoint The location of the element.
    */
   public function getLocation();
 
@@ -60,7 +62,7 @@ interface WebDriverElement extends WebDriverSearchContext {
    * Try scrolling the element into the view port and return the location of
    * element relative to the top-left corner of the page afterwards.
    *
-   * @return WebDriverLocation The location of the element.
+   * @return WebDriverPoint The location of the element.
    */
   public function getLocationOnScreenOnceScrolledIntoView();
 

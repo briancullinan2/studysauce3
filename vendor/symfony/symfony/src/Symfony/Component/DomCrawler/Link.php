@@ -12,11 +12,9 @@
 namespace Symfony\Component\DomCrawler;
 
 /**
- * Link represents an HTML link (an HTML a or area tag).
+ * Link represents an HTML link (an HTML a, area or link tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Link
 {
@@ -43,8 +41,6 @@ class Link
      * @param string      $method     The method to use for the link (get by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
-     *
-     * @api
      */
     public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
     {
@@ -71,8 +67,6 @@ class Link
      * Gets the method associated with this link.
      *
      * @return string The method
-     *
-     * @api
      */
     public function getMethod()
     {
@@ -83,8 +77,6 @@ class Link
      * Gets the URI associated with this link.
      *
      * @return string The URI
-     *
-     * @api
      */
     public function getUri()
     {
@@ -154,7 +146,7 @@ class Link
         }
 
         if ('.' === substr($path, -1)) {
-            $path = $path.'/';
+            $path .= '/';
         }
 
         $output = array();
@@ -163,7 +155,7 @@ class Link
             if ('..' === $segment) {
                 array_pop($output);
             } elseif ('.' !== $segment) {
-                array_push($output, $segment);
+                $output[] = $segment;
             }
         }
 
@@ -179,8 +171,8 @@ class Link
      */
     protected function setNode(\DOMElement $node)
     {
-        if ('a' !== $node->nodeName && 'area' !== $node->nodeName) {
-            throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
+        if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {
+            throw new \LogicException(sprintf('Unable to navigate from a "%s" tag.', $node->nodeName));
         }
 
         $this->node = $node;

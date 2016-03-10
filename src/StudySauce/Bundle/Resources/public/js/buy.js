@@ -165,7 +165,7 @@ jQuery(document).ready(function($) {
         evt.preventDefault();
         checkout.find('.form-actions .error').remove();
         $.ajax({
-            url: window.callbackPaths['checkout_coupon'],
+            url: Routing.generate('checkout_coupon'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -192,7 +192,7 @@ jQuery(document).ready(function($) {
         evt.preventDefault();
         checkout.find('.form-actions .error').remove();
         $.ajax({
-            url: window.callbackPaths['checkout_coupon'],
+            url: Routing.generate('checkout_coupon'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -277,7 +277,7 @@ jQuery(document).ready(function($) {
         loadingAnimation(checkout.find('a[href="#submit-order"]'));
 
         $.ajax({
-            url: window.callbackPaths['checkout_pay'],
+            url: Routing.generate('checkout_pay'),
             type: 'POST',
             dataType: 'json',
             data: {

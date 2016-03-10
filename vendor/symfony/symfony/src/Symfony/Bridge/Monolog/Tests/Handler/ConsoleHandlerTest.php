@@ -110,7 +110,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testWritingAndFormatting()
     {
-        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutputInterface');
+        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
         $output
             ->expects($this->any())
             ->method('getVerbosity')
@@ -119,20 +119,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         $output
             ->expects($this->once())
             ->method('write')
-            ->with('<info>[2013-05-29 16:21:54] app.INFO:</info> My info message [] []'."\n")
-        ;
-
-        $errorOutput = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $errorOutput
-            ->expects($this->once())
-            ->method('write')
-            ->with('<error>[2013-05-29 16:21:54] app.ERROR:</error> My error message [] []'."\n")
-        ;
-
-        $output
-            ->expects($this->any())
-            ->method('getErrorOutput')
-            ->will($this->returnValue($errorOutput))
+            ->with('<info>[2013-05-29 16:21:54] app.INFO:</info> My info message  '."\n")
         ;
 
         $handler = new ConsoleHandler(null, false);
@@ -149,18 +136,6 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
-
-        $errorRecord = array(
-            'message' => 'My error message',
-            'context' => array(),
-            'level' => Logger::ERROR,
-            'level_name' => Logger::getLevelName(Logger::ERROR),
-            'channel' => 'app',
-            'datetime' => new \DateTime('2013-05-29 16:21:54'),
-            'extra' => array(),
-        );
-
-        $this->assertTrue($handler->handle($errorRecord), 'The handler finished handling the log as bubble is false.');
     }
 
     public function testLogsFromListeners()

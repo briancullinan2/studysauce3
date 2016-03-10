@@ -1,9 +1,10 @@
 <?php
 namespace Codeception\Lib\Driver;
 
+use Codeception\Configuration;
+
 class Sqlite extends Db
 {
-
     protected $hasSnapshot = false;
     protected $filename = '';
     protected $con = null;
@@ -11,8 +12,8 @@ class Sqlite extends Db
     public function __construct($dsn, $user, $password)
     {
         parent::__construct($dsn, $user, $password);
-        $this->filename = \Codeception\Configuration::projectDir() . substr($this->dsn, 7);
-        $this->dsn      = 'sqlite:' . $this->filename;
+        $this->filename = Configuration::projectDir() . substr($this->dsn, 7);
+        $this->dsn = 'sqlite:' . $this->filename;
     }
 
     public function cleanup()
@@ -41,11 +42,25 @@ class Sqlite extends Db
     /**
      * @param string $tableName
      *
-     * @return string
+     * @return array[string]
      */
-    public function getPrimaryColumn($tableName)
+    public function getPrimaryKey($tableName)
     {
-        // @TODO: Implement this for SQLite later
-        return 'id';
+        if (!isset($this->primaryKeys[$tableName])) {
+            $primaryKey = [];
+            $query = 'PRAGMA table_info(' . $this->getQuotedName($tableName) . ')';
+            $stmt = $this->executeQuery($query, []);
+            $columns = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($columns as $column) {
+                if ($column['pk'] !== '0') {
+                    $primaryKey []= $column['name'];
+                }
+            }
+
+            $this->primaryKeys[$tableName] = $primaryKey;
+        }
+
+        return $this->primaryKeys[$tableName];
     }
 }

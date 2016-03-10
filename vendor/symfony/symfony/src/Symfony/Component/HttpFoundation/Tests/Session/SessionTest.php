@@ -190,9 +190,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface', $this->session->getFlashBag());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Session\Session::getIterator
-     */
     public function testGetIterator()
     {
         $attributes = array('hello' => 'world', 'symfony' => 'rocks');
@@ -203,15 +200,12 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $i = 0;
         foreach ($this->session as $key => $val) {
             $this->assertEquals($attributes[$key], $val);
-            $i++;
+            ++$i;
         }
 
         $this->assertEquals(count($attributes), $i);
     }
 
-    /**
-     * @covers \Symfony\Component\HttpFoundation\Session\Session::count
-     */
     public function testGetCount()
     {
         $this->session->set('hello', 'world');

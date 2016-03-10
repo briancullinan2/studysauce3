@@ -37,21 +37,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         new PhpDumper($container);
     }
 
-    public function testDumpFrozenContainerWithNoParameter()
-    {
-        $container = new ContainerBuilder();
-        $container->setResourceTracking(false);
-        $container->register('foo', 'stdClass');
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-
-        $dumpedString = $dumper->dump();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services11.php', $dumpedString, '->dump() does not add getDefaultParameters() method call if container have no parameters.');
-        $this->assertNotRegexp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
-    }
-
     public function testDumpOptimizationString()
     {
         $definition = new Definition();
@@ -63,8 +48,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             '.' => 'dot as a key',
             '.\'\'.' => 'concatenation as a key',
             '\'\'.' => 'concatenation from the start key',
-            'optimize concatenation' => "string1%some_string%string2",
-            'optimize concatenation with empty string' => "string1%empty_value%string2",
+            'optimize concatenation' => 'string1%some_string%string2',
+            'optimize concatenation with empty string' => 'string1%empty_value%string2',
             'optimize concatenation from the start' => '%empty_value%start',
             'optimize concatenation at the end' => 'end%empty_value%',
         ));
@@ -89,8 +74,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $container = new ContainerBuilder();
         $container->setDefinition('test', $definition);
-        $container->setParameter('foo', 'wiz'.dirname(dirname(__FILE__)));
-        $container->setParameter('bar', dirname(__FILE__));
+        $container->setParameter('foo', 'wiz'.dirname(__DIR__));
+        $container->setParameter('bar', __DIR__);
         $container->setParameter('baz', '%bar%/PhpDumperTest.php');
         $container->setParameter('buz', dirname(dirname(__DIR__)));
         $container->compile();
@@ -140,6 +125,24 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testLegacySynchronizedServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container20.php';
+        $dumper = new PhpDumper($container);
+        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services20.php')), $dumper->dump(), '->dump() dumps services');
+    }
+
+    public function testServicesWithAnonymousFactories()
+    {
+        $container = include self::$fixturesPath.'/containers/container19.php';
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
      */
@@ -149,6 +152,31 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->register('bar$', 'FooClass');
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    /**
+     * @dataProvider provideInvalidFactories
+     * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot dump definition
+     */
+    public function testInvalidFactories($factory)
+    {
+        $container = new ContainerBuilder();
+        $def = new Definition('stdClass');
+        $def->setFactory($factory);
+        $container->setDefinition('bar', $def);
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+    }
+
+    public function provideInvalidFactories()
+    {
+        return array(
+            array(array('', 'method')),
+            array(array('class', '')),
+            array(array('...', 'method')),
+            array(array('class', '...')),
+        );
     }
 
     public function testAliases()

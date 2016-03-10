@@ -16,8 +16,6 @@ namespace Symfony\Component\Translation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class MessageSelector
 {
@@ -46,8 +44,6 @@ class MessageSelector
      * @return string
      *
      * @throws \InvalidArgumentException
-     *
-     * @api
      */
     public function choose($message, $number, $locale)
     {
@@ -57,7 +53,7 @@ class MessageSelector
         foreach ($parts as $part) {
             $part = trim($part);
 
-            if (preg_match('/^(?P<interval>'.Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/x', $part, $matches)) {
+            if (preg_match('/^(?P<interval>'.Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/xs', $part, $matches)) {
                 $explicitRules[$matches['interval']] = $matches['message'];
             } elseif (preg_match('/^\w+\:\s*(.*?)$/', $part, $matches)) {
                 $standardRules[] = $matches[1];

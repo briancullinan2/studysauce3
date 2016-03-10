@@ -1,8 +1,13 @@
 <?php
 namespace Codeception;
 
+use Codeception\Lib\ModuleContainer;
+use Codeception\Step\Meta;
+use Codeception\Util\Locator;
+
 abstract class Step
 {
+    const STACK_POSITION = 3;
     /**
      * @var    string
      */
@@ -17,10 +22,50 @@ abstract class Step
 
     public $executed = false;
 
+    protected $line = null;
+    protected $file = null;
+    protected $actor = 'I';
+
+    /**
+     * @var Meta
+     */
+    protected $metaStep = null;
+
+    protected $failed = false;
+
     public function __construct($action, array $arguments)
     {
-        $this->action    = $action;
+        $this->action = $action;
         $this->arguments = $arguments;
+        $this->storeCallerInfo();
+    }
+
+    protected function storeCallerInfo()
+    {
+        if (!function_exists('xdebug_get_function_stack')) {
+            return;
+        }
+
+        ini_set('xdebug.collect_params', '1');
+        $stack = xdebug_get_function_stack();
+        ini_set('xdebug.collect_params', 0);
+        if (count($stack) <= self::STACK_POSITION) {
+            return;
+        }
+        $traceLine = $stack[count($stack) - self::STACK_POSITION];
+
+        if (!isset($traceLine['file'])) {
+            return;
+        }
+        $this->file = $traceLine['file'];
+        $this->line = $traceLine['line'];
+
+        $this->addMetaStep($traceLine, $stack);
+    }
+
+    private function isTestFile($file)
+    {
+        return preg_match('~[^\\'.DIRECTORY_SEPARATOR.'](Cest|Cept|Test).php$~', $file);
     }
 
     public function getName()
@@ -34,39 +79,71 @@ abstract class Step
         return $this->action;
     }
 
+    public function getLine()
+    {
+        if ($this->line && $this->file) {
+            return codecept_relative_path($this->file) . ':' . $this->line;
+        }
+    }
+
+    public function hasFailed()
+    {
+        return $this->failed;
+    }
+
     public function getArguments($asString = false)
     {
         return ($asString) ? $this->getArgumentsAsString($this->arguments) : $this->arguments;
     }
 
-    protected function getArgumentsAsString(array $arguments) 
+    protected function getArgumentsAsString(array $arguments)
     {
+        $argumentsAsJson = [];
         foreach ($arguments as $key => $argument) {
-            $arguments[$key] = (is_string($argument)) ? $argument : $this->parseArgumentAsString($argument);
+            $argumentsAsJson []= stripcslashes(json_encode($this->parseArgumentAsString($argument), JSON_UNESCAPED_UNICODE));
         }
 
-        if (defined('JSON_UNESCAPED_UNICODE')) {
-            return stripcslashes(trim(json_encode($arguments, JSON_UNESCAPED_UNICODE), '[]'));
-        }
-
-        return stripcslashes(trim(json_encode($arguments), '[]'));
+        return implode(',', $argumentsAsJson);
     }
 
     protected function parseArgumentAsString($argument)
     {
-        if (is_callable($argument, true)) {
-            return 'lambda function';  
-        } 
+        if (is_object($argument)) {
+            if (method_exists($argument, '__toString')) {
+                return (string)$argument;
+            }
+            if (get_class($argument) == 'Facebook\WebDriver\WebDriverBy') {
+                return Locator::humanReadableString($argument);
+            }
+            return $this->getClassName($argument);
+        }
 
-        if (!is_object($argument)) {
+        if (is_array($argument)) {
+            foreach ($argument as $key => $value) {
+                if (is_object($value)) {
+                    $argument[$key] = $this->getClassName($value);
+                }
+            }
             return $argument;
         }
 
-        if (method_exists($argument, '__toString')) {
-            return $argument->__toString();    
-        } 
+        if (is_resource($argument)) {
+            return (string)$argument;
+        }
 
-        return (isset($argument->__mocked)) ? $this->formatClassName($argument->__mocked) : $this->formatClassName(get_class($argument));
+        return $argument;
+    }
+
+
+    protected function getClassName($argument)
+    {
+        if ($argument instanceof \Closure) {
+            return 'Closure';
+        } elseif ((isset($argument->__mocked))) {
+            return $this->formatClassName($argument->__mocked);
+        } else {
+            return $this->formatClassName(get_class($argument));
+        }
     }
 
     protected function formatClassName($classname)
@@ -74,20 +151,32 @@ abstract class Step
         return trim($classname, "\\");
     }
 
+    public function getPhpCode()
+    {
+        return "\${$this->actor}->" . $this->getAction() . '(' . $this->getHumanizedArguments() .')';
+    }
+
+    /**
+     * @return Meta
+     */
+    public function getMetaStep()
+    {
+        return $this->metaStep;
+
+    }
+
     public function __toString()
     {
-        return "I " . $this->getHumanizedAction();
+        return $this->actor . ' ' . $this->humanize($this->getAction()) . ' ' . $this->getHumanizedArguments();
     }
 
-    public function getHumanizedAction()
+    public function getHtml($highlightColor = '#732E81')
     {
-        return $this->humanize($this->getAction()) . ' ' . $this->getHumanizedArguments();
-    }
+        if (empty($this->arguments)) {
+            return sprintf('%s %s', ucfirst($this->actor), $this->humanize($this->getAction()));
+        }
 
-    public function getHtmlAction()
-    {
-        $args = preg_replace('~\$(.*?)\s~', '$<span style="color: #3C3C89; font-weight: bold;">$1</span>', $this->getHumanizedArguments());
-        return $this->humanize($this->getAction()) . ' <span style="color: #732E81;">' . $args . '</span>';
+        return sprintf('%s %s <span style="color: %s">%s</span>', ucfirst($this->actor), $this->humanize($this->getAction()), $highlightColor, $this->getHumanizedArguments());
     }
 
     public function getHumanizedActionWithoutArguments()
@@ -113,15 +202,62 @@ abstract class Step
         return strtolower($text);
     }
 
-    public function run()
+    public function run(ModuleContainer $container = null)
     {
         $this->executed = true;
-        $activeModule   = \Codeception\SuiteManager::$modules[\Codeception\SuiteManager::$actions[$this->action]];
+        if (!$container) {
+            return null;
+        }
+        $activeModule = $container->moduleForAction($this->action);
 
-        if (!is_callable(array($activeModule, $this->action))) {
-            throw new \RuntimeException("Action can't be called");  
-        } 
-        
-        return call_user_func_array(array($activeModule, $this->action), $this->arguments);
+        if (!is_callable([$activeModule, $this->action])) {
+            throw new \RuntimeException("Action '{$this->action}' can't be called");
+        }
+
+        try {
+            $res = call_user_func_array([$activeModule, $this->action], $this->arguments);
+        } catch (\Exception $e) {
+            $this->failed = true;
+            throw $e;
+        }
+        return $res;
+    }
+
+    /**
+     * If steps are combined into one method they can be reproduced as meta-step.
+     * We are using stack trace to analyze if steps were called from test, if not - they were called from meta-step.
+     *
+     * @param $step
+     * @param $stack
+     */
+    protected function addMetaStep($step, $stack)
+    {
+        if (($this->isTestFile($this->file)) || ($step['class'] == 'Codeception\Scenario')) {
+            return;
+        }
+
+        $i = count($stack) - self::STACK_POSITION - 1;
+
+        // get into test file and retrieve its actual call
+        while (isset($stack[$i])) {
+            $step = $stack[$i];
+            $i--;
+            if (!isset($step['file']) or !isset($step['function'])) {
+                continue;
+            }
+
+            if (!$this->isTestFile($step['file'])) {
+                continue;
+            }
+
+            $this->metaStep = new Meta($step['function'], array_values($step['params']));
+            $this->metaStep->setTraceInfo($step['file'], $step['line']);
+
+            // pageobjects or other classes should not be included with "I"
+            if (!(new \ReflectionClass($step['class']))->isSubclassOf('Codeception\Actor')) {
+                $this->metaStep->setActor($step['class'] . ':');
+            }
+            return;
+        }
     }
 }

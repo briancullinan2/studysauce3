@@ -8,7 +8,7 @@
  *
  */
 
-abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
+abstract class TestsForWeb extends \Codeception\TestCase\Test
 {
     /**
      * @var \Codeception\Module\PhpBrowser
@@ -47,6 +47,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
     {
         $this->module->amOnPage('/');
         $this->module->see('Welcome to test app!');
+        $this->module->see('A wise man said: "debug!"');
 
         $this->module->amOnPage('/');
         $this->module->see('Welcome to test app!', 'h1');
@@ -58,6 +59,14 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->dontSee('Welcome');
         $this->module->dontSee('valuable', 'h1');
         $this->module->dontSee('Welcome','h6');
+    }
+
+    public function testSeeInSource()
+    {
+        $this->module->amOnPage('/');
+        $this->module->seeInSource('<h1>Welcome to test app!</h1>');
+        $this->module->seeInSource('A wise man said: "debug!"');
+        $this->module->dontSeeInSource('John Cleese');
     }
 
     public function testSeeInCurrentUrl()
@@ -87,7 +96,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
 
         $this->module->amOnPage('/');
         $this->module->click("descendant-or-self::a[@id = 'link']");
-        $this->module->seeInCurrentUrl('/info');               
+        $this->module->seeInCurrentUrl('/info');
     }
 
     public function testClickByName()
@@ -190,6 +199,18 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->amOnPage('/form/example6');
         $this->module->seeOptionIsSelected('input[name=frequency]', 'hour');
         $this->module->dontSeeOptionIsSelected('input[name=frequency]', 'week');
+    }
+
+    /**
+     * @Issue https://github.com/Codeception/Codeception/issues/2733
+     */
+    public function testSeeSelectedOptionReturnsFirstOptionIfNotSelected()
+    {
+        $this->module->amOnPage('/form/complex');
+        $this->module->seeOptionIsSelected('#age', 'below 13');
+        $this->module->click('Submit');
+        $form = data::get('form');
+        $this->assertEquals('child', $form['age'], 'first option was not submitted');
     }
 
     /**
@@ -369,7 +390,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeInField('checkbox[]', 'not seen three');
         $this->module->seeInField('checkbox[]', 'see test three');
     }
-    
+
     public function testSeeInFieldWithBoolean()
     {
         $this->module->amOnPage('/form/field_values');
@@ -382,7 +403,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->seeInField('radio3', false);
         $this->module->dontSeeInField('radio3', true);
     }
-    
+
     public function testSeeInFieldOnRadio()
     {
         $this->module->amOnPage('/form/field_values');
@@ -391,7 +412,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeInField('radio1', 'not seen two');
         $this->module->dontSeeInField('radio1', 'not seen three');
     }
-    
+
     public function testSeeInFieldOnSelect()
     {
         $this->module->amOnPage('/form/field_values');
@@ -400,7 +421,13 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeInField('select1', 'not seen two');
         $this->module->dontSeeInField('select1', 'not seen three');
     }
-    
+
+    public function testSeeInFieldEmptyValueForUnselectedSelect()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $this->module->seeInField('select3', '');
+    }
+
     public function testSeeInFieldOnSelectMultiple()
     {
         $this->module->amOnPage('/form/field_values');
@@ -411,7 +438,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeInField('select2', 'not seen three');
         $this->module->seeInField('select2', 'see test three');
     }
-    
+
     public function testSeeInFieldWithExactMatch()
     {
         $this->module->amOnPage('/form/field_values');
@@ -432,6 +459,82 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->dontSeeInField('Description','sunset');
         $this->module->dontSeeInField('textarea','sunset');
         $this->module->dontSeeInField('descendant-or-self::textarea[@id="description"]','sunset');
+    }
+
+    public function testSeeInFormFields()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $params = [
+            'checkbox[]' => [
+                'see test one',
+                'see test two',
+            ],
+            'radio1' => 'see test one',
+            'checkbox1' => true,
+            'checkbox2' => false,
+            'select1' => 'see test one',
+            'select2' => [
+                'see test one',
+                'see test two',
+                'see test three'
+            ]
+        ];
+        $this->module->seeInFormFields('form', $params);
+    }
+
+    public function testSeeInFormFieldsFails()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $this->setExpectedException("PHPUnit_Framework_AssertionFailedError");
+        $params = [
+            'radio1' => 'something I should not see',
+            'checkbox1' => true,
+            'checkbox2' => false,
+            'select1' => 'see test one',
+            'select2' => [
+                'see test one',
+                'see test two',
+                'see test three'
+            ]
+        ];
+        $this->module->seeInFormFields('form', $params);
+    }
+
+    public function testDontSeeInFormFields()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $params = [
+            'checkbox[]' => [
+                'not seen one',
+                'not seen two',
+            ],
+            'radio1' => 'not seen one',
+            'checkbox1' => false,
+            'checkbox2' => true,
+            'select1' => 'not seen one',
+            'select2' => [
+                'not seen one',
+                'No where to be seen'
+            ]
+        ];
+        $this->module->dontSeeInFormFields('form', $params);
+    }
+
+    public function testDontSeeInFormFieldsFails()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $this->setExpectedException("PHPUnit_Framework_AssertionFailedError");
+        $params = [
+            'checkbox[]' => [
+                'wont see this anyway',
+                'see test one',
+            ],
+            'select2' => [
+                'not seen one',
+                'No where to be seen'
+            ]
+        ];
+        $this->module->dontSeeInFormFields('form', $params);
     }
 
     public function testSeeInFieldWithNonLatin()
@@ -558,6 +661,14 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->resetCookie($cookie_name, ['path' => '/info']);
         $this->module->dontSeeCookie($cookie_name, ['path' => '/info']);
         $this->module->dontSeeCookie($cookie_name);
+    }
+
+    public function testSendingCookies()
+    {
+        $this->module->amOnPage('/');
+        $this->module->setCookie('nocookie', '1111');
+        $this->module->amOnPage('/cookies');
+        $this->module->see('nocookie','pre');
     }
 
     public function testPageTitle()
@@ -729,6 +840,22 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->module->seeCurrentUrlEquals('/form/example5?username=John&password=1234');
     }
 
+    public function testExample5WithParams()
+    {
+        $this->module->amOnPage('/form/example5?a=b');
+        $this->module->fillField('username', 'John');
+        $this->module->fillField('password', '1234');
+        $this->module->click('Login');
+        $this->module->seeCurrentUrlEquals('/form/example5?username=John&password=1234');
+    }
+
+    public function testExample5WithSubmitFormAndParams()
+    {
+        $this->module->amOnPage('/form/example5?a=b');
+        $this->module->submitForm('form', ['username' => 'John', 'password' => '1234']);
+        $this->module->seeCurrentUrlEquals('/form/example5?username=John&password=1234');
+    }
+
     /**
      * @Issue https://github.com/Codeception/Codeception/issues/1212
      */
@@ -748,7 +875,6 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
 
     }
 
-
     public function testSubmitForm() {
         $this->module->amOnPage('/form/complex');
         $this->module->submitForm('form', array(
@@ -763,6 +889,19 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->assertEquals('kill_all', $form['action']);
     }
 
+    public function testSubmitFormWithFillField()
+    {
+        $this->module->amOnPage('/form/complex');
+        $this->module->fillField('name', 'Kilgore Trout');
+        $this->module->fillField('description', 'Is a fish');
+        $this->module->submitForm('form', [
+            'description' => 'Is from Iliyum, NY'
+        ]);
+        $form = data::get('form');
+        $this->assertEquals('Kilgore Trout', $form['name']);
+        $this->assertEquals('Is from Iliyum, NY', $form['description']);
+    }
+
     public function testSubmitFormWithoutButton() {
         $this->module->amOnPage('/form/empty');
         $this->module->submitForm('form', array(
@@ -771,7 +910,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $form = data::get('form');
         $this->assertEquals('Hello!', $form['text']);
     }
-    
+
     public function testSubmitFormWithAmpersand()
     {
         $this->module->amOnPage('/form/submitform_ampersands');
@@ -779,7 +918,22 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $form = data::get('form');
         $this->assertEquals('this & that', $form['test']);
     }
-    
+
+    public function testSubmitFormMultiSelectWithArrayParameter()
+    {
+        $this->module->amOnPage('/form/submitform_multiple');
+        $this->module->submitForm('form', [
+            'select' => [
+                'see test one',
+                'not seen four'
+            ]
+        ]);
+        $form = data::get('form');
+        $this->assertCount(2, $form['select']);
+        $this->assertEquals('see test one', $form['select'][0]);
+        $this->assertEquals('not seen four', $form['select'][1]);
+    }
+
     public function testSubmitFormWithMultiSelect()
     {
         $this->module->amOnPage('/form/submitform_multiple');
@@ -790,6 +944,39 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->assertEquals('see test two', $form['select'][1]);
     }
 
+    public function testSubmitFormCheckboxWithArrayParameter()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $this->module->submitForm('form', [
+            'checkbox' => [
+                'not seen one',
+                'see test two',
+                'not seen three'
+            ]
+        ]);
+        $form = data::get('form');
+        $this->assertCount(3, $form['checkbox']);
+        $this->assertEquals('not seen one', $form['checkbox'][0]);
+        $this->assertEquals('see test two', $form['checkbox'][1]);
+        $this->assertEquals('not seen three', $form['checkbox'][2]);
+    }
+
+    public function testSubmitFormCheckboxWithBooleanArrayParameter()
+    {
+        $this->module->amOnPage('/form/field_values');
+        $this->module->submitForm('form', [
+            'checkbox' => [
+                true,
+                false,
+                true
+            ]
+        ]);
+        $form = data::get('form');
+        $this->assertCount(2, $form['checkbox']);
+        $this->assertEquals('not seen one', $form['checkbox'][0]);
+        $this->assertEquals('not seen two', $form['checkbox'][1]);
+    }
+
     /**
      * https://github.com/Codeception/Codeception/issues/1381
      */
@@ -797,6 +984,14 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
     {
         $this->module->amOnPage('/form/empty_fill');
         $this->module->fillField('test', 'value');
+    }
+
+    public function testSubmitFormWithDefaultTextareaValue()
+    {
+        $this->module->amOnPage('/form/textarea');
+        $this->module->submitForm('form', []);
+        $form = data::get('form');
+        $this->assertEquals('sunrise', $form['description']);
     }
 
     /**
@@ -876,7 +1071,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         ));
         $this->module->seeCurrentUrlEquals('/form/example11');
     }
-    
+
     public function testSubmitFormWithDocRelativePathForActionFromDefaultPage()
     {
         $this->module->amOnPage('/form/');
@@ -885,7 +1080,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         ));
         $this->module->seeCurrentUrlEquals('/form/example11');
     }
-    
+
     public function testLinkWithDocRelativeURLFromDefaultPage()
     {
         $this->module->amOnPage('/form/');
@@ -905,10 +1100,28 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $form = data::get('form');
         $this->assertTrue(isset($form['checkbox1']), 'Checkbox value not sent');
         $this->assertTrue(isset($form['radio1']), 'Radio button value not sent');
-        $this->assertEquals($form['checkbox1'], 'testing');
-        $this->assertEquals($form['radio1'], 'to be sent');
+        $this->assertEquals('testing', $form['checkbox1']);
+        $this->assertEquals('to be sent', $form['radio1']);
     }
-    
+
+    public function testSubmitFormCheckboxWithBoolean()
+    {
+        $this->module->amOnPage('/form/example16');
+        $this->module->submitForm('form', array(
+            'checkbox1' => true
+        ));
+        $form = data::get('form');
+        $this->assertTrue(isset($form['checkbox1']), 'Checkbox value not sent');
+        $this->assertEquals('testing', $form['checkbox1']);
+
+        $this->module->amOnPage('/form/example16');
+        $this->module->submitForm('form', array(
+            'checkbox1' => false
+        ));
+        $form = data::get('form');
+        $this->assertFalse(isset($form['checkbox1']), 'Checkbox value sent');
+    }
+
     public function testSubmitFormWithButtons()
     {
         $this->module->amOnPage('/form/form_with_buttons');
@@ -917,7 +1130,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         ));
         $form = data::get('form');
         $this->assertFalse(isset($form['button1']) || isset($form['button2']) || isset($form['button3']) || isset($form['button4']), 'Button values should not be set');
-        
+
         $this->module->amOnPage('/form/form_with_buttons');
         $this->module->submitForm('form', array(
             'test' => 'value',
@@ -926,7 +1139,7 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($form['button1']) || isset($form['button2']) || isset($form['button4']), 'Button values for buttons 1, 2 and 4 should not be set');
         $this->assertTrue(isset($form['button3']), 'Button value for button3 should be set');
         $this->assertEquals($form['button3'], 'third', 'Button value for button3 should equal third');
-        
+
         $this->module->amOnPage('/form/form_with_buttons');
         $this->module->submitForm('form', array(
             'test' => 'value',
@@ -942,9 +1155,30 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
      */
     public function testWrongXpath()
     {
-        $this->shouldFail();
+        $this->setExpectedException('Codeception\Exception\MalformedLocatorException');
         $this->module->amOnPage('/');
         $this->module->seeElement('//aas[asd}[sd]a[/[');
+    }
+
+    public function testWrongCSS()
+    {
+        $this->setExpectedException('Codeception\Exception\MalformedLocatorException');
+        $this->module->amOnPage('/');
+        $this->module->seeElement('.user#iasos<here');
+    }
+
+    public function testWrongStrictCSSLocator()
+    {
+        $this->setExpectedException('Codeception\Exception\MalformedLocatorException');
+        $this->module->amOnPage('/');
+        $this->module->seeElement(['css' => 'hel!1$<world']);
+    }
+
+    public function testWrongStrictXPathLocator()
+    {
+        $this->setExpectedException('Codeception\Exception\MalformedLocatorException');
+        $this->module->amOnPage('/');
+        $this->module->seeElement(['xpath' => 'hello<wo>rld']);
     }
 
     public function testFormWithFilesArray()
@@ -1014,7 +1248,105 @@ abstract class TestsForWeb extends \PHPUnit_Framework_TestCase
         $this->assertContains('test3', $data['items'][1]);
         $this->assertContains('test2', $data['captions']);
         $this->assertContains('davert', $data['users']);
-
     }
 
+    public function testSubmitAdjacentForms()
+    {
+        $this->module->amOnPage('/form/submit_adjacentforms');
+        $this->module->submitForm('#form-2', []);
+        $data = data::get('form');
+        $this->assertTrue(isset($data['second-field']));
+        $this->assertFalse(isset($data['first-field']));
+        $this->assertEquals('Killgore Trout', $data['second-field']);
+    }
+
+    public function testArrayField()
+    {
+        $this->module->amOnPage('/form/example17');
+        $this->module->seeInField('input[name="FooBar[bar]"]', 'baz');
+        $this->module->seeInField('input[name="Food[beer][yum][yeah]"]', 'mmhm');
+    }
+
+    public function testFillFieldSquareBracketNames()
+    {
+        $this->module->amOnPage('/form/names-sq-brackets');
+        $this->module->fillField('//input[@name="input_text"]', 'filling this input');
+        $this->module->fillField('//input[@name="input[text][]"]', 'filling this input');
+
+        $this->module->fillField('//textarea[@name="textarea_name"]', 'filling this textarea');
+        $this->module->fillField('//textarea[@name="textarea[name][]"]', 'filling this textarea');
+        $this->module->fillField('//textarea[@name="textarea[name][]"]', 'filling this textarea once again');
+
+        $this->module->fillField('//textarea[@name="textarea_name"]', 'filling this textarea');
+        $this->module->fillField('//textarea[@name="textarea[name][]"]', 'filling this textarea more');
+        $this->module->fillField('//textarea[@name="textarea[name][]"]', 'filling this textarea most');
+    }
+
+    public function testSelectAndCheckOptionSquareBracketNames()
+    {
+        $this->module->amOnPage('/form/names-sq-brackets');
+        $this->module->selectOption('//input[@name="input_radio_name"]', '1');
+        $this->module->selectOption('//input[@name="input_radio_name"]', '2');
+
+        $this->module->checkOption('//input[@name="input_checkbox_name"]', '1');
+        $this->module->checkOption('//input[@name="input_checkbox_name"]', '2');
+
+        $this->module->checkOption('//input[@name="input[checkbox][name][]"]', '1');
+        $this->module->checkOption('//input[@name="input[checkbox][name][]"]', '2');
+        $this->module->checkOption('//input[@name="input[checkbox][name][]"]', '1');
+
+        $this->module->selectOption('//select[@name="select_name"]', '1');
+
+        $this->module->selectOption('//input[@name="input[radio][name][]"]', '1');
+        $this->module->selectOption('//input[@name="input[radio][name][]"]', '2');
+        $this->module->selectOption('//input[@name="input[radio][name][]"]', '1');
+
+        $this->module->selectOption('//select[@name="select[name][]"]', '1');
+    }
+
+    public function testFillFieldWithAmpersand()
+    {
+        $this->module->amOnPage('/form/field');
+        $this->module->fillField('Name', 'this & that');
+        $this->module->click('Submit');
+        $form = data::get('form');
+        $this->assertEquals('this & that', $form['name']);
+    }
+
+    public function testSeeInDeactivatedField()
+    {
+        $this->module->amOnPage('/form/complex');
+        $this->module->seeInField('#disabled_field', 'disabled_field');
+        $this->module->seeInField('#salutation', 'mr');
+    }
+
+    public function testSwitchToIframe()
+    {
+        $this->module->amOnPage('/iframe');
+        $this->module->switchToIframe('content');
+        $this->module->see('Is that interesting?');
+        $this->module->click('Ссылочка');
+    }
+    
+    public function testGrabMultiple()
+    {
+        $this->module->amOnPage('/info');
+        
+        $arr = $this->module->grabMultiple('#grab-multiple a:first-child');
+        $this->assertCount(1, $arr);
+        $this->assertEquals('First', $arr[0]);
+        
+        $arr = $this->module->grabMultiple('#grab-multiple a');
+        $this->assertCount(3, $arr);
+        $this->assertEquals('First', $arr[0]);
+        $this->assertEquals('Second', $arr[1]);
+        $this->assertEquals('Third', $arr[2]);
+        
+        // href for WebDriver with selenium returns a full link, so testing with ID
+        $arr = $this->module->grabMultiple('#grab-multiple a', 'id');
+        $this->assertCount(3, $arr);
+        $this->assertEquals('first-link', $arr[0]);
+        $this->assertEquals('second-link', $arr[1]);
+        $this->assertEquals('third-link', $arr[2]);
+    }
 }

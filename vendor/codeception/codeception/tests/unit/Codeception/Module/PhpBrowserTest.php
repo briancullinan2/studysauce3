@@ -3,6 +3,7 @@
 use Codeception\Util\Stub;
 require_once 'tests/data/app/data.php';
 require_once __DIR__ . '/TestsForBrowsers.php';
+use GuzzleHttp\Psr7\Response;
 
 class PhpBrowserTest extends TestsForBrowsers
 {
@@ -11,20 +12,31 @@ class PhpBrowserTest extends TestsForBrowsers
      */
     protected $module;
 
-    /**
-     * @var \GuzzleHttp\Subscriber\History
-     */
-    protected $history;
+    protected $history = [];
 
     protected function setUp() {
-        $this->module = new \Codeception\Module\PhpBrowser();
+        $this->module = new \Codeception\Module\PhpBrowser(make_container());
         $url = 'http://localhost:8000';
         $this->module->_setConfig(array('url' => $url));
         $this->module->_initialize();
         $this->module->_cleanup();
         $this->module->_before($this->makeTest());
-        $this->history = new \GuzzleHttp\Subscriber\History();
-        $this->module->guzzle->getEmitter()->attach($this->history);
+        if (class_exists('GuzzleHttp\Url')) {
+            $this->history = new \GuzzleHttp\Subscriber\History();
+            $this->module->guzzle->getEmitter()->attach($this->history);
+        } else {
+            $this->module->guzzle->getConfig('handler')->push(\GuzzleHttp\Middleware::history($this->history));
+        }
+
+    }
+
+    private function getLastRequest()
+    {
+        if (is_array($this->history)) {
+            return end($this->history)['request'];
+        } else {
+            return $this->history->getLastRequest();
+        }
     }
     
     protected function tearDown() {
@@ -58,6 +70,7 @@ class PhpBrowserTest extends TestsForBrowsers
 
 
 	public function testSetMultipleCookies() {
+        $this->module->amOnPage('/');
         $cookie_name_1  = 'test_cookie';
         $cookie_value_1 = 'this is a test';
         $this->module->setCookie($cookie_name_1, $cookie_value_1);
@@ -100,6 +113,13 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->amOnPage('/redirect_interval');
         $this->module->seeCurrentUrlEquals('/redirect_interval');
     }
+
+    public function testHtmlRedirectWithParams()
+    {
+        $this->module->amOnPage('/redirect_params');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/search?one=1&two=2'); 
+    }
     
     public function testMetaRefresh()
     {
@@ -126,12 +146,88 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->assertContains('test@gmail.com', $params);
     }
 
+    public function testRedirectBaseUriHasPath()
+    {
+        // prepare config
+        $config = $this->module->_getConfig();
+        $config['url'] .= '/somepath'; // append path to the base url
+        $this->module->_reconfigure($config);
+
+        $this->module->amOnPage('/redirect_base_uri_has_path');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/somepath/info');
+        $this->module->see('Lots of valuable data here');
+    }
+
+    public function testRedirectBaseUriHasPathAnd302Code()
+    {
+        // prepare config
+        $config = $this->module->_getConfig();
+        $config['url'] .= '/somepath'; // append path to the base url
+        $this->module->_reconfigure($config);
+
+        $this->module->amOnPage('/redirect_base_uri_has_path_302');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/somepath/info');
+        $this->module->see('Lots of valuable data here');
+    }
+
+    public function testRelativeRedirect()
+    {
+        // test relative redirects where the effective request URI is in a
+        // subdirectory
+        $this->module->amOnPage('/relative/redirect');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/relative/info');
+
+        // also, test relative redirects where the effective request URI is not
+        // in a subdirectory
+        $this->module->amOnPage('/relative_redirect');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/info');
+    }
+
+    public function testChainedRedirects()
+    {
+        $this->module->amOnPage('/redirect_twice');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/info');
+    }
+
+    public function testDisabledRedirects()
+    {
+        $this->module->client->followRedirects(false);
+        $this->module->amOnPage('/redirect_twice');
+        $this->module->seeResponseCodeIs(302);
+        $this->module->seeCurrentUrlEquals('/redirect_twice');
+    }
+
+    public function testRedirectLimitReached()
+    {
+        $this->module->client->setMaxRedirects(1);
+        try {
+            $this->module->amOnPage('/redirect_twice');
+            $this->assertTrue(false, 'redirect limit is not respected');
+        } catch (\LogicException $e) {
+            $this->assertEquals('The maximum number (1) of redirections was reached.', $e->getMessage(), 'redirect limit is respected');
+        }
+    }
+
+    public function testRedirectLimitNotReached()
+    {
+        $this->module->client->setMaxRedirects(2);
+        $this->module->amOnPage('/redirect_twice');
+        $this->module->seeResponseCodeIs(200);
+        $this->module->seeCurrentUrlEquals('/info');
+    }
+
     public function testSetCookieByHeader()
     {
         $this->module->amOnPage('/cookies2');
         $this->module->seeResponseCodeIs(200);
         $this->module->seeCookie('a');
         $this->assertEquals('b', $this->module->grabCookie('a'));
+        $this->module->seeCookie('c');
     }
 
     public function testUrlSlashesFormatting()
@@ -140,6 +236,20 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->seeCurrentUrlEquals('/somepage.php');
         $this->module->amOnPage('///somepage.php');
         $this->module->seeCurrentUrlEquals('/somepage.php');
+    }
+
+    public function testSettingContentTypeFromHtml()
+    {
+        $this->module->amOnPage('/content-iso');
+        $charset = $this->module->client->getResponse()->getHeader('Content-Type');
+        $this->assertEquals('text/html;charset=ISO-8859-1', $charset);
+    }
+
+    public function testSettingCharsetFromHtml()
+    {
+        $this->module->amOnPage('/content-cp1251');
+        $charset = $this->module->client->getResponse()->getHeader('Content-Type');
+        $this->assertEquals('text/html;charset=windows-1251', $charset);
     }
 
     /**
@@ -157,37 +267,77 @@ class PhpBrowserTest extends TestsForBrowsers
         $this->module->seeCurrentUrlEquals('/form/example3?validate=yes');
     }
 
-    public function testChangeDomains()
-    {
-        $this->mockResponse();
-        $this->module->amOnSubdomain('user');
-        $this->module->amOnPage('/form1');
-        $this->assertEquals('http://user.localhost:8000/form1', $this->module->client->getHistory()->current()->getUri());
-    }
-
     public function testHeadersByConfig()
     {
-        $this->mockResponse();
         $this->module->_setConfig(['headers' => ['xxx' => 'yyyy']]);
         $this->module->_initialize();
         $this->module->amOnPage('/form1');
-        $this->assertArrayHasKey('xxx', $this->module->guzzle->getDefaultOption('headers'));
-        $this->assertEquals('yyyy', $this->module->guzzle->getDefaultOption('headers/xxx'));
+
+        if (method_exists($this->module->guzzle, 'getConfig')) {
+            $headers = $this->module->guzzle->getConfig('headers');
+        } else {
+            $headers = $this->module->guzzle->getDefaultOption('headers');
+        }
+        $this->assertArrayHasKey('xxx', $headers);
     }
 
     public function testHeadersBySetHeader()
     {
+
         $this->module->setHeader('xxx', 'yyyy');
         $this->module->amOnPage('/');
-        $this->assertTrue($this->history->getLastRequest()->hasHeader('xxx'));
+        $this->assertTrue($this->getLastRequest()->hasHeader('xxx'));
+    }
+
+    public function testDeleteHeaders()
+    {
+        $this->module->setHeader('xxx', 'yyyy');
+        $this->module->deleteHeader('xxx');
+        $this->module->amOnPage('/');
+        $this->assertFalse($this->getLastRequest()->hasHeader('xxx'));
+    }
+
+    public function testDeleteHeadersByEmptyValue()
+    {
+        $this->module->setHeader('xxx', 'yyyy');
+        $this->module->setHeader('xxx', '');
+        $this->module->amOnPage('/');
+        $this->assertFalse($this->getLastRequest()->hasHeader('xxx'));
     }
 
     public function testCurlOptions()
     {
         $this->module->_setConfig(array('url' => 'http://google.com', 'curl' => array('CURLOPT_NOBODY' => true)));
         $this->module->_initialize();
-        $this->assertTrue($this->module->guzzle->getDefaultOption('config/curl/'.CURLOPT_NOBODY));
+        if (method_exists($this->module->guzzle, 'getConfig')) {
+            $config = $this->module->guzzle->getConfig();
+        } else {
+            $config = $this->module->guzzle->getDefaultOption('config');
+        }
+        $this->assertArrayHasKey('curl', $config);
+        $this->assertArrayHasKey(CURLOPT_NOBODY, $config['curl']);
+    }
 
+
+    public function testCurlSslOptions()
+    {
+        $this->module->_setConfig(array(
+            'url' => 'https://google.com',
+            'curl' => array(
+                'CURLOPT_NOBODY' => true,
+                'CURLOPT_SSL_CIPHER_LIST' => 'TLSv1',
+            )));
+        $this->module->_initialize();
+        if (method_exists($this->module->guzzle, 'getConfig')) {
+            $config = $this->module->guzzle->getConfig();
+        } else {
+            $config = $this->module->guzzle->getDefaultOption('config');
+        }
+
+        $this->assertArrayHasKey('curl', $config);
+        $this->assertArrayHasKey(CURLOPT_SSL_CIPHER_LIST, $config['curl']);
+        $this->module->amOnPage('/');
+        $this->assertSame('', $this->module->_getResponseContent(), 'CURLOPT_NOBODY setting is not respected');
     }
 
     public function testHttpAuth()
@@ -211,14 +361,6 @@ class PhpBrowserTest extends TestsForBrowsers
             return $res->getStatusCode();
         });
         $this->assertEquals(200, $code);
-    }
-
-    protected function mockResponse($body = "hello", $code = 200)
-    {
-        $mock = new \GuzzleHttp\Subscriber\Mock([
-            new \GuzzleHttp\Message\Response($code, [], \GuzzleHttp\Stream\Stream::factory($body))
-        ]);
-        $this->module->guzzle->getEmitter()->attach($mock);
     }
 
     /**
@@ -262,7 +404,123 @@ class PhpBrowserTest extends TestsForBrowsers
 
     public function testFillFieldWithoutPage()
     {
-        $this->setExpectedException("\\Codeception\\Exception\\TestRuntime");
+        $this->setExpectedException("\\Codeception\\Exception\\ModuleException");
         $this->module->fillField('#name', 'Nothing special');
+    }
+    
+    public function testArrayFieldSubmitForm()
+    {
+        $this->skipForOldGuzzle();
+
+        $this->module->amOnPage('/form/example17');
+        $this->module->submitForm(
+            'form',
+            [
+                'FooBar' => ['bar' => 'booze'],
+                'Food' => [
+                    'beer' => [
+                        'yum' => ['yeah' => 'crunked']
+                    ]
+                ]
+            ]
+        );
+        $data = data::get('form');
+        $this->assertEquals('booze', $data['FooBar']['bar']);
+        $this->assertEquals('crunked', $data['Food']['beer']['yum']['yeah']);
+    }
+
+    public function testCookiesForDomain()
+    {
+        $this->skipForOldGuzzle();
+
+        $mock = new \GuzzleHttp\Handler\MockHandler([
+            new Response(200, ['X-Foo' => 'Bar']),
+        ]);
+        $handler = \GuzzleHttp\HandlerStack::create($mock);
+        $handler->push(\GuzzleHttp\Middleware::history($this->history));
+        $client = new \GuzzleHttp\Client(['handler' => $handler, 'base_uri' => 'http://codeception.com']);
+        $guzzleConnector = new \Codeception\Lib\Connector\Guzzle6();
+        $guzzleConnector->setClient($client);
+        $guzzleConnector->getCookieJar()->set(new \Symfony\Component\BrowserKit\Cookie('hello', 'world'));
+        $guzzleConnector->request('GET', 'http://codeception.com/');
+        $this->assertArrayHasKey('cookies', $this->history[0]['options']);
+        /** @var $cookie GuzzleHttp\Cookie\SetCookie  **/
+        $cookies = $this->history[0]['options']['cookies']->toArray();
+        $cookie = reset($cookies);
+        $this->assertEquals('codeception.com', $cookie['Domain']);
+    }
+
+    /**
+     * @issue https://github.com/Codeception/Codeception/issues/2653
+     */
+    public function testSetCookiesByOptions()
+    {
+        $config = $this->module->_getConfig();
+        $config['cookies'] = [
+            [
+                'Name' => 'foo',
+                'Value' => 'bar1',
+            ],
+            [
+                'Name' => 'baz',
+                'Value' => 'bar2',
+            ],
+        ];
+        $this->module->_reconfigure($config);
+        // this url redirects if cookies are present
+        $this->module->amOnPage('/cookies');
+        $this->module->seeCurrentUrlEquals('/info');
+    }
+
+    private function skipForOldGuzzle()
+    {
+        if (class_exists('GuzzleHttp\Url')) {
+            $this->markTestSkipped("Not for Guzzle <6");
+        }
+    }
+
+    /**
+     * @issue https://github.com/Codeception/Codeception/issues/2234
+     */
+    public function testEmptyValueOfCookie()
+    {
+      //set cookie
+      $this->module->amOnPage('/cookies2');
+
+      $this->module->amOnPage('/unset-cookie');
+      $this->module->seeResponseCodeIs(200);
+      $this->module->dontSeeCookie('a');
+    }
+
+    public function testRequestApi()
+    {
+        $this->setExpectedException('Codeception\Exception\ModuleException');
+        $response = $this->module->_request('POST', '/form/try', ['user' => 'davert']);
+        $data = data::get('form');
+        $this->assertEquals('davert', $data['user']);
+        $this->assertInternalType('string', $response);
+        $this->assertContains('Welcome to test app', $response);
+        $this->module->click('Welcome to test app'); // page not loaded
+    }
+
+    public function testLoadPageApi()
+    {
+        $this->module->_loadPage('POST', '/form/try', ['user' => 'davert']);
+        $data = data::get('form');
+        $this->assertEquals('davert', $data['user']);
+        $this->module->see('Welcome to test app');
+        $this->module->click('More info');
+        $this->module->seeInCurrentUrl('/info');
+    }
+
+    /**
+     * @issue https://github.com/Codeception/Codeception/issues/2408
+     */
+    public function testClickFailure()
+    {
+        $this->module->amOnPage('/info');
+        $this->setExpectedException('Codeception\Exception\ElementNotFound',
+            "'Sign In!' is invalid CSS and XPath selector and Link or Button element with 'name=Sign In!' was not found");
+        $this->module->click('Sign In!');
     }
 }

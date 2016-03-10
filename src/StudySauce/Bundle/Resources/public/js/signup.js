@@ -188,7 +188,7 @@ jQuery(document).ready(function($) {
         loadingAnimation(signup.find('[value="#business-order"]'));
 
         $.ajax({
-            url: window.callbackPaths['signup_save'],
+            url: Routing.generate('signup_save'),
             type: 'POST',
             dataType: 'json',
             data: {

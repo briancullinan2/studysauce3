@@ -18,8 +18,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class AllValidator extends ConstraintValidator
 {
@@ -41,18 +39,17 @@ class AllValidator extends ConstraintValidator
         }
 
         $context = $this->context;
-        $group = $context->getGroup();
 
         if ($context instanceof ExecutionContextInterface) {
             $validator = $context->getValidator()->inContext($context);
 
             foreach ($value as $key => $element) {
-                $validator->atPath('['.$key.']')->validate($element, $constraint->constraints, $group);
+                $validator->atPath('['.$key.']')->validate($element, $constraint->constraints);
             }
         } else {
             // 2.4 API
             foreach ($value as $key => $element) {
-                $context->validateValue($element, $constraint->constraints, '['.$key.']', $group);
+                $context->validateValue($element, $constraint->constraints, '['.$key.']');
             }
         }
     }

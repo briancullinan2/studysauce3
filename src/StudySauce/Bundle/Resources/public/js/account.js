@@ -100,7 +100,7 @@ jQuery(document).ready(function() {
             return;
         cancel.removeClass('valid').addClass('invalid');
         jQuery.ajax({
-            url: window.callbackPaths['cancel_payment'],
+            url: Routing.generate('cancel_payment'),
             type: 'POST',
             dataType: 'json',
             data: {
@@ -122,7 +122,7 @@ jQuery(document).ready(function() {
         evt.preventDefault();
         var account = $('#account');
         jQuery.ajax({
-            url: window.callbackPaths['remove_social'],
+            url: Routing.generate('remove_social'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -171,7 +171,7 @@ jQuery(document).ready(function() {
         var hash = getHash();
 
         jQuery.ajax({
-            url:window.callbackPaths['account_update'],
+            url: Routing.generate('account_update'),
             type: 'POST',
             dataType: 'json',
             data: {

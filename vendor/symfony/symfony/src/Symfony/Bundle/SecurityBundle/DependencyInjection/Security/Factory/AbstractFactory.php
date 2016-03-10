@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * AbstractFactory is the base class for all classes inheriting from
  * AbstractAuthenticationListener.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -169,29 +170,36 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
     protected function createAuthenticationSuccessHandler($container, $id, $config)
     {
-        if (isset($config['success_handler'])) {
-            return $config['success_handler'];
-        }
-
         $successHandlerId = $this->getSuccessHandlerId($id);
+        $options = array_intersect_key($config, $this->defaultSuccessHandlerOptions);
 
-        $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.success_handler'));
-        $successHandler->replaceArgument(1, array_intersect_key($config, $this->defaultSuccessHandlerOptions));
-        $successHandler->addMethodCall('setProviderKey', array($id));
+        if (isset($config['success_handler'])) {
+            $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.custom_success_handler'));
+            $successHandler->replaceArgument(0, new Reference($config['success_handler']));
+            $successHandler->replaceArgument(1, $options);
+            $successHandler->replaceArgument(2, $id);
+        } else {
+            $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.success_handler'));
+            $successHandler->addMethodCall('setOptions', array($options));
+            $successHandler->addMethodCall('setProviderKey', array($id));
+        }
 
         return $successHandlerId;
     }
 
     protected function createAuthenticationFailureHandler($container, $id, $config)
     {
-        if (isset($config['failure_handler'])) {
-            return $config['failure_handler'];
-        }
-
         $id = $this->getFailureHandlerId($id);
+        $options = array_intersect_key($config, $this->defaultFailureHandlerOptions);
 
-        $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.failure_handler'));
-        $failureHandler->replaceArgument(2, array_intersect_key($config, $this->defaultFailureHandlerOptions));
+        if (isset($config['failure_handler'])) {
+            $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.custom_failure_handler'));
+            $failureHandler->replaceArgument(0, new Reference($config['failure_handler']));
+            $failureHandler->replaceArgument(1, $options);
+        } else {
+            $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.failure_handler'));
+            $failureHandler->addMethodCall('setOptions', array($options));
+        }
 
         return $id;
     }

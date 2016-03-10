@@ -41,16 +41,16 @@ class TemplateManagerTest extends TestCase
      */
     protected $templateManager;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         $profiler = $this->mockProfiler();
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = array(
-            'data_collector.foo' => array('foo','FooBundle:Collector:foo'),
-            'data_collector.bar' => array('bar','FooBundle:Collector:bar'),
-            'data_collector.baz' => array('baz','FooBundle:Collector:baz'),
+            'data_collector.foo' => array('foo', 'FooBundle:Collector:foo'),
+            'data_collector.bar' => array('bar', 'FooBundle:Collector:bar'),
+            'data_collector.baz' => array('baz', 'FooBundle:Collector:baz'),
             );
 
         $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);
@@ -138,7 +138,7 @@ class TemplateManagerTest extends TestCase
 
     protected function mockTwigEnvironment()
     {
-        $this->twigEnvironment = $this->getMockBuilder('Twig_Environment')->getMock();
+        $this->twigEnvironment = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
 
         $this->twigEnvironment->expects($this->any())
             ->method('loadTemplate')

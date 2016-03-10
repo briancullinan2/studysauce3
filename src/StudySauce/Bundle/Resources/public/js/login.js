@@ -53,7 +53,7 @@ jQuery(document).ready(function() {
         loadingAnimation(account.find('[value="#user-login"]'));
 
         jQuery.ajax({
-            url:window.callbackPaths['account_auth'],
+            url: Routing.generate('account_auth'),
             type: 'POST',
             dataType: 'json',
             data: {

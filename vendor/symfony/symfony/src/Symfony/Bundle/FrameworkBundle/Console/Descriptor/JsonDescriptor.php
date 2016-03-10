@@ -11,19 +11,19 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
-if (!defined('JSON_PRETTY_PRINT')) {
-    define('JSON_PRETTY_PRINT', 128);
-}
-
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class JsonDescriptor extends Descriptor
 {
@@ -137,11 +137,27 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    {
+        $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, array_key_exists('event', $options) ? $options['event'] : null), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeCallable($callable, array $options = array())
+    {
+        $this->writeData($this->getCallableData($callable, $options), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerParameter($parameter, array $options = array())
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';
 
-        $this->writeData(array($key => $this->formatParameter($parameter)), $options);
+        $this->writeData(array($key => $parameter), $options);
     }
 
     /**
@@ -154,7 +170,13 @@ class JsonDescriptor extends Descriptor
      */
     private function writeData(array $data, array $options)
     {
-        $this->write(json_encode($data, (isset($options['json_encoding']) ? $options['json_encoding'] : 0) | JSON_PRETTY_PRINT)."\n");
+        $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
+
+        if (defined('JSON_PRETTY_PRINT')) {
+            $flags |= JSON_PRETTY_PRINT;
+        }
+
+        $this->write(json_encode($data, $flags)."\n");
     }
 
     /**
@@ -195,21 +217,40 @@ class JsonDescriptor extends Descriptor
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
-            'synchronized' => $definition->isSynchronized(),
-            'abstract' => $definition->isAbstract(),
-            'file' => $definition->getFile(),
         );
 
-        if ($definition->getFactoryClass()) {
-            $data['factory_class'] = $definition->getFactoryClass();
+        if (method_exists($definition, 'isSynchronized')) {
+            $data['synchronized'] = $definition->isSynchronized(false);
         }
 
-        if ($definition->getFactoryService()) {
-            $data['factory_service'] = $definition->getFactoryService();
+        $data['abstract'] = $definition->isAbstract();
+        $data['file'] = $definition->getFile();
+
+        if ($definition->getFactoryClass(false)) {
+            $data['factory_class'] = $definition->getFactoryClass(false);
         }
 
-        if ($definition->getFactoryMethod()) {
-            $data['factory_method'] = $definition->getFactoryMethod();
+        if ($definition->getFactoryService(false)) {
+            $data['factory_service'] = $definition->getFactoryService(false);
+        }
+
+        if ($definition->getFactoryMethod(false)) {
+            $data['factory_method'] = $definition->getFactoryMethod(false);
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $data['factory_service'] = (string) $factory[0];
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $data['factory_class'] = $factory[0];
+                }
+                $data['factory_method'] = $factory[1];
+            } else {
+                $data['factory_function'] = $factory;
+            }
         }
 
         if (!$omitTags) {
@@ -237,5 +278,97 @@ class JsonDescriptor extends Descriptor
             'service' => (string) $alias,
             'public' => $alias->isPublic(),
         );
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param string|null              $event
+     *
+     * @return array
+     */
+    private function getEventDispatcherListenersData(EventDispatcherInterface $eventDispatcher, $event = null)
+    {
+        $data = array();
+
+        $registeredListeners = $eventDispatcher->getListeners($event);
+        if (null !== $event) {
+            foreach ($registeredListeners as $listener) {
+                $data[] = $this->getCallableData($listener);
+            }
+        } else {
+            ksort($registeredListeners);
+
+            foreach ($registeredListeners as $eventListened => $eventListeners) {
+                foreach ($eventListeners as $eventListener) {
+                    $data[$eventListened][] = $this->getCallableData($eventListener);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param callable $callable
+     * @param array    $options
+     *
+     * @return array
+     */
+    private function getCallableData($callable, array $options = array())
+    {
+        $data = array();
+
+        if (is_array($callable)) {
+            $data['type'] = 'function';
+
+            if (is_object($callable[0])) {
+                $data['name'] = $callable[1];
+                $data['class'] = get_class($callable[0]);
+            } else {
+                if (0 !== strpos($callable[1], 'parent::')) {
+                    $data['name'] = $callable[1];
+                    $data['class'] = $callable[0];
+                    $data['static'] = true;
+                } else {
+                    $data['name'] = substr($callable[1], 8);
+                    $data['class'] = $callable[0];
+                    $data['static'] = true;
+                    $data['parent'] = true;
+                }
+            }
+
+            return $data;
+        }
+
+        if (is_string($callable)) {
+            $data['type'] = 'function';
+
+            if (false === strpos($callable, '::')) {
+                $data['name'] = $callable;
+            } else {
+                $callableParts = explode('::', $callable);
+
+                $data['name'] = $callableParts[1];
+                $data['class'] = $callableParts[0];
+                $data['static'] = true;
+            }
+
+            return $data;
+        }
+
+        if ($callable instanceof \Closure) {
+            $data['type'] = 'closure';
+
+            return $data;
+        }
+
+        if (method_exists($callable, '__invoke')) {
+            $data['type'] = 'object';
+            $data['name'] = get_class($callable);
+
+            return $data;
+        }
+
+        throw new \InvalidArgumentException('Callable is not describable.');
     }
 }

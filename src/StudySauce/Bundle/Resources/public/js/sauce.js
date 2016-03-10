@@ -627,9 +627,11 @@ function ssMergeStyles(content)
     var any = false;
     $(styles).each(function () {
         var url = $(this).attr('href');
-        if (typeof url != 'undefined' && $('link[href="' + url + '"]').length == 0) {
-            $('head').append('<link href="' + url + '" type="text/css" rel="stylesheet" />');
-            any = true;
+        if (typeof url != 'undefined') {
+            if ($('link[href="' + url + '"]').length == 0) {
+                $('head').append('<link href="' + url + '" type="text/css" rel="stylesheet" />');
+                any = true;
+            }
         }
         else {
             var re = (/url\("(.*?)"\)/ig),
@@ -820,13 +822,15 @@ $(document).ready(function () {
     // show the already visible tabs
     var panel = body.find('.panel-pane:visible').first();
     if(panel.length > 0) {
-        var key = window.callbackKeys.indexOf(panel.attr('id').replace(/-step[0-9]+/g, '')),
-            path = window.callbackUri[key],
-            item = body.find('.main-menu a[href^="' + path + '"]').first();
+        var key = panel.attr('id').replace(/-[a-z]+[0-9]+$/ig, '');
+        if (Routing.getRoute(key)) {
+            var path = Routing.generate(key),
+                item = body.find('.main-menu a[href^="' + path + '"]').first();
 
-        if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
-            item.parents('nav').find('ul.collapse.in').removeClass('in');
-        item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
+            if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
+                item.parents('nav').find('ul.collapse.in').removeClass('in');
+            item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
+        }
         var triggerShow = function () {
             panel.scrollintoview(DASHBOARD_MARGINS).trigger('show');
         };

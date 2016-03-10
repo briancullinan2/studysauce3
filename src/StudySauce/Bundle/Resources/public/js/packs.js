@@ -5,7 +5,7 @@ $(document).ready(function () {
         radioCounter = 5000;
 
     key('⌘+v, ctrl+v, command+v', function () {
-        var tab = $('#packs');
+        var tab = $('[id^="packs"] .results:visible');
         if(tab.is(':visible') && tab.find('input:focus, select:focus, textarea:focus').parents('.results [class*="-row"]').is('.empty')) {
             // get the clipboard text
             var text = $('<textarea></textarea>')
@@ -49,7 +49,7 @@ $(document).ready(function () {
     }
 
     function rowImport(clipText) {
-        var tab = $('#packs'),
+        var tab = $('.results:visible'),
             last = tab.find('.card-row.empty').first();
 
         // split into rows
@@ -91,23 +91,20 @@ $(document).ready(function () {
 
             if(clipRows[i].length == 2) {
                 newRow.find('.content input').val(clipRows[i][0]);
-                newRow.find('.response input').val(clipRows[i][1]);
+                newRow.find('.correct input').val(clipRows[i][1]);
             }
             else {
                 newRow.find('.correct.type-tf input').filter(clipRows[i][2].match(/t/i) ? '[value="true"]' : (clipRows[i][2]
                     .match(/f/i) ? '[value="false"]' : ':not(input)')).prop('checked', true);
-                newRow.find('.correct.type-mc select, .answers.type-sa input, .input.correct:not([class*="type-"]) input').val(clipRows[i][2]);
+                newRow.find('.correct.type-mc select, .correct.type-sa input, .input.correct:not([class*="type-"]) input').val(clipRows[i][2]);
                 newRow.find('.content input').val(clipRows[i][1]);
-                newRow.find('.response input').val(clipRows[i][7]);
             }
         }
 
         // remove empties
         tab.find('.card-row.empty').each(function () {
             var that = jQuery(this);
-            if(that.find('.content input').val().trim() == '' &&
-                that.find('.response input').val().trim() == '' &&
-                tab.find('.card-row').length > 1) {
+            if(that.find('.content input').val().trim() == '' && tab.find('.card-row').length > 1) {
                 that.remove();
             }
         });
@@ -115,7 +112,7 @@ $(document).ready(function () {
         packsFunc();
     }
 
-    body.on('focus mousedown keydown change keyup blur', '#packs .answers textarea', function () {
+    body.on('focus mousedown keydown change keyup blur', '.card-row .answers textarea', function () {
         $(this).css('height', '');
         if ($(this).is(':focus')) {
             $(this).height($(this)[0].scrollHeight - 4);
@@ -138,35 +135,15 @@ $(document).ready(function () {
         row.find('.correct.type-mc select').val(newVal.attr('value'));
     });
 
-    body.on('mousedown click focus', '#packs .type select', function () {
-        $(this).find('option').each(function () {
-            if($(this).attr('data-text') != null) {
-                $(this).text($(this).attr('data-text'));
-            }
-        });
-    });
-
-    body.on('change blur', '#packs .type select', function () {
-        $(this).find('option').each(function () {
-            if($(this).attr('value') != '') {
-                $(this).text($(this).attr('value').toLocaleUpperCase());
-            }
-            else {
-                $(this).text('Type');
-            }
-        });
-    });
-
     function packsFunc () {
-        var tab = $('#packs');
+        var tab = $('.results:visible');
         var rows = $(this).closest('.card-row:not(.removed)');
         if (rows.length == 0) {
             rows = tab.find('.card-row:not(.removed)');
         }
         rows.each(function () {
             var row = $(this);
-            if(row.find('.content input').val().trim() == '' &&
-                row.find('.response input').val().trim() == '' && (
+            if(row.find('.content input').val().trim() == '' && (
                     row.find('.type select').val() != 'mc' || row.find('.answers.type-mc textarea').val().trim() == ''
                 )) {
                 row.removeClass('invalid').addClass('empty valid');
@@ -213,9 +190,8 @@ $(document).ready(function () {
         var results = $(this).parents('.results');
         var row = $(this).parents('.pack-row');
         var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        var search = 'pack-id:' + packId;
-        results.find('.search .input').addClass('read-only');
-        results.find('.search input[name="search"]').val(search).trigger('change');
+        window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
+        row.removeClass('edit').addClass('read-only');
     });
 
     body.on('resulted', '.results', function () {
@@ -227,21 +203,21 @@ $(document).ready(function () {
         packsFunc();
     });
 
-    body.on('click', '.pack-row.edit a[href^="#cancel-"]', function () {
-        var results = $(this).parents('.results');
+    body.on('click', '.pack-row.edit a[href^="#cancel-"], .results .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
+        evt.preventDefault();
+        var results = $(this).parents('.results'),
+            row = $(this).parents('.pack-row');
         results.find('.search .input').removeClass('read-only');
-        results.find('.card-row').removeClass('edit').addClass('read-only');
-        results.find('.search input[name="search"]').val('').trigger('change');
+        row.removeClass('read-only').addClass('edit');
+        window.activateMenu(Routing.generate('packs'));
     });
-
-    body.on('change keyup keydown', '#packs .card-row input, #packs .card-row select, #packs .card-row textarea', packsFunc);
 
     body.on('click', '.results [href="#remove-confirm-pack"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.pack-row');
         var rowId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'))[1];
         $.ajax({
-            url: window.callbackPaths['packs_remove'],
+            url: Routing.generate('packs_remove'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -254,7 +230,7 @@ $(document).ready(function () {
     body.on('click', '.results a[href="#save-pack"], .results [value="#save-pack"]', function (evt) {
         evt.preventDefault();
 
-        var tab = $('#packs');
+        var tab = $('.results:visible');
         var row = $(this).parents('.pack-row');
         if (row.length == 0) {
             row = tab.find('.pack-row:not(.empty):visible').first();
@@ -282,7 +258,6 @@ $(document).ready(function () {
                     id: rowId != null ? rowId[1] : null,
                     type:     $(this).find('.type select').val(),
                     content:  $(this).find('.input.content:visible input').val(),
-                    response: $(this).find('.input.response:visible input').val(),
                     answers:  $(this).find('.input.answers:visible textarea, .input.answers:visible input').val(),
                     correct:  $(this).find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked').val()
                 };
@@ -290,7 +265,7 @@ $(document).ready(function () {
         });
 
         $.ajax({
-            url: window.callbackPaths['packs_create'],
+            url: Routing.generate('packs_create'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -309,11 +284,18 @@ $(document).ready(function () {
                 var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.results .pack-row:visible').first().attr('class'))[1];
                 tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
                 tab.find('.search .input').removeClass('read-only');
+                window.activateMenu(Routing.generate('packs'));
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
             }
         })
     });
+
+    body.on('show', '[id^="packs"]', function () {
+        packsFunc();
+    });
+
+    body.on('change keyup keydown', '.card-row input, .card-row select, .card-row textarea', packsFunc);
 
 });

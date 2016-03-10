@@ -185,7 +185,7 @@ jQuery(document).ready(function() {
             users[users.length] = newInvite;
         });
         jQuery.ajax({
-            url: window.callbackPaths['import_save'],
+            url: Routing.generate('import_save'),
             type: 'POST',
             dataType: 'text',
             data: {

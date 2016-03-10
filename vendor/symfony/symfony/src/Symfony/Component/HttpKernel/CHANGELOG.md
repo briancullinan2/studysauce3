@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added the HTTP status code to profiles
+
+2.6.0
+-----
+
+ * deprecated `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener`, use `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` instead
+ * deprecated unused method `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle`
+
 2.5.0
 -----
 

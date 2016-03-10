@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  * the controller method arguments.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ControllerResolver implements ControllerResolverInterface
 {
@@ -44,14 +42,12 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * This method looks for a '_controller' request attribute that represents
      * the controller name (a string like ClassName::MethodName).
-     *
-     * @api
      */
     public function getController(Request $request)
     {
         if (!$controller = $request->attributes->get('_controller')) {
             if (null !== $this->logger) {
-                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing');
+                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing.');
             }
 
             return false;
@@ -71,7 +67,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         if (false === strpos($controller, ':')) {
             if (method_exists($controller, '__invoke')) {
-                return new $controller();
+                return $this->instantiateController($controller);
             } elseif (function_exists($controller)) {
                 return $controller;
             }
@@ -88,8 +84,6 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getArguments(Request $request, $controller)
     {
@@ -137,7 +131,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @param string $controller A Controller string
      *
-     * @return mixed A PHP callable
+     * @return callable A PHP callable
      *
      * @throws \InvalidArgumentException
      */
@@ -153,6 +147,18 @@ class ControllerResolver implements ControllerResolverInterface
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        return array(new $class(), $method);
+        return array($this->instantiateController($class), $method);
+    }
+
+    /**
+     * Returns an instantiated controller.
+     *
+     * @param string $class A class name
+     *
+     * @return object
+     */
+    protected function instantiateController($class)
+    {
+        return new $class();
     }
 }

@@ -1,25 +1,13 @@
 <?php
 namespace Codeception\Exception;
 
+use Codeception\Util\Locator;
+
 class ElementNotFound extends \PHPUnit_Framework_AssertionFailedError
 {
-
     public function __construct($selector, $message = null)
     {
-        if (is_array($selector)) {
-            $type = strtolower(key($selector));
-            $locator = $selector[$type];
-            parent::__construct("Element with $type '$locator' was not found on page.");
-            return;
-        }
-        if ($selector instanceof \WebDriverBy) {
-            $type = $selector->getMechanism();
-            $locator = $selector->getValue();
-            parent::__construct("Element with $type '$locator' was not found on page.");
-            return;
-        }
-
-        parent::__construct($message . " '$selector' was not found on page.");
+        $selector = Locator::humanReadableString($selector);
+        parent::__construct($message . " element with $selector was not found.");
     }
-
 }

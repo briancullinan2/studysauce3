@@ -52,113 +52,14 @@ $collection = $router->getRouteCollection();
         ?>
         <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
     <?php endforeach;
-
     $view['slots']->output('stylesheets');
-
-
-    $allRoutes = $collection->all();
-
-    //$routes = [];
-    $callbackPaths = [];
-    $callbackKeys = [];
-    $callbackUri = [];
-
-    /** @var $params \Symfony\Component\Routing\Route */
-    foreach ($allRoutes as $route => $params) {
-        $defaults = $params->getDefaults();
-        $condition = $params->getCondition();
-        $format = $params->getRequirement('_format');
-        $step = $params->getRequirement('_step');
-        $path = $params->getPath();
-
-        if (isset($defaults['_controller'])) {
-            $controllerAction = explode(':', $defaults['_controller']);
-            $controller = $controllerAction[0];
-
-            if ($route == '_welcome')
-            {
-                $dir = dirname($router->generate($route));
-                $callbackPaths[$route] = substr($dir, -1) == '/' ? $dir : ($dir . '/');
-                $callbackKeys[] = $route;
-                $callbackUri[] = $router->generate($route);
-            }
-
-            try {
-                $tmpRoute = $router->generate($route);
-                $callbackPaths[$route] = $tmpRoute;
-                $callbackKeys[] = $route;
-                $callbackUri[] = $tmpRoute;
-            }
-            catch (\Exception $e) {
-
-            }
-
-            if (!empty($format) && strpos($format, 'tab') > -1) {
-                try {
-                    $callbackPaths[$route] = $router->generate($route, ['_format' => 'tab']);
-                    $callbackKeys[] = $route;
-                    $callbackUri[] = $router->generate($route);
-                } catch(Exception $ex) {
-                    // TODO: replace with defaults
-                }
-            }
-
-            if (!empty($step) && is_numeric(explode('|', $step)[0])) {
-                foreach (explode('|', $step) as $j) {
-                    $key = $route . (intval($j) > 0 ? ('-step' . intval($j)) : '');
-                    $callbackPaths[$key] = $router->generate(
-                        $route,
-                        ['_step' => intval($j), '_format' => 'tab']
-                    );
-                    $callbackKeys[] = $key;
-                    $callbackUri[] = $router->generate($route, ['_step' => intval($j)]);
-                }
-            }
-        }
-    }
-
     ?>
-    <script type="text/javascript">
-        window.callbackPaths = JSON.parse('<?php print json_encode($callbackPaths); ?>');
-        window.callbackKeys = JSON.parse('<?php print json_encode($callbackKeys); ?>');
-        window.callbackUri = JSON.parse('<?php print json_encode($callbackUri); ?>');
-        window.musicLinks = [
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_2_Bb_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_15_Bb_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/C_Major_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_17_G_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_16_D_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_6_Bb_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_5_D_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_1_F_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_12_B_Allegro.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_27_B_Allegro.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_21_C.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_20_D_Allegro.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_19_F_Allegro.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_10_E_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_14_E.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_13_G.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_13_G_Minuet.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_3_G_Adagio.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_23_F_Andante.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_23_F_Allegro.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_23_F_Allegro4.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_6_E.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_5_D_Andante5.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_5_D_Allegro3.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_5_D_Allegro1.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_9_D_Andantino.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_9_D_Andante3.mp3',
-            'https://s3-us-west-2.amazonaws.com/studysauce/No_11_E_Allegro.mp3'
-
-        ];
-        window.musicAlarm = 'https://s3-us-west-2.amazonaws.com/studysauce/study_alarm.mp3';
-    </script>
 </head>
 <body class="<?php $view['slots']->output('classes') ?>">
 <?php $view['slots']->output('body') ?>
 <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+<script src="<?php echo $view['assets']->getUrl('bundles/fosjsrouting/js/router.js'); ?>"></script>
+<script src="<?php echo $view['router']->generate('fos_js_routing_js', array('callback' => 'fos.Router.setData')); ?>"></script>
 <?php foreach ($view['assetic']->javascripts(['@layout'],[],['output' => 'bundles/studysauce/js/*.js']) as $url):?>
     <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach;

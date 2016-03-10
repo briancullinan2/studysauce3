@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType
 {
@@ -28,6 +28,7 @@ class CollectionType extends AbstractType
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
+                'required' => $options['required'],
                 'label' => $options['prototype_name'].'label__',
             ), $options['options']));
             $builder->setAttribute('prototype', $prototype->getForm());
@@ -72,7 +73,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $optionsNormalizer = function (Options $options, $value) {
             $value['block_name'] = 'entry';
@@ -90,9 +91,7 @@ class CollectionType extends AbstractType
             'delete_empty' => false,
         ));
 
-        $resolver->setNormalizers(array(
-            'options' => $optionsNormalizer,
-        ));
+        $resolver->setNormalizer('options', $optionsNormalizer);
     }
 
     /**

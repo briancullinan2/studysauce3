@@ -9,5 +9,4 @@
             <option value="DELETED" <?php print ($pack->getStatus() == 'DELETED' ? 'selected="selected"' : ''); ?>>Deleted</option>
         </select>
     </label>
-    <img height="50" src="<?php print $pack->getLogo(); ?>" />
 </div>

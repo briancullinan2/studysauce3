@@ -1,7 +1,12 @@
 <?php
 // An example of using php-webdriver.
 
-require_once('lib/__init__.php');
+namespace Facebook\WebDriver;
+
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+
+require_once('vendor/autoload.php');
 
 // start Firefox with 5 second timeout
 $host = 'http://localhost:4444/wd/hub'; // this is the default
@@ -27,10 +32,10 @@ $link = $driver->findElement(
 $link->click();
 
 // print the title of the current page
-echo "The title is " . $driver->getTitle() . "'\n";
+echo "The title is '" . $driver->getTitle() . "'\n";
 
-// print the title of the current page
-echo "The current URI is " . $driver->getCurrentURL() . "'\n";
+// print the URI of the current page
+echo "The current URI is '" . $driver->getCurrentURL() . "'\n";
 
 // Search 'php' in the search box
 $input = $driver->findElement(

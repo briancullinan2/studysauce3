@@ -85,8 +85,8 @@ $(document).ready(function () {
             }
         }
 
-        command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
         if(selected.length == 0) {
+            command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
             command.addClass('empty');
         }
         else {
@@ -94,6 +94,7 @@ $(document).ready(function () {
             var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
             table = 'showing-' + table;
             if(!command.is('.' + table)) {
+                command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
                 command.addClass(table);
             }
         }
@@ -127,6 +128,7 @@ $(document).ready(function () {
 
         return result;
     }
+    window.getData = getData;
 
     body.on('click', '.results .class-names .checkbox a', function (evt) {
         evt.preventDefault();
@@ -279,7 +281,7 @@ $(document).ready(function () {
                 }
                 callbackTimeout = setTimeout(function () {
                     $.ajax({
-                        url: window.callbackPaths['command_callback'],
+                        url: Routing.generate('command_callback'),
                         type: 'GET',
                         dataType:'text',
                         data: {
@@ -391,7 +393,7 @@ $(document).ready(function () {
 
         searchTimeout = setTimeout(function () {
             searchRequest = $.ajax({
-                url: window.callbackPaths['command_callback'],
+                url: Routing.generate('command_callback'),
                 type: 'GET',
                 dataType: 'text',
                 data: getData(),

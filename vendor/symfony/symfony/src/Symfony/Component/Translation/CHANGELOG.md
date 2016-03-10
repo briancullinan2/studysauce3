@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added DataCollectorTranslator for collecting the translated messages.
+
+2.6.0
+-----
+
+ * added possibility to cache catalogues
+ * added TranslatorBagInterface
+ * added LoggingTranslator
+ * added Translator::getMessages() for retrieving the message catalogue as an array
+
 2.5.0
 -----
 

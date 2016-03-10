@@ -100,7 +100,7 @@ $(document).ready(function () {
         var row = $(this).parents('.group-row');
         var groupId = ((/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
         $.ajax({
-            url: window.callbackPaths['save_group'],
+            url: Routing.generate('save_group'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -120,7 +120,7 @@ $(document).ready(function () {
         loadingAnimation(that);
         that.parents('.highlighted-link').removeClass('valid').addClass('invalid');
         $.ajax({
-            url: window.callbackPaths['save_group'],
+            url: Routing.generate('save_group'),
             type: 'POST',
             dataType: 'text',
             data: {
@@ -157,7 +157,7 @@ $(document).ready(function () {
         loadingAnimation(that);
         dialog.find('.highlighted-link').removeClass('valid').addClass('invalid');
         $.ajax({
-            url: window.callbackPaths['add_user'],
+            url: Routing.generate('add_user'),
             type: 'POST',
             dataType: 'text',
             data: data,
@@ -206,7 +206,7 @@ $(document).ready(function () {
             };
         //});
         $.ajax({
-            url: window.callbackPaths['save_user'],
+            url: Routing.generate('save_user'),
             type: 'POST',
             dataType: 'text',
             data: data,
@@ -430,12 +430,12 @@ $(document).ready(function () {
         $('#confirm-password-reset').data('userId', userId);
     });
 
-    body.on('click', '#confirm-remove-user a[href="#remove-user"]', function (evt) {
+    body.on('click', 'a[href="#remove-confirm-user"]', function (evt) {
         evt.preventDefault();
         var data = getData();
         data.userId = $('#confirm-remove-user').data('userId');
         $.ajax({
-            url: window.callbackPaths['remove_user'],
+            url: Routing.generate('remove_user'),
             type: 'POST',
             dataType: 'text',
             data: data,
@@ -447,7 +447,7 @@ $(document).ready(function () {
         var data = getData();
         data.userId = $('#confirm-cancel-user').data('userId');
         $.ajax({
-            url: window.callbackPaths['cancel_user'],
+            url: Routing.generate('cancel_user'),
             type: 'POST',
             dataType: 'text',
             data: data,
@@ -459,7 +459,7 @@ $(document).ready(function () {
         var data = getData();
         data.userId = $('#confirm-password-reset').data('userId');
         $.ajax({
-            url: window.callbackPaths['reset_user'],
+            url: Routing.generate('reset_user'),
             type: 'POST',
             dataType: 'text',
             data: data,

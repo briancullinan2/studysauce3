@@ -213,7 +213,7 @@ $(document).ready(function () {
             end = Math.floor(timeLine.range.end / 1000);
         processing = true;
         $.ajax({
-            url: window.callbackPaths['activity'],
+            url: Routing.generate('activity'),
             type: 'POST',
             dataType: 'json',
             data: {

@@ -853,7 +853,7 @@ input[type=month],
     vertical-align: middle;
     margin:0;
     max-width: 100%;
-    background: #EEE none;
+    background: #FFF none;
 }
 
 input:-webkit-autofill {

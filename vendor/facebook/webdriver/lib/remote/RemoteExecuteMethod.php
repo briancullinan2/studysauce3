@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
 class RemoteExecuteMethod implements ExecuteMethod {
 
   private $driver;
@@ -25,6 +27,8 @@ class RemoteExecuteMethod implements ExecuteMethod {
   }
 
   /**
+   * @param string $command_name
+   * @param array $parameters
    * @return mixed
    */
   public function execute(

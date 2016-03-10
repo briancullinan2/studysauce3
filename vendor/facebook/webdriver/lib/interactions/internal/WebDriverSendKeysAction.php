@@ -13,12 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Interactions\Internal;
+
+use Facebook\WebDriver\WebDriverAction;
+use Facebook\WebDriver\WebDriverKeyboard;
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverMouse;
+
 class WebDriverSendKeysAction
     extends WebDriverKeysRelatedAction
     implements WebDriverAction {
 
   private $keys;
 
+  /**
+   * @param WebDriverKeyboard $keyboard
+   * @param WebDriverMouse $mouse
+   * @param WebDriverLocatable $location_provider
+   * @param string $keys
+   */
   public function __construct(
       WebDriverKeyboard $keyboard,
       WebDriverMouse $mouse,

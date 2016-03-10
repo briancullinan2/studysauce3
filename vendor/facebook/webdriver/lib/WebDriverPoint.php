@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver;
+
 /**
  * Represent a point.
  */
@@ -46,6 +48,8 @@ class WebDriverPoint {
   /**
    * Set the point to a new position.
    *
+   * @param int $new_x
+   * @param int $new_y
    * @return WebDriverPoint The same instance with updated coordinates.
    */
   public function move($new_x, $new_y) {
@@ -57,6 +61,8 @@ class WebDriverPoint {
   /**
    * Move the current by offsets.
    *
+   * @param int $x_offset
+   * @param int $y_offset
    * @return WebDriverPoint The same instance with updated coordinates.
    */
   public function moveBy($x_offset, $y_offset) {

@@ -102,7 +102,9 @@ class FOSUBUserProvider implements UserProviderInterface, AccountConnectorInterf
 
         $property = $this->getProperty($response);
 
-        if (!$this->accessor->isWritable($user, $property)) {
+        // Symfony <2.5 BC
+        if (method_exists($this->accessor, 'isWritable') && !$this->accessor->isWritable($user, $property)
+            || !method_exists($this->accessor, 'isWritable') && !method_exists($user, 'set'.ucfirst($property))) {
             throw new \RuntimeException(sprintf("Class '%s' must have defined setter method for property: '%s'.", get_class($user), $property));
         }
 
@@ -139,7 +141,7 @@ class FOSUBUserProvider implements UserProviderInterface, AccountConnectorInterf
             throw new UsernameNotFoundException(sprintf('User with ID "%d" could not be reloaded.', $userId));
         }
 
-        return $reloadedUser;
+        return $user;
     }
 
     /**

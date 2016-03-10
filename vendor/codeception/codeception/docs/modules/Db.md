@@ -1,6 +1,4 @@
-# Db Module
 
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Db.php)**
 
 
 Works with SQL database.
@@ -50,19 +48,36 @@ Check out drivers if you get problems loading dumps and cleaning databases.
 * dump - path to database dump.
 * populate: true - should the dump be loaded before test suite is started.
 * cleanup: true - should the dump be reloaded after each test
+* reconnect: false - should the module reconnect to database before each test
 
 ### Example
 
     modules:
-       enabled: [Db]
-       config:
-          Db:
+       enabled:
+          - Db:
              dsn: 'mysql:host=localhost;dbname=testdb'
              user: 'root'
              password: ''
              dump: 'tests/_data/dump.sql'
              populate: true
              cleanup: false
+             reconnect: true
+
+### SQL data dump
+
+ * Comments are permitted.
+ * The `dump.sql` may contain multiline statements.
+  * The delimiter, a semi-colon in this case, must be on the same line as the last statement:
+ 
+```sql
+-- Add a few contacts to the table.
+REPLACE INTO `Contacts` (`created`, `modified`, `status`, `contact`, `first`, `last`) VALUES
+(NOW(), NOW(), 1, 'Bob Ross', 'Bob', 'Ross'),
+(NOW(), NOW(), 1, 'Fred Flintstone', 'Fred', 'Flintstone');
+
+-- Remove existing orders for testing.
+DELETE FROM `Order`;
+```
 
 ## Public Properties
 * dbh - contains PDO connection.
@@ -81,13 +96,13 @@ Example:
 
 ``` php
 <?php
-$I->dontSeeInDatabase('users', array('name' => 'Davert', 'email' => 'davert@mail.com'));
+$I->dontSeeInDatabase('users', array('name' => 'Davert', 'email' => 'davert * `mail.com'));` 
 
 ```
 Will generate:
 
 ``` sql
-SELECT COUNT(*) FROM `users` WHERE `name` = 'Davert' AND `email` = 'davert@mail.com'
+SELECT COUNT(*) FROM `users` WHERE `name` = 'Davert' AND `email` = 'davert * `mail.com'` 
 ```
 Fails if such user was found.
 
@@ -108,7 +123,7 @@ $mail = $I->grabFromDatabase('users', 'email', array('name' => 'Davert'));
 
 ```
 
-@version 1.1
+ * `Available since` 1.1
 
  * `param`       $table
  * `param`       $column
@@ -122,12 +137,13 @@ Inserts SQL record into database. This record will be erased after the test.
 
 ``` php
 <?php
-$I->haveInDatabase('users', array('name' => 'miles', 'email' => 'miles@davis.com'));
+$I->haveInDatabase('users', array('name' => 'miles', 'email' => 'miles * `davis.com'));` 
 ?>
 ```
 
- * `param` $table
+ * `param`       $table
  * `param array` $data
+
  * `return integer` $id
 
 
@@ -140,17 +156,32 @@ Example:
 
 ``` php
 <?php
-$I->seeInDatabase('users', array('name' => 'Davert', 'email' => 'davert@mail.com'));
+$I->seeInDatabase('users', array('name' => 'Davert', 'email' => 'davert * `mail.com'));` 
 
 ```
 Will generate:
 
 ``` sql
-SELECT COUNT(*) FROM `users` WHERE `name` = 'Davert' AND `email` = 'davert@mail.com'
+SELECT COUNT(*) FROM `users` WHERE `name` = 'Davert' AND `email` = 'davert * `mail.com'` 
 ```
 Fails if no such user found.
 
  * `param`       $table
  * `param array` $criteria
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/Db.php">Help us to improve documentation. Edit module reference</a></div>
+
+### seeNumRecords
+ 
+Asserts that found number of records in database
+
+``` php
+<?php
+$I->seeNumRecords(1, 'users', ['name' => 'davert'])
+?>
+```
+
+ * `param int`    $expectedNumber      Expected number
+ * `param string` $table    Table name
+ * `param array`  $criteria Search criteria [Optional]
+
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/Db.php">Help us to improve documentation. Edit module reference</a></div>

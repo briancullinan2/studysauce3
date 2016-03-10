@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony Config Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,21 +12,26 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.9",
         "symfony/filesystem": "~2.3"
     },
-    "autoload": {
-        "psr-0": { "Symfony\\Component\\Config\\": "" }
+    "suggest": {
+        "symfony/yaml": "To use the yaml reference dumper"
     },
-    "target-dir": "Symfony/Component/Config",
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Config\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

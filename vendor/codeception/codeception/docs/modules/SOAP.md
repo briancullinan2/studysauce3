@@ -1,6 +1,4 @@
-# SOAP Module
 
-**For additional reference, please review the [source](https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/SOAP.php)**
 
 
 Module for testing SOAP WSDL web services.
@@ -33,13 +31,19 @@ If you use PHP SoapServer with framework, try to block call to this method in te
 
 
 
+### dontSeeSoapResponseContainsStructure
+ 
+Opposite to `seeSoapResponseContainsStructure`
+ * `param` $xml
+
+
 ### dontSeeSoapResponseContainsXPath
  
 Checks XML response doesn't contain XPath locator
 
 ``` php
 <?php
-$I->dontSeeSoapResponseContainsXPath('//root/user[@id=1]');
+$I->dontSeeSoapResponseContainsXPath('//root/user[ * `id=1]');` 
 ?>
 ```
 
@@ -70,10 +74,10 @@ Parameter can be passed either as XmlBuilder, DOMDocument, DOMNode, XML string, 
 Finds and returns attribute of element.
 Element is matched by either CSS or XPath
 
-@version 1.1
+ * `Available since` 1.1
  * `param` $cssOrXPath
  * `param` $attribute
-@return string
+ * `return` string
 
 
 ### grabTextContentFrom
@@ -81,9 +85,9 @@ Element is matched by either CSS or XPath
 Finds and returns text contents of element.
 Element is matched by either CSS or XPath
 
-@version 1.1
+ * `Available since` 1.1
  * `param` $cssOrXPath
-@return string
+ * `return` string
 
 
 ### haveSoapHeader
@@ -150,7 +154,7 @@ Checks XML response with XPath locator
 
 ``` php
 <?php
-$I->seeSoapResponseContainsXPath('//root/user[@id=1]');
+$I->seeSoapResponseContainsXPath('//root/user[ * `id=1]');` 
 ?>
 ```
 
@@ -222,4 +226,4 @@ $I->sendRequest('UpdateUser', \Codeception\Utils\Soap::request()->user
  * `param` $request
  * `param` $body
 
-<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.0/src/Codeception/Module/SOAP.php">Help us to improve documentation. Edit module reference</a></div>
+<p>&nbsp;</p><div class="alert alert-warning">Module reference is taken from the source code. <a href="https://github.com/Codeception/Codeception/tree/2.1/src/Codeception/Module/SOAP.php">Help us to improve documentation. Edit module reference</a></div>

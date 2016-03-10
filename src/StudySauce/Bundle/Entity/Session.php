@@ -27,11 +27,15 @@ class Session
     protected $time;
 
     /**
+     * @ORM\Column(type="integer", name="session_lifetime")
+     */
+    protected $lifetime;
+
+    /**
      * @ORM\OneToMany(targetEntity="Visit", mappedBy="session")
      * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $visits;
-
 
     /**
      * Constructor

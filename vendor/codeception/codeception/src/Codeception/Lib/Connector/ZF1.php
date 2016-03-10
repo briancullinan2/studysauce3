@@ -3,6 +3,7 @@ namespace Codeception\Lib\Connector;
 
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\Response;
+use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
 
 class ZF1 extends Client
 {
@@ -43,7 +44,7 @@ class ZF1 extends Client
         $redirector->setExit(false);
 
         // json helper should not exit
-        $json               = \Zend_Controller_Action_HelperBroker::getStaticHelper('json');
+        $json = \Zend_Controller_Action_HelperBroker::getStaticHelper('json');
         $json->suppressExit = true;
 
         $zendRequest = new \Zend_Controller_Request_HttpTestCase();
@@ -54,8 +55,17 @@ class ZF1 extends Client
         // so we set all parameters in ZF's request here to not break apps
         // relying on $request->getPost()
         $zendRequest->setPost($request->getParameters());
-        $zendRequest->setRequestUri(str_replace('http://localhost','',$request->getUri()));
-        $zendRequest->setHeaders($request->getServer());
+        $zendRequest->setRawBody($request->getContent());
+
+        $uri = $request->getUri();
+        $queryString = parse_url($uri, PHP_URL_QUERY);
+        $requestUri = parse_url($uri, PHP_URL_PATH);
+        if (!empty($queryString)) {
+            $requestUri .= '?' . $queryString;
+        }
+        $zendRequest->setRequestUri($requestUri);
+
+        $zendRequest->setHeaders($this->extractHeaders($request));
         $_FILES  = $this->remapFiles($request->getFiles());
         $_SERVER = array_merge($_SERVER, $request->getServer());
 
@@ -63,7 +73,14 @@ class ZF1 extends Client
         $this->front->setRequest($zendRequest)->setResponse($zendResponse);
 
         ob_start();
-        $this->bootstrap->run();
+        try {
+            $this->bootstrap->run();
+            $_GET = $_POST = [];
+        } catch (\Exception $e) {
+            ob_end_clean();
+            $_GET = $_POST = [];
+            throw $e;
+        }
         ob_end_clean();
 
         $this->zendRequest = $zendRequest;
@@ -71,7 +88,7 @@ class ZF1 extends Client
         $response = new Response(
             $zendResponse->getBody(),
             $zendResponse->getHttpResponseCode(),
-            $this->_formatResponseHeaders($zendResponse)
+            $this->formatResponseHeaders($zendResponse)
         );
 
         return $response;
@@ -83,7 +100,7 @@ class ZF1 extends Client
      * @param \Zend_Controller_Response_Abstract $response The ZF1 Response Object.
      * @return array the clean key/value headers
      */
-    private function _formatResponseHeaders (\Zend_Controller_Response_Abstract $response) {
+    private function formatResponseHeaders (\Zend_Controller_Response_Abstract $response) {
         $headers = array();
         foreach ($response->getHeaders() as $header) {
             $name = $header['name'];
@@ -99,12 +116,29 @@ class ZF1 extends Client
     }
 
 
-
     /**
      * @return \Zend_Controller_Request_HttpTestCase
      */
     public function getZendRequest()
     {
         return $this->zendRequest;
+    }
+
+    private function extractHeaders(BrowserKitRequest $request)
+    {
+        $headers = [];
+        $server = $request->getServer();
+
+        $contentHeaders = array('Content-Length' => true, 'Content-Md5' => true, 'Content-Type' => true);
+        foreach ($server as $header => $val) {
+            $header = implode('-', array_map('ucfirst', explode('-', strtolower(str_replace('_', '-', $header)))));
+
+            if (strpos($header, 'Http-') === 0) {
+                $headers[substr($header, 5)] = $val;
+            } elseif (isset($contentHeaders[$header])) {
+                $headers[$header] = $val;
+            }
+        }
+        return $headers;
     }
 }

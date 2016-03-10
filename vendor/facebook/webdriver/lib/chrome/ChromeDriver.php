@@ -13,15 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Chrome;
+
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\DriverCommand;
+use Facebook\WebDriver\Remote\Service\DriverCommandExecutor;
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\WebDriverCommand;
+
 class ChromeDriver extends RemoteWebDriver {
 
   public static function start(
-    DesiredCapabilities $desired_capabilities = null
+    DesiredCapabilities $desired_capabilities = null,
+    ChromeDriverService $service = null
   ) {
     if ($desired_capabilities === null) {
       $desired_capabilities = DesiredCapabilities::chrome();
     }
-    $service = ChromeDriverService::createDefaultService();
+    if ($service === null) {
+      $service = ChromeDriverService::createDefaultService();
+    }
     $executor = new DriverCommandExecutor($service);
     $driver = new static();
     $driver->setCommandExecutor($executor)
@@ -41,14 +53,30 @@ class ChromeDriver extends RemoteWebDriver {
     $this->setSessionID($response->getSessionID());
   }
 
+  /**
+   * Always throws an exception. Use ChromeDriver::start() instead.
+   *
+   * @throws WebDriverException
+   */
   public static function create(
     $url = 'http://localhost:4444/wd/hub',
     $desired_capabilities = null,
-    $timeout_in_ms = 300000
+    $connection_timeout_in_ms = null,
+    $request_timeout_in_ms = null,
+    $http_proxy = null,
+    $http_proxy_port = null
   ) {
     throw new WebDriverException('Please use ChromeDriver::start() instead.');
   }
 
+  /**
+   * Always throws an exception. Use ChromeDriver::start() instead.
+   *
+   * @param string $session_id The existing session id
+   * @param string $url        The url of the remote server
+   *
+   * @throws WebDriverException
+   */
   public static function createBySessionID(
     $session_id,
     $url = 'http://localhost:4444/wd/hub'

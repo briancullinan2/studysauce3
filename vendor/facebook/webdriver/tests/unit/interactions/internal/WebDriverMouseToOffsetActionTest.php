@@ -13,18 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-class WebDriverMouseToOffsetActionTest extends PHPUnit_Framework_TestCase {
+namespace Facebook\WebDriver\Interactions\Internal;
+
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverMouse;
+
+class WebDriverMouseToOffsetActionTest extends \PHPUnit_Framework_TestCase {
   /**
    * @type WebDriverMoveToOffsetAction
    */
   private $webDriverMoveToOffsetAction;
-
+  /** @var WebDriverMouse|\PHPUnit_Framework_MockObject_MockObject */
   private $webDriverMouse;
+  /** @var WebDriverLocatable|\PHPUnit_Framework_MockObject_MockObject  */
   private $locationProvider;
 
   public function setUp() {
-    $this->webDriverMouse = $this->getMock('WebDriverMouse');
-    $this->locationProvider = $this->getMock('WebDriverLocatable');
+    $this->webDriverMouse = $this->getMock('Facebook\WebDriver\WebDriverMouse');
+    $this->locationProvider = $this->getMock('Facebook\WebDriver\Internal\WebDriverLocatable');
+
     $this->webDriverMoveToOffsetAction = new WebDriverMoveToOffsetAction(
       $this->webDriverMouse,
       $this->locationProvider,
@@ -34,7 +41,8 @@ class WebDriverMouseToOffsetActionTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testPerformFocusesOnElementAndSendPressKeyCommand() {
-    $coords = $this->getMockBuilder('WebDriverCoordinates')->disableOriginalConstructor()->getMock();
+    $coords = $this->getMockBuilder('Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates')
+      ->disableOriginalConstructor()->getMock();
     $this->webDriverMouse->expects($this->once())->method('mouseMove')->with($coords, 150, 200);
     $this->locationProvider->expects($this->once())->method('getCoordinates')->will($this->returnValue($coords));
     $this->webDriverMoveToOffsetAction->perform();

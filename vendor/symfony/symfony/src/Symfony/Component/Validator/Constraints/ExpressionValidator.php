@@ -60,10 +60,6 @@ class ExpressionValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Expression');
         }
 
-        if (null === $value || '' === $value) {
-            return;
-        }
-
         $variables = array();
 
         // Symfony 2.5+
@@ -89,9 +85,15 @@ class ExpressionValidator extends ConstraintValidator
         }
 
         if (!$this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {
-            $this->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+            }
         }
     }
 

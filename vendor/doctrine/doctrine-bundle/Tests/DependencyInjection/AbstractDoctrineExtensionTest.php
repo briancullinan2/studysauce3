@@ -75,6 +75,7 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('pgsql_user', $config['user']);
         $this->assertSame('pgsql_s3cr3t', $config['password']);
         $this->assertSame('require', $config['sslmode']);
+        $this->assertSame('postgresql-ca.pem', $config['sslrootcert']);
         $this->assertSame('utf8', $config['charset']);
 
         // doctrine.dbal.sqlanywhere_connection
@@ -114,7 +115,11 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Doctrine\\DBAL\\Connections\\MasterSlaveConnection', $param['wrapperClass']);
         $this->assertTrue($param['keepSlave']);
         $this->assertEquals(
-            array('user' => 'mysql_user', 'password' => 'mysql_s3cr3t', 'port' => null, 'dbname' => 'mysql_db', 'host' => 'localhost', 'unix_socket' => '/path/to/mysqld.sock'),
+            array('user' => 'mysql_user', 'password' => 'mysql_s3cr3t',
+                  'port' => null, 'dbname' => 'mysql_db', 'host' => 'localhost',
+                  'unix_socket' => '/path/to/mysqld.sock',
+                  'defaultTableOptions' => array(),
+            ),
             $param['master']
         );
         $this->assertEquals(
@@ -136,7 +141,11 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Doctrine\\DBAL\\Sharding\\PoolingShardConnection', $param['wrapperClass']);
         $this->assertEquals(new Reference('foo.shard_choser'), $param['shardChoser']);
         $this->assertEquals(
-            array('user' => 'mysql_user', 'password' => 'mysql_s3cr3t', 'port' => null, 'dbname' => 'mysql_db', 'host' => 'localhost', 'unix_socket' => '/path/to/mysqld.sock'),
+            array('user' => 'mysql_user', 'password' => 'mysql_s3cr3t',
+                  'port' => null, 'dbname' => 'mysql_db', 'host' => 'localhost',
+                  'unix_socket' => '/path/to/mysqld.sock',
+                  'defaultTableOptions' => array(),
+            ),
             $param['global']
         );
         $this->assertEquals(
@@ -146,6 +155,22 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $param['shards'][0]
         );
+    }
+
+    public function testDbalLoadSavepointsForNestedTransactions()
+    {
+        $container = $this->loadContainer('dbal_savepoints');
+
+        $calls = $container->getDefinition('doctrine.dbal.savepoints_connection')->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertEquals('setNestTransactionsWithSavepoints', $calls[0][0]);
+        $this->assertTrue($calls[0][1][0]);
+
+        $calls = $container->getDefinition('doctrine.dbal.nosavepoints_connection')->getMethodCalls();
+        $this->assertCount(0, $calls);
+
+        $calls = $container->getDefinition('doctrine.dbal.notset_connection')->getMethodCalls();
+        $this->assertCount(0, $calls);
     }
 
     public function testLoadSimpleSingleConnection()
@@ -163,6 +188,7 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
                 'password' => null,
                 'driver' => 'pdo_mysql',
                 'driverOptions' => array(),
+                'defaultTableOptions' => array(),
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager'),
@@ -183,6 +209,49 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * The PDO driver doesn't require a database name to be to set when connecting to a database server
+     */
+    public function testLoadSimpleSingleConnectionWithoutDbName()
+    {
+
+        $container = $this->loadContainer('orm_service_simple_single_entity_manager_without_dbname');
+
+        /** @var Definition $definition */
+        $definition = $container->getDefinition('doctrine.dbal.default_connection');
+
+        $this->assertDICConstructorArguments($definition, array(
+                array(
+                    'host' => 'localhost',
+                    'port' => null,
+                    'user' => 'root',
+                    'password' => null,
+                    'driver' => 'pdo_mysql',
+                    'driverOptions' => array(),
+                    'defaultTableOptions' => array(),
+                ),
+                new Reference('doctrine.dbal.default_connection.configuration'),
+                new Reference('doctrine.dbal.default_connection.event_manager'),
+                array(),
+            ));
+
+        $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        if (method_exists($definition, 'getFactory')) {
+            $factory = $definition->getFactory();
+        } else {
+            $factory[0] = $definition->getFactoryClass();
+            $factory[1] = $definition->getFactoryMethod();
+        }
+
+        $this->assertEquals('%doctrine.orm.entity_manager.class%', $factory[0]);
+        $this->assertEquals('create', $factory[1]);
+
+        $this->assertDICConstructorArguments($definition, array(
+                new Reference('doctrine.dbal.default_connection'), new Reference('doctrine.orm.default_configuration')
+            ));
+    }
+
     public function testLoadSingleConnection()
     {
         $container = $this->loadContainer('orm_service_single_entity_manager');
@@ -199,6 +268,7 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
                 'password' => 'sqlite_s3cr3t',
                 'dbname' => 'sqlite_db',
                 'memory' => true,
+                'defaultTableOptions' => array(),
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager'),
@@ -294,7 +364,7 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger')));
 
         $definition = $container->getDefinition('doctrine.dbal.profile_connection.configuration');
-        $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger.chain.profile')));
+        $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger.profiling.profile')));
 
         $definition = $container->getDefinition('doctrine.dbal.both_connection.configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setSQLLogger', array(new Reference('doctrine.dbal.logger.chain.both')));
@@ -419,6 +489,26 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testSingleEntityManagerDefaultTableOptions()
+    {
+        $container = $this->loadContainer('orm_single_em_default_table_options', array('YamlBundle', 'AnnotationsBundle', 'XmlBundle'));
+
+        $param = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
+
+        $this->assertArrayHasKey('defaultTableOptions',$param);
+
+        $defaults = $param['defaultTableOptions'];
+
+        $this->assertArrayHasKey('charset', $defaults);
+        $this->assertArrayHasKey('collate', $defaults);
+        $this->assertArrayHasKey('engine', $defaults);
+
+        $this->assertEquals('utf8mb4',$defaults['charset']);
+        $this->assertEquals('utf8mb4_unicode_ci',$defaults['collate']);
+        $this->assertEquals('InnoDB',$defaults['engine']);
+
+    }
+
     public function testSetTypes()
     {
         $container = $this->loadContainer('dbal_types');
@@ -452,6 +542,20 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertDICDefinitionMethodCallOnce($def1, 'setNamingStrategy', array(0 => new Reference('doctrine.orm.naming_strategy.default')));
         $this->assertDICDefinitionMethodCallOnce($def2, 'setNamingStrategy', array(0 => new Reference('doctrine.orm.naming_strategy.underscore')));
+    }
+
+    public function testSetQuoteStrategy()
+    {
+        if (version_compare(Version::VERSION, "2.3.0-DEV") < 0) {
+            $this->markTestSkipped('Quote Strategies are not available');
+        }
+        $container = $this->loadContainer('orm_quotestrategy');
+
+        $def1 = $container->getDefinition('doctrine.orm.em1_configuration');
+        $def2 = $container->getDefinition('doctrine.orm.em2_configuration');
+
+        $this->assertDICDefinitionMethodCallOnce($def1, 'setQuoteStrategy', array(0 => new Reference('doctrine.orm.quote_strategy.default')));
+        $this->assertDICDefinitionMethodCallOnce($def2, 'setQuoteStrategy', array(0 => new Reference('doctrine.orm.quote_strategy.ansi')));
     }
 
     public function testSecondLevelCache()
@@ -558,7 +662,12 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definition = $container->getDefinition('doctrine.orm.listeners.resolve_target_entity');
         $this->assertDICDefinitionMethodCallOnce($definition, 'addResolveTargetEntity', array('Symfony\Component\Security\Core\User\UserInterface', 'MyUserClass', array()));
-        $this->assertEquals(array('doctrine.event_listener' => array( array('event' => 'loadClassMetadata') ) ), $definition->getTags());
+
+        if (version_compare(Version::VERSION, '2.5.0-DEV') < 0) {
+            $this->assertEquals(array('doctrine.event_listener' => array(array('event' => 'loadClassMetadata'))), $definition->getTags());
+        } else {
+            $this->assertEquals(array('doctrine.event_subscriber' => array(array())), $definition->getTags());
+        }
     }
 
     public function testAttachEntityListeners()
@@ -653,6 +762,34 @@ abstract class AbstractDoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 
         $listener = $container->getDefinition('entity_listener_resolver');
         $this->assertDICDefinitionMethodCallOnce($listener, 'register', array(new Reference('entity_listener2')));
+    }
+
+    public function testAttachEntityListenerTag()
+    {
+        if (version_compare(Version::VERSION, '2.5.0-DEV') < 0) {
+            $this->markTestSkipped('Attaching entity listeners by tag requires doctrine-orm 2.5.0 or newer');
+        }
+
+        $container = $this->getContainer(array());
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+        $container->addCompilerPass(new EntityListenerPass());
+
+        $this->loadFromFile($container, 'orm_attach_entity_listener_tag');
+
+        $this->compileContainer($container);
+
+        $listener = $container->getDefinition('doctrine.orm.em1_entity_listener_resolver');
+        $this->assertDICDefinitionMethodCallOnce($listener, 'register', array(new Reference('entity_listener1')));
+
+        $listener = $container->getDefinition('doctrine.orm.em2_entity_listener_resolver');
+        $this->assertDICDefinitionMethodCallOnce($listener, 'register', array(new Reference('entity_listener2')));
+
+        $attachListener = $container->getDefinition('doctrine.orm.em1_listeners.attach_entity_listeners');
+        $this->assertDICDefinitionMethodCallOnce($attachListener, 'addEntityListener', array('My/Entity1', 'EntityListener1', 'postLoad'));
+
+        $attachListener = $container->getDefinition('doctrine.orm.em2_listeners.attach_entity_listeners');
+        $this->assertDICDefinitionMethodCallOnce($attachListener, 'addEntityListener', array('My/Entity2', 'EntityListener2', 'preFlush', 'preFlushHandler'));
     }
 
     public function testRepositoryFactory()

@@ -15,11 +15,15 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class MarkdownDescriptor extends Descriptor
 {
@@ -109,7 +113,7 @@ class MarkdownDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
-            $this->write(sprintf("**`%s`:** `%s`", $options['id'], get_class($service)));
+            $this->write(sprintf('**`%s`:** `%s`', $options['id'], get_class($service)));
         }
     }
 
@@ -179,23 +183,43 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
             ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
-            ."\n".'- Synchronized: '.($definition->isSynchronized() ? 'yes' : 'no')
-            ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
+        ;
+
+        if (method_exists($definition, 'isSynchronized')) {
+            $output .= "\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no');
+        }
+
+        $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
         }
 
-        if ($definition->getFactoryClass()) {
-            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass().'`';
+        if ($definition->getFactoryClass(false)) {
+            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass(false).'`';
         }
 
-        if ($definition->getFactoryService()) {
-            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService().'`';
+        if ($definition->getFactoryService(false)) {
+            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService(false).'`';
         }
 
-        if ($definition->getFactoryMethod()) {
-            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod().'`';
+        if ($definition->getFactoryMethod(false)) {
+            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod(false).'`';
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $output .= "\n".'- Factory Service: `'.$factory[0].'`';
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $output .= "\n".'- Factory Class: `'.$factory[0].'`';
+                }
+                $output .= "\n".'- Factory Method: `'.$factory[1].'`';
+            } else {
+                $output .= "\n".'- Factory Function: `'.$factory.'`';
+            }
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
@@ -231,6 +255,106 @@ class MarkdownDescriptor extends Descriptor
         $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    {
+        $event = array_key_exists('event', $options) ? $options['event'] : null;
+
+        $title = 'Registered listeners';
+        if (null !== $event) {
+            $title .= sprintf(' for event `%s` ordered by descending priority', $event);
+        }
+
+        $this->write(sprintf('# %s', $title)."\n");
+
+        $registeredListeners = $eventDispatcher->getListeners($event);
+        if (null !== $event) {
+            foreach ($registeredListeners as $order => $listener) {
+                $this->write("\n".sprintf('## Listener %d', $order + 1)."\n");
+                $this->describeCallable($listener);
+            }
+        } else {
+            ksort($registeredListeners);
+
+            foreach ($registeredListeners as $eventListened => $eventListeners) {
+                $this->write("\n".sprintf('## %s', $eventListened)."\n");
+
+                foreach ($eventListeners as $order => $eventListener) {
+                    $this->write("\n".sprintf('### Listener %d', $order + 1)."\n");
+                    $this->describeCallable($eventListener);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeCallable($callable, array $options = array())
+    {
+        $string = '';
+
+        if (is_array($callable)) {
+            $string .= "\n- Type: `function`";
+
+            if (is_object($callable[0])) {
+                $string .= "\n".sprintf('- Name: `%s`', $callable[1]);
+                $string .= "\n".sprintf('- Class: `%s`', get_class($callable[0]));
+            } else {
+                if (0 !== strpos($callable[1], 'parent::')) {
+                    $string .= "\n".sprintf('- Name: `%s`', $callable[1]);
+                    $string .= "\n".sprintf('- Class: `%s`', $callable[0]);
+                    $string .= "\n- Static: yes";
+                } else {
+                    $string .= "\n".sprintf('- Name: `%s`', substr($callable[1], 8));
+                    $string .= "\n".sprintf('- Class: `%s`', $callable[0]);
+                    $string .= "\n- Static: yes";
+                    $string .= "\n- Parent: yes";
+                }
+            }
+
+            return $this->write($string."\n");
+        }
+
+        if (is_string($callable)) {
+            $string .= "\n- Type: `function`";
+
+            if (false === strpos($callable, '::')) {
+                $string .= "\n".sprintf('- Name: `%s`', $callable);
+            } else {
+                $callableParts = explode('::', $callable);
+
+                $string .= "\n".sprintf('- Name: `%s`', $callableParts[1]);
+                $string .= "\n".sprintf('- Class: `%s`', $callableParts[0]);
+                $string .= "\n- Static: yes";
+            }
+
+            return $this->write($string."\n");
+        }
+
+        if ($callable instanceof \Closure) {
+            $string .= "\n- Type: `closure`";
+
+            return $this->write($string."\n");
+        }
+
+        if (method_exists($callable, '__invoke')) {
+            $string .= "\n- Type: `object`";
+            $string .= "\n".sprintf('- Name: `%s`', get_class($callable));
+
+            return $this->write($string."\n");
+        }
+
+        throw new \InvalidArgumentException('Callable is not describable.');
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return string
+     */
     private function formatRouterConfig(array $array)
     {
         if (!count($array)) {

@@ -19,12 +19,25 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
+        $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
             array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
             $config
         );
+    }
+
+    public function testDoNoDuplicateDefaultFormResources()
+    {
+        $input = array('templating' => array(
+            'form' => array('resources' => array('FrameworkBundle:Form')),
+            'engines' => array('php'),
+        ));
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), array($input));
+
+        $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }
 
     /**
@@ -33,7 +46,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testValidTrustedProxies($trustedProxies, $processedProxies)
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, array(array(
             'secret' => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
@@ -53,6 +66,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             array(array(), array()),
             array(array('10.0.0.0/8'), array('10.0.0.0/8')),
             array(array('::ffff:0:0/96'), array('::ffff:0:0/96')),
+            array(array('0.0.0.0/0'), array('0.0.0.0/0')),
         );
     }
 
@@ -62,7 +76,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testInvalidTypeTrustedProxies()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
@@ -77,11 +91,31 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValueTrustedProxies()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
                 'trusted_proxies' => array('Not an IP address'),
+            ),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.
+     * @group legacy
+     */
+    public function testLegacyInvalidValueAssets()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
+            array(
+                'templating' => array(
+                    'engines' => null,
+                    'assets_base_urls' => '//example.com',
+                ),
+                'assets' => null,
             ),
         ));
     }
@@ -105,6 +139,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'field_name' => '_token',
             ),
             'esi' => array('enabled' => false),
+            'ssi' => array('enabled' => false),
             'fragments' => array(
                 'enabled' => false,
                 'path' => '/_fragment',
@@ -122,6 +157,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'translator' => array(
                 'enabled' => false,
                 'fallbacks' => array('en'),
+                'logging' => true,
             ),
             'validation' => array(
                 'enabled' => false,
@@ -129,7 +165,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email' => false,
-                'api' => PHP_VERSION_ID < 50309 ? '2.4' : '2.5-bc',
             ),
             'annotations' => array(
                 'cache' => 'file',
@@ -138,6 +173,18 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'serializer' => array(
                 'enabled' => false,
+                'enable_annotations' => false,
+            ),
+            'property_access' => array(
+                'magic_call' => false,
+                'throw_exception_on_invalid_index' => false,
+            ),
+            'assets' => array(
+                'version' => null,
+                'version_format' => '%%s?%%s',
+                'base_path' => '',
+                'base_urls' => array(),
+                'packages' => array(),
             ),
         );
     }

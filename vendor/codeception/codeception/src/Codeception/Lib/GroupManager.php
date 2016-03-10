@@ -2,11 +2,8 @@
 namespace Codeception\Lib;
 
 use Codeception\Configuration;
-use Codeception\Exception\Configuration as ConfigurationException;
-use Codeception\TestCase\Interfaces\Descriptive;
 use Codeception\TestCase\Interfaces\Reported;
 use Codeception\TestCase\Interfaces\ScenarioDriven;
-use Codeception\TestCase\Interfaces\Plain;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -50,7 +47,7 @@ class GroupManager
 
             $i = 1;
             foreach ($files as $file) {
-                /** @var SplFileInfo $file  **/
+                /** @var SplFileInfo $file * */
                 $this->configuredGroups[str_replace('*', $i, $group)] = $file->getRelativePathname();
                 $i++;
             }
@@ -65,13 +62,18 @@ class GroupManager
             if (is_array($tests)) {
                 foreach ($tests as $test) {
                     $file = str_replace(['/', '\\'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $test);
-                    $this->testsInGroups[$group][] = Configuration::projectDir().$file;
+                    $this->testsInGroups[$group][] = Configuration::projectDir() . $file;
                 }
-            } elseif (is_file(Configuration::projectDir().$tests)) {
-                $handle = @fopen(Configuration::projectDir().$tests, "r");
+            } elseif (is_file(Configuration::projectDir() . $tests)) {
+                $handle = @fopen(Configuration::projectDir() . $tests, "r");
                 if ($handle) {
                     while (($test = fgets($handle, 4096)) !== false) {
-                        $file = trim(Configuration::projectDir().$test);
+                        // if the current line is blank then we need to move to the next line
+                        // otherwise the current codeception directory becomes part of the group
+                        // which causes every single test to run
+                        if (trim($test) === '') continue;
+
+                        $file = trim(Configuration::projectDir() . $test);
                         $file = str_replace(['/', '\\'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $file);
                         $this->testsInGroups[$group][] = $file;
                     }
@@ -94,7 +96,7 @@ class GroupManager
             if (isset($info['class'])) {
                 $groups = array_merge($groups, \PHPUnit_Util_Test::getGroups($info['class'], $info['name']));
             }
-            $filename = $info['file'];
+            $filename = str_replace(['\\\\', '//'], ['\\', '/'], $info['file']);
         } else {
             $groups = array_merge($groups, \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false)));
             $filename = (new \ReflectionClass($test))->getFileName();

@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated synchronized services
+
+2.6.0
+-----
+
+ * added new factory syntax and deprecated the old one
+
 2.5.0
 -----
 

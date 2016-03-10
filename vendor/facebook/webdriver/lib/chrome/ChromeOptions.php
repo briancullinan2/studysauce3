@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Chrome;
+
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+
 /**
  * The class manages the capabilities in ChromeDriver.
  *
@@ -58,7 +62,7 @@ class ChromeOptions {
   }
 
   /**
-   * @param array $args
+   * @param array $arguments
    * @return ChromeOptions
    */
   public function addArguments(array $arguments) {
@@ -81,8 +85,7 @@ class ChromeOptions {
   }
 
   /**
-   * @param array $encoded_extensions An array of base64 encoded of the
-   *                                  extensions.
+   * @param array $encoded_extensions An array of base64 encoded of the extensions.
    * @return ChromeOptions
    */
   public function addEncodedExtensions(array $encoded_extensions) {
@@ -96,7 +99,7 @@ class ChromeOptions {
    * Sets an experimental option which has not exposed officially.
    *
    * @param string $name
-   * @parma mixed $value
+   * @param mixed $value
    * @return ChromeOptions
    */
   public function setExperimentalOption($name, $value) {
@@ -105,8 +108,7 @@ class ChromeOptions {
   }
 
   /**
-   * @return DesiredCapabilities The DesiredCapabilities for Chrome with this
-   *                             options.
+   * @return DesiredCapabilities The DesiredCapabilities for Chrome with this options.
    */
   public function toCapabilities() {
     $capabilities = DesiredCapabilities::chrome();
@@ -120,6 +122,10 @@ class ChromeOptions {
   public function toArray() {
     $options = $this->experimentalOptions;
 
+    // The selenium server expects a 'dictionary' instead of a 'list' when
+    // reading the chrome option. However, an empty array in PHP will be
+    // converted to a 'list' instead of a 'dictionary'. To fix it, we always
+    // set the 'binary' to avoid returning an empty array.
     $options['binary'] = $this->binary;
 
     if ($this->arguments) {

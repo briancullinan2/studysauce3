@@ -14,13 +14,15 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
+/**
+ * @group legacy
+ */
 class LegacyTableHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $stream;
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->stream = fopen('php://memory', 'r+');
     }
 
@@ -94,7 +96,7 @@ class LegacyTableHelperTest extends \PHPUnit_Framework_TestCase
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    | Author           |
 +---------------+--------------------------+------------------+
@@ -144,7 +146,7 @@ TABLE
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    |                  |
 +---------------+--------------------------+------------------+
@@ -165,7 +167,7 @@ TABLE
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +---------------+--------------------------+------------------+
 | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
 | 9971-5-0210-0 |                          |                  |
@@ -178,13 +180,13 @@ TABLE
             array(
                 array('ISBN', 'Title', 'Author'),
                 array(
-                    array("99921-58-10-7", "Divine\nComedy", "Dante Alighieri"),
-                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
-                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
-                    array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
+                    array('99921-58-10-7', "Divine\nComedy", 'Dante Alighieri'),
+                    array('9971-5-0210-2', "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array('9971-5-0210-2', "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array('960-425-059-0', 'The Lord of the Rings', "J. R. R.\nTolkien"),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +---------------+----------------------------+-----------------+
 | ISBN          | Title                      | Author          |
 +---------------+----------------------------+-----------------+
@@ -204,7 +206,7 @@ TABLE
                 array('ISBN', 'Title'),
                 array(),
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +------+-------+
 | ISBN | Title |
 +------+-------+
@@ -224,7 +226,7 @@ TABLE
                     array('9971-5-0210-0', 'A Tale of Two Cities', '<info>Charles Dickens</>'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +---------------+----------------------+-----------------+
 | ISBN          | Title                | Author          |
 +---------------+----------------------+-----------------+
@@ -241,7 +243,7 @@ TABLE
                     array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
-<<<TABLE
+<<<'TABLE'
 +----------------------------------+----------------------+-----------------+
 | ISBN                             | Title                | Author          |
 +----------------------------------+----------------------+-----------------+
@@ -254,12 +256,11 @@ TABLE
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testRenderMultiByte()
     {
-        if (!function_exists('mb_strlen')) {
-            $this->markTestSkipped('The "mbstring" extension is not available');
-        }
-
         $table = new TableHelper();
         $table
             ->setHeaders(array('■■'))
@@ -269,12 +270,38 @@ TABLE
         $table->render($output = $this->getOutputStream());
 
         $expected =
-<<<TABLE
+<<<'TABLE'
 +------+
 | ■■   |
 +------+
 | 1234 |
 +------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    /**
+     * @requires extension mbstring
+     */
+    public function testRenderFullWidthCharacters()
+    {
+        $table = new TableHelper();
+        $table
+            ->setHeaders(array('あいうえお'))
+            ->setRows(array(array(1234567890)))
+            ->setLayout(TableHelper::LAYOUT_DEFAULT)
+        ;
+        $table->render($output = $this->getOutputStream());
+
+        $expected =
+            <<<'TABLE'
++------------+
+| あいうえお |
++------------+
+| 1234567890 |
++------------+
 
 TABLE;
 

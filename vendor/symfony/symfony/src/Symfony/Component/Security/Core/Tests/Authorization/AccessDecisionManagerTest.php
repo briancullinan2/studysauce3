@@ -104,11 +104,11 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     protected function getVoterFor2Roles($token, $vote1, $vote2)
     {
         $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->exactly(2))
+        $voter->expects($this->any())
               ->method('vote')
               ->will($this->returnValueMap(array(
-                  array($token, null, array("ROLE_FOO"), $vote1),
-                  array($token, null, array("ROLE_BAR"), $vote2),
+                  array($token, null, array('ROLE_FOO'), $vote1),
+                  array($token, null, array('ROLE_BAR'), $vote2),
               )))
         ;
 
@@ -153,13 +153,13 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     protected function getVoters($grants, $denies, $abstains)
     {
         $voters = array();
-        for ($i = 0; $i < $grants; $i++) {
+        for ($i = 0; $i < $grants; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_GRANTED);
         }
-        for ($i = 0; $i < $denies; $i++) {
+        for ($i = 0; $i < $denies; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_DENIED);
         }
-        for ($i = 0; $i < $abstains; $i++) {
+        for ($i = 0; $i < $abstains; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_ABSTAIN);
         }
 

@@ -39,6 +39,9 @@ class StringUtil
         // nebulae (nebula)
         array('ea', 2, true, true, 'a'),
 
+        // services (service)
+        array('secivres', 8, true, true, 'service'),
+
         // mice (mouse), lice (louse)
         array('eci', 3, false, true, 'ouse'),
 
@@ -59,6 +62,18 @@ class StringUtil
 
         // indices (index), appendices (appendix), prices (price)
         array('seci', 4, false, true, array('ex', 'ix', 'ice')),
+
+        // selfies (selfie)
+        array('seifles', 7, true, true, 'selfie'),
+
+        // movies (movie)
+        array('seivom', 6, true, true, 'movie'),
+
+        // news (news)
+        array('swen', 4, true, true, 'news'),
+
+        // series (series)
+        array('seires', 6, true, true, 'series'),
 
         // babies (baby)
         array('sei', 3, false, true, 'y'),
@@ -197,7 +212,7 @@ class StringUtil
         }
 
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3) {
+        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && 'feedback' !== $plural) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

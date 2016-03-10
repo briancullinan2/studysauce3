@@ -13,6 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Interactions\Internal\WebDriverCoordinates;
+use Facebook\WebDriver\Internal\WebDriverLocatable;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\WebDriverPoint;
+use ZipArchive;
+
 /**
  * Represents an HTML element.
  */
@@ -319,8 +331,8 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable {
       throw new WebDriverException("You may only upload files: " . $local_file);
     }
 
-    // Create a temperary file in the system temp directory.
-    $temp_zip = tempnam('', 'WebDriverZip');
+    // Create a temporary file in the system temp directory.
+    $temp_zip = tempnam(sys_get_temp_dir(), 'WebDriverZip');
     $zip = new ZipArchive();
     if ($zip->open($temp_zip, ZipArchive::CREATE) !== true) {
       return false;
@@ -344,7 +356,7 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable {
    * Set the fileDetector in order to let the RemoteWebElement to know that
    * you are going to upload a file.
    *
-   * Bascially, if you want WebDriver trying to send a file, set the fileDector
+   * Basically, if you want WebDriver trying to send a file, set the fileDetector
    * to be LocalFileDetector. Otherwise, keep it UselessFileDetector.
    *
    *   eg. $element->setFileDetector(new LocalFileDetector);
@@ -404,7 +416,7 @@ class RemoteWebElement implements WebDriverElement, WebDriverLocatable {
    *
    * @return RemoteWebElement
    */
-  private function newElement($id) {
-    return new RemoteWebElement($this->executor, $id);
+  protected function newElement($id) {
+    return new static($this->executor, $id);
   }
 }

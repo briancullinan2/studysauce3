@@ -2,6 +2,8 @@
 
 namespace Evernote;
 
+use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use Evernote\Factory\ThriftClientFactory;
 use Evernote\Store\Store;
 
@@ -13,24 +15,36 @@ class AdvancedClient
     /** @var bool */
     protected $sandbox;
 
+    /** @var bool */
+    protected $china;
+
     /** @var \Evernote\Factory\ThriftClientFactory  */
     protected $thriftClientFactory;
 
     /** @var  \EDAM\UserStore\UserStoreClient */
     protected $userStore;
 
+    /** @var \Psr\Log\LoggerInterface */
+    protected $logger;
+
     const SANDBOX_BASE_URL = 'https://sandbox.evernote.com';
     const PROD_BASE_URL    = 'https://www.evernote.com';
+    const CHINA_BASE_URL   = 'https://app.yinxiang.com';
 
     /**
+     * @param string $token
      * @param bool $sandbox
-     * @param null $thriftClientFactory
+     * @param Evernote\Factory\ThriftClientFactory|null $thriftClientFactory
+     * @param \Psr\Log\LoggerInterface|null $logger
+     * @param bool $china
      */
-    public function __construct($token, $sandbox = true, $thriftClientFactory = null)
+    public function __construct($token, $sandbox = true, $thriftClientFactory = null, LoggerInterface $logger = null, $china = false)
     {
         $this->token               = $token;
         $this->sandbox             = $sandbox;
         $this->thriftClientFactory = $thriftClientFactory;
+        $this->logger              = $logger ?: new NullLogger;
+        $this->china               = $china;
     }
 
     /**
@@ -39,11 +53,7 @@ class AdvancedClient
     public function getUserStore()
     {
         if (null === $this->userStore) {
-            $this->userStore =
-                new Store(
-                    $this->token,
-                    $this->getThriftClient('user', $this->getEndpoint('/edam/user'))
-                );
+            $this->userStore = $this->getStoreInstance($this->token, 'user', $this->getEndpoint('/edam/user'));
         }
 
         return $this->userStore;
@@ -53,16 +63,17 @@ class AdvancedClient
      * @param $noteStoreUrl
      * @return mixed
      */
-    public function getNoteStore($noteStoreUrl = null)
+    public function getNoteStore($noteStoreUrl = null, $token = null)
     {
         if (null === $noteStoreUrl) {
             $noteStoreUrl = $this->getUserStore()->getNoteStoreUrl($this->token);
         }
 
-        return new Store(
-            $this->token,
-            $this->getThriftClient('note', $noteStoreUrl)
-        );
+        if (null == $token) {
+            $token = $this->token;
+        }
+
+        return $this->getStoreInstance($token, 'note', $noteStoreUrl);
     }
 
 
@@ -73,19 +84,14 @@ class AdvancedClient
         $sharedAuth = $noteStore->authenticateToSharedNotebook($linkedNotebook->shareKey);
         $sharedToken = $sharedAuth->authenticationToken;
 
-        return new Store(
-            $sharedToken,
-            $this->getThriftClient('note', $noteStoreUrl)
-        );
+        return $this->getStoreInstance($sharedToken, 'note', $noteStoreUrl);
     }
 
     public function getBusinessNoteStore()
     {
         $businessAuth = $this->getUserStore()->authenticateToBusiness($this->token);
 
-        return $this->getNoteStore($businessAuth->noteStoreUrl);
-
-
+        return $this->getNoteStore($businessAuth->noteStoreUrl, $businessAuth->authenticationToken);
     }
 
     /**
@@ -94,7 +100,13 @@ class AdvancedClient
      */
     public function getEndpoint($path = null)
     {
-        $url = $this->sandbox ? self::SANDBOX_BASE_URL : self::PROD_BASE_URL;
+        if (true === $this->sandbox) {
+            $url = self::SANDBOX_BASE_URL;
+        } elseif (true === $this->china) {
+            $url = self::CHINA_BASE_URL;
+        } else {
+            $url = self::PROD_BASE_URL;
+        }    
 
         if (null != $path) {
             $url .= '/' . $path;
@@ -108,21 +120,14 @@ class AdvancedClient
      */
     public function getThriftClientFactory()
     {
-        if (null === $this->thriftClientFactory) {
-            $this->thriftClientFactory = new ThriftClientFactory();
-        }
-
         return $this->thriftClientFactory;
     }
 
-    /**
-     * @param $type
-     * @param $url
-     * @return mixed
-     */
-    protected function getThriftClient($type, $url)
+
+
+    public function getStoreInstance($token, $type, $url)
     {
-        return $this->getThriftClientFactory()->createThriftClient($type, $url);
+        return new Store($this->getThriftClientFactory(), $token, $type, $url);
     }
 }
 

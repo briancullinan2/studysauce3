@@ -13,6 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+namespace Facebook\WebDriver\Remote;
+
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\WebDriverCommandExecutor;
+use InvalidArgumentException;
+use BadMethodCallException;
+
 /**
  * Command executor talking to the standalone server via HTTP.
  */
@@ -44,6 +51,7 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
     DriverCommand::GET_ACTIVE_ELEMENT =>      array('method' => 'POST', 'url' => '/session/:sessionId/element/active'),
     DriverCommand::GET_ALERT_TEXT =>          array('method' => 'GET', 'url' => '/session/:sessionId/alert_text'),
     DriverCommand::GET_ALL_COOKIES =>         array('method' => 'GET',  'url' => '/session/:sessionId/cookie'),
+    DriverCommand::GET_ALL_SESSIONS =>        array('method' => 'GET', 'url' => '/sessions'),
     DriverCommand::GET_AVAILABLE_LOG_TYPES => array('method' => 'GET', 'url' => '/session/:sessionId/log/types'),
     DriverCommand::GET_CURRENT_URL =>         array('method' => 'GET',  'url' => '/session/:sessionId/url'),
     DriverCommand::GET_CURRENT_WINDOW_HANDLE => array('method' => 'GET',  'url' => '/session/:sessionId/window_handle'),
@@ -109,10 +117,19 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
 
   /**
    * @param string $url
+   * @param string|null $http_proxy
+   * @param int|null $http_proxy_port
    */
-  public function __construct($url) {
+  public function __construct($url, $http_proxy = null, $http_proxy_port = null) {
     $this->url = $url;
     $this->curl = curl_init();
+
+    if (!empty($http_proxy)) {
+      curl_setopt($this->curl, CURLOPT_PROXY, $http_proxy);
+      if (!empty($http_proxy_port)) {
+        curl_setopt($this->curl, CURLOPT_PROXYPORT, $http_proxy_port);
+      }
+    }
 
     // Get credentials from $url (if any)
     $matches = null;
@@ -133,25 +150,49 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
         'Accept: application/json',
       )
     );
-    curl_setopt($this->curl, CURLOPT_TIMEOUT_MS, 300000);
-    $this->setConnectionTimeout(300000);
+    $this->setRequestTimeout(30000);
+    $this->setConnectionTimeout(30000);
   }
 
   /**
-   * @param int $timeout
+   * Set timeout for the connect phase
+   *
+   * @param int $timeout_in_ms Timeout in milliseconds
    * @return HttpCommandExecutor
    */
-  public function setConnectionTimeout($timeout) {
+  public function setConnectionTimeout($timeout_in_ms) {
     // There is a PHP bug in some versions which didn't define the constant.
-    curl_setopt($this->curl, /* CURLOPT_CONNECTTIMEOUT_MS */ 156, $timeout);
+    curl_setopt(
+      $this->curl,
+      /* CURLOPT_CONNECTTIMEOUT_MS */ 156,
+      $timeout_in_ms
+    );
+    return $this;
+  }
+
+  /**
+   * Set the maximum time of a request
+   *
+   * @param int $timeout_in_ms Timeout in milliseconds
+   * @return HttpCommandExecutor
+   */
+  public function setRequestTimeout($timeout_in_ms) {
+    // There is a PHP bug in some versions (at least for PHP 5.3.3) which
+    // didn't define the constant.
+    curl_setopt(
+      $this->curl,
+      /* CURLOPT_TIMEOUT_MS */ 155,
+      $timeout_in_ms
+    );
     return $this;
   }
 
   /**
    * @param WebDriverCommand $command
-   * @param array $curl_opts An array of curl options.
    *
    * @return mixed
+   *
+   * @throws WebDriverException
    */
   public function execute(WebDriverCommand $command) {
     if (!isset(self::$commands[$command->getName()])) {
@@ -186,21 +227,20 @@ class HttpCommandExecutor implements WebDriverCommandExecutor {
     curl_setopt($this->curl, CURLOPT_URL, $this->url . $url);
 
     // https://github.com/facebook/php-webdriver/issues/173
-    switch ($command->getName()) {
-      case DriverCommand::NEW_SESSION:
-        curl_setopt($this->curl, CURLOPT_POST, 1);
-        break;
-      default:
-        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $http_method);
+    if ($command->getName() === DriverCommand::NEW_SESSION) {
+      curl_setopt($this->curl, CURLOPT_POST, 1);
+    } else {
+      curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $http_method);
     }
 
     $encoded_params = null;
+
     if ($http_method === 'POST' && $params && is_array($params)) {
       $encoded_params = json_encode($params);
     }
+
     curl_setopt($this->curl, CURLOPT_POSTFIELDS, $encoded_params);
-    curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 0);
+
     $raw_results = trim(curl_exec($this->curl));
 
     if ($error = curl_error($this->curl)) {

@@ -94,9 +94,7 @@ interface NoteStoreIf {
 }
 
 class NoteStoreClient implements \EDAM\NoteStore\NoteStoreIf {
-    /** @var TProtocol $input_ */
     protected $input_ = null;
-    /** @var TProtocol $output_ */
     protected $output_ = null;
 
     protected $seqid_ = 0;
@@ -306,12 +304,6 @@ class NoteStoreClient implements \EDAM\NoteStore\NoteStoreIf {
             $this->output_->writeMessageEnd();
             $this->output_->getTransport()->flush();
         }
-    }
-
-    public function close()
-    {
-        $this->output_->getTransport()->close();
-        $this->input_->getTransport()->close();
     }
 
     public function recv_getFilteredSyncChunk()

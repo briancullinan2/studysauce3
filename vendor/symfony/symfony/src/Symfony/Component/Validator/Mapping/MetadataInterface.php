@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
 
 /**
@@ -24,6 +25,7 @@ use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
  * traversed or not.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see CascadingStrategy
@@ -48,4 +50,11 @@ interface MetadataInterface extends LegacyMetadataInterface
      * @see TraversalStrategy
      */
     public function getTraversalStrategy();
+
+    /**
+     * Returns all constraints of this element.
+     *
+     * @return Constraint[] A list of Constraint instances
+     */
+    public function getConstraints();
 }

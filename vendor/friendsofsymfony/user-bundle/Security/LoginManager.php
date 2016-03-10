@@ -14,6 +14,7 @@ namespace FOS\UserBundle\Security;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -27,29 +28,44 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  */
 class LoginManager implements LoginManagerInterface
 {
-    private $securityContext;
+    /**
+     * @var SecurityContextInterface|TokenStorageInterface
+     */
+    private $tokenStorage;
     private $userChecker;
     private $sessionStrategy;
     private $container;
 
-    public function __construct(SecurityContextInterface $context, UserCheckerInterface $userChecker,
+    public function __construct($tokenStorage, UserCheckerInterface $userChecker,
                                 SessionAuthenticationStrategyInterface $sessionStrategy,
                                 ContainerInterface $container)
     {
-        $this->securityContext = $context;
+        if (!$tokenStorage instanceof TokenStorageInterface && !$tokenStorage instanceof SecurityContextInterface) {
+            throw new \InvalidArgumentException('Argument 1 should be an instance of Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface or Symfony\Component\Security\Core\SecurityContextInterface');
+        }
+
+        $this->tokenStorage = $tokenStorage;
         $this->userChecker = $userChecker;
         $this->sessionStrategy = $sessionStrategy;
         $this->container = $container;
     }
 
-    final public function loginUser($firewallName, UserInterface $user, Response $response = null)
+    final public function logInUser($firewallName, UserInterface $user, Response $response = null)
     {
         $this->userChecker->checkPostAuth($user);
 
         $token = $this->createToken($firewallName, $user);
 
-        if ($this->container->isScopeActive('request')) {
-            $this->sessionStrategy->onAuthentication($this->container->get('request'), $token);
+        $request = null;
+        if ($this->container->has('request_stack')) {
+            $request = $this->container->get('request_stack')->getCurrentRequest();
+        } elseif (method_exists($this->container, 'isScopeActive') && $this->container->isScopeActive('request')) {
+            // BC for SF <2.4
+            $request = $this->container->get('request');
+        }
+
+        if (null !== $request) {
+            $this->sessionStrategy->onAuthentication($request, $token);
 
             if (null !== $response) {
                 $rememberMeServices = null;
@@ -60,12 +76,12 @@ class LoginManager implements LoginManagerInterface
                 }
 
                 if ($rememberMeServices instanceof RememberMeServicesInterface) {
-                    $rememberMeServices->loginSuccess($this->container->get('request'), $response, $token);
+                    $rememberMeServices->loginSuccess($request, $response, $token);
                 }
             }
         }
 
-        $this->securityContext->setToken($token);
+        $this->tokenStorage->setToken($token);
     }
 
     protected function createToken($firewall, UserInterface $user)

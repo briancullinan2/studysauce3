@@ -110,7 +110,7 @@ abstract class FixtureMonologExtensionTest extends DependencyInjectionTest
 
         $handler = $container->getDefinition('monolog.handler.main');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.buffer.class%');
-        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), 0, \Monolog\Logger::INFO, true));
+        $this->assertDICConstructorArguments($handler, array(new Reference('monolog.handler.nested'), 0, \Monolog\Logger::INFO, true, false));
 
         $handler = $container->getDefinition('monolog.handler.first');
         $this->assertDICDefinitionClass($handler, '%monolog.handler.rotating_file.class%');
@@ -140,22 +140,38 @@ abstract class FixtureMonologExtensionTest extends DependencyInjectionTest
     {
         $container = $this->getContainer('single_email_recipient');
 
-        $this->assertSame(array(
-            array('setFrom', array('error@example.com')),
-            array('setTo', array(array('error@example.com'))),
-            array('setSubject', array('An Error Occurred!')),
-        ), $container->getDefinition('monolog.handler.swift.mail_prototype')->getMethodCalls());
+        $this->assertEquals(array(
+            new Reference('mailer'),
+            'error@example.com', // from
+            array('error@example.com'), // to
+            'An Error Occurred!', // subject
+            null,
+        ), $container->getDefinition('monolog.handler.swift.mail_message_factory')->getArguments());
     }
 
     public function testMultipleEmailRecipients()
     {
         $container = $this->getContainer('multiple_email_recipients');
 
-        $this->assertSame(array(
-            array('setFrom', array('error@example.com')),
-            array('setTo', array(array('dev1@example.com', 'dev2@example.com'))),
-            array('setSubject', array('An Error Occurred!')),
-        ), $container->getDefinition('monolog.handler.swift.mail_prototype')->getMethodCalls());
+        $this->assertEquals (array(
+            new Reference('mailer'),
+            'error@example.com',
+            array('dev1@example.com', 'dev2@example.com'),
+            'An Error Occurred!',
+            null
+        ), $container->getDefinition('monolog.handler.swift.mail_message_factory')->getArguments());
+    }
+
+    public function testChannelParametersResolved()
+    {
+        $container = $this->getContainer('parameterized_handlers');
+
+        $this->assertEquals(
+            array(
+                'monolog.handler.custom' => array('type' => 'inclusive', 'elements' => array('some_channel')),
+            ),
+            $container->getParameter('monolog.handlers_to_channels')
+        );
     }
 
     protected function getContainer($fixture)

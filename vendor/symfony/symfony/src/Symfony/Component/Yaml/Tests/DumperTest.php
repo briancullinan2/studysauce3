@@ -54,7 +54,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->dumper->setIndentation(7);
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -95,8 +95,7 @@ EOF;
                     // TODO
                 } else {
                     eval('$expected = '.trim($test['php']).';');
-
-                    $this->assertEquals($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);
+                    $this->assertSame($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);
                 }
             }
         }
@@ -104,13 +103,13 @@ EOF;
 
     public function testInlineLevel()
     {
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
         $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -120,7 +119,7 @@ foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -135,7 +134,7 @@ foobar:
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -154,7 +153,7 @@ foobar:
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -181,7 +180,7 @@ EOF;
     {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
 
-        $this->assertEquals('{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
+        $this->assertEquals('{ foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
     }
 
     public function testObjectSupportDisabledButNoExceptions()
