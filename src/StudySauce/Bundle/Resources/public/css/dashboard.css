@@ -293,6 +293,10 @@ a[href="#remove-deadline"]:hover
     width:50%;
 }
 
+.dragging #upload-file .plup-filelist {
+    border:4px solid #09B;
+}
+
 #upload-file .modal-body {
     text-align: center;
 }

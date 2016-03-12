@@ -14,15 +14,18 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         opacity: 1;
         visibility: visible;
     }
+
     .showing-<?php print $table; ?> header > h2.<?php print $table; ?> {
         display: block;
         opacity: 1;
         visibility: visible;
     }
+
     .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .highlighted-link.<?php print $table; ?>,
     .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .<?php print $table; ?>-row {
-        display:none;
+        display: none;
     }
+
     <?php } ?>
 </style>
 <div class="results collapsible">
@@ -35,15 +38,13 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                             <label class="checkbox">
                                 <input type="checkbox" name="tables" value="<?php print $table; ?>" checked="checked"/>
                                 <i></i> <a
-                                    href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>
-                                    s</a></label>
+                                    href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
                         <?php }
                         foreach (array_diff($allTables, array_keys($tables)) as $table) { ?>
                             <label class="checkbox">
                                 <input type="checkbox" name="tables" value="<?php print $table; ?>"/>
                                 <i></i> <a
-                                    href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>
-                                    s</a></label>
+                                    href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
                         <?php } ?>
                     </div>
                     <label class="input"><input name="search" type="text" value="" placeholder="Search"/></label>
@@ -109,36 +110,43 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
     }
 
     foreach ($tables as $table => $t) {
-        if(count($$table) > 0 && $app->getRequest()->get('headers') !== false) {
+        if (count($$table) > 0 && $app->getRequest()->get('headers') !== false) {
             $tableTotal = $table . '_total';
             ?>
             <h2 class="<?php print $table; ?>"><a
                     name="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a> <a
-                    href="#add-<?php print $table; ?>">+</a> <small>(<?php print $$tableTotal; ?>)</small></h2>
+                    href="#add-<?php print $table; ?>">+</a>
+                <small>(<?php print $$tableTotal; ?>)</small>
+            </h2>
             <?php
         }
         foreach ($$table as $e) {
             /** @var User|Group $e */
             $rowId = $table . '-id-' . $e->getId();
             ?>
-            <div class="<?php print $table; ?>-row <?php print $rowId; ?> <?php print ($app->getRequest()->get('edit') === true ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable': ''); ?>">
-                <?php
-                foreach ($tables[$table] as $f => $fields) {
-                    $field = is_array($fields) ? $f : $fields;
-                    ?>
-                    <div class="<?php print $field; ?>">
-                    <?php
-                    if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
-                        print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'groups' => $allGroups, 'table' => $table]);
-                    } else {
-                        print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
-                    }
-                    ?></div><?php
-                }
+        <div
+            class="<?php print $table; ?>-row <?php print $rowId; ?> <?php print ($app->getRequest()->get('edit') === true ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable' : ''); ?>">
+            <?php
+            foreach ($tables[$table] as $f => $fields) {
+                $field = is_array($fields) ? $f : $fields;
                 ?>
-                <label class="checkbox"><input type="checkbox" name="selected" /><i></i></label>
+            <div class="<?php print $field; ?>">
+                <?php
+                if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
+                    print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'groups' => $allGroups, 'table' => $table]);
+                } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
+                    print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
+                } else {
+                    print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
+                }
+                ?></div><?php
+            }
+            ?>
+            <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
             </div><?php
-            if (isset($expandable[$table])) {
+            if (isset($expandable[$table])) { ?>
+                <div class="expandable">
+                <?php
                 foreach ($expandable[$table] as $f => $fields) {
                     $field = is_array($fields) ? $f : $fields;
                     ?>
@@ -146,18 +154,22 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                     <?php
                     if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
                         print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'groups' => $allGroups, 'table' => $table]);
-                    } else {
+                    } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                         print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
+                    } else {
+                        print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                     }
                     ?></div><?php
                 }
+                ?></div><?php
             }
         }
 
         $class = AdminController::$allTables[$table]->name;
         $entity = new $class();
         ?>
-        <div class="<?php print $table; ?>-row <?php print $table . '-id-'; ?> <?php print ($app->getRequest()->get('edit') === true ? 'edit' : 'read-only'); ?> template empty">
+        <div
+            class="<?php print $table; ?>-row <?php print $table . '-id-'; ?> <?php print ($app->getRequest()->get('edit') === true ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable' : ''); ?> template empty">
             <?php
             foreach ($tables[$table] as $f => $fields) {
                 $field = is_array($fields) ? $f : $fields;
@@ -166,8 +178,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                 <?php
                 if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
                     print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $entity, 'groups' => $allGroups, 'table' => $table]);
-                } else {
+                } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                     print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
+                } else {
+                    print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                 }
                 ?></div><?php
             }
@@ -175,7 +189,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
             <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
         </div>
         <?php if (isset($expandable[$table])) { ?>
-            <div class="template">
+            <div class="expandable template">
                 <?php
                 foreach ($expandable[$table] as $f => $fields) {
                     $field = is_array($fields) ? $f : $fields;
@@ -184,8 +198,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                     <?php
                     if ($view->exists('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php')) {
                         print $view->render('AdminBundle:Admin:row-' . $field . '-' . $table . '.html.php', [$table => $e, 'groups' => $allGroups, 'table' => $table]);
-                    } else {
+                    } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                         print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
+                    } else {
+                        print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                     }
                     ?></div><?php
                 }
@@ -194,7 +210,8 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         <?php } ?>
 
         <div class="highlighted-link form-actions invalid <?php print $table; ?>">
-            <a href="#add-<?php print $table; ?>" class="big-add">Add <span>+</span> <?php print str_replace('ss_', '', $table); ?></a>
+            <a href="#add-<?php print $table; ?>" class="big-add">Add
+                <span>+</span> <?php print str_replace('ss_', '', $table); ?></a>
             <a href="#cancel-edit">Cancel</a>
             <a href="#save-<?php print $table; ?>" class="more">Save <?php print str_replace('ss_', '', $table); ?></a>
         </div>

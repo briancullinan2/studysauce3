@@ -278,6 +278,15 @@ $(document).ready(function () {
         }
     }, 10000);
 
+    body.on('hidden.bs.modal', '#upload-file', function () {
+        var dialog = $('#upload-file');
+        dialog.find('.file').remove();
+    });
+
+    body.on('dragover', '#upload-file', function () {
+        $(this).addClass('dragging');
+    });
+
     body.on('click', 'a[data-target="#upload-file"], a[href="#upload-file"]', function () {
         var dialog = $('#upload-file');
 
@@ -287,8 +296,9 @@ $(document).ready(function () {
             chunk_size: '5MB',
             runtimes : 'html5,flash,silverlight,html4',
             drop_element : 'upload-file',
+            dragdrop: true,
             browse_button : 'file-upload-select', // you can pass in id...
-            container: dialog.find('.plupload')[0], // ... or DOM Element itself
+            container: 'upload-file', // ... or DOM Element itself
             url : Routing.generate('file_create'),
             unique_names: true,
             max_files: 0,
@@ -315,19 +325,28 @@ $(document).ready(function () {
                         up.splice();
                     });
                 },
-                FilesAdded: function(up) {
+                FilesAdded: function(up, files) {
+                    plupload.each(files, function(file) {
+                        $('<div id="' + file.id + '" class="file">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>').appendTo(dialog.find('.plupload'));
+                    });
                     up.start();
                 },
-                UploadProgress: function(up) {
+                UploadProgress: function(up, file) {
                     var squiggle;
                     if((squiggle = dialog.find('.squiggle')).length == 0)
                         squiggle = $('<small class="squiggle">&nbsp;</small>').appendTo(dialog.find('.plup-filelist'));
-                    squiggle.stop().animate({width: up.total.percent + '%'}, 1000, 'swing');
+                    squiggle.stop().animate({width: up.total.percent + '%'}, 500, 'swing');
+                    var subsquiggle;
+                    if((subsquiggle = dialog.find('#' + file.id).find('b').html('<span>' + file.percent + '%</span>').find('.squiggle')).length == 0) {
+                        subsquiggle = $('<small class="squiggle">&nbsp;</small>').appendTo(dialog.find('#' + file.id));
+                    }
+                    subsquiggle.stop().animate({width: file.percent + '%'}, 500, 'swing');
                 },
                 FileUploaded: function(up, file, response) {
                     var data = JSON.parse(response.response);
                     dialog.find('input[type="hidden"]').val(data.fid);
                     dialog.find('.plup-filelist .squiggle').stop().remove();
+                    dialog.find('#' + file.id).find('.squiggle').stop().remove();
                     dialog.find('.plupload img').attr('src', data.src);
                 },
                 Error: function(up, err) {
@@ -337,6 +356,16 @@ $(document).ready(function () {
 
         setTimeout(function () {upload.init();}, 200);
 
+    });
+
+    $(document.body).bind("dragover", function() {
+        $(this).addClass('dragging');
+    });
+    $(document.body).bind("dragleave", function() {
+        $(this).removeClass('dragging');
+    });
+    $(document.body).bind("drop", function(){
+        $(this).removeClass('dragging').addClass('dropped');
     });
 
 

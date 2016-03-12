@@ -152,7 +152,7 @@ table.results > tbody > tr > td > *
     line-height: 100%;
 }
 
-.results [class*="-row"] > * > label,
+.results [class*="-row"] > * label,
 .results header label,
 table.results > thead > tr > th > label,
 table.results > tbody > tr > td > label
@@ -182,7 +182,7 @@ table.results > tbody > tr:hover:not(.selected):not(.edit) > td
     cursor: pointer;
 }
 
-.results > [class*="-row"].expandable:nth-of-type(even):hover > *,
+.results > [class*="-row"] + .expandable:hover > *,
 table.results.expandable > tbody > tr:nth-child(even):hover > td
 {
     box-shadow: none;
@@ -192,14 +192,14 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     cursor: default;
 }
 
-.results > [class*="-row"].expandable:nth-of-type(odd) > *:first-child,
+.results > [class*="-row"].expandable > *:first-child,
 table.results.expandable > tbody > tr:nth-child(odd) > td:first-child
 {
     position:relative;
     padding-left: 30px;
 }
 
-.results > [class*="-row"].expandable:nth-of-type(odd) > *:first-child:before,
+.results > [class*="-row"].expandable > *:first-child:before,
 table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 {
     transform: rotate(-90deg);
@@ -347,7 +347,7 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     font-size: 24px;
 }
 
-.results > [class*="-row"].expandable.selected > *:first-child:before,
+.results > [class*="-row"].selected > *:first-child:before,
 table.results.expandable > tbody > tr.selected > td:first-child:before
 {
     transform: rotate(0deg);
@@ -358,13 +358,13 @@ table.results.expandable > tbody > tr.selected > td:first-child:before
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
 }
 
-.results > [class*="-row"].expandable + *:nth-of-type(even),
+.results > [class*="-row"] + *.expandable,
 table.results.expandable > tbody > tr:nth-child(even)
 {
     display:none;
 }
 
-.results > [class*="-row"].expandable.selected + * {
+.results > [class*="-row"].selected + *.expandable {
     display:block;
 }
 
@@ -373,7 +373,7 @@ table.results.expandable > tbody > tr.selected + tr
     display:table-row;
 }
 
-.results > [class*="-row"].expandable + *:nth-of-type(even) > *,
+.results > [class*="-row"] + *.expandable > *,
 table.results.expandable > tbody > tr:nth-child(even) > td
 {
     padding:0;
@@ -563,13 +563,13 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 }
 
 .entity-search.buttons-1 .title {
-    padding:5px 50px 5px 10px;
+    padding:0 50px 0 10px;
     margin-right:-40px;
     width:100%;
 }
 
 .entity-search.buttons-2 .title {
-    padding:5px 90px 5px 10px;
+    padding:0 90px 0 10px;
     margin-right:-80px;
     width:100%;
 }
@@ -581,7 +581,7 @@ a[href="#subtract-entity"] {
     vertical-align: middle;
     background-color: #ddd;
     position: relative;
-    height: 50px;
+    height: 40px;
     display: inline-block;
     color: white;
     text-align: center;
@@ -631,7 +631,7 @@ a[href="#insert-entity"]:before,
 a[href="#set-owner"]:before,
 a[href="#subtract-entity"]:before {
     font-size:50px;
-    line-height: 50px;
+    line-height: 40px;
     vertical-align: middle;
     transition: background-color ease-in-out .15s;
 }
@@ -694,6 +694,7 @@ a[href="#set-owner"]:hover {
 .entity-search .by {
     opacity: 0.8;
 }
+
 
 @media (min-width: 1500px)
 {

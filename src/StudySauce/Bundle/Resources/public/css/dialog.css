@@ -378,6 +378,12 @@ body.right-menu #bookmark
     margin-bottom:0;
 }
 
+.modal-body h1:first-child,
+.modal-body h2:first-child,
+.modal-body h3:first-child {
+    margin-top:0;
+}
+
 #claim textarea
 {
     height: 12em;

@@ -21,6 +21,7 @@ use StudySauce\Bundle\Entity\Schedule;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -61,7 +62,7 @@ class AdminController extends Controller
         return [null, null];
     }
 
-    private static function joinBuilder(QueryBuilder $qb, $joinTable, $joinName, $field, $request, &$joins)
+    private static function joinBuilder(QueryBuilder $qb, $joinTable, $joinName, $field, $request, &$joins = [])
     {
         $joinFields = explode('.', $field);
         foreach($joinFields as $jf) {
@@ -209,7 +210,7 @@ class AdminController extends Controller
             'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
             'ss_group' => ['id' => ['created', 'id'], 'name' => ['title','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions' => ['deleted']],
             'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title'], 'status', 'groups' => ['group','groups'], 'users' => ['user','userPacks.user'], 'properties', 'actions'],
-            'card' => ['id', 'name' => ['content','pack'], 'correct', 'answers', 'actions' => ['deleted']],
+            'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
             // TODO: this really generalized template
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
         ];
@@ -227,7 +228,7 @@ class AdminController extends Controller
 
         // default entities to show
 
-        $request = array_merge($request->attributes->all(), $request->query->all());
+        $searchRequest = array_merge($request->attributes->all(), $request->query->all());
 
         // pull out field searches
         $allFields = array_map(function ($t, $table) {
@@ -249,27 +250,27 @@ class AdminController extends Controller
 
         // TODO: fix this to do all occurrences and table names and other formats of searches specified above
         $regex = '/\s(' . implode('|', $allFields) . '):(.*)\s/i';
-        if (isset($request['search']) && preg_match_all($regex, ' ' . $request['search'] . ' ', $matches)) {
+        if (isset($searchRequest['search']) && preg_match_all($regex, ' ' . $searchRequest['search'] . ' ', $matches)) {
             foreach($matches[0] as $i => $m) {
-                $request['search'] = str_replace(trim($m), '', $request['search']);
-                $request[$matches[1][$i]] = $matches[2][$i];
+                $searchRequest['search'] = str_replace(trim($m), '', $searchRequest['search']);
+                $searchRequest[$matches[1][$i]] = $matches[2][$i];
             }
         }
 
-        if (!isset($request['tables'])) {
-            $request['tables'] = self::$defaultSearch['tables'];
+        if (!isset($searchRequest['tables'])) {
+            $searchRequest['tables'] = self::$defaultSearch['tables'];
         }
-        $vars['tables'] = array_intersect_key(self::$tables, array_flip($request['tables']));
+        $vars['tables'] = array_intersect_key(self::$tables, array_flip($searchRequest['tables']));
 
         $vars['search'] = '';
         foreach(self::$tables as $table => $t) {
-            if (!empty($request['tables']) && !in_array($table, $request['tables'])) {
+            if (!empty($searchRequest['tables']) && !in_array($table, $searchRequest['tables'])) {
                 continue;
             }
 
             /** @var QueryBuilder $qb */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $where = self::searchBuilder($qb, $table, $table, $request);
+            $where = self::searchBuilder($qb, $table, $table, $searchRequest);
             $defaultWhere = self::searchBuilder($qb, $table, $table, self::$defaultSearch);
             if(!empty($where)) {
                 $qb = $qb->where($where);
@@ -284,8 +285,8 @@ class AdminController extends Controller
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count
-            if(isset($request['page-' . $table])) {
-                $page = $request['page-' . $table];
+            if(isset($searchRequest['page-' . $table])) {
+                $page = $searchRequest['page-' . $table];
                 if($page == 'last') {
                     $page = $total / 25;
                 }
@@ -298,7 +299,7 @@ class AdminController extends Controller
             // TODO: add sorting back in
             // figure out how to sort
             /*
-            if(!empty($order = $request->get('order'))) {
+            if(!empty($order = $searchRequest->get('order'))) {
                 $field = explode(' ', $order)[0];
                 $direction = explode(' ', $order)[1];
                 if($direction != 'ASC' && $direction != 'DESC')
@@ -313,7 +314,7 @@ class AdminController extends Controller
             }
             */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $where = self::searchBuilder($qb, $table, $table, $request);
+            $where = self::searchBuilder($qb, $table, $table, $searchRequest);
             $defaultWhere = self::searchBuilder($qb, $table, $table, self::$defaultSearch);
             if(!empty($where)) {
                 $qb = $qb->where($where);
@@ -335,7 +336,33 @@ class AdminController extends Controller
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        $vars['allTables'] = !empty($request['tables']) ? $request['tables'] : ['ss_user', 'ss_group', 'pack'];
+        $vars['allTables'] = !empty($searchRequest['tables']) ? $searchRequest['tables'] : ['ss_user', 'ss_group', 'pack'];
+
+        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+            // convert db entity to flat object
+            foreach(self::$tables as $table => $t) {
+                if (!isset($vars[$table])) {
+                    continue;
+                }
+                $fields = self::$allTables[$table]->getFieldNames();
+                $vars[$table] = array_map(function ($e) use ($fields) {
+                    $obj = [];
+                    foreach($fields as $f) {
+                        if (!method_exists($e, 'get' . ucfirst($f))) {
+                            continue;
+                        }
+                        if (is_object($e->{'get' . ucfirst($f)}()) && $e->{'get' . ucfirst($f)}() instanceof \DateTime) {
+                            $obj[$f] = $e->{'get' . ucfirst($f)}()->format('r');
+                        }
+                        else {
+                            $obj[$f] = $e->{'get' . ucfirst($f)}();
+                        }
+                    }
+                    return $obj;
+                }, $vars[$table]);
+            }
+            return new JsonResponse($vars);
+        }
 
         return $this->render('AdminBundle:Admin:results.html.php', $vars);
     }

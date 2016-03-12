@@ -1,10 +1,7 @@
 <?php $view->extend('StudySauceBundle::Dialogs/dialog.html.php');
 
-$view['slots']->start('modal-header') ?>
-Drag a file here -or-
-<?php $view['slots']->stop();
-
 $view['slots']->start('modal-body') ?>
+<h3>Drag a file here -or-</h3>
 <div class="plupload">
     <div class="plup-filelist">
         <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/upload_all.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>

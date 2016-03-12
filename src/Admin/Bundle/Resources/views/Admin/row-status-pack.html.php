@@ -1,4 +1,5 @@
 <div class="<?php print strtolower($pack->getStatus()); ?>">
+    <a href="#pack-publish" data-target="#pack-publish" data-toggle="modal">
     <label class="input status">
         <select name="status">
             <option value="">Not Set</option>
@@ -9,4 +10,5 @@
             <option value="DELETED" <?php print ($pack->getStatus() == 'DELETED' ? 'selected="selected"' : ''); ?>>Deleted</option>
         </select>
     </label>
+    </a>
 </div>

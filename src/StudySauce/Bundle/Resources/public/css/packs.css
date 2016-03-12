@@ -144,7 +144,12 @@
 }
 
 .results .card-row .id {
-    width: 15%;
+    width: 25%;
+}
+
+.results .card-row > *:nth-last-child(2)
+{
+    width:5%;
 }
 
 .results .card-row > *:nth-child(2) {
@@ -167,11 +172,6 @@
 .results .card-row[class*="type"].type-tf > .answers
 {
     display:none;
-}
-
-.results .card-row[class*="type"] > .correct
-{
-    width:20%;
 }
 
 .results .card-row > .correct,
@@ -197,7 +197,7 @@
     position:absolute;
     left:0;
     top:50%;
-    margin-top:-12px;
+    margin-top:-9px;
 }
 
 .results .card-row.type-tf .correct.type-tf
@@ -219,4 +219,233 @@
 .results .card-row.type-sa .correct.type-sa
 {
     display:block;
+}
+
+.results .card-row + .expandable h3 {
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.results .card-row + .expandable {
+    white-space: nowrap;
+}
+
+.results .card-row + .expandable .preview {
+    height:400px;
+    overflow: auto;
+    text-align: center;
+}
+
+.results .card-row + .expandable .preview-card {
+    width: 300px;
+    height: 100%;
+    background: #eee;
+    display: inline-block;
+    vertical-align: middle;
+    position:relative;
+    border: 2px solid #BBB;
+    padding: 10px;
+    white-space: normal;
+}
+
+.results .card-row + .expandable .preview-title {
+    position:absolute;
+    top:0;
+    left: 0;
+    width:100%;
+    background: #555;
+    color: #EEE;
+    font-size: 105%;
+    padding:5px;
+    text-align: right;
+}
+
+.results .card-row + .expandable .preview-count {
+    position:absolute;
+    bottom:0;
+    left: 0;
+    width:100%;
+    color: #BBB;
+    font-size: 105%;
+    padding:5px;
+    text-align: center;
+}
+
+.results .card-row + .expandable .preview-prompt {
+    background: #FFF;
+    height: 40%;
+    padding: 10px;
+    position:absolute;
+    width:100%;
+    left:0;
+    top:0;
+}
+
+.results .card-row + .expandable .type-mc .preview-response {
+    height: 11%;
+    margin: 1% -10px;
+    background: #09B;
+    color: #fff;
+}
+
+.results .card-row + .expandable .preview-inner {
+    height:100%;
+}
+
+.results .preview-card:not(.preview-answer) .preview-inner,
+.results .card-row + .expandable .preview-answer:not([class*="type-"]) .preview-inner
+{
+    padding-bottom: 2.6em;
+    margin-bottom: -2.6em;
+}
+
+.results .card-row + .expandable .type-mc .preview-inner {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.results .card-row + .expandable .type-sa:not(.preview-answer) .preview-inner {
+    margin-bottom: -2.4em;
+    padding-bottom: 2.4em;
+}
+
+.results .card-row + .expandable .preview-answer .preview-inner {
+    padding-top:55%;
+    position:relative;
+}
+
+.results .card-row + .expandable .preview-answer .preview-correct {
+    color:#BBB;
+    position:absolute;
+    left:0;
+    width:100%;
+    top:40%;
+}
+
+.results .card-row + .expandable .preview-tap
+{
+    color: #bbb;
+}
+
+.results .card-row + .expandable .preview-right,
+.results .card-row + .expandable .preview-wrong {
+    padding: 10px 10px;
+    width: 75px;
+    color: #fff;
+    font-size:30px;
+    display:inline-block;
+    vertical-align: middle;
+    background:#C00;
+}
+
+.results .card-row + .expandable .preview-true,
+.results .card-row + .expandable .preview-false {
+    padding: 10px 10px;
+    width: 75px;
+    color: #fff;
+    display:inline-block;
+    vertical-align: middle;
+    background:#C00;
+}
+
+.results .card-row + .expandable .preview-true,
+.results .card-row + .expandable .preview-right
+{
+    background:#0C0;
+}
+
+.results .card-row + .expandable .preview-guess {
+    display:inline-block;
+    width:100%;
+    margin: 0 -80px;
+    padding: 0 80px;
+    vertical-align: middle;
+    color:#BBB;
+}
+
+.results .card-row + .expandable .preview-prompt img,
+.results .card-row + .expandable .preview-inner img {
+    height:auto;
+    width:auto;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.results .card-row + .expandable .preview-content {
+    height: 100%;
+}
+
+.results .card-row + .expandable .preview-answer .preview-inner .preview-content,
+.results .card-row + .expandable .preview-card:not(.preview-answer) .preview-content {
+    font-size: 30px;
+    line-height: 120%;
+}
+
+.results .card-row + .expandable .type-mc:not(.preview-answer) .preview-inner {
+    margin-bottom:-64%;
+    padding-bottom:64%;
+}
+
+.results .card-row + .expandable .type-sa label input {
+    font-size: 110%;
+    height:auto;
+    border:1px solid #555;
+    border-radius:0;
+}
+
+.results .card-row .correct {
+    position:relative;
+}
+
+.results .card-row .correct.editing .radios {
+    height:auto;
+    pointer-events: inherit;
+}
+
+.results .card-row .radios input:checked ~ i,
+.results .card-row .correct.editing .radios i {
+    z-index: 10;
+    position:relative;
+}
+
+.results .card-row .correct.editing .radios span {
+    z-index: -1;
+    position:relative;
+}
+
+.results .card-row .radios {
+    white-space: normal;
+    vertical-align: middle;
+    line-height: 135%;
+    position:absolute;
+    height: 1.7em;
+    overflow:hidden;
+    padding: 3px;
+    pointer-events: none;
+    width: 100%;
+}
+
+.results .card-row .radios label {
+    display:block;
+    font-size:inherit;
+    line-height: inherit;
+    padding-left:27px;
+    white-space: pre-wrap;
+    color:transparent;
+}
+
+.results .card-row .radios label i {
+    margin-left:-21px;
+}
+
+.results .card-row .correct.type-mc textarea {
+    padding-left: 30px;
+    vertical-align: middle;
+    position:relative;
+}
+
+#pack-publish .ui-datepicker {
+    position:static;
+    width:50%;
+    margin: auto;
 }

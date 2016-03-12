@@ -14,7 +14,12 @@ $(document).ready(function () {
             return false;
         }
     };
-    body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function () {
+    body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function (evt) {
+        // cancel select toggle if target of click is also interactable
+        if($(evt.target).is('select, input, a, textarea, button, label, label *, button *')) {
+            return;
+        }
+
         selectViable = false;
         var results = $(this).parents('.results');
         var type = (/(.*)-row/i).exec($(this).attr('class'))[1];
@@ -40,6 +45,7 @@ $(document).ready(function () {
         if (state) {
             range.addClass('selected').find('> *:last-child input[name="selected"]')
                 .prop('checked', state);
+            range.trigger('selected');
         }
         else {
             range.removeClass('selected').find('> *:last-child input[name="selected"]')
@@ -106,6 +112,9 @@ $(document).ready(function () {
             $(this).find('.results header .search .checkbox').draggable();
         }
         resetHeader();
+        $(this).find('.results [class*="-row"].edit').each(function () {
+            setupFields.apply($(this));
+        });
     });
 
     function getData()
@@ -177,7 +186,7 @@ $(document).ready(function () {
         this.selectize.setValue('');
     });
 
-    body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"], a[href="#set-owner"]', function (evt) {
+    body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"]', function (evt) {
         evt.preventDefault();
         var field = $(this).parents('.users').find('label.input');
         var id = parseInt($(this).parents('label').find('input').val());
@@ -212,36 +221,24 @@ $(document).ready(function () {
         }
         else if (field.data('users').indexOf(id) > -1) {
             // remove user
-            newRow.addClass('buttons-2');
+            newRow.addClass('buttons-1');
             newRow.find('[href="#subtract-entity"]').remove();
             $('<input type="hidden" name="' + newRow.find('input').attr('name').replace('[id]', '[remove]') + '" value="true" />').insertAfter(newRow.find('input'));
             field.data('users', field.data('users').filter(function (e) {return e != id;}));
         }
         else {
             // add user
-            newRow.addClass('buttons-2');
+            newRow.addClass('buttons-1');
             newRow.find('[href="#insert-entity"]').remove();
             field.data('users', $.merge(field.data('users'), [id]));
-        }
-        if (owner || field.data('owner') == '') {
-            newRow.find('[href="#set-owner"]').remove();
-            newRow.removeClass('buttons-2');
         }
         owner = false;
         newRow.removeClass('template');
     }
 
-    body.on('mouseover', 'a[href="#set-owner"]', function () {
-        owner = true;
-    });
-
-    body.on('mouseout', 'a[href="#set-owner"]', function () {
-        owner = false;
-    });
-
     function setupUsers()
     {
-        var row = $(this).parents('[class*="-row"]'),
+        var row = $(this).closest('[class*="-row"]'),
             that = row.find('.users input[type="text"]:not(.selectized)'),
             field = that.parents('label');
         that.selectize({
@@ -249,7 +246,7 @@ $(document).ready(function () {
             delimiter: ' ',
             searchField: ['text', 'value', '0'],
             maxItems: 1,
-            dropdownParent:'body',
+            dropdownParent:null,
             options: [],
             render: {
                 option: function(item) {
@@ -263,10 +260,6 @@ $(document).ready(function () {
                     }
                     else {
                         desc += '<a href="#insert-entity" title="Add user"></a>';
-                    }
-                    if (field.data('owner') != item.value && field.data('owner') != '') {
-                        desc += '<a href="#set-owner" title="Set as owner"></a>';
-                        buttons++;
                     }
                     return '<div class="entity-search buttons-' + buttons + '">' + desc + '</div>';
                 }
@@ -283,7 +276,7 @@ $(document).ready(function () {
                     $.ajax({
                         url: Routing.generate('command_callback'),
                         type: 'GET',
-                        dataType:'text',
+                        dataType:'json',
                         data: {
                             tables: ['ss_user'],
                             search: query
@@ -292,13 +285,12 @@ $(document).ready(function () {
                             callback();
                         },
                         success: function(content) {
-                            var results = $(content).find('.ss_user-row:not(.empty)').map(function () {
-                                var rowId = (/ss_user-id-([0-9]*)/i).exec($(this).attr('class'))[1];
+                            var results = content['ss_user'].map(function (e) {
                                 return {
-                                    value: parseInt(rowId),
-                                    text: $(this).find('.first input').val() + ' ' + $(this).find('.last input').val(),
-                                    0: $(this).find('.email input').val()
-                                }}).toArray();
+                                    value: e.id,
+                                    text: e.first + ' ' + e.last,
+                                    0: e.email
+                                }});
                             callback(results);
                         }
                     });
@@ -321,17 +313,20 @@ $(document).ready(function () {
         evt.preventDefault();
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);
-        var newRow = results.find('.' + table + '-row').first().clone();
-        newRow.attr('class', newRow.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
-        newRow.removeClass('template removed read-only historic').addClass('edit blank');
-        newRow.find('select, textarea, input[type="text"]').val('').trigger('change');
-        newRow.find('> *').each(function () {
-            var radio = $(this).find('input[type="radio"]').first();
-            if (radio.length > 0) {
-                $(this).find('input[type="radio"]').attr('name', radio.attr('name').split('-')[0] + '-' + radioCounter++).trigger('change');
-            }
+        var newRow = results.find('.' + table + '-row.template, .' + table + '-row.template + .expandable.template').clone();
+        newRow.each(function () {
+            var that = $(this);
+            that.attr('class', that.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
+            that.removeClass('template removed read-only historic').addClass('edit blank');
+            that.find('select, textarea, input[type="text"]').val('').trigger('change');
+            that.find('> *').each(function () {
+                var radio = $(this).find('input[type="radio"]').first();
+                if (radio.length > 0) {
+                    $(this).find('input[type="radio"]').attr('name', radio.attr('name').split('-')[0] + '-' + radioCounter++).trigger('change');
+                }
+            });
+            that.find('input[type="checkbox"]').prop('checked', false).trigger('change');
         });
-        newRow.find('input[type="checkbox"]').prop('checked', false).trigger('change');
         newRow.insertBefore(results.find('.' + table + '-row').first());
     });
 
