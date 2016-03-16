@@ -69,8 +69,18 @@
     display:none;
 }
 
+.highlighted-link.pack {
+    margin: 50px 0;
+}
+
 .results .pack-row .id {
     text-align: center;
+    position:relative;
+    overflow:visible;
+}
+
+.results .pack-row .pack-icon {
+    position: absolute;
 }
 
 .results .pack-row.read-only .id img[alt="Upload"], .results .pack-row.read-only .id img[alt="Upload"] ~ *, .results .pack-row.read-only .id a[href="#upload-image"] {
@@ -107,12 +117,22 @@
 
 .results .pack-row.edit > .groups {
     padding-left:10%;
-    width:35%;
+    width:60%;
 }
 
 .results .pack-row.edit > .properties,
 .results .pack-row.edit > .users {
     width: 25%;
+}
+
+.results .pack-row.edit > .properties
+{
+    width: 35%;
+}
+
+.results .pack-row.edit > *:nth-last-child(2)
+{
+    width:5%;
 }
 
 .results .pack-row.edit .groups .checkbox:nth-of-type(even) {
@@ -246,6 +266,7 @@
     border: 2px solid #BBB;
     padding: 10px;
     white-space: normal;
+    margin:0 5px;
 }
 
 .results .card-row + .expandable .preview-title {
@@ -448,4 +469,36 @@
     position:static;
     width:50%;
     margin: auto;
+}
+
+a[href="#users-groups"] {
+    line-height: 20px;
+    border-radius: 100%;
+    display: inline-block;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: 0;
+    margin-top: -10px;
+    font-size: 50px;
+    vertical-align: middle;
+}
+
+.pack-row.edit .groups label {
+    padding-right: 30px;
+}
+
+.pack-row.edit .groups {
+    position:relative;
+}
+
+.results .pack-row.edit .highlighted-link > a[href="#remove-pack"]
+{
+    display:inline-block !important;
+}
+
+.results .pack-row.edit .highlighted-link > a[href="#cancel-edit"],
+.results .pack-row.edit .highlighted-link > [value^="#save-"]
+{
+    display:none !important;
 }

@@ -88,7 +88,7 @@ $(document).ready(function () {
         packsFunc();
     }
 
-    body.on('focus mousedown keydown change keyup blur', '.card-row .correct textarea, .card-row .correct .radios', function () {
+    body.on('focus mousedown keydown change keyup blur', '.card-row .correct textarea, .card-row .correct .radios input', function (evt) {
         var row = $(this).parents('.card-row');
         var that = row.find('.correct textarea');
         var rowId = (/card-id-([0-9]*)(\s|$)/i).exec(row.attr('class'))[1];
@@ -105,8 +105,8 @@ $(document).ready(function () {
         }
 
         // get current line
-        var orig = row.find('.correct .radios input:checked').val();
-        var line = row.find('.correct .radios input[value="' + orig + '"]').index();
+        var orig = $(evt.target).is('.correct .radios input') ? $(evt.target).val() : row.find('.correct .radios input:checked').val();
+        var line = row.find('.correct .radios input').index(row.find('.correct .radios input[value="' + orig + '"]'));
         var existing = row.find('.correct .radios label');
         var answers = that.val().split(/\n/ig) || [];
         var newItems = [];
@@ -116,7 +116,7 @@ $(document).ready(function () {
                 continue;
             var newItem;
             if ((newItem = $(existing.find('[value="' + answers[i] + '"]').map(function () {return $(this).parents('label')[0];})).not(newItems).first()).length == 0) {
-                newItem = $('<label class="radio"><input type="radio" name="correct-' + rowId + '" value="' + answers[i] + '"><i></i><span>' + answers[i] + '</span></label>')
+                newItem = $('<label class="radio"><input type="radio" name="correct-mc-' + rowId + '" value="' + answers[i] + '"><i></i><span>' + answers[i] + '</span></label>')
                     .appendTo(row.find('.correct .radios'));
             }
             else {
@@ -132,10 +132,49 @@ $(document).ready(function () {
         }
         var newVal = row.find('.correct .radios input[value="' + orig + '"]');
         if(newVal.length == 0 || !orderChanged) {
-            newVal = row.find('.corrent .radios input').eq(line);
+            newVal = row.find('.correct .radios input').eq(line);
         }
         newVal.prop('checked', true);
+        updatePreview.apply(row);
     });
+
+    function updatePreview() {
+        var row = $(this);
+        var template = row.find('select[name="type"]').val() == ''
+            ? row.find('+ .expandable .preview-card:not([class*="type-"])')
+            : row.find('+ .expandable .preview-card.type-' + row.find('select[name="type"]').val().split(' ')[0]);
+        var newTemplate = row.find('select[name="type"]').val() == ''
+            ? row.find('~ .card-row + .expandable.template .preview-card:not([class*="type-"])')
+            : row.find('~ .card-row + .expandable.template .preview-card.type-' + row.find('select[name="type"]').val().split(' ')[0]);
+        // switch templates if needed
+        if (newTemplate.length != template.length) {
+            row.find('+ .expandable .preview-card').remove();
+            template = newTemplate.clone().appendTo(row.find('+ .expandable .preview'))
+        }
+
+        // replace with image
+        var url;
+        if((url = row.find('input[name="url"]').val().trim()) != '') {
+            template.find('img').attr('src', url);
+            template.filter(':not(.preview-answer)').find('.preview-content').replaceWith('<img src="' + url + '" />');
+            template.filter('.preview-answer').find('.preview-prompt .preview-content').replaceWith('<img src="' + url + '" />');
+        }
+
+        // insert content and multiple choice answers
+        template.find('[type="text"]').val(row.find('.content input').val());
+        template.find('.preview-content').text(row.find('.content input:visible').val());
+        var answers = row.find('.correct.type-mc:visible textarea').val();
+        if (answers != null) {
+            answers = answers.split("\n");
+            template.find('.preview-response').each(function () {
+                $(this).text(answers[$(this).parent().find('.preview-response').index($(this))]);
+            });
+        }
+        template.filter('.preview-answer').find('.preview-inner .preview-content').text(row.find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
+
+        // center some preview fields
+        centerize.apply(row.find(' + .expandable .preview-content, + .expandable .preview-response, + .expandable .preview-inner img'));
+    }
 
     function centerize() {
         var text = $('<textarea></textarea>')
@@ -167,7 +206,7 @@ $(document).ready(function () {
         var tab = $('.results:visible');
         var rows = $(this).closest('.card-row:not(.removed)');
         if (rows.length == 0) {
-            rows = tab.find('.card-row:not(.removed)');
+            rows = tab.find('.card-row:not(.removed):not(.template)');
         }
         rows.each(function () {
             var row = $(this);
@@ -196,8 +235,7 @@ $(document).ready(function () {
                 row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios :checked').parents('label').position().top - 2);
             }
 
-            // center some preview fields
-            centerize.apply(row.find(' + .expandable .preview-content, + .expandable .preview-response'))
+            updatePreview.apply(row);
         });
         if(tab.find('.card-row.invalid:not(.removed)').length == 0 && (
             tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0)) {
@@ -206,7 +244,6 @@ $(document).ready(function () {
         else {
             tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
         }
-
     }
 
     body.on('selected', '.card-row', function () {
@@ -270,8 +307,14 @@ $(document).ready(function () {
     body.on('click', '.results a[href="#save-pack"], .results [value="#save-pack"]', function (evt) {
         evt.preventDefault();
 
+        autoSave.apply(this);
+
+    });
+
+    function autoSave(close) {
         var tab = $('.results:visible');
         var row = $(this).parents('.pack-row');
+        var packId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'));
         if (row.length == 0) {
             row = tab.find('.pack-row:not(.empty):visible').first();
         }
@@ -285,7 +328,7 @@ $(document).ready(function () {
 
         // get the parsed list of cards
         var cards = [];
-        tab.find('.card-row.valid:not(.empty)').each(function () {
+        tab.find('.card-row.valid:not(.empty):not(.template)').each(function () {
             var rowId = (/card-id-([0-9]+)(\s|$)/i).exec($(this).attr('class'));
             if($(this).is('.removed')) {
                 cards[cards.length] = {
@@ -297,9 +340,9 @@ $(document).ready(function () {
                 cards[cards.length] = {
                     id: rowId != null ? rowId[1] : null,
                     type:     $(this).find('.type select').val(),
-                    content:  $(this).find('.input.content:visible input').val(),
-                    answers:  $(this).find('.input.correct:visible textarea').val(),
-                    correct:  $(this).find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked').val()
+                    content:  ($(this).find('input[name="url"]').val() != '' ? ($(this).find('input[name="url"]').val() + "\\n") : '') + $(this).find('.input.content:visible input').val(),
+                    answers:  $(this).find('.correct.type-mc:visible textarea').val(),
+                    correct:  $(this).find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val()
                 };
             }
         });
@@ -309,34 +352,61 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'text',
             data: {
-                id: tab.find('.results .search input[name="search"]').val().split(':')[1],
+                id: packId != null ? packId[1] : null,
+                logo: row.find('.id img:not(.default)').attr('src'),
                 cards: cards,
-                group: row.find('.groups input[name="group"]:checked').val(),
-                groups: row.find('.groups input[name="groups"]:checked').map(function () {return $(this).val();}).toArray(),
+                groups: row.find('.groups input').data('groups'),
+                users: row.find('.groups input').data('users'),
                 status: row.find('.status select').val(),
-                title: row.find('.name input').val()
+                title: row.find('.name input').val(),
+                keyboard: row.find('select[name="keyboard"]').val()
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
-                row.removeClass('edit').addClass('read-only');
-                tab.find('.card-row.valid').removeClass('edit').addClass('read-only');
-                window.loadContent(data);
-                var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.results .pack-row:visible').first().attr('class'))[1];
-                tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
-                tab.find('.search .input').removeClass('read-only');
-                window.activateMenu(Routing.generate('packs'));
+                if (close) {
+                    row.removeClass('edit').addClass('read-only');
+                    tab.find('.card-row.valid').removeClass('edit').addClass('read-only');
+                    window.loadContent(data);
+                    var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.results .pack-row:visible').first().attr('class'))[1];
+                    tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
+                    tab.find('.search .input').removeClass('read-only');
+                    window.activateMenu(Routing.generate('packs'));
+                }
+                // if done in the background, don't refresh the tab with loadContent
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
             }
-        })
-    });
+        });
+    }
 
     body.on('show', '[id^="packs"]', function () {
         packsFunc();
     });
 
     body.on('change keyup keydown', '.card-row input, .card-row select, .card-row textarea', packsFunc);
+
+    // TODO: generalize and move this to dashboard, just like users-groups dialog
+    body.on('click', '.card-row a[href="#upload-image"]', function () {
+        var row = $(this).parents('.card-row');
+        body.one('click.upload', 'a[href="#submit-upload"]', function () {
+            row.find('input[name="url"]').val($('#upload-file').find('img').attr('src'));
+            updatePreview.apply(row);
+        });
+    });
+
+    body.on('click', '.pack-row a[href="#upload-image"]', function () {
+        var row = $(this).parents('.pack-row');
+        body.one('click.upload', 'a[href="#submit-upload"]', function () {
+            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('.default');
+        });
+    });
+
+    body.on('hidden.bs.modal', '#upload-file', function () {
+        setTimeout(function () {
+            body.off('click.upload');
+        }, 100);
+    });
 
     body.on('click', 'a[data-target="#pack-publish"], a[href="#pack-publish"]', function () {
         var dialog = $('#pack-publish');

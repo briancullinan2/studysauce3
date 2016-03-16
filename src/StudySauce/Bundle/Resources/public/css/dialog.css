@@ -384,24 +384,6 @@ body.right-menu #bookmark
     margin-top:0;
 }
 
-#claim textarea
-{
-    height: 12em;
-}
-
-#claim label.input
-{
-    padding:0 2px;
-    width:50%;
-    margin:0 -2px;
-    display:inline-block;
-    vertical-align: top;
-}
-
-#claim .plupload
-{
-    width:50%;
-}
 
 @media all and (max-width:1000px)
 {

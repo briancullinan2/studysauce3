@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use StudySauce\Bundle\Command\CronSauceCommand;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
+use StudySauce\Bundle\Entity\File;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Pack;
@@ -109,8 +110,8 @@ class PacksController extends Controller
         /** @var User $user */
         $user = $this->getUser();
 
-        $shouldNotify = false;
         /** @var Pack $newPack */
+        // process pack settings
         $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->where('p.id = :id')
             ->setParameter('id', intval($request->get('id')))
@@ -121,24 +122,41 @@ class PacksController extends Controller
             $newPack->setUser($user);
         }
         if ($user->hasRole('ROLE_ADMIN')) {
+            $newPack->setProperty('logo', $request->get('logo'));
             $groups = new ArrayCollection($orm->getRepository('StudySauceBundle:Group')->findAll());
         } else {
+            /** @var File $logo */
+            $logo = $user->getFiles()->filter(function (File $f) use ($request) {return $f->getUrl() == $request->get('logo');})->first();
+            $newPack->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
             $groups = $user->getGroups();
         }
-        $group = $groups->filter(function (Group $g) use ($request) {
-            return $g->getId() == intval($request->get('group'));
-        })->first();
+        $newPack->setProperty('keyboard', $request->get('keyboard'));
         $newPack->setTitle($request->get('title'));
-        $newPack->setGroup(!empty($group) ? $group : null);
-        foreach ($groups->toArray() as $g) {
+        foreach ($request->get('groups') as $group) {
             /** @var Group $g */
-            if (in_array($g->getId(), $request->get('groups') ?: []) && !$newPack->hasGroup($g->getName())) {
+            if (!empty($g = $groups->filter(function (Group $g) use ($group) {
+                    return $group['id'] == $g->getId();})->first()) && $newPack->hasGroup($g->getName()) && $group['remove'] == 'true') {
                 $newPack->addGroup($g);
             }
-            else if ($newPack->hasGroup($g->getName()) && !in_array($g->getId(), $request->get('groups') ?: [])) {
+            else if (!empty($g) && !$newPack->hasGroup($g->getName())) {
                 $newPack->removeGroup($g);
             }
-            $shouldNotify = true;
+        }
+        foreach ($request->get('users') as $u) {
+            /** @var UserPack $up */
+            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first()) && $u['remove'] == 'true') {
+                $up->setRemoved(true);
+            }
+            else if (empty($up) && (!isset($u['remove']) || $u['remove'] != 'true')) {
+                $up = new UserPack();
+                /** @var User $upUser */
+                $upUser = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $u['id']]);
+                $up->setUser($upUser);
+                $upUser->addUserPack($up);
+                $up->setPack($newPack);
+                $newPack->addUserPack($up);
+                $orm->persist($up);
+            }
         }
         $newPack->setStatus($request->get('status'));
         if (empty($newPack->getId())) {
@@ -147,7 +165,10 @@ class PacksController extends Controller
             $newPack->setModified(new \DateTime());
             $orm->merge($newPack);
         }
+        $orm->flush();
 
+        // process cards
+        // TODO: break this up
         foreach ($request->get('cards') as $c) {
             /** @var Card $newCard */
             $newCard = $newPack->getCards()->filter(function (Card $x) use ($c) {
@@ -254,12 +275,6 @@ class PacksController extends Controller
             }
         }
         $orm->flush();
-
-        if($shouldNotify) {
-            $cron = new CronSauceCommand();
-            $cron->setContainer($this->container);
-            $cron->sendNotifications();
-        }
 
         return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'search' => 'pack-id:' . $newPack->getId()]);
     }
@@ -376,7 +391,9 @@ class PacksController extends Controller
             return $g->getId();
         })->toArray();
 
-        return array_filter(array_merge([$user], $user->getInvites()
+        return array_filter(
+            // also return current user and children
+            array_merge([$user], $user->getInvites()
             ->filter(function (Invite $i) {
                 return !empty($i->getInvitee());
             })
@@ -387,7 +404,7 @@ class PacksController extends Controller
                 return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED')
                 || $u->getUserPacks()
                     ->filter(function (UserPack $up) use ($x) {
-                        return $up->getPack()->getId() == $x->getId();
+                        return !$up->getRemoved() && $up->getPack()->getId() == $x->getId();
                     })->count() > 0
                 || count(array_intersect($packGroups, $u->getGroups()
                     ->map(function (Group $g) {
@@ -419,7 +436,9 @@ class PacksController extends Controller
         $packs = self::getPacksForUser($user);
         $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
 
-            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus())) {
+            $users = self::getChildUsersForPack($x, $user);
+
+            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || count($users) == 0) {
                 return [
                     'id' => $x->getId(),
                     'deleted' => true
@@ -444,7 +463,7 @@ class PacksController extends Controller
                         'id' => $u->getId(),
                         'created' => empty($up) || empty($up->getCreated()) ? null : $up->getCreated()->format('r')
                     ];
-                }, self::getChildUsersForPack($x, $user)))
+                }, $users))
             ];
         }, $packs));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);

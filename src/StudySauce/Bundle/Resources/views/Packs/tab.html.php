@@ -54,5 +54,6 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->start('sincludes');
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']), ['strategy' => 'sinclude']);
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'users-groups']), ['strategy' => 'sinclude']);
 $view['slots']->stop();
 

@@ -155,6 +155,9 @@ class Pack
 
     public function getLogo()
     {
+        if (!empty($this->getProperty('logo'))) {
+            return $this->getProperty('logo');
+        }
         $group = $this->getGroup();
 
         $logo = !empty($group) && !empty($group->getLogo())

@@ -1,19 +1,26 @@
-<div class="<?php print $field; ?>">
-    <label class="input"
-           data-options="<?php print $view->escape(json_encode(array_map(function ($u) use ($tables) {
-               $type = gettype($u);
-               $ti = array_search($type, \Admin\Bundle\Controller\AdminController::$allTableClasses);
-               $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
-               return [
-                   'value' => $u->getId(),
-                   'text' => $u->{'get' . ucfirst($tables[$joinTable][0])}() . ' ' . $u->{'get' . ucfirst($tables[$joinTable][1])}(),
-                   0 => $u->{'get' . ucfirst($tables[$joinTable][2])}()
-               ];
-           }, $entities))); ?>"
-           data-<?php print $field; ?>="<?php print $view->escape(json_encode(array_map(function ($u) {
-               return $u->getId();
-           }, $entities))); ?>"
-           data-tables="<?php print $view->escape(json_encode($tables)); ?>"><input type="text" name="<?php print $field; ?>" value="" placeholder="Search for <?php print $field; ?>"/></label>
+<?php
+$entityIds = [];
+
+?>
+
+<div class="<?php print $field; ?> entity-search">
+    <label class="input">
+        <input type="text" name="<?php print $field; ?>" value=""
+               placeholder="Search for <?php print $field; ?>"
+               data-options="<?php print $view->escape(json_encode(array_map(function ($u) use ($tables, &$entityIds) {
+                   $type = gettype($u);
+                   $ti = array_search($type, \Admin\Bundle\Controller\AdminController::$allTableClasses);
+                   $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
+                   $entityIds[] = $joinTable . '-' . $u->getId();
+                   return [
+                       'table' => $joinTable,
+                       'value' => $u->getId(),
+                       'text' => $u->{'get' . ucfirst($tables[$joinTable][0])}() . ' ' . $u->{'get' . ucfirst($tables[$joinTable][1])}(),
+                       0 => $u->{'get' . ucfirst($tables[$joinTable][2])}()
+                   ];
+               }, $entities))); ?>"
+               data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"
+               data-tables="<?php print $view->escape(json_encode($tables)); ?>"/></label>
     <?php
     $i = 0;
     foreach ($entities as $u) {
@@ -22,7 +29,8 @@
         $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
         ?>
         <label class="checkbox buttons-1">
-            <input type="checkbox" name="<?php print $field; ?>[<?php print $i; ?>][id]" value="<?php print $u->getId(); ?>"
+            <input type="checkbox" name="<?php print $field; ?>[<?php print $i; ?>][id]"
+                   value="<?php print $u->getId(); ?>"
                    checked="checked"/>
             <i></i>
             <span><?php print $u->{'get' . ucfirst($tables[$joinTable][0])}() . ' ' . $u->{'get' . ucfirst($tables[$joinTable][1])}(); ?></span>

@@ -3,7 +3,7 @@ use StudySauce\Bundle\Entity\Pack;
 
 /** @var Pack $pack */
 ?>
-<div class="<?php print strtolower($pack->getStatus()); ?>">
+<div>
     <label class="input status">
         <select name="keyboard">
             <option value="">Normal (default)</option>

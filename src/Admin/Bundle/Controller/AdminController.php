@@ -37,7 +37,15 @@ class AdminController extends Controller
     public static $allTableMetadata;
     /** @var string[] $allTableClasses */
     public static $allTableClasses;
-    public static $tables;
+    public static $tables = [
+        // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
+        'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
+        'ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions' => ['deleted']],
+        'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title'], 'status', 'groups' => ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
+        'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
+        // TODO: this really generalized template
+        //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
+    ];
 
     public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user-deleted' => false, 'ss_group-deleted' => false, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
@@ -205,16 +213,6 @@ class AdminController extends Controller
             throw new AccessDeniedHttpException();
         }
 
-        self::$tables = [
-            // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
-            'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
-            'ss_group' => ['id' => ['created', 'id'], 'name' => ['title','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions' => ['deleted']],
-            'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title'], 'status', 'groups' => ['group','groups'], 'users' => ['user','userPacks.user'], 'properties', 'actions'],
-            'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
-            // TODO: this really generalized template
-            //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
-        ];
-
         self::$allTableClasses = $orm->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
 
         self::$allTableMetadata = array_map(function ($table) use ($orm) {return $orm->getMetadataFactory()->getMetadataFor($table);}, self::$allTableClasses);
@@ -340,11 +338,16 @@ class AdminController extends Controller
 
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             // convert db entity to flat object
-            foreach(self::$tables as $table => $t) {
+            foreach(array_merge(array_keys(self::$tables), ['allGroups']) as $table) {
                 if (!isset($vars[$table])) {
                     continue;
                 }
-                $fields = self::$allTables[$table]->getFieldNames();
+                $tableName = $table;
+                if ($table == 'allGroups') {
+                    $tableName = 'ss_group';
+                }
+                $allowedFields = call_user_func_array('array_merge', array_map(function ($f) {return is_array($f) ? $f : [$f];}, self::$tables[$tableName]));
+                $fields = array_intersect(self::$allTables[$tableName]->getFieldNames(), $allowedFields);
                 $vars[$table] = array_map(function ($e) use ($fields) {
                     $obj = [];
                     foreach($fields as $f) {

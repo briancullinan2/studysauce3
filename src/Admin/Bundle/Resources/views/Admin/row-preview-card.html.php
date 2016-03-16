@@ -20,7 +20,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
 <?php if (empty($card->getResponseType()) || empty($card->getId())) { ?>
     <div class="preview-card">
         <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img height="50" src="<?php print $url; ?>" /><?php } ?>
+            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
                 <div class="preview-content"><?php print $view->escape($content); ?></div>
             <?php } ?>
@@ -29,7 +29,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
     </div>
     <div class="preview-card preview-answer">
         <div class="preview-prompt">
-            <?php if (!empty($isImage)) { ?><img height="50" src="<?php print $url; ?>" /><?php } ?>
+            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
                 <div class="preview-content"><?php print $view->escape($content); ?></div>
             <?php } ?>
@@ -46,21 +46,21 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
 <?php if ($card->getResponseType() == 'mc' || empty($card->getId())) { ?>
     <div class="preview-card type-mc">
         <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img height="50" src="<?php print $url; ?>" /><?php } ?>
+            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
                 <div class="preview-content"><?php print $view->escape($content); ?></div>
             <?php } ?>
         </div>
-        <div class="preview-response"><?php print $view->escape($answers[0]->getContent()); ?></div>
-        <div class="preview-response"><?php print $view->escape($answers[1]->getContent()); ?></div>
-        <div class="preview-response"><?php print $view->escape($answers[2]->getContent()); ?></div>
-        <div class="preview-response"><?php print $view->escape($answers[3]->getContent()); ?></div>
+        <div class="preview-response"><?php print (count($answers) > 0 ? $view->escape($answers[0]->getContent()) : ''); ?></div>
+        <div class="preview-response"><?php print (count($answers) > 1 ? $view->escape($answers[1]->getContent()) : ''); ?></div>
+        <div class="preview-response"><?php print (count($answers) > 2 ? $view->escape($answers[2]->getContent()) : ''); ?></div>
+        <div class="preview-response"><?php print (count($answers) > 3 ? $view->escape($answers[3]->getContent()) : ''); ?></div>
     </div>
 <?php } ?>
 <?php if ($card->getResponseType() == 'tf' || empty($card->getId())) { ?>
     <div class="preview-card type-tf">
         <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img height="50" src="<?php print $url; ?>" /><?php } ?>
+            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
                 <div class="preview-content"><?php print $view->escape($content); ?></div>
             <?php } ?>
@@ -73,7 +73,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
 <?php if ($card->getResponseType() == 'sa' || empty($card->getId())) { ?>
     <div class="preview-card type-sa">
         <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img height="50" src="<?php print $url; ?>" /><?php } ?>
+            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
                 <div class="preview-content"><?php print $view->escape($content); ?></div>
             <?php } ?>
@@ -84,7 +84,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
 <?php if (!empty($card->getResponseType()) || empty($card->getId())) { ?>
     <div class="preview-card type-mc type-tf type-sa preview-answer">
         <div class="preview-prompt">
-            <?php if (!empty($isImage)) { ?><img height="50" src="<?php print $url; ?>" /><?php } ?>
+            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
                 <div class="preview-content"><?php print $view->escape($content); ?></div>
             <?php } ?>

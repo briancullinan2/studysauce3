@@ -112,9 +112,6 @@ $(document).ready(function () {
             $(this).find('.results header .search .checkbox').draggable();
         }
         resetHeader();
-        $(this).find('.results [class*="-row"].edit').each(function () {
-            setupFields.apply($(this));
-        });
     });
 
     function getData()
@@ -153,6 +150,7 @@ $(document).ready(function () {
         command.find('[class*="-row"].' + this.hash.substr(1) + '-row').first().trigger('mouseover');
     });
 
+    // collapse section feature
     body.on('change', '.results .class-names .checkbox input', function () {
         var command = $('.results:visible');
         var table = $(this).val();
@@ -173,139 +171,6 @@ $(document).ready(function () {
             resetHeader();
         }
     });
-
-    var callbackTimeout = null;
-    var owner = false;
-    body.on('change', '.results .users input.selectized', function () {
-        if ($(this).val().trim() == '') {
-            return;
-        }
-        var id = parseInt($(this).val());
-        createUsersRow.apply($(this).parents('label'), [id]);
-        $(this).val('');
-        this.selectize.setValue('');
-    });
-
-    body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"]', function (evt) {
-        evt.preventDefault();
-        var field = $(this).parents('.users').find('label.input');
-        var id = parseInt($(this).parents('label').find('input').val());
-        createUsersRow.apply(field, [id]);
-    });
-
-    function createUsersRow(id) {
-        var field = $(this);
-        var selectize = field.find('input')[0].selectize;
-        var users = field.parents('.users');
-        var i = users.find('.checkbox').length;
-        var existing = users.find('.checkbox [value="' + id + '"]');
-        var newRow;
-        if (existing.length > 0) {
-            if (existing.attr('name') != 'user') {
-                i = (/users\[([0-9]*)]/i).exec(existing.attr('name'))[1];
-            }
-            existing.parents('label').replaceWith(newRow = users.find('.template').clone());
-        }
-        else {
-            newRow = users.find('.template').clone().insertBefore(users.find('label.checkbox').first());
-        }
-
-        newRow.find('span').text(selectize.options[id].text);
-        newRow.find('input').attr('name', 'users[' + i + '][id]').val(id);
-
-        if (owner) {
-            newRow.find('[href="#insert-entity"]').remove();
-            newRow.find('input').attr('name', 'user');
-            newRow.find('span').html(newRow.find('span').text() + ' <strong>owner</strong>');
-            field.data('owner', id);
-        }
-        else if (field.data('users').indexOf(id) > -1) {
-            // remove user
-            newRow.addClass('buttons-1');
-            newRow.find('[href="#subtract-entity"]').remove();
-            $('<input type="hidden" name="' + newRow.find('input').attr('name').replace('[id]', '[remove]') + '" value="true" />').insertAfter(newRow.find('input'));
-            field.data('users', field.data('users').filter(function (e) {return e != id;}));
-        }
-        else {
-            // add user
-            newRow.addClass('buttons-1');
-            newRow.find('[href="#insert-entity"]').remove();
-            field.data('users', $.merge(field.data('users'), [id]));
-        }
-        owner = false;
-        newRow.removeClass('template');
-    }
-
-    function setupUsers()
-    {
-        var row = $(this).closest('[class*="-row"]'),
-            that = row.find('.users input[type="text"]:not(.selectized)'),
-            field = that.parents('label');
-        that.selectize({
-            persist:false,
-            delimiter: ' ',
-            searchField: ['text', 'value', '0'],
-            maxItems: 1,
-            dropdownParent:null,
-            options: [],
-            render: {
-                option: function(item) {
-                    var desc = '<span class="title">'
-                        + '<span class="name"><i class="icon source"></i>' + item.text + '</span>'
-                        + '<span class="by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
-                        + '</span>';
-                    var buttons = 1;
-                    if (field.data('users').indexOf(item.value) > -1) {
-                        desc += '<a href="#subtract-entity" title="Remove user"></a>';
-                    }
-                    else {
-                        desc += '<a href="#insert-entity" title="Add user"></a>';
-                    }
-                    return '<div class="entity-search buttons-' + buttons + '">' + desc + '</div>';
-                }
-            },
-            load: function(query, callback) {
-                if (query.length < 1) {
-                    callback();
-                    return;
-                }
-                if(callbackTimeout) {
-                    clearTimeout(callbackTimeout);
-                }
-                callbackTimeout = setTimeout(function () {
-                    $.ajax({
-                        url: Routing.generate('command_callback'),
-                        type: 'GET',
-                        dataType:'json',
-                        data: {
-                            tables: ['ss_user'],
-                            search: query
-                        },
-                        error: function() {
-                            callback();
-                        },
-                        success: function(content) {
-                            var results = content['ss_user'].map(function (e) {
-                                return {
-                                    value: e.id,
-                                    text: e.first + ' ' + e.last,
-                                    0: e.email
-                                }});
-                            callback(results);
-                        }
-                    });
-                }, 100);
-            }
-        });
-        var existing = field.data('options');
-        for (var i in existing) {
-            that[0].selectize.addOption(existing[i]);
-        }
-    }
-
-    function setupFields() {
-        setupUsers.apply(this);
-    }
 
     var radioCounter = 5000;
 
@@ -345,7 +210,6 @@ $(document).ready(function () {
         evt.preventDefault();
         var row = $(this).parents('[class*="-row"]');
         row.removeClass('read-only').addClass('edit');
-        setupFields.apply(this);
     });
 
     body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {

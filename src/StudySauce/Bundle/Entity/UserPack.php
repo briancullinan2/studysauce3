@@ -49,6 +49,11 @@ class UserPack
     protected $created;
 
     /**
+     * @ORM\Column(type="boolean", name="removed")
+     */
+    protected $removed = false;
+
+    /**
      * @param int $correct
      * @return Response[]
      */
@@ -242,4 +247,28 @@ class UserPack
         return $this->pack;
     }
 
+
+    /**
+     * Set removed
+     *
+     * @param boolean $removed
+     *
+     * @return UserPack
+     */
+    public function setRemoved($removed)
+    {
+        $this->removed = $removed;
+
+        return $this;
+    }
+
+    /**
+     * Get removed
+     *
+     * @return boolean
+     */
+    public function getRemoved()
+    {
+        return $this->removed;
+    }
 }
