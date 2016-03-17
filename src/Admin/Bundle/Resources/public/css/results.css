@@ -520,9 +520,6 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     width: 25%;
 }
 
-.results .groups,
-.results .users,
-.results .packs,
 .results .ss_group-row .name .input:nth-child(2) textarea,
 .results .ss_user-row .user-name .input:nth-child(3) input
 {

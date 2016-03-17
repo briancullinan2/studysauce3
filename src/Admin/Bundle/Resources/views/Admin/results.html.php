@@ -137,7 +137,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                 } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                     print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                 } else {
-                    print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
+                    print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => is_array($fields) ? $fields : [$fields], 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                 }
                 ?></div><?php
             }
@@ -157,7 +157,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                     } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                         print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                     } else {
-                        print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
+                        print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => is_array($fields) ? $fields : [$fields], 'field' => $field, 'entity' => $e, 'groups' => $allGroups, 'table' => $table]);
                     }
                     ?></div><?php
                 }
@@ -181,7 +181,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                 } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                     print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
                 } else {
-                    print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
+                    print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => is_array($fields) ? $fields : [$fields], 'field' => $field, 'entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
                 }
                 ?></div><?php
             }
@@ -201,7 +201,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                     } else if ($view->exists('AdminBundle:Admin:row-' . $field . '.html.php')) {
                         print $view->render('AdminBundle:Admin:row-' . $field . '.html.php', ['entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
                     } else {
-                        print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => $fields, 'field' => $field, 'entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
+                        print $view->render('AdminBundle:Admin:row-generic.html.php', ['tables' => $tables, 'fields' => is_array($fields) ? $fields : [$fields], 'field' => $field, 'entity' => $entity, 'groups' => $allGroups, 'table' => $table]);
                     }
                     ?></div><?php
                 }

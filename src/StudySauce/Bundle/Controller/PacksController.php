@@ -132,19 +132,24 @@ class PacksController extends Controller
         }
         $newPack->setProperty('keyboard', $request->get('keyboard'));
         $newPack->setTitle($request->get('title'));
-        foreach ($request->get('groups') as $group) {
+        if (!empty($publish = $request->get('publish'))) {
+            $newPack->setProperty('schedule', new \DateTime($publish['schedule']));
+            $newPack->setProperty('email', $publish['email']);
+            $newPack->setProperty('alert', $publish['alert']);
+        }
+        foreach ($request->get('groups') ?: [] as $group) {
             /** @var Group $g */
             if (!empty($g = $groups->filter(function (Group $g) use ($group) {
-                    return $group['id'] == $g->getId();})->first()) && $newPack->hasGroup($g->getName()) && $group['remove'] == 'true') {
+                    return $group['id'] == $g->getId();})->first()) && $newPack->hasGroup($g->getName()) && isset($group['remove']) && $group['remove'] == 'true') {
                 $newPack->addGroup($g);
             }
             else if (!empty($g) && !$newPack->hasGroup($g->getName())) {
                 $newPack->removeGroup($g);
             }
         }
-        foreach ($request->get('users') as $u) {
+        foreach ($request->get('users') ?: [] as $u) {
             /** @var UserPack $up */
-            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first()) && $u['remove'] == 'true') {
+            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first()) && isset($group['remove']) && $u['remove'] == 'true') {
                 $up->setRemoved(true);
             }
             else if (empty($up) && (!isset($u['remove']) || $u['remove'] != 'true')) {
@@ -203,7 +208,6 @@ class PacksController extends Controller
                 continue;
             }
             $newCard->setContent($c['content']);
-            $newCard->setResponseContent($c['response']);
             if (!empty($c['type'])) {
                 if ($c['type'] == 'sa exactly' || $c['type'] == 'sa contains') {
                     $newCard->setResponseType('sa');
@@ -275,8 +279,7 @@ class PacksController extends Controller
             }
         }
         $orm->flush();
-
-        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'search' => 'pack-id:' . $newPack->getId()]);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'pack-id' => $newPack->getId(), 'headers' => false, 'edit' => true, 'expandable' => ['card' => ['preview']]]);
     }
 
     public function removeAction(Request $request)
@@ -438,7 +441,7 @@ class PacksController extends Controller
 
             $users = self::getChildUsersForPack($x, $user);
 
-            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || count($users) == 0) {
+            if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || count($users) == 0 || $x->getProperty('schedule') > new \DateTime()) {
                 return [
                     'id' => $x->getId(),
                     'deleted' => true

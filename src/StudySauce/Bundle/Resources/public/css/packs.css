@@ -94,17 +94,20 @@
 .results .pack-row .status .unpublished select {
     background-color: #FF9900;
 }
-
 .results .pack-row .status .public select {
     background-color: #11CC33;
 }
-
 .results .pack-row .status .group select {
     background-color: #1199CC;
 }
-
+.results .pack-row .status .group.pending select {
+    background-color: #EECC11;
+}
 .results .pack-row .status .unlisted select {
     background-color: #AAAAAA;
+}
+.results .pack-row .status .deleted select {
+    background-color: #FF4433;
 }
 
 .results .pack-row.edit > *:nth-child(2) {
@@ -484,10 +487,23 @@ a[href="#users-groups"] {
     vertical-align: middle;
 }
 
+a[href="#pack-publish"] {
+    position:absolute;
+    right:0;
+    top:65%;
+    margin-top:-12px;
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1302px transparent;
+}
+
+.pack-row.edit .status label,
 .pack-row.edit .groups label {
     padding-right: 30px;
 }
 
+.pack-row.edit .status,
 .pack-row.edit .groups {
     position:relative;
 }

@@ -8,6 +8,7 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/selectize.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery.plugin.js',
                 '@StudySauceBundle/Resources/public/js/jquery.timeentry.js',
+                '@StudySauceBundle/Resources/public/js/datetimepicker-master/build/jquery.datetimepicker.full.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery.scrollintoview.js',
                 '@StudySauceBundle/Resources/public/js/keymaster.js',
                 '@StudySauceBundle/Resources/public/js/sauce.js',

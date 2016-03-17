@@ -1,1 +1,1 @@
-<div><input type="text" name="title" value="<?php print $view->escape($pack->getTitle()); ?>" /></div>
+<label class="input"><span>Pack name</span><br /><input type="text" name="title" value="<?php print $view->escape($pack->getTitle()); ?>" /></label>

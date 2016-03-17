@@ -17,6 +17,7 @@ $diffUsers = array_filter($users, function (User $u) use (&$entityIds, $groups) 
 
 <div>
     <label class="input">
+        <span>Groups</span><br />
         <input type="text" value="<?php print implode(', ', array_map(function (Group $g) {return $g->getName();}, $groups)); ?>"
             data-groups="<?php print $view->escape(json_encode(array_map(function (Group $u) use (&$entityIds) {
                 $entityIds[] = 'ss_group-' . $u->getId();

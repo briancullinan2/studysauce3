@@ -364,6 +364,18 @@ $(document).ready(function () {
 
     });
 
+    body.on('hidden.bs.modal', '#upload-file', function () {
+        setTimeout(function () {
+            body.off('click.upload');
+        }, 100);
+    });
+
+    // hide any visible modals when panel changes
+    body.on('hide', '.panel-pane', function () {
+        body.find('.modal:visible').modal('hide');
+        body.find('.ui-datepicker:not(.ui-datepicker-inline)').hide();
+    });
+
     $(document.body).bind("dragover", function () {
         $(this).addClass('dragging');
     });

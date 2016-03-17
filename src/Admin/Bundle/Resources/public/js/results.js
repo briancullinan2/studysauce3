@@ -221,28 +221,27 @@ $(document).ready(function () {
     function loadContent (data) {
         var admin = jQuery('.results:visible'),
             content = $(data).filter('.results');
-        admin.find('.class-names .checkbox input:checked').each(function () {
-            var table = $(this).val();
-            // leave edit rows alone
-            admin.find('> .' + table + '-row:not(.edit)').remove();
-            var keepRows = admin.find('> .' + table + '-row').map(function () {
-                var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
-                return '.' + table + '-id-' + rowId;
-            }).toArray().join(',');
-            content.find('> .' + table + '-row').not(keepRows).insertAfter(admin.find('> h2.' + table));
-            admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
-        });
+        var tables = admin.find('[class*="-row"].template').map(function () {
+            return (/(.*)-row/i).exec($(this).attr('class'))[1];
+        }).toArray();
+        for(var t = 0; t < tables.length; t++) {
+            var table = tables[t];
+            (function (table) {
+                // leave edit rows alone
+                admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable').remove();
+                var keepRows = admin.find('> .' + table + '-row').map(function () {
+                    var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
+                    return '.' + table + '-id-' + rowId;
+                }).toArray().join(',');
+                content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows).insertBefore(admin.find('.' + table + '-row.template').first());
+                admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
+            })(table);
+        }
         resetHeader();
         admin.trigger('resulted');
     }
     // make available to save functions that always lead back to index
     window.loadContent = loadContent;
-
-    body.on('change', '.results input[name="group"]', function () {
-        if ($(this).prop('checked')) {
-            $(this).parents('[class*="-row"] > *').find('input[name="group"]').not(this).prop('checked', false);
-        }
-    });
 
     function loadResults() {
         if(searchRequest != null)
@@ -262,12 +261,6 @@ $(document).ready(function () {
     }
 
     body.on('mouseover click', '.results [class*="-row"]', resetHeader);
-
-    // hide any visible modals when panel changes
-    body.on('hide', '.panel-pane', function () {
-        body.find('.modal:visible').modal('hide');
-        body.find('.ui-datepicker').hide();
-    });
 
     body.on('change', '.paginate input', function () {
         var results = $(this).parents('.results');

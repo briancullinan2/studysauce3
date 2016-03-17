@@ -273,7 +273,7 @@ $(document).ready(function () {
 
     body.on('resulted', '.results', function () {
         var results = $(this);
-        var pack = results.find('.pack-row.edit');
+        var pack = results.find('.pack-row').removeClass('read-only').addClass('edit');
         if (pack.length > 0) {
             results.find('.card-row').removeClass('read-only').addClass('edit');
         }
@@ -307,13 +307,13 @@ $(document).ready(function () {
     body.on('click', '.results a[href="#save-pack"], .results [value="#save-pack"]', function (evt) {
         evt.preventDefault();
 
-        autoSave.apply(this);
+        autoSave.apply(this, [true]);
 
     });
 
     function autoSave(close) {
         var tab = $('.results:visible');
-        var row = $(this).parents('.pack-row');
+        var row = tab.find('.pack-row.edit:not(.template)');
         var packId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'));
         if (row.length == 0) {
             row = tab.find('.pack-row:not(.empty):visible').first();
@@ -355,11 +355,12 @@ $(document).ready(function () {
                 id: packId != null ? packId[1] : null,
                 logo: row.find('.id img:not(.default)').attr('src'),
                 cards: cards,
-                groups: row.find('.groups input').data('groups'),
-                users: row.find('.groups input').data('users'),
+                groups: row.find('.groups input').data('groups').map(function (g) {return {id: g['value'], remove: g['remove']};}),
+                users: row.find('.groups input').data('users').map(function (g) {return {id: g['value'], remove: g['remove']};}),
                 status: row.find('.status select').val(),
                 title: row.find('.name input').val(),
-                keyboard: row.find('select[name="keyboard"]').val()
+                keyboard: row.find('select[name="keyboard"]').val(),
+                publish: row.find('.status select').data('publish')
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
@@ -367,10 +368,13 @@ $(document).ready(function () {
                     row.removeClass('edit').addClass('read-only');
                     tab.find('.card-row.valid').removeClass('edit').addClass('read-only');
                     window.loadContent(data);
-                    var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.results .pack-row:visible').first().attr('class'))[1];
+                    var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.pack-row:visible').first().attr('class'))[1];
                     tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
                     tab.find('.search .input').removeClass('read-only');
                     window.activateMenu(Routing.generate('packs'));
+                }
+                else {
+                    packsFunc();
                 }
                 // if done in the background, don't refresh the tab with loadContent
             },
@@ -385,6 +389,17 @@ $(document).ready(function () {
     });
 
     body.on('change keyup keydown', '.card-row input, .card-row select, .card-row textarea', packsFunc);
+
+    body.on('change', '.pack-row .status select', function () {
+        var row = $(this).parents('.pack-row');
+        var status = row.find('.status select').val().toLowerCase();
+        if(status == '') {
+            row.find('.status > div').attr('class', '');
+        }
+        else if(!row.find('.status > div').is('.' + status)) {
+            row.find('.status > div').attr('class', status);
+        }
+    });
 
     // TODO: generalize and move this to dashboard, just like users-groups dialog
     body.on('click', '.card-row a[href="#upload-image"]', function () {
@@ -402,36 +417,37 @@ $(document).ready(function () {
         });
     });
 
-    body.on('hidden.bs.modal', '#upload-file', function () {
-        setTimeout(function () {
-            body.off('click.upload');
-        }, 100);
-    });
-
     body.on('click', 'a[data-target="#pack-publish"], a[href="#pack-publish"]', function () {
         var dialog = $('#pack-publish');
+        var row = $(this).parents('.pack-row');
 
-        dialog.find('#publish-date').datepicker({
-            showOtherMonths: true,
-            altField: 'input[name="publish-date"]',
-            altFormat: "DD, d MM, yy",
-            selectOtherMonths: true,
-            minDate: body.is('.adviser') ? null : 0,
-            autoPopUp:'focus',
-            changeMonth: true,
-            changeYear: true,
-            closeAtTop: false,
-            dateFormat: 'mm/dd/yy',
-            defaultDate:'0y',
-            firstDay:0,
-            fromTo:false,
-            speed:'immediate',
-            yearRange: '-3:+3'
+        dialog.find('input[name="publish-date"]').datetimepicker({
+            format: 'd.m.Y H:i',
+            inline: true,
+            minDate: 0
         }).on('focus', function () {
             setTimeout(function () {
                 $('#ui-datepicker-div').scrollintoview(DASHBOARD_MARGINS);
             }, 50);
         });
+
+        body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
+            var publish = {
+                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? 'now' : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
+                email: dialog.find('input[name="publish-email"]:checked').val() != null,
+                alert: dialog.find('input[name="publish-alert"]:checked').val() != null
+            };
+            row.find('.status select option[value="GROUP"]').text(publish.schedule == 'now' ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
+            row.find('.status select').data('publish', publish).val('GROUP');
+            row.find('.status > div').attr('class', publish.schedule == 'now' ? 'group' : 'group pending');
+            packsFunc.apply(row);
+        });
+    });
+
+    body.on('hidden.bs.modal', '#pack-publish', function () {
+        setTimeout(function () {
+            body.off('click.publish');
+        }, 100);
     });
 
 });

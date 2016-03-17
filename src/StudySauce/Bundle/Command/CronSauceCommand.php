@@ -144,12 +144,13 @@ EOF
             // loop through packs and determine if they have already been downloaded by the user
             foreach($packs as $p) {
 
-                if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus())) {
+                $children = $controller->getChildUsersForPack($p, $u);
+
+                if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus()) || count($children) == 0 || $p->getProperty('schedule') > new \DateTime()) {
                     continue;
                 }
 
                 /** @var Pack $p */
-                $children = $controller->getChildUsersForPack($p, $u);
                 foreach($children as $c) {
                     /** @var User $c */
                     if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {
@@ -184,16 +185,30 @@ EOF
                     $group = $groupInvite->getInvitee()->getGroups()->first();
                 }
 
-                foreach($u->getDevices() as $d) {
-                    if (!empty($group)) {
-                        $controller->sendNotification($group->getDescription() . ' added a new pack, "' . $difference[0]->getTitle() . '"!', count($notify), $d);
-                    }
-                    else {
-                        $controller->sendNotification('You have a new pack "' . $difference[0]->getTitle() . '" on Study Sauce!', count($notify), $d);
+                /** @var Pack[] $alerting */
+                $alerting = array_values(array_filter($difference, function (Pack $p) {
+                    return $p->getProperty('alert') == true;
+                }));
+
+                if (count($alerting) > 0) {
+                    foreach($u->getDevices() as $d) {
+                        if (!empty($group)) {
+                            $controller->sendNotification($group->getDescription() . ' added a new pack, "' . $alerting[0]->getTitle() . '"!', count($notify), $d);
+                        }
+                        else {
+                            $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce!', count($notify), $d);
+                        }
                     }
                 }
 
-                //$emails->sendNewPacksNotification();
+                /** @var Pack[] $emailing */
+                $emailing = array_values(array_filter($difference, function (Pack $p) {
+                    return $p->getProperty('email') == true;
+                }));
+
+                if(count($emailing) > 0) {
+                    //$emails->sendNewPacksNotification();
+                }
             }
         }
     }
