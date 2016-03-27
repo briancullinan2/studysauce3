@@ -29,8 +29,8 @@ foreach($fields as $subfield) {
         }
     }
     // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-    if (!empty($joinName) && isset(\Admin\Bundle\Controller\AdminController::$tables[$joinTable])) {
-        $searchTables[$joinTable] = \Admin\Bundle\Controller\AdminController::$tables[$joinTable]['name'];
+    if (!empty($joinName) && isset(\Admin\Bundle\Controller\AdminController::$defaultTables[$joinTable])) {
+        $searchTables[$joinTable] = \Admin\Bundle\Controller\AdminController::$defaultTables[$joinTable]['name'];
     }
 }
 
@@ -38,7 +38,7 @@ if (method_exists($entity, 'get' . ucfirst($field))) {
     $result = $entity->{'get' . ucfirst($field)}();
 
     if ($result instanceof \Doctrine\Common\Collections\ArrayCollection) {
-        print $this->render('AdminBundle:Admin:row-collection.html.php', ['field' => $field, 'tables' => $searchTables, 'entities' => $result->slice(0, 5)]);
+        print $this->render('AdminBundle:Admin:row-collection.html.php', ['tables' => $searchTables, 'entities' => $result->slice(0, 5)]);
         if ($result->count() > 5) {
             print ' <a href="#search-' . $table . ':' . $entity->getId() . '">+' . ($result->count() - 5) . ' more</a>';
         }

@@ -39,12 +39,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                                 <input type="checkbox" name="tables" value="<?php print $table; ?>" checked="checked"/>
                                 <i></i> <a
                                     href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
-                        <?php }
-                        foreach (array_diff($allTables, array_keys($tables)) as $table) { ?>
-                            <label class="checkbox">
-                                <input type="checkbox" name="tables" value="<?php print $table; ?>"/>
-                                <i></i> <a
-                                    href="#<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s</a></label>
                         <?php } ?>
                     </div>
                     <label class="input"><input name="search" type="text" value="" placeholder="Search"/></label>
@@ -65,6 +59,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
             foreach ($tables as $table => $t) {
                 for ($i = 0; $i < count($t); $i++) {
                     $field = is_array(array_values($t)[$i]) ? array_keys($t)[$i] : array_values($t)[$i];
+                    // skip search only fields
+                    if(is_numeric($field)) {
+                        continue;
+                    }
                     if ($view->exists('AdminBundle:Admin:heading-' . $field . '-' . $table . '.html.php')) {
                         $viewName = 'AdminBundle:Admin:heading-' . $field . '-' . $table . '.html.php';
                     } else {
@@ -125,10 +123,14 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
             $rowId = $table . '-id-' . $e->getId();
             ?>
         <div
-            class="<?php print $table; ?>-row <?php print $rowId; ?> <?php print ($app->getRequest()->get('edit') === true ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable' : ''); ?>">
+            class="<?php print $table; ?>-row <?php print $rowId; ?> <?php print ($app->getRequest()->get('edit') === true || is_array($app->getRequest()->get('edit')) && in_array($table, $app->getRequest()->get('edit')) ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable' : ''); ?>">
             <?php
             foreach ($tables[$table] as $f => $fields) {
                 $field = is_array($fields) ? $f : $fields;
+                // skip search only fields
+                if(is_numeric($field)) {
+                    continue;
+                }
                 ?>
             <div class="<?php print $field; ?>">
                 <?php
@@ -149,6 +151,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                 <?php
                 foreach ($expandable[$table] as $f => $fields) {
                     $field = is_array($fields) ? $f : $fields;
+                    // skip search only fields
+                    if(is_numeric($field)) {
+                        continue;
+                    }
                     ?>
                 <div class="<?php print $field; ?>">
                     <?php
@@ -169,10 +175,14 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         $entity = new $class();
         ?>
         <div
-            class="<?php print $table; ?>-row <?php print $table . '-id-'; ?> <?php print ($app->getRequest()->get('edit') === true ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable' : ''); ?> template empty">
+            class="<?php print $table; ?>-row <?php print $table . '-id-'; ?> <?php print ($app->getRequest()->get('edit') === true || is_array($app->getRequest()->get('edit')) && in_array($table, $app->getRequest()->get('edit')) ? 'edit' : 'read-only'); ?> <?php print (isset($expandable[$table]) ? 'expandable' : ''); ?> template empty">
             <?php
             foreach ($tables[$table] as $f => $fields) {
                 $field = is_array($fields) ? $f : $fields;
+                // skip search only fields
+                if(is_numeric($field)) {
+                    continue;
+                }
                 ?>
             <div class="<?php print $field; ?>">
                 <?php
@@ -193,6 +203,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
                 <?php
                 foreach ($expandable[$table] as $f => $fields) {
                     $field = is_array($fields) ? $f : $fields;
+                    // skip search only fields
+                    if(is_numeric($field)) {
+                        continue;
+                    }
                     ?>
                 <div class="<?php print $field; ?>">
                     <?php

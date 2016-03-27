@@ -180,7 +180,7 @@ $(document).ready(function () {
                     }
                 });
 
-                loadContent(response);
+                loadContent.apply(admin.find('.results'), [response]);
             },
             error: function () {
                 that.find('.squiggle').stop().remove();

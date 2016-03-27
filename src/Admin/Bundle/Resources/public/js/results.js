@@ -182,7 +182,7 @@ $(document).ready(function () {
         newRow.each(function () {
             var that = $(this);
             that.attr('class', that.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
-            that.removeClass('template removed read-only historic').addClass('edit blank');
+            that.removeClass('template removed read-only historic').addClass('edit empty');
             that.find('select, textarea, input[type="text"]').val('').trigger('change');
             that.find('> *').each(function () {
                 var radio = $(this).find('input[type="radio"]').first();
@@ -219,7 +219,7 @@ $(document).ready(function () {
     });
 
     function loadContent (data) {
-        var admin = jQuery('.results:visible'),
+        var admin = $(this).closest('.results:visible'),
             content = $(data).filter('.results');
         var tables = admin.find('[class*="-row"].template').map(function () {
             return (/(.*)-row/i).exec($(this).attr('class'))[1];

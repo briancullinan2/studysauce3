@@ -64,6 +64,18 @@ class Group extends BaseGroup implements GroupInterface
     protected $logo;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Group")
+     * @ORM\JoinColumn(name="parent", referencedColumnName="id", nullable = true)
+     */
+    protected $parent;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Group", mappedBy="parent", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"created" = "DESC"})
+     */
+    protected $subgroups;
+
+    /**
      * @ORM\Column(type="boolean", name="deleted")
      */
     protected $deleted = false;
@@ -132,6 +144,10 @@ class Group extends BaseGroup implements GroupInterface
         return $this->created;
     }
 
+    public function getUserCountStr() {
+        return '(' . $this->getUsers()->count() . ' users)';
+    }
+
     /**
      * Constructor
      * @param null $name
@@ -143,6 +159,7 @@ class Group extends BaseGroup implements GroupInterface
         $this->groupPacks = new ArrayCollection();
         $this->invites = new ArrayCollection();
         $this->coupons = new ArrayCollection();
+        $this->subgroups = new ArrayCollection();
         $this->roles = [];
         parent::__construct($name, $roles);
     }
@@ -356,5 +373,63 @@ class Group extends BaseGroup implements GroupInterface
     public function getGroupPacks()
     {
         return $this->groupPacks;
+    }
+
+    /**
+     * Set parent
+     *
+     * @param \StudySauce\Bundle\Entity\Group $parent
+     *
+     * @return Group
+     */
+    public function setParent(\StudySauce\Bundle\Entity\Group $parent = null)
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * Get parent
+     *
+     * @return \StudySauce\Bundle\Entity\Group
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Add subgroup
+     *
+     * @param \StudySauce\Bundle\Entity\Group $subgroup
+     *
+     * @return Group
+     */
+    public function addSubgroup(\StudySauce\Bundle\Entity\Group $subgroup)
+    {
+        $this->subgroups[] = $subgroup;
+
+        return $this;
+    }
+
+    /**
+     * Remove subgroup
+     *
+     * @param \StudySauce\Bundle\Entity\Group $subgroup
+     */
+    public function removeSubgroup(\StudySauce\Bundle\Entity\Group $subgroup)
+    {
+        $this->subgroups->removeElement($subgroup);
+    }
+
+    /**
+     * Get subgroups
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSubgroups()
+    {
+        return $this->subgroups;
     }
 }

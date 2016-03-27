@@ -36,15 +36,18 @@ foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/p
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="packs<?php print (!empty($entity) ? ('-pack' . $entity->getId()) : ''); ?>">
+    <div class="panel-pane" id="packs<?php print ($entity !== null ? ('-pack' . $entity->getId()) : ''); ?>">
         <div class="pane-content">
             <?php
-            $tables = ['tables' => ['pack', 'card']];
-            if(!empty($entity)) {
+            $tables = ['tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']]];
+            if($entity !== null) {
                 $tables['pack-id'] = $entity->getId();
                 $tables['headers'] = false;
                 $tables['edit'] = true;
-                $tables['expandable'] = ['card' => ['preview']];
+                $tables['count-card'] = 0;
+            }
+            else {
+                $tables['card-id'] = 0;
             }
             print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)); ?>
         </div>
@@ -54,6 +57,7 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->start('sincludes');
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'users-groups']), ['strategy' => 'sinclude']);
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']), ['strategy' => 'sinclude']);
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'confirm-remove']), ['strategy' => 'sinclude']);
 $view['slots']->stop();
 

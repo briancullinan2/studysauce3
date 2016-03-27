@@ -4,9 +4,9 @@ $view['slots']->start('modal-body') ?>
 <h2>Authorized to see this pack:</h2>
     <form action="<?php print $view['router']->generate('command_callback'); ?>" method="post">
         <h3>Groups:</h3>
-        <?php print $this->render('AdminBundle:Admin:row-collection.html.php', ['field' => 'groups', 'tables' => ['ss_group' => ['name', 'description', 'id']], 'entities' => []]); ?>
+        <?php print $this->render('AdminBundle:Admin:row-collection.html.php', ['tables' => ['ss_group' => ['name', 'userCountStr', 'description', 'id']], 'entities' => []]); ?>
         <h3>Individuals:</h3>
-        <?php print $this->render('AdminBundle:Admin:row-collection.html.php', ['field' => 'users', 'tables' => ['ss_user' => ['first', 'last', 'email']], 'entities' => []]); ?>
+        <?php print $this->render('AdminBundle:Admin:row-collection.html.php', ['tables' => ['ss_user' => ['first', 'last', 'email']], 'entities' => []]); ?>
     </form>
 <?php $view['slots']->stop();
 

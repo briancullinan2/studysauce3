@@ -45,5 +45,5 @@ $view['slots']->start('body'); ?>
 $view['slots']->start('sincludes');
 print $this->render('AdminBundle:Dialogs:confirm-password-reset.html.php', ['id' => 'confirm-password-reset']);
 print $this->render('AdminBundle:Dialogs:confirm-cancel-user.html.php', ['id' => 'confirm-cancel-user']);
-print $this->render('AdminBundle:Dialogs:add-user.html.php', ['id' => 'add-user']);
+print $this->render('AdminBundle:Dialogs:add-entity.html.php', ['id' => 'add-entity']);
 $view['slots']->stop();

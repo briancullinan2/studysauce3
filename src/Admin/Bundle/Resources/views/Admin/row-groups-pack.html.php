@@ -7,36 +7,45 @@ use StudySauce\Bundle\Entity\User;
 $groups = $pack->getGroups()->toArray();
 $users = $pack->getUsers()->toArray();
 $entityIds = [];
-
-$diffUsers = array_filter($users, function (User $u) use (&$entityIds, $groups) {
+$groupIds = [];
+$diffIds = [];
+$diffUsers = array_values(array_filter($users, function (User $u) use (&$entityIds, $groups) {
     $entityIds[] = 'ss_user-' . $u->getId();
-    return count(array_intersect($u->getGroups()->map(function (Group $g) {return $g->getId();})->toArray(), array_map(function (Group $g) {return $g->getId();}, $groups))) == 0;
-});
+    return count(array_intersect($u->getGroups()->map(function (Group $g) {
+        return $g->getId();
+    })->toArray(), array_map(function (Group $g) {
+        return $g->getId();
+    }, $groups))) == 0;
+}));
 
 ?>
 
 <div>
     <label class="input">
-        <span>Groups</span><br />
-        <input type="text" value="<?php print implode(', ', array_map(function (Group $g) {return $g->getName();}, $groups)); ?>"
-            data-groups="<?php print $view->escape(json_encode(array_map(function (Group $u) use (&$entityIds) {
-                $entityIds[] = 'ss_group-' . $u->getId();
-                return [
-                    'table' => 'ss_group',
-                    'value' => $u->getId(),
-                    'text' => $u->getName() . ' ' . $u->getDescription(),
-                    0 => $u->getId()
-                ];
-            }, $groups))); ?>"
-               data-users="<?php print $view->escape(json_encode(array_map(function (User $u) use (&$entityIds) {
+        <span>Groups</span><br/>
+        <input type="text"
+               data-tables="<?php print $view->escape(json_encode(['ss_user' => ['first', 'last', 'email'], 'ss_group' => ['name', 'userCountStr', 'description', 'id']])); ?>"
+               data-ss_group="<?php print $view->escape(json_encode(array_map(function (Group $u) use (&$entityIds, &$groupIds) {
+                   $entityIds[] = 'ss_group-' . $u->getId();
+                   $groupIds[] = 'ss_group-' . $u->getId();
+                   return [
+                       'table' => 'ss_group',
+                       'value' => 'ss_group-' . $u->getId(),
+                       'text' => $u->getName() . ' ' . $u->getUserCountStr(),
+                       0 => $u->getDescription()
+                   ];
+               }, $groups))); ?>"
+               data-ss_user="<?php print $view->escape(json_encode(array_map(function (User $u) use (&$entityIds, &$diffIds) {
+                   $diffIds[] = 'ss_user-' . $u->getId();
                    return [
                        'table' => 'ss_user',
-                       'value' => $u->getId(),
+                       'value' => 'ss_user-' . $u->getId(),
                        'text' => $u->getFirst() . ' ' . $u->getLast(),
                        0 => $u->getEmail()
                    ];
                }, $diffUsers))); ?>"
-               data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"/>
+               data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"
+               value="<?php print implode(' ', array_merge($groupIds, $diffIds)); ?>" />
     </label>
-    <a href="#users-groups" data-target="#users-groups" data-toggle="modal">+</a>
+    <a href="#add-entity" data-target="#add-entity" data-toggle="modal">+</a>
 </div>

@@ -6,6 +6,9 @@ security:
         drupal_encoder:
             id: studysauce.drupal_encoder
 
+    acl:
+        connection: default
+
     role_hierarchy:
         ROLE_GUEST:       [ROLE_GUEST]
         ROLE_ADMIN:       [ROLE_ADMIN, ROLE_USER]

@@ -329,6 +329,18 @@
     background-position: left -1705px;
 }
 
+#right-panel .main-menu a[href*="/groups"] span
+{
+    background-position: left -1605px;
+}
+
+#right-panel .main-menu a[href*="/groups"]:hover span,
+#right-panel .main-menu a[href*="/groups"]:focus span,
+#right-panel .main-menu a[href*="/groups"]:active span,
+#right-panel .main-menu a[href*="/groups"].active span {
+    background-position: left -1705px;
+}
+
 #right-panel .main-menu a[href*="/profile"] span
 {
     background-position: left -1805px;
@@ -461,6 +473,9 @@
     background-position: left -4705px;
 }
 
+.pane-content a[href="#upload-audio"],
+.pane-content a[href="#upload-video"],
+.pane-content a[href="#upload-image"],
 .pane-content a[href*="/home"]:not(.more),
 .pane-content a[href*="/goals"]:not(.more),
 .pane-content a[href*="/deadlines"]:not(.more),
@@ -482,6 +497,9 @@
     position:relative;
 }
 
+.pane-content a[href="#upload-audio"]:before,
+.pane-content a[href="#upload-video"]:before,
+.pane-content a[href="#upload-image"]:before,
 .pane-content a[href*="/home"]:not(.more):before,
 .pane-content a[href*="/goals"]:not(.more):before,
 .pane-content a[href*="/deadlines"]:not(.more):before,
@@ -508,6 +526,52 @@
     position:absolute;
     left:2px;
     top:50%;
+}
+
+.results a[href="#upload-audio"]:before,
+.results a[href="#upload-video"]:before,
+.results a[href="#upload-image"]:before
+{
+    background: url(../images/menu_new2_half.png) no-repeat left -2px transparent;
+}
+
+.results a[href="#upload-video"]:before
+{
+    background-position: left -2px;
+}
+
+.results a[href="#upload-video"]:hover:before,
+.results a[href="#upload-video"]:focus:before,
+.results a[href="#upload-video"]:active:before,
+.results a[href="#upload-video"].active:before
+{
+    background-position: left -2px;
+}
+
+.results a[href="#upload-image"]:before
+{
+    background-position: left -52px;
+}
+
+.results a[href="#upload-image"]:hover:before,
+.results a[href="#upload-image"]:focus:before,
+.results a[href="#upload-image"]:active:before,
+.results a[href="#upload-image"].active:before
+{
+    background-position: left -52px;
+}
+
+.results a[href="#upload-audio"]:before
+{
+    background-position: left -102px;
+}
+
+.results a[href="#upload-audio"]:hover:before,
+.results a[href="#upload-audio"]:focus:before,
+.results a[href="#upload-audio"]:active:before,
+.results a[href="#upload-audio"].active:before
+{
+    background-position: left -102px;
 }
 
 .results a[href^="#search-"]:before

@@ -93,9 +93,6 @@ table.results > tbody > tr > td .checkbox {
 .results label.checkbox
 {
     font-weight: normal;
-    font-size: 12px;
-    line-height: 100%;
-    vertical-align: middle;
 }
 
 .results .read-only :not(.highlighted-link) label.radio input,
@@ -538,8 +535,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results .search {
     display:inline-block;
     width:100%;
-    margin-right:-300px;
-    padding-right: 300px;
+    margin-right:-16.66%;
+    padding-right:16.66%;
 }
 
 .results .search .class-names + .input {

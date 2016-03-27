@@ -92,7 +92,8 @@ class Card
     }
 
     public function getIndex() {
-        return !empty($this->getPack()) ? $this->getPack()->getCards()->indexOf($this) : 0;
+        return !empty($this->getPack()) ? $this->getPack()->getCards()
+            ->filter(function (Card $c) {return !$c->getDeleted();})->indexOf($this) : 0;
     }
 
     /**

@@ -5,6 +5,9 @@ use StudySauce\Bundle\Entity\Card;
 /** @var Card $card */
 
 $answers = array_unique($card->getAnswers()->filter(function(Answer $a) {return !$a->getDeleted();})->map(function (Answer $a) {return $a->getValue();})->toArray());
+if(empty($answers)) {
+    $answers = [''];
+}
 
 ?>
 <label class="input correct">
@@ -13,7 +16,7 @@ $answers = array_unique($card->getAnswers()->filter(function(Answer $a) {return 
 <div class="correct type-mc">
     <div class="radios">
         <?php foreach($answers as $a) { ?>
-            <label class="radio"><input type="radio" name="correct-mc-<?php print $card->getId(); ?>" value="<?php print $a ?>" <?php print (!empty($card->getCorrect()) && $a == $card->getCorrect()->getValue() ? 'checked="checked"' : ''); ?> /><i></i><span><?php print $a; ?></span></label>
+            <label class="radio"><input type="radio" name="correct-mc-<?php print $card->getId(); ?>" value="<?php print $view->escape($a); ?>" <?php print (!empty($card->getCorrect()) && $a == $card->getCorrect()->getValue() ? 'checked="checked"' : ''); ?> /><i></i><span><?php print $view->escape($a); ?></span></label>
         <?php } ?>
     </div>
     <label class="input">
@@ -31,5 +34,5 @@ $answers = array_unique($card->getAnswers()->filter(function(Answer $a) {return 
     <span>False</span>
 </label>
 <label class="input correct type-sa">
-    <input type="text" name="correct" placeholder="fill in the blank" value="<?php print (!empty($card->getCorrect()) ? trim($card->getCorrect()->getValue(), '$^') : ''); ?>" />
+    <input type="text" name="correct" placeholder="fill in the blank" value="<?php print $view->escape(!empty($card->getCorrect()) ? trim($card->getCorrect()->getValue(), '$^') : ''); ?>" />
 </label>

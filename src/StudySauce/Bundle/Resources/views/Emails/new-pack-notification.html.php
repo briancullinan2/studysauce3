@@ -6,23 +6,25 @@ $view->extend('StudySauceBundle:Emails:layout.html.php');
 /** @var User $user */
 
 $view['slots']->start('message'); ?>
-We just wanted to let you know that [sponsor] has just added a new study pack to ["your" for a parent or [child first name]"'s"] Study Sauce account.<br />
-<?php $view['slots']->stop(); ?>
-Body:
-Hello [parent first name] -
-
-
-
-(left side)
-[sponsor logo]
-
-(right side)
-[pack name]
-[number of cards in pack] cards
-
+<p style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">
+    We just wanted to let you know that <?php print (!empty($group) ? ($group . ' has') : 'we have'); ?> just added a new study pack to <?php print (!empty($child) ? ($child . (substr($child, -1) == 's' ? '\'' : '\'s')) : 'your'); ?> Study Sauce account.<br />
+</p>
+<?php if (!empty($groupLogo)) { ?>
+    <p style="text-align:right; font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; ">
+        <img width="150" height="150" src="<?php echo $groupLogo; ?>" alt="LOGO" style="float:left;vertical-align: middle;" />
+        <br />
+        <br />
+        <br />
+        <?php print $packName; ?>
+        <br />
+        <?php print $packCount; ?>
+        <br />
+        <br />
+        <br />
+    </p>
+<?php } ?>
+<p style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">
 We hope you enjoy the new study material!
+</p>
+<?php $view['slots']->stop(); ?>
 
-Thank you,
-The Study Sauce Team
-
-P.S. If you have any questions, please reach out to us at admin@studysauce.com.

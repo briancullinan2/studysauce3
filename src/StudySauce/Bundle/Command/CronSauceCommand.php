@@ -61,6 +61,12 @@ EOF
                 null,
                 InputOption::VALUE_NONE,
                 'If set, cron will only sync'
+            )
+            ->addOption(
+                'notify',
+                null,
+                InputOption::VALUE_NONE,
+                'If set, cron will only notify pack changes'
             );;
     }
 
@@ -128,7 +134,6 @@ EOF
         $orm = $this->getContainer()->get('doctrine')->getManager();
 
         $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
-            ->where('u.devices != \'\' AND u.devices IS NOT NULL')
             ->getQuery()->getResult();
 
         $controller = new PacksController();
@@ -146,7 +151,12 @@ EOF
 
                 $children = $controller->getChildUsersForPack($p, $u);
 
-                if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus()) || count($children) == 0 || $p->getProperty('schedule') > new \DateTime()) {
+                // same conditions as on PackControllers listAction()
+                if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus())
+                    // skip packs that aren't associated with an account
+                    || count($children) == 0 || empty($p->getProperty('schedule'))
+                    // skip packs that haven't release yet
+                    || $p->getProperty('schedule') > new \DateTime()) {
                     continue;
                 }
 
@@ -158,14 +168,14 @@ EOF
                         || $c->getResponses()->filter(function (Response $r) use ($p) {
                                 return $r->getCard()->getPack() == $p && $r->getCreated() <= new \DateTime();
                             })->count() == 0) {
-                        $notify[] = $p;
+                        $notify[] = [$p, $c];
                     }
                 }
             }
 
             /** @var Pack[] $difference */
             $difference = [];
-            foreach($notify as $p) {
+            foreach($notify as list($p, $c)) {
                 if (!in_array($p->getId(), $u->getProperty('notified') ?: [])) {
                     $difference[] = $p;
                 }
@@ -173,12 +183,15 @@ EOF
 
             if (count($difference) > 0) {
 
-                $u->setProperty('notified', array_unique(array_merge(array_map(function (Pack $p) {return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
-                $orm->merge($u);
-                $orm->flush();
+                $u->setProperty('notified', array_unique(array_merge(array_map(function ($n) {
+                    /** @var Pack $p */
+                    list($p) = $n;
+                    return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
+                $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
                 /** @var Invite $groupInvite */
-                $groupInvite = $u->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
+                $groupInvite = $u->getInvites()->filter(function (Invite $i) {
+                    return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
 
                 /** @var Group $group */
                 if (!empty($groupInvite)) {
@@ -193,10 +206,12 @@ EOF
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($group)) {
-                            $controller->sendNotification($group->getDescription() . ' added a new pack, "' . $alerting[0]->getTitle() . '"!', count($notify), $d);
+                            $controller->sendNotification($group->getDescription() . ' added a new pack, "'
+                                . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
-                            $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce!', count($notify), $d);
+                            $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
+                                . '" on Study Sauce!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                     }
                 }
@@ -206,8 +221,10 @@ EOF
                     return $p->getProperty('email') == true;
                 }));
 
+                $child = array_values(array_filter($notify, function ($n) use ($u) { return $n[1] != $u; }));
+
                 if(count($emailing) > 0) {
-                    //$emails->sendNewPacksNotification();
+                    $emails->sendNewPacksNotification($u, $emailing, !empty($child) ? $child[1]->getFirst() : '');
                 }
             }
         }
@@ -219,8 +236,16 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // set the timeout to 4 and a half minutes
+        $empty = !$input->getOptions()['emails'] && !$input->getOptions()['sync'] && !$input->getOptions()['notify'];
         set_time_limit(60*6);
-        if(empty($input->getOptions()) || isset($input->getOptions()['emails'])) {
+        $options = $input->getOptions();
+        if($empty || !empty($input->getOptions()['sync'])) {
+
+        }
+        if($empty || !empty($input->getOptions()['notify'])) {
+            $this->sendNotifications();
+        }
+        if($empty || !empty($input->getOptions()['emails'])) {
             try {
                 $this->sendReminders();
                 //$this->send3DayMarketing();
@@ -235,12 +260,6 @@ EOF
             catch (\Exception $e) {
                 $error = $e;
             }
-        }
-        if(empty($input->getOptions()) || isset($input->getOptions()['sync'])) {
-
-        }
-        if(empty($input->getOptions()) || isset($input->getOptions()['notify'])) {
-            //$this->sendNotifications();
         }
         if(!empty($error))
             throw $error;

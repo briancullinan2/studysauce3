@@ -168,6 +168,14 @@ class Pack
         return $logo;
     }
 
+    public function getUserCountStr() {
+        return '(' . $this->getUsers()->count() . ' users)';
+    }
+
+    public function getCardCountStr() {
+        return '(' . $this->getCards()->count() . ' cards)';
+    }
+
     /**
      * Constructor
      */

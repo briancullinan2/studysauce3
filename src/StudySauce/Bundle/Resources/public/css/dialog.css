@@ -354,6 +354,46 @@ body.right-menu #bookmark
     background-color: rgba(0,0,0,.2);
 }
 
+#pack-publish .ui-datepicker {
+    position:static;
+    width:50%;
+    margin: auto;
+}
+
+/*
+#add-entity .template {
+    display:none;
+}
+
+#add-entity .nav-tabs {
+    display: inline-block;
+    padding-left:100px;
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+}
+
+#add-entity h2 {
+    display:inline-block;
+}
+
+#add-entity .nav-tabs li {
+    position:static;
+    transition: left ease-in-out .15s;
+    text-align:center;
+}
+
+#add-entity .nav-tabs li>a {
+    width:100px;
+}
+
+#add-entity .nav-tabs li.active {
+    position:absolute;
+    left:0;
+}
+*/
+
 .dialog
 {
     z-index: 99;
@@ -404,9 +444,7 @@ body.right-menu #bookmark
     .modal-open .modal
     {
         overflow-y:visible;
-        height: auto;
         position:absolute;
-        bottom:auto;
         transition: left linear .15s;
     }
 

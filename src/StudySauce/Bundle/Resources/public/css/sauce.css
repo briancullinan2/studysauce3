@@ -844,7 +844,7 @@ input[type=month],
     border-radius: 2px;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
-    border: 2px solid #BBB;
+    border: 1px solid #BBB;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-shadow: none;
@@ -881,6 +881,14 @@ input:-webkit-autofill {
     padding:5px;
 }
 
+.selectize-input,
+.selectize-control.multi .selectize-input.has-items,
+.selectize-control.single .selectize-input,
+.selectize-control.multi .selectize-input
+{
+    padding: 1px 5px;
+}
+
 .selectize-dropdown.single,
 .selectize-dropdown.multi
 {
@@ -893,12 +901,21 @@ input:-webkit-autofill {
 {
     background: #EEEEEE none;
     border-radius: 3px;
-    padding: 0;
-    margin: 0;
-    border: none;
+    padding: 0 2px;
+    margin: 0 2px;
+    border: 1px solid #bbb;
     vertical-align: top;
     color: inherit;
     text-shadow: none;
+}
+
+.read-only .selectize-control.single .selectize-input .item,
+.read-only .selectize-control.multi .selectize-input .item
+{
+    background: transparent none;
+    border-color:transparent;
+    padding: 0;
+    margin: 0;
 }
 
 .ui-datepicker

@@ -13,14 +13,20 @@
     vertical-align: top;
     margin-bottom:0;
     border-radius: 0;
-    background: #0099BB;
+    background: #444;
 }
 
 .header-wrapper,
 #site-name a,
 #partner-message a
 {
-    color: #FFFFFF;
+    color: #F90;
+}
+
+#welcome-message .input {
+    width:auto;
+    display:inline-block;
+    min-width:200px;
 }
 
 #site-name

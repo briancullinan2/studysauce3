@@ -127,6 +127,7 @@ $(document).ready(function () {
             }
         }, 50);
     }
+    window.activatePanel = activatePanel;
 
     body.on('click', 'a[href*="/redirect/facebook"], a[href*="/redirect/google"]', function () {
         loadingAnimation($(this));
@@ -386,30 +387,83 @@ $(document).ready(function () {
         $(this).removeClass('dragging').addClass('dropped');
     });
 
+    // -------------- Player --------------- //
+    //window.musicIndex = 0;
+    if(typeof $.fn.jPlayer == 'function') {
+        var jp = jQuery('#jquery_jplayer');
+        //window.musicIndex = Math.floor(Math.random() * window.musicLinks.length);
+        jp.jPlayer({
+            swfPath: Routing.generate('_welcome') + 'bundles/studysauce/js',
+            solution: 'html,flash',
+            supplied: 'm4a,mp3,oga',
+            preload: 'metadata',
+            volume: 0.8,
+            muted: false,
+            cssSelectorAncestor: '.preview-play:visible',
+            cssSelector: {
+                play: '.play',
+                pause: '.pause'
+            },
+            ready: function() {
+
+            }
+        });
+
+        /*
+        jp.bind($.jPlayer.event.ended, function () {
+            if(window.musicIndex == -1) {
+                window.musicIndex = Math.floor(Math.random() * window.musicLinks.length);
+                return;
+            }
+            var index = ++window.musicIndex % window.musicLinks.length;
+            jp.jPlayer("setMedia", {
+                mp3: window.musicLinks[index],
+                m4a: window.musicLinks[index].substr(0, window.musicLinks[index].length - 4) + '.mp4',
+                oga: window.musicLinks[index].substr(0, window.musicLinks[index].length - 4) + '.ogg'
+            });
+            $(this).jPlayer("play");
+        });
+        */
+    }
+    // -------------- END Player --------------- //
+
     // entity search
     function setupFields() {
         var that = body.find('input[type="text"][data-tables]:not(.selectized)');
         that.each(function () {
             var field = $(this);
-            $(this).selectize({
+            var options = [];
+            var tables = field.data('tables');
+            for (var i in tables) {
+                if (tables.hasOwnProperty(i)) {
+                    options = $.merge(options, field.data(i) || []);
+                }
+            }
+
+            field.selectize({
                 persist: false,
                 delimiter: ' ',
                 searchField: ['text', 'value', '0'],
-                maxItems: 1,
+                maxItems: 20,
                 dropdownParent: null,
-                options: [],
+                options: options,
                 render: {
                     option: function (item) {
                         var desc = '<span class="title">'
                             + '<span class="name"><i class="icon source"></i>' + item.text + '</span>'
                             + '<span class="by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
                             + '</span>';
-                        var buttons = 1;
-                        if (field.data('entities').indexOf(item.table + '-' + item.value) > -1) {
-                            desc += '<a href="#subtract-entity" title="Remove"></a>';
-                        }
-                        else {
-                            desc += '<a href="#insert-entity" title="Add"></a>';
+                        var buttons = 1,
+                            entities;
+                        if((entities = field.data('entities')) != null) {
+                            if (entities.indexOf(item.value) > -1)
+                            {
+                                desc += '<a href="#subtract-entity" title="Remove"></a>';
+                            }
+                        else
+                            {
+                                desc += '<a href="#insert-entity" title="Add"></a>';
+                            }
                         }
                         return '<div class="entity-search buttons-' + buttons + '">' + desc + '</div>';
                     }
@@ -420,18 +474,12 @@ $(document).ready(function () {
                         return;
                     }
                     var tables = field.data('tables');
-                    var tableNames = [];
-                    for (var t in tables) {
-                        if (tables.hasOwnProperty(t)) {
-                            tableNames[tableNames.length] = t;
-                        }
-                    }
                     $.ajax({
                         url: Routing.generate('command_callback'),
                         type: 'GET',
                         dataType: 'json',
                         data: {
-                            tables: tableNames,
+                            tables: tables,
                             search: query
                         },
                         error: function () {
@@ -439,15 +487,18 @@ $(document).ready(function () {
                         },
                         success: function (content) {
                             var results = [];
-                            for (var t = 0; t < tableNames.length; t++) {
-                                var table = tableNames[t];
+                            for (var t in tables) {
+                                if (!tables.hasOwnProperty(t)) {
+                                    continue;
+                                }
+                                var table = isNaN(parseInt(t)) ? t : tables[t];
                                 if (content.hasOwnProperty(table)) {
                                     (function (table) {
                                         results = $.merge(results, content[table].map(function (e) {
                                             return {
                                                 table: table,
-                                                value: e.id,
-                                                text: e[tables[table][0]] + ' ' + e[tables[table][1]],
+                                                value: table + '-' + e.id,
+                                                text: e[tables[table][0]] + (typeof e[tables[table][1]] != 'undefined' ? (' ' + e[tables[table][1]]) : ''),
                                                 0: e[tables[table][2]]
                                             }
                                         }));
@@ -458,13 +509,9 @@ $(document).ready(function () {
                         }
                     });
                 }
-            });
-            var existing = field.data('options');
-            for (var i in existing) {
-                if (existing.hasOwnProperty(i)) {
-                    $(this)[0].selectize.addOption(existing[i]);
-                }
-            }
+            })//.ready(function () {
+            //    field[0].selectize.setValue(options);
+            //});
         });
     }
 
@@ -474,15 +521,19 @@ $(document).ready(function () {
 
     // collection control for entity search
     body.on('change', '.entity-search input.selectized', function () {
-        if ($(this).val().trim() == '') {
+        var field = $(this);
+        if (field.val().trim() == '') {
             return;
         }
-        var id = parseInt($(this).val());
-        var item = $(this)[0].selectize.options[id];
-        createEntityRow.apply($(this).parents('label'), [item, $(this).data('entities').indexOf(item.table + '-' + item.value) > -1]);
-        $(this).val('');
-        this.selectize.setValue('');
-        this.selectize.renderCache = {};
+        var entities;
+        if((entities = field.data('entities')) != null) {
+            var id = parseInt(field.val());
+            var item = field[0].selectize.options[id];
+            createEntityRow.apply(field.parents('label'), [item, field.data('entities').indexOf(item.value) > -1]);
+            field.val('');
+            this.selectize.setValue('');
+            this.selectize.renderCache = {};
+        }
     });
 
     body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"]', function (evt) {
@@ -493,56 +544,79 @@ $(document).ready(function () {
         field.find('input')[0].selectize.renderCache = {};
     });
 
-    body.on('click', 'label:has(input[data-users][data-groups]) ~ a[href="#users-groups"]', function () {
-        var field = $(this).siblings('label:has(input[data-users][data-groups])').find('input[data-users][data-groups]');
-        var dialog = $('#users-groups');
-        var userField = dialog.find('input[name="users"]'),
-            groupField = dialog.find('input[name="groups"]');
-        userField.data('entities', field.data('entities'));
-        groupField.data('entities', field.data('entities'));
-        dialog.one('shown.bs.modal', function () {
-            var users = field.data('users');
-            var groups = field.data('groups');
-            userField.data('options', users);
-            groupField.data('options', groups);
+    //TODO: generalize these two
+    body.on('click', '*:has(input[data-entities]) ~ a[href="#add-entity"]', function () {
+        var field = $(this).siblings().find('input[data-entities]');
+        var dialog = $('#add-entity');
+        // TODO create fields
+        var tables = field.data('tables');
 
-            // remove existing rows
-            dialog.find('.checkbox:not(.template)').remove();
-
-            // create these rows
-            for (var u in users) {
-                if (users.hasOwnProperty(u)) {
-                    createEntityRow.apply(userField.parents('label'), [users[u]]);
-                    if (typeof userField[0].selectize != 'undefined') {
-                        userField[0].selectize.addOption(users[u]);
-                    }
+        dialog.find('.tab-pane.active, li').removeClass('active');
+        dialog.find('li').hide();
+        var first = null;
+        for(var t in tables) {
+            if(tables.hasOwnProperty(t)) {
+                if(first == null) {
+                    first = t;
                 }
-            }
-            for (var g in groups) {
-                if (groups.hasOwnProperty(g)) {
-                    createEntityRow.apply(groupField.parents('label'), [groups[g]]);
-                    if (typeof groupField[0].selectize != 'undefined') {
-                        groupField[0].selectize.addOption(groups[g]);
-                    }
-                }
-            }
-        });
-        var row = $(this).parents('.pack-row');
-        body.one('click.users_groups', 'a[href="#submit-entities"]', function () {
-            // copy users and groups back to field
-            field.data('groups', dialog.find('.groups .checkbox:not(.template)').map(function () {
-                return $.extend({remove: $(this).find('a[href="#subtract-entity"]').length == 0}, groupField[0].selectize.options[$(this).find('input').val()]);
-            }).toArray());
 
-            field.data('users', dialog.find('.users .checkbox:not(.template)').map(function () {
-                return $.extend({remove: $(this).find('a[href="#subtract-entity"]').length == 0}, userField[0].selectize.options[$(this).find('input').val()]);
-            }).toArray());
-        });
+                var entityField = dialog.find('input[name="' + t + '"]');
+                if(entityField.length == 0) {
+                    var newTemplate = dialog.find('.tab-pane.template').clone()
+                        .attr('id', 'add-entity-' + t).insertBefore(dialog.find('.tab-pane.template'));
+                    newTemplate.removeClass('template active');
+                    var title = t.replace('ss_', '').substr(0, 1).toUpperCase() + t.replace('ss_', '').substr(1);
+                    entityField = newTemplate.find('input').attr('name', t);
+                    dialog.find('li.template').clone().appendTo(dialog.find('ul')).removeClass('template active')
+                        .find('a').attr('href', '#add-entity-' + t).data('target', '#add-entity-' + t).text(title);
+                }
+                dialog.find('a[href="#add-entity-' + t + '"]').parent().show();
+
+                entityField.data('entities', field.data('entities'));
+                (function (entityField, t) {
+                    dialog.one('shown.bs.modal', function () {
+                        var entities = field.data(t);
+                        entityField.data(t, entities);
+                        //entityField.
+
+                        // remove existing rows
+                        dialog.find('.checkbox:not(.template)').remove();
+
+                        // create these rows
+                        setTimeout(function () {
+                            for (var u in entities) {
+                                if (entities.hasOwnProperty(u)) {
+                                    createEntityRow.apply(entityField.parents('label'), [entities[u]]);
+                                    if (typeof entityField[0].selectize != 'undefined') {
+                                        entityField[0].selectize.addOption(entities[u]);
+                                    }
+                                }
+                            }
+                        }, 100);
+                    });
+                    var row = $(this).parents('.pack-row');
+                    body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
+                        var entities = dialog.find('.' + t + '.checkbox:not(.template)').map(function () {
+                            return $.extend({remove: $(this).find('a[href="#subtract-entity"]').length == 0}, entityField[0].selectize.options[$(this).find('input').val()]);
+                        }).toArray();
+
+                        // TODO: copy users and groups back to field
+                        field.val(entities.map(function (g) {
+                            return g.value.trim();
+                        }).join(' '));
+
+                        field.data(t, entities);
+                    });
+                })(entityField, t);
+            }
+        }
+
+        dialog.find('a[href="#add-entity-' + first + '"]').trigger('click');
     });
 
-    body.on('hidden.bs.modal', '#users_groups', function () {
+    body.on('hidden.bs.modal', '#add-entity', function () {
         setTimeout(function () {
-            body.off('click.users_groups');
+            body.off('click.modify_entities');
         }, 100);
     });
 
@@ -568,13 +642,13 @@ $(document).ready(function () {
             newRow.addClass('buttons-1');
             newRow.find('[href="#subtract-entity"]').remove();
             $('<input type="hidden" name="' + newRow.find('input').attr('name').replace('[id]', '[remove]') + '" value="true" />').insertAfter(newRow.find('input'));
-            input.data('entities', input.data('entities').filter(function (e) {return e != option.table + '-' + option.value;}));
+            input.data('entities', input.data('entities').filter(function (e) {return e != option.value;}));
         }
         else {
             // add entity
             newRow.addClass('buttons-1');
             newRow.find('[href="#insert-entity"]').remove();
-            input.data('entities', $.merge(input.data('entities'), [option.table + '-' + option.value]));
+            input.data('entities', $.merge(input.data('entities'), [option.value]));
         }
         newRow.removeClass('template');
         return newRow;

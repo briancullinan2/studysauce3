@@ -252,6 +252,7 @@ class User extends BaseUser implements EncoderAwareInterface
         $this->invitees = new ArrayCollection();
         $this->userPacks = new ArrayCollection();
         $this->authored = new ArrayCollection();
+        $this->devices = new ArrayCollection();
         parent::__construct();
     }
 

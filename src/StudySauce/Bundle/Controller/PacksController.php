@@ -31,32 +31,23 @@ class PacksController extends Controller
 {
     public function indexAction(Pack $pack = null)
     {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
-        $total = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')->select('COUNT(DISTINCT p.id)')
-            ->andWhere('p.status != \'DELETED\'')
-            ->getQuery()
-            ->getSingleScalarResult();
-        $packs = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
-            ->andWhere('p.status != \'DELETED\'')
-            ->getQuery()
-            ->getResult();
-
-        // get the groups for use in dropdown
-        /** @var User $user */
-        $user = $this->getUser();
-        if ($user->hasRole('ROLE_ADMIN')) {
-            $groups = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        } else {
-            $groups = $user->getGroups()->toArray();
+        if ($pack === 0) {
+            $pack = new Pack();
         }
 
         return $this->render('StudySauceBundle:Packs:tab.html.php', [
-            'packs' => $packs,
-            'total' => $total,
-            'groups' => $groups,
             'entity' => $pack
+        ]);
+    }
+
+    public function groupsAction(Group $group = null)
+    {
+        if ($group === 0) {
+            $group = new Group();
+        }
+
+        return $this->render('StudySauceBundle:Packs:groups.html.php', [
+            'entity' => $group
         ]);
     }
 
@@ -122,16 +113,26 @@ class PacksController extends Controller
             $newPack->setUser($user);
         }
         if ($user->hasRole('ROLE_ADMIN')) {
-            $newPack->setProperty('logo', $request->get('logo'));
+            if(!empty($request->get('logo'))) {
+                $newPack->setProperty('logo', $request->get('logo'));
+            }
             $groups = new ArrayCollection($orm->getRepository('StudySauceBundle:Group')->findAll());
         } else {
             /** @var File $logo */
-            $logo = $user->getFiles()->filter(function (File $f) use ($request) {return $f->getUrl() == $request->get('logo');})->first();
-            $newPack->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
+            if(!empty($request->get('logo'))) {
+                $logo = $user->getFiles()->filter(function (File $f) use ($request) {
+                    return $f->getUrl() == $request->get('logo');
+                })->first();
+                $newPack->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
+            }
             $groups = $user->getGroups();
         }
-        $newPack->setProperty('keyboard', $request->get('keyboard'));
-        $newPack->setTitle($request->get('title'));
+        if(!empty($request->get('keyboard'))) {
+            $newPack->setProperty('keyboard', $request->get('keyboard'));
+        }
+        if(!empty($request->get('title'))) {
+            $newPack->setTitle($request->get('title'));
+        }
         if (!empty($publish = $request->get('publish'))) {
             $newPack->setProperty('schedule', new \DateTime($publish['schedule']));
             $newPack->setProperty('email', $publish['email']);
@@ -140,13 +141,14 @@ class PacksController extends Controller
         foreach ($request->get('groups') ?: [] as $group) {
             /** @var Group $g */
             if (!empty($g = $groups->filter(function (Group $g) use ($group) {
-                    return $group['id'] == $g->getId();})->first()) && $newPack->hasGroup($g->getName()) && isset($group['remove']) && $group['remove'] == 'true') {
+                    return $group['id'] == $g->getId();})->first()) && !$newPack->hasGroup($g->getName()) && (!isset($group['remove']) || $group['remove'] != 'true')) {
                 $newPack->addGroup($g);
             }
-            else if (!empty($g) && !$newPack->hasGroup($g->getName())) {
+            else if (!empty($g) && $newPack->hasGroup($g->getName()) && isset($group['remove']) && $group['remove'] == 'true') {
                 $newPack->removeGroup($g);
             }
         }
+        // TODO: secure user access using ACLs, which admins have access to which users?
         foreach ($request->get('users') ?: [] as $u) {
             /** @var UserPack $up */
             if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first()) && isset($group['remove']) && $u['remove'] == 'true') {
@@ -155,7 +157,7 @@ class PacksController extends Controller
             else if (empty($up) && (!isset($u['remove']) || $u['remove'] != 'true')) {
                 $up = new UserPack();
                 /** @var User $upUser */
-                $upUser = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $u['id']]);
+                $upUser = $orm->getRepository('StudySauceBundle:User')->findOneBy(['id' => $u['id']]);
                 $up->setUser($upUser);
                 $upUser->addUserPack($up);
                 $up->setPack($newPack);
@@ -163,7 +165,9 @@ class PacksController extends Controller
                 $orm->persist($up);
             }
         }
-        $newPack->setStatus($request->get('status'));
+        if(!empty($request->get('status'))) {
+            $newPack->setStatus($request->get('status'));
+        }
         if (empty($newPack->getId())) {
             $orm->persist($newPack);
         } else {
@@ -174,7 +178,7 @@ class PacksController extends Controller
 
         // process cards
         // TODO: break this up
-        foreach ($request->get('cards') as $c) {
+        foreach ($request->get('cards') ?: [] as $c) {
             /** @var Card $newCard */
             $newCard = $newPack->getCards()->filter(function (Card $x) use ($c) {
                 return $c['id'] == $x->getId() && !empty($x->getId());
@@ -231,7 +235,7 @@ class PacksController extends Controller
                 if (trim($a) == '')
                     continue;
                 $newAnswer = $newCard->getAnswers()->filter(function (Answer $x) use ($a) {
-                    return trim(trim($a), '$^') == $x->getValue();
+                    return trim(trim($a), '$^') == trim(trim($x->getValue()), '$^');
                 })->first();
                 if (empty($newAnswer)) {
                     $newAnswer = new Answer();
@@ -320,7 +324,7 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card']]);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'card-id' => 0, 'expandable' => ['card' => ['preview']]]);
     }
 
     /**

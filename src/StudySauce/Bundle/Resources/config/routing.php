@@ -342,4 +342,20 @@ $collection->add(
         ['user' => '[0-9]*']
     )
 );
+$collection->add(
+    'groups',
+    new Route(
+        '/groups/{_format}',
+        ['_controller' => 'StudySauceBundle:Packs:groups', '_format' => 'index'],
+        ['_format' => DASHBOARD_VIEWS]
+    )
+);
+$collection->add(
+    'groups_edit',
+    new Route(
+        '/groups/{group}/{_format}',
+        ['_controller' => 'StudySauceBundle:Packs:groups', '_format' => 'index', 'group' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'group' => '[0-9]+']
+    )
+);
 return $collection;

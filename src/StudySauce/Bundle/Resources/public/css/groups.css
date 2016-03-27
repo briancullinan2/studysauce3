@@ -1,0 +1,320 @@
+
+[id^="groups"] .pane-content
+{
+    min-height: 600px;
+}
+
+.group-list .ss_group-row {
+    display:inline-block;
+    width:23%;
+    margin: 10px .5%;
+    padding: 10px;
+    border: 1px solid #bbb;
+    position:relative;
+}
+
+.group-list .ss_group-row .id {
+    display:block;
+    width:auto;
+    height: 120px;
+    text-align: center;
+    position:relative;
+}
+
+.group-list .ss_group-row .packs {
+    display:block;
+    width:auto;
+    height: 120px;
+    background: #FFF;
+    white-space: normal;
+    overflow: auto;
+    padding:10px;
+    line-height: 140%;
+}
+
+.group-list .ss_group-row .actions {
+    position:absolute;
+    right:10px;
+    top:10px;
+    padding:0;
+    margin:0;
+    width:auto;
+}
+
+.group-list .ss_group-row .id .pack-icon {
+    position:absolute;
+    height:100%;
+    width:100%;
+    top:0;
+    left:0;
+}
+
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href^="#add-"],
+.group-edit .ss_group-row.read-only ~ .highlighted-link.ss_group a[href^="#save-"]
+{
+    visibility: hidden;
+}
+
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href^="#cancel-"],
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href^="#save-"]
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.group-edit .highlighted-link.ss_group
+{
+    margin: 50px 0;
+}
+
+.group-list .ss_group-row .name {
+    display:block;
+    width:auto;
+    padding-right: 50px;
+    position:relative;
+}
+
+.group-edit .ss_group-row > .parent
+{
+    width: 40%;
+}
+
+
+.group-edit .ss_group-row > .packs
+{
+    width: 35%;
+}
+
+.group-edit .ss_group-row .actions
+{
+    width:5%;
+}
+
+.group-list .ss_group-row .name span.count {
+    position:absolute;
+    right:0;
+    top:50%;
+    margin-top:-12px;
+}
+
+.group-list .ss_group-row .invites {
+    display:none;
+}
+
+.group-list .ss_group-row .id img {
+    height: auto;
+    width: auto;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.group-list .ss_group-row .packs span {
+    float:right;
+}
+
+.group-edit .results .ss_group-row .name span.count {
+    display:none;
+}
+
+.group-list .ss_group-row label.checkbox {
+    display:none;
+}
+
+.group-edit .pack-row .actions
+{
+    width:10%;
+}
+
+.group-edit .ss_group-row .name
+{
+    width:50%;
+}
+
+.group-edit .ss_group-row .invites
+{
+    width: 60%;
+    padding-left:10%;
+}
+
+.group-edit .pane-content {
+    min-height:600px;
+}
+
+.group-list .ss_group-row .parent {
+    display:none;
+}
+
+.group-edit .ss_group-row .id,
+.group-list .ss_group-row .id {
+    text-align: center;
+    position: relative;
+    overflow: visible;
+    vertical-align: top;
+}
+
+.group-edit .ss_group-row .pack-icon {
+    position: absolute;
+    padding: 20px;
+    height:100%;
+    width:100%;
+    top:0;
+    left:0;
+
+}
+
+.group-edit .pack-row .name {
+    width:65%;
+}
+
+.group-edit .ss_group-row .packs .pack-list {
+    display:none;
+}
+
+.group-edit .pack-row .counts label {
+    width:50%;
+    margin:0 -2px;
+    padding:0 2px;
+    display:inline-block;
+    text-align: center;
+}
+
+.group-edit .results .pack-row {
+    width: 100%;
+    display:inline-block;
+    vertical-align: top;
+    padding-right:40%;
+    margin-right:-40%;
+}
+
+.group-edit .pack-row.selected + .expandable .members
+{
+    top: 0;
+    right: 20px;
+    height: 100%;
+    position:absolute;
+    width:40%;
+    padding-bottom:400px;
+    margin-top:300px;
+}
+
+.group-edit .empty-members {
+    position: absolute;
+    top: 0;
+    margin-top: 355px;
+    width: 40%;
+    padding-bottom: 405px;
+    right: 20px;
+    height: 100%;
+    z-index: -1;
+}
+
+.group-edit .empty-members div {
+    border:1px dashed #bbb;
+    background: #ddd;
+    height:100%;
+    text-align: center;
+    font-size:20px;
+    padding-top:100px;
+}
+
+.group-edit .pack-row.selected + .expandable .members > div {
+    display:block;
+    vertical-align: top;
+    background: #FFF;
+    border: 1px solid #BBB;
+    overflow: auto;
+    padding:10px;
+    height:100%;
+    margin-top:50px;
+}
+
+.group-edit .pack-row.selected + .expandable .members > div label.input {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 10px;
+}
+
+.group-list .empty-members,
+.group-list .ss_group-row.read-only label > br,
+.group-list .ss_group-row.read-only label > span:first-of-type,
+.group-edit .pack-row ~ .pack-row label > br,
+.group-edit .pack-row ~ .pack-row label > span:first-of-type {
+    display:none;
+}
+
+.group-list.left-pad {
+    padding-left:40%;
+}
+
+.group-list.left-pad .ss_group-row {
+    width:31%;
+}
+.group-list .results {
+    padding:20px;
+}
+
+.group-edit .highlighted-link.pack
+{
+    display:none;
+}
+
+.group-edit .pack-row > .checkbox:nth-last-child(1) {
+    display:none;
+}
+
+.highlighted-link.ss_group {
+    visibility: hidden;
+}
+
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group
+{
+    visibility: visible;
+}
+
+.group-edit .pack-row + .expandable .big-add,
+.group-edit .ss_group-row .big-add
+{
+    float:none;
+}
+
+.group-list .ss_group-row.read-only .pack-icon br,
+.group-list .ss_group-row.read-only .pack-icon a,
+.group-list .ss_group-row.read-only .big-add,
+.group-list .ss_group-row.read-only .big-add ~ br {
+    display:none;
+}
+
+.group-edit .pack-row + .expandable .members a[href="#subtract-entity"] {
+    position:absolute;
+    right:0;
+    top: 50%;
+    margin-top: -15px;
+}
+
+.group-edit .ss_group-row.edit > .packs
+{
+    overflow:visible;
+}
+
+.group-edit .ss_group-row.edit .highlighted-link > a[href="#remove-confirm-group"]
+{
+    display:inline-block !important;
+}
+
+.group-edit .ss_group-row.edit .highlighted-link > a[href="#cancel-edit"],
+.group-edit .ss_group-row.edit .highlighted-link > [value^="#save-"]
+{
+    display:none !important;
+}
+
+.group-edit .pack-row.edit .highlighted-link > a[href="#remove-confirm-pack"]
+{
+    display:inline-block !important;
+}
+
+.group-edit .pack-row.edit .highlighted-link > a[href="#cancel-edit"],
+.group-edit .pack-row.edit .highlighted-link > [value^="#save-"]
+{
+    display:none !important;
+}

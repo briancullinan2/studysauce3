@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\ContactMessage;
 use StudySauce\Bundle\Entity\Deadline;
 use StudySauce\Bundle\Entity\Group;
@@ -77,7 +78,6 @@ class EmailsController extends Controller
             ->setFrom('admin@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-parent.html.php', [
-                'name' => $user,
                 'link' => false,
                 'group' => !empty($group) ? $group->getDescription() : '',
                 'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
@@ -85,7 +85,8 @@ class EmailsController extends Controller
                 'greeting' => (empty($user->getFirst()) ? 'Howdy partner' : ('Hello ' . $user->getFirst())) . ','
             ]), 'text/html');
         $headers = $message->getHeaders();
-        $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode(['category' => ['welcome-parent']])));
+        $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
+            'category' => ['welcome-parent']])));
         $this->send($message);
 
         return new Response();
@@ -112,7 +113,48 @@ class EmailsController extends Controller
                     ]), 'text/html');
         $headers = $message->getHeaders();
         $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
-                        'category' => ['welcome-student']])));
+            'category' => ['welcome-student']])));
+        $this->send($message);
+
+        return new Response();
+    }
+
+    /**
+     * @param User $user
+     * @param Pack[] $notify
+     * @return Response
+     */
+    public function sendNewPacksNotification(User $user = null, $notify, $child)
+    {
+        /** @var $user User */
+        if(empty($user))
+            $user = $this->getUser();
+
+        /** @var Invite $groupInvite */
+        $groupInvite = $user->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
+
+        /** @var Group $group */
+        if (!empty($groupInvite)) {
+            $group = $groupInvite->getInvitee()->getGroups()->first();
+        }
+
+        /** @var \Swift_Mime_Message $message */
+        $message = Swift_Message::newInstance()
+            ->setSubject(!empty($group) ? ($group->getDescription() . ' has added ' . $notify[0]->getTitle() . ' to Study Sauce') : 'We have added ' . $notify[0]->getTitle() . ' to Study Sauce')
+            ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
+            ->setTo($user->getEmail())
+            ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
+                'greeting' => 'Hello ' . $user->getFirst() . ',',
+                'child' => $child,
+                'group' => !empty($group) ? $group->getDescription() : '',
+                'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
+                'packName' => $notify[0]->getTitle(),
+                'packCount' => $notify[0]->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(),
+                'link' => false,
+            ]), 'text/html' );
+        $headers = $message->getHeaders();
+        $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
+            'category' => ['new-pack-notification']])));
         $this->send($message);
 
         return new Response();
@@ -1144,43 +1186,6 @@ class EmailsController extends Controller
                 }
                 break;
         }
-    }
-
-    /**
-     * @param User $user
-     * @param Pack[] $notify
-     * @return Response
-     */
-    public function sendNewPacksNotification(User $user = null, $notify)
-    {
-        /** @var $user User */
-        if(empty($user))
-            $user = $this->getUser();
-
-        /** @var Invite $groupInvite */
-        $groupInvite = $user->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
-
-        /** @var Group $group */
-        if (!empty($groupInvite)) {
-            $group = $groupInvite->getInvitee()->getGroups()->first();
-        }
-
-        /** @var \Swift_Mime_Message $message */
-        $message = Swift_Message::newInstance()
-            ->setSubject(!empty($group) ? ($group->getDescription() . ' has added [study pack name] to Study Sauce') : 'We have added [pack] to Study Sauce')
-            ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
-            ->setTo($user->getEmail())
-            ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
-                'greeting' => 'Dear ' . $user->getFirst() . ',',
-                'link' => '<a href="' . $link . '" class="cloak" style="color: #555555; text-decoration: none;">Set up your goals <span class="reveal" style="color: #FF9900;">here</span> and achieve them this term!</a>',
-                'user' => $user
-            ]), 'text/html' );
-        $headers = $message->getHeaders();
-        $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([
-            'category' => ['inactivity-goals']])));
-        $this->send($message);
-
-        return new Response();
     }
 
 

@@ -24,6 +24,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Acl\Dbal\AclProvider;
+use Symfony\Component\Security\Acl\Dbal\MutableAclProvider;
+use Symfony\Component\Security\Acl\Domain\Acl;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 
 /**
  * Class PartnerController
@@ -37,11 +42,12 @@ class AdminController extends Controller
     public static $allTableMetadata;
     /** @var string[] $allTableClasses */
     public static $allTableClasses;
-    public static $tables = [
+    /** @var array $defaultTables A list of all available fields, firewall */
+    public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
-        'ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description'], 'users', 'packs' => ['packs','groupPacks'], 'roles', 'actions' => ['deleted']],
-        'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title'], 'status', 'groups' => ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
+        'ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description','userCountStr'], 'parent', 'invites', 'packs' => ['packs','groupPacks'], 'actions' => ['deleted']],
+        'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'status', 'groups' => ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
         'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
@@ -98,7 +104,7 @@ class AdminController extends Controller
             }
         }
         // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-        if (!empty($joinName) && isset(self::$tables[$joinTable])) {
+        if (!empty($joinName) && isset($request['tables'][$joinTable])) {
             return self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
         }
         return '';
@@ -117,14 +123,25 @@ class AdminController extends Controller
         /** @var QueryBuilder $qb $f */
         /** @var string $op */
         $where = [];
-        if (!isset(self::$tables[$table])) {
+        if ($request == self::$defaultSearch) {
+            $searchTables = self::$defaultTables[$table];
+        }
+        else if (!isset($request['tables'][$table])) {
             return '';
         }
-        foreach(self::$tables[$table] as $k => $f) {
+        else {
+            $searchTables = $request['tables'][$table];
+        }
+        $allFields = self::getAllFieldNames([$table => self::$defaultTables[$table]]);
+        foreach($searchTables as $k => $f) {
             if (!is_array($f)) {
                 $f = [$f];
             }
             foreach($f as $field) {
+                // Skip restricted fields, all available fields are listed above
+                if(!in_array($field, $allFields)) {
+                    continue;
+                }
                 $search = null;
 
                 // by default, columns searching on the same term are ORed together
@@ -136,7 +153,15 @@ class AdminController extends Controller
 
                     // only search joins on first connection
                     if ($table == $tableName) {
-                        $join = self::joinBuilder($qb, $table, $tableName, $field, $request, $joins);
+                        // remove table prefix from matching field
+                        $joinRequest = [];
+                        foreach($request as $j => $r) {
+                            $joinRequest[$j] = $r;
+                            if(substr($j, 0, strlen($field)+1) == $field . '-' && strpos($j, '-', strlen($field)+1) !== false) {
+                                $joinRequest[substr($j, strlen($field)+1)] = $r;
+                            }
+                        }
+                        $join = self::joinBuilder($qb, $table, $tableName, $field, $joinRequest, $joins);
                         if (!empty($join)) {
                             $where['join'] = (empty($where['join']) ? '' : ($where['join'] . ' OR ')) . $join;
                         }
@@ -154,7 +179,7 @@ class AdminController extends Controller
                     list($searchWhere, $searchKey, $searchValue) = self::getWhereValue($search, $searchField, $field, $tableName);
                     if (!empty($searchWhere)) {
                         $where[$searchField] = (empty($where[$searchField]) ? '' : ($where[$searchField] . ' OR ')) . $searchWhere;
-                        if ($qb->getParameters()->filter(function (Parameter $p) use ($searchKey) {return $p->getName() == $searchKey;})->count() == 0) {
+                        if (!empty($searchKey) && $qb->getParameters()->filter(function (Parameter $p) use ($searchKey) {return $p->getName() == $searchKey;})->count() == 0) {
                             $qb = $qb->setParameter($searchKey, $searchValue);
                         }
                     }
@@ -178,6 +203,9 @@ class AdminController extends Controller
             else if (is_numeric($search)) {
                 return [$tableName . '.' . $field . ' != :' . $searchField . '_int_not', $searchField . '_int_not', intval($search)];
             }
+            else if ($search == 'NULL') {
+                return [$tableName . '.' . $field . ' IS NOT NULL', null, null];
+            }
             else {
                 return [$tableName . '.' . $field . ' NOT LIKE :' . $searchField . '_string_not', $searchField . '_string_not', '%' . $search . '%'];
             }
@@ -187,6 +215,9 @@ class AdminController extends Controller
         }
         else if (is_numeric($search)) {
             return [$tableName . '.' . $field . ' = :' . $searchField . '_int', $searchField . '_int', intval($search)];
+        }
+        else if ($search == 'NULL') {
+            return [$tableName . '.' . $field . ' IS NULL', null, null];
         }
         else {
             return [$tableName . '.' . $field . ' LIKE :' . $searchField . '_string', $searchField . '_string', '%' . $search . '%'];
@@ -199,6 +230,26 @@ class AdminController extends Controller
     public function indexAction()
     {
         return $this->render('AdminBundle:Admin:tab.html.php');
+    }
+
+    public static function getAllFieldNames($tables) {
+        $allFields = array_map(function ($t, $table) {
+            $fields = array_map(function ($f, $k) use ($table) {
+                return is_array($f)
+                    ? array_merge([$k], array_map(function ($field) use ($table) {return $table . '-' . $field;}, $f), array_map(function ($field) {return $field;}, $f))
+                    : [$f, $table . '-' . $f];
+            }, $t, array_keys($t));
+            if (count($fields)) {
+                return call_user_func_array('array_merge', $fields);
+            }
+            return [];
+        }, $tables, array_keys($tables));
+        if (count($allFields) > 0) {
+            $allFields = call_user_func_array('array_merge', $allFields);
+        }
+        $allFields = array_merge($allFields, array_keys($tables));
+        $allFields = array_unique($allFields);
+        return $allFields;
     }
 
     public function resultsAction(Request $request) {
@@ -228,23 +279,23 @@ class AdminController extends Controller
 
         $searchRequest = array_merge($request->attributes->all(), $request->query->all());
 
-        // pull out field searches
-        $allFields = array_map(function ($t, $table) {
-            $fields = array_map(function ($f, $k) use ($table) {
-                return is_array($f)
-                    ? array_merge([$k], array_map(function ($field) use ($table) {return $table . '-' . $field;}, $f))
-                    : [$table . '-' . $f];
-            }, $t, array_keys($t));
-            if (count($fields)) {
-                return call_user_func_array('array_merge', $fields);
-            }
-            return [];
-        }, self::$tables, array_keys(self::$tables));
-        if (count($allFields) > 0) {
-            $allFields = call_user_func_array('array_merge', $allFields);
+        // setup the tables we are searching
+        if (!isset($searchRequest['tables'])) {
+            $searchRequest['tables'] = [];
         }
-        $allFields = array_merge($allFields, array_keys(self::$tables));
-        $allFields = array_unique($allFields);
+        // convert table list to table => field list format
+        $tblList = [];
+        foreach($searchRequest['tables'] as $table => $t) {
+            if(!is_array($t)) {
+                $table = $t;
+                $t = self::$defaultTables[$t];
+            }
+            $tblList[$table] = $t;
+        }
+        $searchRequest['tables'] = $tblList;
+
+        // pull out field searches
+        $allFields = self::getAllFieldNames(self::$defaultTables);
 
         // TODO: fix this to do all occurrences and table names and other formats of searches specified above
         $regex = '/\s(' . implode('|', $allFields) . '):(.*)\s/i';
@@ -255,14 +306,15 @@ class AdminController extends Controller
             }
         }
 
-        if (!isset($searchRequest['tables'])) {
-            $searchRequest['tables'] = self::$defaultSearch['tables'];
-        }
-        $vars['tables'] = array_intersect_key(self::$tables, array_flip($searchRequest['tables']));
-
         $vars['search'] = '';
-        foreach(self::$tables as $table => $t) {
-            if (!empty($searchRequest['tables']) && !in_array($table, $searchRequest['tables'])) {
+        foreach($searchRequest['tables'] as $table => $t) {
+            $vars['tables'][$table] = $t;
+
+            $resultCount = isset($searchRequest['count-' . $table]) ? intval($searchRequest['count-' . $table]) : 25;
+            // for templating purposes only
+            if($resultCount == -1) {
+                $vars[$table] = [];
+                $vars[$table . '_total'] = 0;
                 continue;
             }
 
@@ -283,12 +335,12 @@ class AdminController extends Controller
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count
-            if(isset($searchRequest['page-' . $table])) {
+            if(!empty($resultCount) && isset($searchRequest['page-' . $table])) {
                 $page = $searchRequest['page-' . $table];
                 if($page == 'last') {
-                    $page = $total / 25;
+                    $page = $total / $resultCount;
                 }
-                $resultOffset = (min(max(1, ceil($total / 25)), max(1, intval($page))) - 1) * 25;
+                $resultOffset = (min(max(1, ceil($total / $resultCount)), max(1, intval($page))) - 1) * 25;
             }
             else {
                 $resultOffset = 0;
@@ -324,21 +376,23 @@ class AdminController extends Controller
             $qb = $qb
                 ->select($table)
                 ->distinct(true);
-            if (isset(self::$tables[$table]['id']) && is_array(self::$tables[$table]['id'])) {
-                $qb = $qb->orderBy($table . '.' . self::$tables[$table]['id'][0], 'DESC');
+            if (isset($t['id']) && is_array($t['id']) && !empty($t['id']) && in_array($t, $allFields)) {
+                $qb = $qb->orderBy($table . '.' . $t['id'][0], 'DESC');
             }
-            $query = $qb->setFirstResult($resultOffset)
-                ->setMaxResults(25)
-                ->getQuery();
-            $vars[$table] = $query->getResult();
+            $query = $qb->setFirstResult($resultOffset);
+            if($resultCount > 0) {
+                $query = $query->setMaxResults(25);
+            }
+
+            $vars[$table] = $query->getQuery()->getResult();
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        $vars['allTables'] = !empty($searchRequest['tables']) ? $searchRequest['tables'] : ['ss_user', 'ss_group', 'pack'];
 
+        // if request is json, merge the table fields plus a list of all the groups the user has access to
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             // convert db entity to flat object
-            foreach(array_merge(array_keys(self::$tables), ['allGroups']) as $table) {
+            foreach(array_merge(array_keys($searchRequest['tables']), ['allGroups']) as $table) {
                 if (!isset($vars[$table])) {
                     continue;
                 }
@@ -346,8 +400,10 @@ class AdminController extends Controller
                 if ($table == 'allGroups') {
                     $tableName = 'ss_group';
                 }
-                $allowedFields = call_user_func_array('array_merge', array_map(function ($f) {return is_array($f) ? $f : [$f];}, self::$tables[$tableName]));
-                $fields = array_intersect(self::$allTables[$tableName]->getFieldNames(), $allowedFields);
+                $allowedFields = self::getAllFieldNames([$tableName => self::$defaultTables[$tableName]]);
+                $fields = array_intersect(self::getAllFieldNames([$tableName => $table == 'allGroups'
+                    ? self::$defaultTables['ss_group']
+                    : $searchRequest['tables'][$tableName]]), $allowedFields);
                 $vars[$table] = array_map(function ($e) use ($fields) {
                     $obj = [];
                     foreach($fields as $f) {
@@ -480,19 +536,41 @@ class AdminController extends Controller
             $g = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $request->get('groupId')]);
         }
 
-        if(!empty($name = $request->get('groupName')))
+        if(!empty($request->get('parent'))) {
+            /** @var Group $parent */
+            $parent = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $request->get('parent')]);
+            if (!empty($parent) && $parent == $g) {
+                $parent->removeSubgroup($g);
+                $g->setParent(null);
+            }
+            else if(!empty($parent)) {
+                $g->setParent($parent);
+                $parent->addSubgroup($g);
+            }
+        }
+
+        if(!empty($name = $request->get('groupName'))) {
             $g->setName($name);
-        $g->setDescription(!empty($request->get('description')) ? $request->get('description') : '');
+        }
+        if(!empty($request->get('description'))) {
+            $g->setDescription(!empty($request->get('description')) ? $request->get('description') : '');
+        }
 
         // add new roles
-        $roles = $g->getRoles();
-        $newRoles = explode(',', $request->get('roles'));
-        // intersection with current groups is a removal, intersection with request is an addition
-        foreach(array_diff($roles, $newRoles) as $i => $role) {
-            $g->removeRole($role);
+        if(!empty($request->get('roles'))) {
+            $roles = $g->getRoles();
+            $newRoles = explode(',', $request->get('roles'));
+            // intersection with current groups is a removal, intersection with request is an addition
+            foreach (array_diff($roles, $newRoles) as $i => $role) {
+                $g->removeRole($role);
+            }
+            foreach (array_diff($newRoles, $roles) as $i => $role) {
+                $g->addRole($role);
+            }
         }
-        foreach(array_diff($newRoles, $roles) as $i => $role) {
-            $g->addRole($role);
+
+        if(!empty($request->get('packId'))) {
+            $this->forward('StudySauceBundle:Packs:create', ['id' => $request->get('packId'), 'groups' => $request->get('groups'), 'users' => $request->get('users'), 'publish' => $request->get('publish')]);
         }
 
         if(empty($g->getId()))
@@ -520,7 +598,12 @@ class AdminController extends Controller
             $orm->merge($g);
         $orm->flush();
 
-        return $this->forward('AdminBundle:Admin:results', ['tables' => ['ss_user', 'ss_group']]);
+        return $this->forward('AdminBundle:Admin:results', [
+            'tables' => ['ss_group', 'pack' => ['name' => ['title'], 'counts', 'actions', 'group' => ['group','groups']]],
+            'ss_group-id' => $g->getId(),
+            'expandable' => ['pack' => ['members']],
+            'edit' => ['ss_group'],
+            'count-pack' => 0]);
     }
 
     /**
