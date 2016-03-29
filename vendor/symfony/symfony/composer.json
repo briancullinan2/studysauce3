@@ -20,6 +20,7 @@
         "doctrine/common": "~2.4",
         "paragonie/random_compat": "~1.0",
         "symfony/polyfill-apcu": "~1.1",
+        "symfony/polyfill-mbstring": "~1.1",
         "twig/twig": "~1.23|~2.0",
         "psr/log": "~1.0"
     },
@@ -81,11 +82,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
-            "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
-            "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
-            "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
-            "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
+            "Symfony\\Bridge\\": "src/Symfony/Bridge/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"
         },

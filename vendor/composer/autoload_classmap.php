@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'APCUIterator' => $vendorDir . '/symfony/polyfill-apcu/Resources/stubs/APCUIterator.php',
     'AuthorizeNetAIM' => $vendorDir . '/authorizenet/authorizenet/lib/AuthorizeNetAIM.php',
     'AuthorizeNetAIM_Response' => $vendorDir . '/authorizenet/authorizenet/lib/AuthorizeNetAIM.php',
     'AuthorizeNetARB' => $vendorDir . '/authorizenet/authorizenet/lib/AuthorizeNetARB.php',
