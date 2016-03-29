@@ -52,11 +52,6 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::removeSymfonyStandardFiles"
         ]
     },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "http://packagist.org"
-        }],
     "config": {
         "bin-dir": "bin"
     },
