@@ -599,7 +599,7 @@ class AdminController extends Controller
         $orm->flush();
 
         return $this->forward('AdminBundle:Admin:results', [
-            'tables' => ['ss_group', 'pack' => ['name' => ['title'], 'counts', 'actions', 'group' => ['group','groups']]],
+            'tables' => ['ss_group', 'pack' => ['name' => ['title'], 'counts', 'actions', ['group','groups']]],
             'ss_group-id' => $g->getId(),
             'expandable' => ['pack' => ['members']],
             'edit' => ['ss_group'],

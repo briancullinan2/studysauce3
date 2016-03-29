@@ -476,7 +476,6 @@ $(document).ready(function () {
     body.on('show', '.panel-pane[id^="packs-"]', function () {
         packsFunc.apply($(this).find('.pack-row'));
         packsFunc.apply($(this).find('.card-row'));
-        autoSaveTimeout = null;
     });
 
     body.on('change keyup keydown', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
@@ -585,7 +584,7 @@ $(document).ready(function () {
         }, 100);
     });
 
-    body.on('click', '[id^="packs-"] label:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
+    body.on('click', '[id^="packs-"] *:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
         var row = $(this).parents('.pack-row');
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
             setTimeout(function () {

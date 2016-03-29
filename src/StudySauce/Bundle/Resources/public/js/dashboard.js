@@ -616,7 +616,7 @@ $(document).ready(function () {
                     first = tableName;
                 }
 
-                var entityField = dialog.find('input[name="' + tableName + '"]');
+                var entityField = dialog.find('input[name="' + tableName + '"][type="text"]');
                 if(entityField.length == 0) {
                     var newTemplate = dialog.find('.tab-pane.template').clone()
                         .attr('id', 'add-entity-' + tableName).insertBefore(dialog.find('.tab-pane.template'));
@@ -668,7 +668,7 @@ $(document).ready(function () {
                     var entityField = dialog.find('input[name="' + tableName + '"]');
 
                     (function (entityField) {
-                        entities[tableName] = dialog.find('.' + tableName + '.checkbox:not(.template)').map(function () {
+                        entities[tableName] = dialog.find('#add-entity-' + tableName + ' .checkbox:not(.template)').map(function () {
                             return $.extend({remove: $(this).find('a[href="#subtract-entity"]').length == 0}, entityField[0].selectize.options[$(this).find('input').val()]);
                         }).toArray();
 

@@ -43,9 +43,7 @@ $view['slots']->start('body'); ?>
 
             if (!empty($entity)) {
                 $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['packs', 'groupPacks'], 'actions' => ['deleted']]];
-                if ($entity->getPacks()->count() > 0) {
-                    $tables['pack'] = ['name' => ['title'], 'counts', 'actions', ['group', 'groups'] /* search field but don't display a template */];
-                }
+                $tables['pack'] = ['name' => ['title'], 'counts', 'actions', ['group', 'groups'] /* search field but don't display a template */];
                 print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                     'count-pack' => 0,
                     'edit' => ['ss_group'],

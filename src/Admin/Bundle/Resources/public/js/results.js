@@ -218,12 +218,14 @@ $(document).ready(function () {
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
-    function loadContent (data) {
+    function loadContent (data, tables) {
+        if(!tables) {
+            tables = $.unique(admin.find('[class*="-row"].template').map(function () {
+                return (/(.*)-row/i).exec($(this).attr('class'))[1];
+            }).toArray());
+        }
         var admin = $(this).closest('.results:visible'),
             content = $(data).filter('.results');
-        var tables = admin.find('[class*="-row"].template').map(function () {
-            return (/(.*)-row/i).exec($(this).attr('class'))[1];
-        }).toArray();
         for(var t = 0; t < tables.length; t++) {
             var table = tables[t];
             (function (table) {

@@ -82,7 +82,9 @@
 
 .group-edit .ss_group-row > .packs
 {
-    width: 35%;
+    width: 60%;
+    position: relative;
+    margin: 150px -100% -150px -60%;
 }
 
 .group-edit .ss_group-row .actions
@@ -263,7 +265,8 @@
     display:none;
 }
 
-.highlighted-link.ss_group {
+.group-edit .highlighted-link.ss_group,
+.group-list .highlighted-link.pack {
     visibility: hidden;
 }
 
@@ -283,13 +286,6 @@
 .group-list .ss_group-row.read-only .big-add,
 .group-list .ss_group-row.read-only .big-add ~ br {
     display:none;
-}
-
-.group-edit .pack-row + .expandable .members a[href="#subtract-entity"] {
-    position:absolute;
-    right:0;
-    top: 50%;
-    margin-top: -15px;
 }
 
 .group-edit .ss_group-row.edit > .packs

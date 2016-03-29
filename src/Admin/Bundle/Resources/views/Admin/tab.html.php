@@ -37,7 +37,7 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/admin.
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="command">
         <div class="pane-content">
-            <?php print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results')); ?>
+            <?php print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', ['tables' => ['ss_user']])); ?>
         </div>
     </div>
 <?php $view['slots']->stop();
@@ -45,5 +45,5 @@ $view['slots']->start('body'); ?>
 $view['slots']->start('sincludes');
 print $this->render('AdminBundle:Dialogs:confirm-password-reset.html.php', ['id' => 'confirm-password-reset']);
 print $this->render('AdminBundle:Dialogs:confirm-cancel-user.html.php', ['id' => 'confirm-cancel-user']);
-print $this->render('AdminBundle:Dialogs:add-entity.html.php', ['id' => 'add-entity']);
+print $this->render('StudySauceBundle:Dialogs:add-entity.html.php', ['id' => 'add-entity']);
 $view['slots']->stop();

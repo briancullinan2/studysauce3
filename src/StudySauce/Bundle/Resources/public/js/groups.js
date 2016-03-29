@@ -2,9 +2,9 @@
 $(document).ready(function () {
 
     var body = $('body'),
-        autoSaveTimeout = null;
+        autoSaveTimeout = 0;
 
-    function groupsFunc() {
+    function groupsFunc(evt) {
         var tab = $(this).parents('.results:visible');
         var groupRow = tab.find('.ss_group-row.edit');
         if(groupRow.find('.name input').val().trim() == '') {
@@ -12,6 +12,11 @@ $(document).ready(function () {
         }
         else {
             tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
+        }
+
+        // do not autosave from selectize because the input underneath will change
+        if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input')) {
+            return;
         }
 
         // save at most every 2 seconds, don't autosave from admin lists
@@ -22,6 +27,43 @@ $(document).ready(function () {
         }
 
     }
+
+    body.on('click', '[id^="groups-"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
+        evt.preventDefault();
+        var tab = $(this).parents('.results');
+        var row = $(this).parents('.pack-row');
+        var group = tab.find('.ss_group-row.edit:not(.template)');
+        var id = ((/pack-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
+        var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(group.attr('class')) || [])[1];
+        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
+            row.addClass('removed');
+            $.ajax({
+                url: Routing.generate('save_group'),
+                type: 'POST',
+                dataType: 'text',
+                data: {
+                    groupId: groupId,
+                    packId: id != null ? id : null,
+                    groups: [{id: groupId, remove: true}]
+                },
+                success: function (data) {
+                    // copy rows and select
+                    var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                    loadContent.apply(tab, [data, ['pack']]);
+                    if (selected) {
+                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+                    }
+                }
+            });
+        });
+        row.removeClass('removed');
+    });
+
+    body.on('hidden.bs.modal', '#confirm-remove', function () {
+        setTimeout(function () {
+            body.off('click.remove');
+        }, 100);
+    });
 
     body.on('click', '[id^="groups-"] .ss_group-row .packs a[href="/packs"]', function () {
         body.one('show', '#packs', function () {
@@ -91,12 +133,16 @@ $(document).ready(function () {
 
     body.on('change keyup keydown', '[id^="groups-"] .ss_group-row input, [id^="groups-"] .ss_group-row select, [id^="groups-"] .ss_group-row textarea', groupsFunc);
 
-    body.on('click', '.group-list .ss_group-row a[href="#edit-group"]', function () {
-        var results = $(this).parents('.results');
-        var row = $(this).parents('.ss_group-row');
-        var groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        window.activateMenu(Routing.generate('groups_edit', {group: groupId}));
-        row.removeClass('edit').addClass('read-only');
+    body.on('click', '.group-list .ss_group-row', function (evt) {
+        if($(evt.target).is('a[href="#edit-group"]') || !$(evt.target).is('a, .ss_group-row > .packs')
+            && $(evt.target).parents('.ss_group-row > .packs').length == 0)
+        {
+            var results = $(this).parents('.results');
+            var row = $(this).closest('.ss_group-row');
+            var groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
+            window.activateMenu(Routing.generate('groups_edit', {group: groupId}));
+            row.removeClass('edit').addClass('read-only');
+        }
     });
 
     body.on('click', '[id^="groups-"] .ss_group-row.edit a[href^="#cancel-"], [id^="groups-"] .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
@@ -138,7 +184,7 @@ $(document).ready(function () {
             inline: true,
             minDate: 0
         });
-        body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
+        dialog.one('click.publish', 'a[href="#submit-publish"]', function () {
 
 
             var publish = {
@@ -163,21 +209,15 @@ $(document).ready(function () {
                     dataType: 'text',
                     data: {
                         groupId: groupId,
-                        packId: id != null ? id : null,
+                        packId: id != null ? id.substr(5) : null,
                         groups: [{id: groupId, remove: false}],
                         publish: publish
                     },
                     success: function (data) {
+                        tab.find('.squiggle').stop().remove();
                         // copy rows and select
-                        var content = $(data).filter('.results'),
-                            selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                        tab.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').remove();
-                        var keepRows = tab.find('> .pack-row').map(function () {
-                            var rowId = (new RegExp('pack-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
-                            return '.pack-id-' + rowId;
-                        }).toArray().join(',');
-                        content.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').not(keepRows).insertBefore(tab.find('.pack-row.template').first());
-                        tab.find('.paginate.pack .page-total').text(content.find('.paginate.pack .page-total').text());
+                        var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                        loadContent.apply(tab, [data, ['pack']]);
                         if (selected) {
                             tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
                         }
@@ -207,45 +247,44 @@ $(document).ready(function () {
 
     body.on('hidden.bs.modal', '#pack-publish', function () {
         setTimeout(function () {
-            body.off('click.publish');
+            $(this).off('click.publish');
         }, 100);
     });
 
-    body.on('click', '[id^="groups-"] label:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
+    body.on('click', '[id^="groups-"] *:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
         var tab = $(this).parents('.results'),
             row = $(this).parents('.expandable').prev('.pack-row'),
             rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
             groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row.edit').first().attr('class'))[1],
-            field = $(this).siblings('label:has(input[data-ss_user])').find('input[data-ss_user]');
+            field = $(this).siblings('*:has(input[data-ss_user])').find('input[data-ss_user]');
+
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
-            // TODO: confirmation dialog
-            $.ajax({
-                url: Routing.generate('save_group'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    groupId: groupId,
-                    packId: rowId != null ? rowId : null,
-                    users: field.data('ss_user').map(function (g) {return {id: g['value'], remove: g['remove']};})
-                },
-                success: function (data) {
-                    // copy rows and select
-                    var content = $(data).filter('.results'),
-                        selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                    tab.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').remove();
-                    var keepRows = tab.find('> .pack-row').map(function () {
-                        var rowId = (new RegExp('pack-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
-                        return '.pack-id-' + rowId;
-                    }).toArray().join(',');
-                    content.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').not(keepRows).insertBefore(tab.find('.pack-row.template').first());
-                    tab.find('.paginate.pack .page-total').text(content.find('.paginate.pack .page-total').text());
-                    if(selected) {
-                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+            body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+                // TODO: confirmation dialog
+                $.ajax({
+                    url: Routing.generate('save_group'),
+                    type: 'POST',
+                    dataType: 'text',
+                    data: {
+                        groupId: groupId,
+                        packId: rowId != null ? rowId : null,
+                        users: field.data('ss_user').map(function (g) {
+                            return {id: g['value'].substr(8), remove: g['remove']};
+                        })
+                    },
+                    success: function (data) {
+                        tab.find('.squiggle').stop().remove();
+                        // copy rows and select
+                        var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                        loadContent.apply(tab, [data, ['pack']]);
+                        if (selected) {
+                            tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+                        }
+                    },
+                    error: function () {
+                        tab.find('.squiggle').stop().remove();
                     }
-                },
-                error: function () {
-                    tab.find('.squiggle').stop().remove();
-                }
+                });
             });
         });
     });
