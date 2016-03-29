@@ -3,6 +3,12 @@
 /** @var $view \Symfony\Bundle\FrameworkBundle\Templating\PhpEngine */
 use StudySauce\Bundle\Entity\User;
 
+/** @var $router \Symfony\Component\Routing\Router */
+$router = $this->container->get('router');
+
+/** @var $collection \Symfony\Component\Routing\RouteCollection */
+$collection = $router->getRouteCollection();
+
 /** @var $app \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables */
 
 if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_format') == 'funnel' ||
@@ -164,7 +170,14 @@ if($app->getRequest()->get('_format') == 'tab' && empty($exclude_layout)) {
         }
     }
     if(!empty($request->get('_route'))) {
-        $pane = $request->get('_route');
+        $pane = $router->match($view['router']->generate($request->get('_route')))['_route'];
+        $route = $collection->get($request->get('_route'));
+
+        foreach($route->getRequirements() as $r => $regex) {
+            if ($r != '_format' && $regex == '[0-9]*' || $regex == '[0-9]+') {
+                $pane .= '-' . $r . $request->attributes->get('_route_params')[$r];
+            }
+        }
     }
     if(!empty($pane)) { ?>
         <style type="text/css">.css-loaded.<?php print $pane; ?> {

@@ -354,10 +354,8 @@ body.right-menu #bookmark
     background-color: rgba(0,0,0,.2);
 }
 
-#pack-publish .ui-datepicker {
-    position:static;
-    width:50%;
-    margin: auto;
+#pack-publish .input {
+    text-align: center;
 }
 
 /*

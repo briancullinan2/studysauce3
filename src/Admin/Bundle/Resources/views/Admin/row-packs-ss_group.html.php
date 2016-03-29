@@ -5,6 +5,7 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
 /** @var User|Group $ss_group */
+$entityIds = [];
 ?>
 
 <div>
@@ -12,11 +13,18 @@ use StudySauce\Bundle\Entity\User;
         <span>+</span> new pack</a><br/>
     <label class="input">
         <input type="text" name="packs" value=""
+               data-pack="<?php print $view->escape(json_encode(array_map(function (Pack $u) use (&$entityIds) {
+                   $entityIds[] = 'pack-' . $u->getId();
+                   return [
+                       'table' => 'pack',
+                       'value' => 'pack-' . $u->getId(),
+                       'text' => $u->getTitle() . ' ' . $u->getUserCountStr(),
+                       0 => $u->getCardCountStr()
+                   ];
+               }, $ss_group->getPacks()->toArray()))); ?>"
                data-tables="<?php print $view->escape(json_encode([
                    'pack' => ['title', 'userCountStr', 'cardCountStr', 'id']])); ?>"
-               data-entities="<?php print $view->escape(json_encode($ss_group->getPacks()->map(function (Pack $p) {
-                   return 'pack-' . $p->getId();
-               })->toArray())); ?>" placeholder="Search for existing pack"/></label>
+               data-entities="<?php print $view->escape(json_encode($entityIds)); ?>" placeholder="Search for existing pack"/></label>
     <?php
     foreach ($ss_group->getPacks()->toArray() as $p) {
         /** @var Pack $p */

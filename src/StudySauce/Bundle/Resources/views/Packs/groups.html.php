@@ -62,7 +62,7 @@ $view['slots']->start('body'); ?>
             }
             ?>
             </div>
-            <div class="group-list <?php print ($entity->getPacks()->count() > 0 ? 'left-pad' : ''); ?>">
+            <div class="group-list <?php print (!empty($entity) && $entity->getPacks()->count() > 0 ? 'right-pad' : ''); ?>">
                 <?php
                 if (empty($entity)) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [

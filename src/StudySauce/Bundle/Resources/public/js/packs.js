@@ -104,7 +104,7 @@ $(document).ready(function () {
         packsFunc.apply(tab.find('.card-row'));
     }
 
-    body.on('focus mousedown keydown change keyup blur', '.card-row .correct textarea, .card-row .correct .radios input', function (evt) {
+    body.on('focus mousedown keydown change keyup blur', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
         var row = $(this).parents('.card-row');
         var that = row.find('.correct textarea');
         that.css('height', '');
@@ -204,7 +204,7 @@ $(document).ready(function () {
         centerize.apply(row.find(' + .expandable .preview-content, + .expandable .preview-response, + .expandable img'));
     }
 
-    body.on('click', '.preview-play .play', function () {
+    body.on('click', '[id^="packs-"] .preview-play .play', function () {
         var player = $('#jquery_jplayer');
         player.jPlayer("setMedia", {
             mp3: $(this).attr('href')
@@ -246,12 +246,10 @@ $(document).ready(function () {
             var row = $(this);
             if(row.find('.content input').val().trim() == '' && (
                     row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() == ''
-                )) {
+                ) && row.find('.correct input').val().trim() == '') {
                 row.removeClass('invalid').addClass('empty valid');
             }
-            else if (row.find('.content input').val().trim() != '' && (
-                    row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() != ''
-                )) {
+            else if (row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() != '') {
                 row.removeClass('invalid empty').addClass('valid');
             }
             else {
@@ -304,13 +302,13 @@ $(document).ready(function () {
     }
 
     var autoSaveTimeout = 0,
-        previewTimeout = null;
+    previewTimeout = null;
 
-    body.on('selected', '.card-row', function () {
+    body.on('selected', '[id^="packs-"] .card-row', function () {
         updatePreview.apply($(this));
     });
 
-    body.on('click', '.results a[href="#add-pack"]', function () {
+    body.on('click', '#packs a[href="#add-pack"]', function () {
         var results = $(this).parents('.results');
         var row = results.find('.pack-row.empty:not(.template)').first().detach()
             .add(results.find('.highlighted-link.pack, .highlighted-link.card, .pack-row.template, .card-row.template, .card-row.template + .expandable').clone());
@@ -322,7 +320,7 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '.pack-row a[href="#edit-pack"]', function () {
+    body.on('click', '#packs a[href="#edit-pack"]', function () {
         var results = $(this).parents('.results');
         var row = $(this).parents('.pack-row');
         var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
@@ -330,7 +328,7 @@ $(document).ready(function () {
         row.removeClass('edit').addClass('read-only');
     });
 
-    body.on('click', '.pack-row.edit a[href^="#cancel-"], .results .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
+    body.on('click', '[id^="packs-"] .pack-row.edit a[href^="#cancel-"], [id^="packs-"] .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results'),
             row = $(this).parents('.pack-row');
@@ -339,7 +337,7 @@ $(document).ready(function () {
         window.activateMenu(Routing.generate('packs'));
     });
 
-    body.on('click', '.pack-row [href="#remove-confirm-pack"]', function (evt) {
+    body.on('click', '[id^="packs-"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.pack-row');
         var rowId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'))[1];
@@ -373,7 +371,7 @@ $(document).ready(function () {
         }, 100);
     });
 
-    body.on('click', '.results a[href="#save-pack"], .results [value="#save-pack"]', function (evt) {
+    body.on('click', '[id^="packs-"] a[href="#save-pack"], [id^="packs-"] [value="#save-pack"]', function (evt) {
         evt.preventDefault();
 
         if (autoSaveTimeout != null) {
@@ -481,10 +479,10 @@ $(document).ready(function () {
         autoSaveTimeout = null;
     });
 
-    body.on('change keyup keydown', '.card-row input, .card-row select, .card-row textarea', packsFunc);
-    body.on('change keyup keydown', '.pack-row input, .pack-row select, .pack-row textarea', packsFunc);
+    body.on('change keyup keydown', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
+    body.on('change keyup keydown', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
 
-    body.on('change', '.pack-row .status select', function () {
+    body.on('change', '[id^="packs-"] .pack-row .status select', function () {
         var row = $(this).parents('.pack-row');
         var status = row.find('.status select').val().toLowerCase();
         if(status == '') {
@@ -496,7 +494,7 @@ $(document).ready(function () {
     });
 
     // TODO: generalize and move this to dashboard, just like users-groups dialog
-    body.on('click', '.card-row a[href="#upload-image"]', function () {
+    body.on('click', '[id^="packs-"] .card-row a[href="#upload-image"]', function () {
         var row = $(this).parents('.card-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
             row.find('input[name="url"]').val($('#upload-file').find('img').attr('src'));
@@ -504,7 +502,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '.pack-row a[href="#upload-image"]', function () {
+    body.on('click', '[id^="packs-"] .pack-row a[href="#upload-image"]', function () {
         var row = $(this).parents('.pack-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
             row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('.default');
@@ -512,7 +510,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', 'a[data-target="#pack-publish"], a[href="#pack-publish"]', function () {
+    body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', function () {
         var dialog = $('#pack-publish');
         var row = $(this).parents('.pack-row');
 
@@ -551,19 +549,43 @@ $(document).ready(function () {
         }
 
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
+            var entityField = row.find('.groups');
+            var newValue = entityField.val().split(' ');
+            var groupStr = '';
+            for(var v in newValue) {
+                if (newValue.hasOwnProperty(v)) {
+                    var obj = entityField[0].selectize.options[newValue[v]];
+                    groupStr += (groupStr != '' ? '<br />' : '') + obj.text;
+                }
+            }
+
             var publish = {
                 schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? 'now' : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
                 email: dialog.find('input[name="publish-email"]:checked').val() != null,
                 alert: dialog.find('input[name="publish-alert"]:checked').val() != null
             };
-            row.find('.status select option[value="GROUP"]').text(publish.schedule == 'now' ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
-            row.find('.status select').data('publish', publish).val('GROUP');
-            row.find('.status > div').attr('class', publish.schedule == 'now' ? 'group' : 'group pending');
-            packsFunc.apply(row);
+
+            // show confirmation dialog
+            $('#general-dialog').modal({show: true, backdrop: true})
+                .find('.modal-body').html('<p>Are you sure you want to publish to <br />' + groupStr + '?');
+
+            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
+                row.find('.status select option[value="GROUP"]').text(publish.schedule == 'now' ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
+                row.find('.status select').data('publish', publish).val('GROUP');
+                row.find('.status > div').attr('class', publish.schedule == 'now' ? 'group' : 'group pending');
+                packsFunc.apply(row);
+            });
         });
     });
 
-    body.on('click', 'label:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
+    body.on('hidden.bs.modal', '#general-dialog', function () {
+        setTimeout(function () {
+            body.off('click.modify_entities_confirm');
+            body.off('click.publish_confirm');
+        }, 100);
+    });
+
+    body.on('click', '[id^="packs-"] label:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
         var row = $(this).parents('.pack-row');
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
             setTimeout(function () {

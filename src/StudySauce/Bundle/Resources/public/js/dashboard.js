@@ -432,6 +432,9 @@ $(document).ready(function () {
         var that = body.find('input[type="text"][data-tables]:not(.selectized)');
         that.each(function () {
             var field = $(this);
+            if(field.parents('.template').length > 0) {
+                return;
+            }
             var options = [];
             var tables = field.data('tables');
             for (var i in tables) {
@@ -446,6 +449,7 @@ $(document).ready(function () {
                 searchField: ['text', 'value', '0'],
                 maxItems: 20,
                 dropdownParent: null,
+                closeAfterSelect: true,
                 options: options,
                 render: {
                     option: function (item) {
@@ -509,7 +513,7 @@ $(document).ready(function () {
                         }
                     });
                 }
-            })//.ready(function () {
+            });//.ready(function () {
             //    field[0].selectize.setValue(options);
             //});
         });
@@ -520,20 +524,73 @@ $(document).ready(function () {
     body.on('show', '.panel-pane', setupFields);
 
     // collection control for entity search
-    body.on('change', '.entity-search input.selectized', function () {
+    body.on('change', '.entity-search input.selectized[data-tables]', function () {
         var field = $(this);
         if (field.val().trim() == '') {
             return;
         }
         var entities;
-        if((entities = field.data('entities')) != null) {
-            var id = parseInt(field.val());
+        if ((entities = field.data('entities')) != null) {
+            var id = field.val();
             var item = field[0].selectize.options[id];
             createEntityRow.apply(field.parents('label'), [item, field.data('entities').indexOf(item.value) > -1]);
             field.val('');
             this.selectize.setValue('');
             this.selectize.renderCache = {};
+            field.blur();
         }
+    });
+
+    // collection control for entity search
+    body.on('change', 'input.selectized[data-tables]', function () {
+        if($(this).parents('.entity-search').length > 0) {
+            return;
+        }
+        var entityField = $(this);
+        var existing = (entityField.data('entities') || []);
+        var tables = entityField.data('tables');
+        // confirm dialog
+        var entities = {}, remove = '', add = '';
+        var newValue = entityField.val().trim().split(' ');
+        if(entityField.val().trim() == '') {
+            newValue = [];
+        }
+        for(var v in newValue) {
+            if (newValue.hasOwnProperty(v)) {
+                var obj = entityField[0].selectize.options[newValue[v]];
+                var tableName = obj.table;
+                if(typeof entities[tableName] == 'undefined') {
+                    entities[tableName] = [];
+                }
+                entities[tableName][entities[tableName].length] = obj;
+                if(existing.indexOf(newValue[v]) == -1) {
+                    add += (add != '' ? '<br />' : '') + obj.text;
+                }
+            }
+        }
+        for(var e in existing) {
+            if (existing.hasOwnProperty(e)) {
+                if (newValue.indexOf(existing[e]) == -1) {
+                    var obj2 = entityField[0].selectize.options[existing[e]];
+                    remove += (remove != '' ? '<br />' : '') + obj2.text;
+                }
+            }
+        }
+
+
+        // show confirmation dialog
+        $('#general-dialog').modal({show: true, backdrop: true})
+            .find('.modal-body').html('<p>Are you sure you want to <br />'
+            + (add != '' ? ('add ' + add) : '')
+            + (remove != '' ? ((add != '' ? ' and ' : '') + 'remove ' + remove) : '') + '?');
+
+        body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+            for(var tableName in tables) {
+                if (tables.hasOwnProperty(tableName)) {
+                    entityField.data(tableName, entities[tableName]);
+                }
+            }
+        });
     });
 
     body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"]', function (evt) {
@@ -544,7 +601,6 @@ $(document).ready(function () {
         field.find('input')[0].selectize.renderCache = {};
     });
 
-    //TODO: generalize these two
     body.on('click', '*:has(input[data-entities]) ~ a[href="#add-entity"]', function () {
         var field = $(this).siblings().find('input[data-entities]');
         var dialog = $('#add-entity');
@@ -554,64 +610,115 @@ $(document).ready(function () {
         dialog.find('.tab-pane.active, li').removeClass('active');
         dialog.find('li').hide();
         var first = null;
-        for(var t in tables) {
-            if(tables.hasOwnProperty(t)) {
+        for(var tableName in tables) {
+            if(tables.hasOwnProperty(tableName)) {
                 if(first == null) {
-                    first = t;
+                    first = tableName;
                 }
 
-                var entityField = dialog.find('input[name="' + t + '"]');
+                var entityField = dialog.find('input[name="' + tableName + '"]');
                 if(entityField.length == 0) {
                     var newTemplate = dialog.find('.tab-pane.template').clone()
-                        .attr('id', 'add-entity-' + t).insertBefore(dialog.find('.tab-pane.template'));
+                        .attr('id', 'add-entity-' + tableName).insertBefore(dialog.find('.tab-pane.template'));
                     newTemplate.removeClass('template active');
-                    var title = t.replace('ss_', '').substr(0, 1).toUpperCase() + t.replace('ss_', '').substr(1);
-                    entityField = newTemplate.find('input').attr('name', t);
+                    var title = tableName.replace('ss_', '').substr(0, 1).toUpperCase() + tableName.replace('ss_', '').substr(1);
+                    entityField = newTemplate.find('input').attr('name', tableName);
                     dialog.find('li.template').clone().appendTo(dialog.find('ul')).removeClass('template active')
-                        .find('a').attr('href', '#add-entity-' + t).data('target', '#add-entity-' + t).text(title);
+                        .find('a').attr('href', '#add-entity-' + tableName).data('target', '#add-entity-' + tableName).text(title);
                 }
-                dialog.find('a[href="#add-entity-' + t + '"]').parent().show();
-
+                dialog.find('a[href="#add-entity-' + tableName + '"]').parent().show();
+                var tmpTables = {};
+                tmpTables[tableName] = tables[tableName];
+                entityField.data('tables', tmpTables);
                 entityField.data('entities', field.data('entities'));
-                (function (entityField, t) {
-                    dialog.one('shown.bs.modal', function () {
-                        var entities = field.data(t);
-                        entityField.data(t, entities);
-                        //entityField.
 
-                        // remove existing rows
-                        dialog.find('.checkbox:not(.template)').remove();
-
-                        // create these rows
-                        setTimeout(function () {
-                            for (var u in entities) {
-                                if (entities.hasOwnProperty(u)) {
-                                    createEntityRow.apply(entityField.parents('label'), [entities[u]]);
-                                    if (typeof entityField[0].selectize != 'undefined') {
-                                        entityField[0].selectize.addOption(entities[u]);
-                                    }
-                                }
-                            }
-                        }, 100);
-                    });
-                    var row = $(this).parents('.pack-row');
-                    body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
-                        var entities = dialog.find('.' + t + '.checkbox:not(.template)').map(function () {
-                            return $.extend({remove: $(this).find('a[href="#subtract-entity"]').length == 0}, entityField[0].selectize.options[$(this).find('input').val()]);
-                        }).toArray();
-
-                        // TODO: copy users and groups back to field
-                        field.val(entities.map(function (g) {
-                            return g.value.trim();
-                        }).join(' '));
-
-                        field.data(t, entities);
-                    });
-                })(entityField, t);
             }
         }
 
+        dialog.one('shown.bs.modal', function () {
+            for(var tableName in tables) {
+                if (tables.hasOwnProperty(tableName)) {
+                    var entityField = dialog.find('input[name="' + tableName + '"]');
+                    var entities = field.data(tableName);
+                    entityField.data(tableName, entities);
+                    //entityField.
+
+                    // remove existing rows
+                    dialog.find('.checkbox:not(.template)').remove();
+
+                    // create these rows
+                    /*setTimeout(function () {
+                        for (var u in entities) {
+                            if (entities.hasOwnProperty(u)) {
+                                createEntityRow.apply(entityField.parents('label'), [entities[u]]);
+                                if (typeof entityField[0].selectize != 'undefined') {
+                                    entityField[0].selectize.addOption(entities[u]);
+                                }
+                            }
+                        }
+                    }, 100);*/
+                }
+            }
+        });
+
+        body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
+            var entities = {}, remove = '', add = '';
+            for(var tableName in tables) {
+                if (tables.hasOwnProperty(tableName)) {
+                    var entityField = dialog.find('input[name="' + tableName + '"]');
+
+                    (function (entityField) {
+                        entities[tableName] = dialog.find('.' + tableName + '.checkbox:not(.template)').map(function () {
+                            return $.extend({remove: $(this).find('a[href="#subtract-entity"]').length == 0}, entityField[0].selectize.options[$(this).find('input').val()]);
+                        }).toArray();
+
+                        remove += (remove != '' ? '<br />' : '') + entities[tableName].filter(function (e) {
+                                    return e.remove;
+                                })
+                                .map(function (e) {
+                                    return e.text;
+                                }).join('<br />');
+                        add += (add != '' ? '<br />' : '') + entities[tableName].filter(function (e) {
+                                    return !e.remove;
+                                })
+                                .map(function (e) {
+                                    return e.text;
+                                }).join('<br />');
+                    })(entityField);
+                }
+            }
+
+            // show confirmation dialog
+            $('#general-dialog').modal({show: true, backdrop: true})
+                .find('.modal-body').html('<p>Are you sure you want to '
+                + (add != '' ? ('add ' + add) : '')
+                + (remove != '' ? ((add != '' ? 'and ' : '') + 'remove ' + remove) : '') + '?');
+
+            body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+                for(var tableName in tables) {
+                    if (tables.hasOwnProperty(tableName)) {
+                        // copy users and groups back to field
+                        field.val(entities[tableName].map(function (g) {
+                            return g.value.trim();
+                        }).join(' '));
+
+                        field.data(tableName, entities[tableName]);
+                    }
+                }
+            });
+        });
+
         dialog.find('a[href="#add-entity-' + first + '"]').trigger('click');
+    });
+
+    body.on('hidden.bs.modal', '#general-dialog', function () {
+        $(this).find('.modal-body').html('<p>put message here</p>');
+    });
+
+    body.on('hidden.bs.modal', '#general-dialog', function () {
+        setTimeout(function () {
+            body.off('click.modify_entities_confirm');
+        }, 100);
     });
 
     body.on('hidden.bs.modal', '#add-entity', function () {

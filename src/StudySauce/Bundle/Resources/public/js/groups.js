@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     }
 
-    body.on('click', '.results .ss_group-row .packs a[href="/packs"]', function () {
+    body.on('click', '[id^="groups-"] .ss_group-row .packs a[href="/packs"]', function () {
         body.one('show', '#packs', function () {
             $(this).find('a[href="#add-pack"]').first().trigger('click');
         });
@@ -78,7 +78,7 @@ $(document).ready(function () {
         autoSaveTimeout = null;
     });
 
-    body.on('click', '.results a[href="#save-ss_group"], .results [value="#save-ss_group"]', function (evt) {
+    body.on('click', '[id^="groups-"] a[href="#save-ss_group"], [id^="groups-"] [value="#save-ss_group"]', function (evt) {
         evt.preventDefault();
 
         if (autoSaveTimeout != null) {
@@ -89,9 +89,9 @@ $(document).ready(function () {
 
     });
 
-    body.on('change keyup keydown', '.ss_group-row input, .ss_group-row select, .ss_group-row textarea', groupsFunc);
+    body.on('change keyup keydown', '[id^="groups-"] .ss_group-row input, [id^="groups-"] .ss_group-row select, [id^="groups-"] .ss_group-row textarea', groupsFunc);
 
-    body.on('click', '.ss_group-row a[href="#edit-group"]', function () {
+    body.on('click', '.group-list .ss_group-row a[href="#edit-group"]', function () {
         var results = $(this).parents('.results');
         var row = $(this).parents('.ss_group-row');
         var groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
@@ -99,7 +99,7 @@ $(document).ready(function () {
         row.removeClass('edit').addClass('read-only');
     });
 
-    body.on('click', '.ss_group-row.edit a[href^="#cancel-"], .results .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
+    body.on('click', '[id^="groups-"] .ss_group-row.edit a[href^="#cancel-"], [id^="groups-"] .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results'),
             row = $(this).parents('.ss_group-row');
@@ -108,7 +108,7 @@ $(document).ready(function () {
         window.activateMenu(Routing.generate('groups'));
     });
 
-    body.on('click', '.ss_group-row a[href="#upload-image"]', function () {
+    body.on('click', '[id^="groups-"] .ss_group-row a[href="#upload-image"]', function () {
         var row = $(this).parents('.ss_group-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
             row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('.default');
@@ -116,7 +116,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '.ss_group-row .packs input.selectized', function (evt) {
+    body.on('change', '[id^="groups-"] .ss_group-row .packs input.selectized', function (evt) {
         var dialog = $('#pack-publish').modal({show: true, backdrop: true});
         var tab = $(this).parents('.results'),
             groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec($(this).parents('.ss_group-row').attr('class'))[1],
@@ -126,7 +126,8 @@ $(document).ready(function () {
         if ($(this).val().trim() == '') {
             return;
         }
-        var id = $(this).val();
+        var id = $(this).val(),
+            packName = this.selectize.options[id].text;
         $(this).val('');
         this.selectize.setValue('');
         this.selectize.renderCache = {};
@@ -138,47 +139,70 @@ $(document).ready(function () {
             minDate: 0
         });
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
+
+
             var publish = {
                 schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? 'now' : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
                 email: dialog.find('input[name="publish-email"]:checked').val() != null,
                 alert: dialog.find('input[name="publish-alert"]:checked').val() != null
             };
 
-            // save packs
-            tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
-            loadingAnimation(tab.find('a[href="#save-pack"]'));
+            // show confirmation dialog
+            $('#general-dialog').modal({show: true, backdrop: true})
+                .find('.modal-body').html('<p>Are you sure you want to publish ' + packName + '?');
 
-            $.ajax({
-                url: Routing.generate('save_group'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    groupId: groupId,
-                    packId: id != null ? id : null,
-                    groups: [{id: groupId, remove: false}],
-                    publish: publish
-                },
-                success: function (data) {
-                    // copy rows and select
-                    var content = $(data).filter('.results'),
-                        selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                    tab.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').remove();
-                    var keepRows = tab.find('> .pack-row').map(function () {
-                        var rowId = (new RegExp('pack-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
-                        return '.pack-id-' + rowId;
-                    }).toArray().join(',');
-                    content.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').not(keepRows).insertBefore(tab.find('.pack-row.template').first());
-                    tab.find('.paginate.pack .page-total').text(content.find('.paginate.pack .page-total').text());
-                    if(selected) {
-                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
+
+                // save packs
+                tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+                loadingAnimation(tab.find('a[href="#save-pack"]'));
+
+                $.ajax({
+                    url: Routing.generate('save_group'),
+                    type: 'POST',
+                    dataType: 'text',
+                    data: {
+                        groupId: groupId,
+                        packId: id != null ? id : null,
+                        groups: [{id: groupId, remove: false}],
+                        publish: publish
+                    },
+                    success: function (data) {
+                        // copy rows and select
+                        var content = $(data).filter('.results'),
+                            selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                        tab.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').remove();
+                        var keepRows = tab.find('> .pack-row').map(function () {
+                            var rowId = (new RegExp('pack-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
+                            return '.pack-id-' + rowId;
+                        }).toArray().join(',');
+                        content.find('> .pack-row:not(.template), > .pack-row:not(.template) + .expandable').not(keepRows).insertBefore(tab.find('.pack-row.template').first());
+                        tab.find('.paginate.pack .page-total').text(content.find('.paginate.pack .page-total').text());
+                        if (selected) {
+                            tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+                        }
+                    },
+                    error: function () {
+                        tab.find('.squiggle').stop().remove();
                     }
-                },
-                error: function () {
-                    tab.find('.squiggle').stop().remove();
-                }
+                });
             });
-
         });
+    });
+
+    body.on('click', '[id^="groups-"] a[href="#edit-pack"]', function () {
+        var results = $(this).parents('.results');
+        var row = $(this).parents('.pack-row');
+        var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
+        window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
+        row.removeClass('edit').addClass('read-only');
+    });
+
+    body.on('hidden.bs.modal', '#general-dialog', function () {
+        setTimeout(function () {
+            body.off('click.modify_entities_confirm');
+            body.off('click.publish_confirm');
+        }, 100);
     });
 
     body.on('hidden.bs.modal', '#pack-publish', function () {
@@ -187,13 +211,14 @@ $(document).ready(function () {
         }, 100);
     });
 
-    body.on('click', 'label:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
+    body.on('click', '[id^="groups-"] label:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
         var tab = $(this).parents('.results'),
             row = $(this).parents('.expandable').prev('.pack-row'),
             rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
             groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row.edit').first().attr('class'))[1],
             field = $(this).siblings('label:has(input[data-ss_user])').find('input[data-ss_user]');
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
+            // TODO: confirmation dialog
             $.ajax({
                 url: Routing.generate('save_group'),
                 type: 'POST',

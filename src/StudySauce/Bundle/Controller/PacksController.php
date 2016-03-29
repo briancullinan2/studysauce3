@@ -207,10 +207,6 @@ class PacksController extends Controller
                 $newCard->setPack($newPack);
                 $newPack->addCard($newCard);
             }
-
-            if (empty($c['content'])) {
-                continue;
-            }
             $newCard->setContent($c['content']);
             if (!empty($c['type'])) {
                 if ($c['type'] == 'sa exactly' || $c['type'] == 'sa contains') {

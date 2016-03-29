@@ -243,11 +243,11 @@
     display:none;
 }
 
-.group-list.left-pad {
-    padding-left:40%;
+.group-list.right-pad {
+    padding-right:40%;
 }
 
-.group-list.left-pad .ss_group-row {
+.group-list.right-pad .ss_group-row {
     width:31%;
 }
 .group-list .results {
