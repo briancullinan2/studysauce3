@@ -658,22 +658,22 @@ class PacksController extends Controller
         foreach($cards as $c) {
             /** @var Card $c */
             $responses = $orm->getRepository('StudySauceBundle:Response')->findBy(['card' => $c, 'user' => $user], ['created' => 'ASC']);
-            /** @var Response $last */
+            /** @var \DateTime $last */
             $last = null;
             $i = 0;
             foreach($responses as $r) {
                 /** @var Response $r */
                 if ($r->getCorrect()) {
                     // If it is in between time intervals ignore the response
-                    while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last->getCreated(), new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {
+                    while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {
                         // shift the time interval if answers correctly in the right time frame
-                        $last = $r;
+                        $last = $r->getCreated();
                         $i += 1;
                     }
                 }
                 else {
                     $i = 0;
-                    $last = $r;
+                    $last = $r->getCreated();
                 }
             }
             if ($i < 0) {
@@ -682,8 +682,8 @@ class PacksController extends Controller
             if ($i > count($intervals) - 1) {
                 $i = count($intervals) - 1;
             }
-            if (!empty($last) && date_time_set(date_add(clone $last->getCreated(), new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0)) {
-                $result[$c->getId()] = [$intervals[$i], $last->getCreated()->format('r')];
+            if (!empty($last)) {
+                $result[$c->getId()] = [$intervals[$i], $last->format('r')];
             }
         }
         return $result;
