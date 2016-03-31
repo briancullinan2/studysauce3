@@ -683,7 +683,7 @@ class PacksController extends Controller
                 $i = count($intervals) - 1;
             }
             if (!empty($last)) {
-                $result[$c->getId()] = [$intervals[$i], $last->format('r')];
+                $result[$c->getId()] = [$intervals[$i], $last->format('r'), date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0)];
             }
         }
         return $result;
