@@ -630,7 +630,7 @@ class PacksController extends Controller
                 'user' => $r->getUser()->getId()
             ];
         }, $user->getResponses()->filter(function (Response $r) use ($user, $since, $packs) {
-            return $r->getUser() == $user && !$r->getCard()->getDeleted() && in_array($r->getCard()->getPack(), $packs)
+            return $r->getUser() == $user && !$r->getCard()->getDeleted() && $packs->contains($r->getCard()->getPack())
                 && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
         })->toArray()));
 
@@ -648,6 +648,8 @@ class PacksController extends Controller
      * @return mixed
      */
     function getRetention(Pack $pack, User $user) {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
 
         $intervals = [1, 2, 4, 7, 14, 28, 28 * 3, 28 * 6, 7 * 52];
         // if a card hasn't been answered, return the next card
@@ -655,17 +657,12 @@ class PacksController extends Controller
         $result = [];
         foreach($cards as $c) {
             /** @var Card $c */
-            $responses = $c->getResponses()->filter(function (Response $r) use ($user) {return $r->getUser() == $user;});
+            $responses = $orm->getRepository('StudySauceBundle:Response')->findBy(['card' => $c, 'user' => $user], ['created' => 'ASC']);
             /** @var Response $last */
             $last = null;
             $i = 0;
-            $correctAfter = false;
             foreach($responses as $r) {
                 /** @var Response $r */
-                // TODO: if its correct the first time skip to index 2
-                //if r.created == nil {
-                //    continue
-                //}
                 if ($r->getCorrect()) {
                     // If it is in between time intervals ignore the response
                     while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last->getCreated(), new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {
@@ -673,12 +670,10 @@ class PacksController extends Controller
                         $last = $r;
                         $i += 1;
                     }
-                    $correctAfter = true;
                 }
                 else {
                     $i = 0;
                     $last = $r;
-                    $correctAfter = false;
                 }
             }
             if ($i < 0) {
