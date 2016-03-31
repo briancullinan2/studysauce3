@@ -260,7 +260,7 @@ class AdminController extends Controller
         /** @var $user User */
         $user = $this->getUser();
 
-        if(!$user->hasRole('ROLE_ADMIN')) {
+        if(empty($user) || !$user->hasRole('ROLE_ADMIN')) {
             throw new AccessDeniedHttpException();
         }
 

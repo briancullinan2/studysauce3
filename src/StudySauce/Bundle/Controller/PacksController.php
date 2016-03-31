@@ -239,7 +239,7 @@ class PacksController extends Controller
                     $newCard->addAnswer($newAnswer);
                 }
                 $answerValues[] = $newAnswer;
-                $newAnswer->setContent(trim($a));
+                $newAnswer->setContent(str_replace('|', ' or ', trim($a)));
                 $newAnswer->setResponse(trim($a));
                 $newAnswer->setValue(trim($a));
                 if (!empty($c['correct'])) {
@@ -542,19 +542,7 @@ class PacksController extends Controller
                 }, $x->getAnswers()->filter(function (Answer $a) {
                     return !$a->getDeleted();
                 })->toArray())),
-                'responses' => array_values(array_map(function (Response $r) {
-                    return [
-                        'id' => $r->getId(),
-                        'card' => $r->getCard()->getId(),
-                        'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
-                        'correct' => $r->getCorrect() ? 1 : 0,
-                        'value' => $r->getValue(),
-                        'created' => $r->getCreated()->format('r'),
-                        'user' => $r->getUser()->getId()
-                    ];
-                }, $x->getResponses()->filter(function (Response $r) use ($user) {
-                    return $r->getUser() == $user && $r->getCreated() <= new \DateTime();
-                })->toArray()))
+                'responses' => []
             ];
         }, $cards));
     }
@@ -625,10 +613,10 @@ class PacksController extends Controller
         }
         // only sync responses for specific pack
         if (!empty($request->get('pack'))) {
-            $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getId() == intval($request->get('pack'));})->toArray();
+            $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getId() == intval($request->get('pack'));});
         }
         else {
-            $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
+            $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted();});
         }
 
         $responses = array_values(array_map(function (Response $r) {
@@ -651,6 +639,58 @@ class PacksController extends Controller
             return empty($r) ? null : $r->getId();
         }, $result);
 
-        return new JsonResponse(['ids' => $ids, 'responses' => $responses]);
+        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => self::getRetention($packs->first(), $user)]);
+    }
+
+    /**
+     * @param Pack $pack
+     * @param User $user
+     * @return mixed
+     */
+    function getRetention(Pack $pack, User $user) {
+
+        $intervals = [1, 2, 4, 7, 14, 28, 28 * 3, 28 * 6, 7 * 52];
+        // if a card hasn't been answered, return the next card
+        $cards = $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->toArray();
+        $result = [];
+        foreach($cards as $c) {
+            /** @var Card $c */
+            $responses = $c->getResponses()->filter(function (Response $r) use ($user) {return $r->getUser() == $user;});
+            /** @var Response $last */
+            $last = null;
+            $i = 0;
+            $correctAfter = false;
+            foreach($responses as $r) {
+                /** @var Response $r */
+                // TODO: if its correct the first time skip to index 2
+                //if r.created == nil {
+                //    continue
+                //}
+                if ($r->getCorrect()) {
+                    // If it is in between time intervals ignore the response
+                    while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last->getCreated(), new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {
+                        // shift the time interval if answers correctly in the right time frame
+                        $last = $r;
+                        $i += 1;
+                    }
+                    $correctAfter = true;
+                }
+                else {
+                    $i = 0;
+                    $last = $r;
+                    $correctAfter = false;
+                }
+            }
+            if ($i < 0) {
+                $i = 0;
+            }
+            if ($i > count($intervals) - 1) {
+                $i = count($intervals) - 1;
+            }
+            if (!empty($last) && date_time_set(date_add(clone $last->getCreated(), new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0)) {
+                $result[$c->getId()] = [$intervals[$i], $last->getCreated()->format('r')];
+            }
+        }
+        return $result;
     }
 }
