@@ -616,9 +616,11 @@ class PacksController extends Controller
         // only sync responses for specific pack
         if (!empty($request->get('pack'))) {
             $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getId() == intval($request->get('pack'));});
+            $retention = self::getRetention($packs->first(), $user);
         }
         else {
             $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted();});
+            $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];});
         }
 
         $responses = array_values(array_map(function (Response $r) {
@@ -641,7 +643,7 @@ class PacksController extends Controller
             return empty($r) ? null : $r->getId();
         }, $result);
 
-        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => self::getRetention($packs->first(), $user)]);
+        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => $retention]);
     }
 
     /**
