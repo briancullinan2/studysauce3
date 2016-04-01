@@ -615,11 +615,11 @@ class PacksController extends Controller
         }
         // only sync responses for specific pack
         if (!empty($request->get('pack'))) {
-            $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getStatus() == 'UNPUBLISHED' && $p->getId() == intval($request->get('pack'));});
+            $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && $p->getId() == intval($request->get('pack'));});
             $retention = self::getRetention($packs->first(), $user);
         }
         else {
-            $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted() && $p->getStatus() == 'UNPUBLISHED';});
+            $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED';});
             $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray();
         }
 
