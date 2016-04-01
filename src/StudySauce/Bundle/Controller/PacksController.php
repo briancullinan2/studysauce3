@@ -578,7 +578,7 @@ class PacksController extends Controller
         $result = [];
         foreach ($responses as $r) {
 
-            /** @var Pack $pack */
+            /** @var Card $card */
             $card = $orm->getRepository('StudySauceBundle:Card')->createQueryBuilder('c')
                 ->select('c')
                 ->where('c.id=:id')
@@ -592,7 +592,9 @@ class PacksController extends Controller
 
             $response = new Response();
             $response->setUser($user);
+            $user->addResponse($response);
             $response->setCard($card);
+            $card->addResponse($response);
             $response->setCreated(date_timezone_set(new \DateTime($r['created']), new \DateTimeZone(date_default_timezone_get())));
             $response->setCorrect($r['correct'] == '1' || $r['correct'] == 'true');
             if (!empty($r['answer'])
@@ -685,7 +687,7 @@ class PacksController extends Controller
             if ($i > count($intervals) - 1) {
                 $i = count($intervals) - 1;
             }
-            $result[$c->getId()] = [$intervals[$i], !empty($last) ? $last->format('r') : null, count($responses) == 0 || ($i == 0 && !$correctAfter) || date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0)];
+            $result[$c->getId()] = [$intervals[$i], !empty($last) ? $last->format('r') : null, empty($last) || ($i == 0 && !$correctAfter) || date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0)];
         }
         return $result;
     }
