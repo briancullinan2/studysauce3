@@ -619,7 +619,7 @@ class PacksController extends Controller
             $retention = self::getRetention($packs->first(), $user);
         }
         else {
-            $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED';});
+            $packs = $user->getPacks()->filter(function (Pack $p) use ($user) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && in_array($user, self::getChildUsersForPack($p, $user));});
             $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray();
         }
 

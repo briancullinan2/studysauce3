@@ -142,7 +142,13 @@ class Pack
      * @return ArrayCollection
      */
     public function getUsers() {
-        return new ArrayCollection(array_values(array_unique(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())))));
+        $users = [];
+        foreach(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())) as $u) {
+            if(!in_array($u, $users)) {
+                $users[] = $u;
+            }
+        }
+        return new ArrayCollection($users);
     }
 
     /**
@@ -478,7 +484,13 @@ class Pack
      */
     public function getGroups()
     {
-        return new ArrayCollection(array_merge(!empty($this->getGroup()) ? [$this->getGroup()] : [], $this->groups->toArray()));
+        $groups = [];
+        foreach(array_merge(!empty($this->getGroup()) ? [$this->getGroup()] : [], $this->groups->toArray()) as $g) {
+            if(!in_array($g, $groups)) {
+                $groups[] = $g;
+            }
+        }
+        return new ArrayCollection($groups);
     }
 
     /**
