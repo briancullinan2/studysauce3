@@ -620,7 +620,7 @@ class PacksController extends Controller
         }
         else {
             $packs = $user->getPacks()->filter(function (Pack $p) {return !$p->getDeleted();});
-            $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];});
+            $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray();
         }
 
         $responses = array_values(array_map(function (Response $r) {
