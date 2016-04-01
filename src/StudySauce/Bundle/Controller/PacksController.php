@@ -665,6 +665,7 @@ class PacksController extends Controller
             $last = null;
             $i = 0;
             $correctAfter = false;
+            $max = null;
             foreach($responses as $r) {
                 if ($r->getCorrect()) {
                     // If it is in between time intervals ignore the response
@@ -680,6 +681,7 @@ class PacksController extends Controller
                     $last = $r->getCreated();
                     $correctAfter = false;
                 }
+                $max = $r->getCreated();
             }
             if ($i < 0) {
                 $i = 0;
@@ -687,7 +689,16 @@ class PacksController extends Controller
             if ($i > count($intervals) - 1) {
                 $i = count($intervals) - 1;
             }
-            $result[$c->getId()] = [$intervals[$i], !empty($last) ? $last->format('r') : null, empty($last) || ($i == 0 && !$correctAfter) || date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0)];
+            $result[$c->getId()] = [
+                // interval value
+                $intervals[$i],
+                // last interval date
+                !empty($last) ? $last->format('r') : null,
+                // should display on home screen
+                empty($last) || ($i == 0 && !$correctAfter) || date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0),
+                // last response date for card, used for counting
+                empty($max) ? null : $max->format('r')
+            ];
         }
         return $result;
     }
