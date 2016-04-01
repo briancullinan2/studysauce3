@@ -404,11 +404,11 @@ class PacksController extends Controller
                 return $i->getInvitee();
             })->toArray()),
             function (User $u) use ($x, $packGroups) {
-                return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED')
-                || $u->getUserPacks()
+                return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED' && !$x->getStatus() == 'DELETED')
+                || ($u->getUserPacks()
                     ->filter(function (UserPack $up) use ($x) {
                         return !$up->getRemoved() && $up->getPack()->getId() == $x->getId();
-                    })->count() > 0
+                    })->count() > 0 && !$x->getStatus() == 'GROUP')
                 || count(array_intersect($packGroups, $u->getGroups()
                     ->map(function (Group $g) {
                         return $g->getId();
