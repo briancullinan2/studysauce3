@@ -623,20 +623,25 @@ class PacksController extends Controller
             $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray();
         }
 
-        $responses = array_values(array_map(function (Response $r) {
-            return [
-                'id' => $r->getId(),
-                'card' => $r->getCard()->getId(),
-                'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
-                'correct' => $r->getCorrect() ? 1 : 0,
-                'value' => $r->getValue(),
-                'created' => $r->getCreated()->format('r'),
-                'user' => $r->getUser()->getId()
-            ];
-        }, $user->getResponses()->filter(function (Response $r) use ($user, $since, $packs) {
-            return $r->getUser() == $user && !$r->getCard()->getDeleted() && $packs->contains($r->getCard()->getPack())
+        if(intval($request->get('version')) == 2) {
+            $responses = [];
+        }
+        else {
+            $responses = array_values(array_map(function (Response $r) {
+                return [
+                    'id' => $r->getId(),
+                    'card' => $r->getCard()->getId(),
+                    'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
+                    'correct' => $r->getCorrect() ? 1 : 0,
+                    'value' => $r->getValue(),
+                    'created' => $r->getCreated()->format('r'),
+                    'user' => $r->getUser()->getId()
+                ];
+            }, $user->getResponses()->filter(function (Response $r) use ($user, $since, $packs) {
+                return $r->getUser() == $user && !$r->getCard()->getDeleted() && $packs->contains($r->getCard()->getPack())
                 && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
-        })->toArray()));
+            })->toArray()));
+        }
 
         $ids = array_map(function ($r) {
             /** @var Response $r */
