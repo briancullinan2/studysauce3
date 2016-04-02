@@ -620,7 +620,7 @@ class PacksController extends Controller
         }
         else {
             $packs = $user->getPacks()->filter(function (Pack $p) use ($user, $currentUser) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && !empty($p->getStatus()) && in_array($user, self::getChildUsersForPack($p, $user));});
-            $retention = $packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray();
+            $retention = array_values($packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray());
         }
 
         if(intval($request->get('version')) == 2) {
@@ -648,7 +648,7 @@ class PacksController extends Controller
             return empty($r) ? null : $r->getId();
         }, $result);
 
-        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => array_values($retention)]);
+        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => $retention]);
     }
 
     /**
