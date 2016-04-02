@@ -702,7 +702,7 @@ class PacksController extends Controller
                 // last interval date
                 !empty($last) ? $last->format('r') : null,
                 // should display on home screen
-                empty($last) || ($i == 0 && !$correctAfter) || date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0) <= date_time_set(new \DateTime(), 3, 0, 0),
+                empty($last) || ($i == 0 && !$correctAfter) || date_add(date_time_set(clone $last, 3, 0, 0), new \DateInterval('P' . $intervals[$i] . 'D')) <= date_time_set(new \DateTime(), 3, 0, 0),
                 // last response date for card, used for counting
                 empty($max) ? null : $max->format('r')
             ];
