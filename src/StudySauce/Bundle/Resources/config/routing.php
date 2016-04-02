@@ -95,6 +95,13 @@ $collection->add(
     )
 );
 $collection->add(
+    'app_links',
+    new Route(
+        '/.well-known/apple-app-site-association',
+        ['_controller' => 'StudySauceBundle:Home:appLinks']
+    )
+);
+$collection->add(
     'hwi_oauth_connect',
     new Route(
         '/connect',
