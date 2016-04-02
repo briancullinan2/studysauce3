@@ -552,10 +552,10 @@ class PacksController extends Controller
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
-        if (empty($user) || !$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {
+        if (empty($user) || (!$currentUser->getInvites()->exists(function ($_, Invite $x) use ($user) {
                 return $x->getInvitee() == $user;
-            })
-        ) {
+            }) && !$currentUser->hasRole('ROLE_ADMIN')))
+        {
             $user = $currentUser;
         }
         /** @var $orm EntityManager */
