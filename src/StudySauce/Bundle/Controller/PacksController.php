@@ -648,7 +648,7 @@ class PacksController extends Controller
             return empty($r) ? null : $r->getId();
         }, $result);
 
-        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => $retention]);
+        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => array_values($retention)]);
     }
 
     /**
