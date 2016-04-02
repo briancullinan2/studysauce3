@@ -681,7 +681,7 @@ class PacksController extends Controller
                         $last = $r->getCreated();
                         $i += 1;
                     }
-                    $correctAfter = false;
+                    $correctAfter = true;
                 }
                 else {
                     $i = 0;
