@@ -680,8 +680,8 @@ class PacksController extends Controller
                         // shift the time interval if answers correctly in the right time frame
                         $last = $r->getCreated();
                         $i += 1;
-                        $correctAfter = false;
                     }
+                    $correctAfter = false;
                 }
                 else {
                     $i = 0;
