@@ -51,7 +51,7 @@ $view['slots']->start('body'); ?>
                     'tables' => $tables,
                     'headers' => false,
                     'expandable' => ['pack' => ['members']]]));
-                if ($entity->getPacks()->count() > 0) {
+                if ($entity->getGroupPacks()->count() > 0) {
                     ?>
                     <div class="empty-members">
                         <div>Click pack name to see group members</div>
