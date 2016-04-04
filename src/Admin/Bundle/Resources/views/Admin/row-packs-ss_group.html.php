@@ -26,7 +26,7 @@ $entityIds = [];
                    'pack' => ['title', 'userCountStr', 'cardCountStr', 'id']])); ?>"
                data-entities="<?php print $view->escape(json_encode($entityIds)); ?>" placeholder="Search for existing pack"/></label>
     <?php
-    foreach ($ss_group->getPacks()->toArray() as $p) {
+    foreach ($ss_group->getGroupPacks()->toArray() as $p) {
         /** @var Pack $p */
         ?>
         <div class="pack-list"><?php print $p->getTitle(); ?>

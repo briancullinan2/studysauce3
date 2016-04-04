@@ -85,6 +85,7 @@
     width: 60%;
     position: relative;
     margin: 150px -100% -150px -60%;
+    display:none;
 }
 
 .group-edit .ss_group-row .actions
@@ -245,13 +246,18 @@
     display:none;
 }
 
-.group-list.right-pad {
+.right-pad .group-list {
     padding-right:40%;
 }
 
-.group-list.right-pad .ss_group-row {
+.right-pad .group-list .ss_group-row {
     width:31%;
 }
+
+.right-pad .group-edit .ss_group-row > .packs {
+    display:inline-block;
+}
+
 .group-list .results {
     padding:20px;
 }
