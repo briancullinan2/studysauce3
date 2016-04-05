@@ -36,30 +36,32 @@ foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/g
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane <?php print (!empty($entity) && $entity->getGroupPacks()->count() > 0 ? 'right-pad' : ''); ?>" id="groups<?php print ($entity !== null ? ('-group' . $entity->getId()) : ''); ?>">
+    <div
+        class="panel-pane <?php print (!empty($entity) && $entity->getGroupPacks()->count() > 0 ? 'right-pad' : ''); ?>"
+        id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
-            <div class="group-edit">
-            <?php
-
-            if (!empty($entity)) {
-                $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]];
-                $tables['pack'] = ['name' => ['title'], 'counts', 'actions', ['groups'] /* search field but don't display a template */];
-                print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                    'count-pack' => 0,
-                    'edit' => ['ss_group'],
-                    'ss_group-id' => $entity->getId(),
-                    'tables' => $tables,
-                    'headers' => false,
-                    'expandable' => ['pack' => ['members']]]));
-                if ($entity->getGroupPacks()->count() > 0) {
-                    ?>
-                    <div class="empty-members">
-                        <div>Click pack name to see group members</div>
-                    </div><?php
-                }
-            }
-            ?>
-            </div>
+            <?php if ($entity !== null) { ?>
+                <div class="group-edit">
+                    <?php
+                    $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]];
+                    $tables['pack'] = ['name' => ['title'], 'counts', 'actions', ['groups'] /* search field but don't display a template */];
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                        'count-pack' => empty($entity->getId()) ? -1 : 0,
+                        'count-ss_group' => 1,
+                        'new' => empty($entity->getId()),
+                        'edit' => ['ss_group'],
+                        'ss_group-id' => $entity->getId(),
+                        'tables' => $tables,
+                        'headers' => false,
+                        'expandable' => ['pack' => ['members']]]));
+                    if ($entity->getGroupPacks()->count() > 0) {
+                        ?>
+                        <div class="empty-members">
+                            <div>Click pack name to see group members</div>
+                        </div><?php
+                    } ?>
+                </div>
+            <?php } ?>
             <div class="group-list">
                 <?php
                 if (empty($entity)) {
@@ -67,14 +69,16 @@ $view['slots']->start('body'); ?>
                         'count-pack' => -1,
                         'parent-ss_group-id' => 'NULL',
                         'tables' => ['ss_group', 'pack'],
-                        'headers' => false,
+                        'headers' => ['ss_group' => 'new'],
+                        'footers' => ['ss_group' => 'new'],
                         'expandable' => ['pack' => ['members']]]));
                 } else if ($entity->getSubgroups()->count() > 0) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-pack' => -1,
                         'parent-ss_group-id' => $entity->getId(),
                         'tables' => ['ss_group'],
-                        'headers' => false,
+                        'headers' => ['ss_group' => 'new'],
+                        'footers' => ['ss_group' => 'new'],
                         'expandable' => ['pack' => ['members']]]));
                 }
                 ?>

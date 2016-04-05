@@ -33,6 +33,19 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         <?php if($app->getRequest()->get('_format') == 'index' || ($app->getRequest()->get('_format') != 'funnel' &&
                 !empty($user) && $user->hasRole('ROLE_PARTNER'))) { ?>
         <?php } ?>
+        <nav>
+            <ul class="main-menu">
+                <li><a href="<?php print $view['router']->generate('command'); ?>"><span>&nbsp;</span>Users</a></li>
+                <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
+                <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
+                <li><a href="<?php print $view['router']->generate('import'); ?>"><span>&nbsp;</span>User Import</a></li>
+                <li><a href="<?php print $view['router']->generate('emails'); ?>"><span>&nbsp;</span>Emails</a></li>
+                <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>
+                <li><a href="<?php print $view['router']->generate('activity'); ?>"><span>&nbsp;</span>Recent activity</a></li>
+                <li><a href="<?php print $view['router']->generate('results'); ?>"><span>&nbsp;</span>Results</a></li>
+                <li><a href="<?php print $view['router']->generate('account'); ?>"><span>&nbsp;</span>Account settings</a></li>
+            </ul>
+        </nav>
         <?php if($app->getRequest()->get('_format') != 'funnel') { ?>
             <div id="welcome-message">
                 <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode([

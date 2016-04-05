@@ -9,7 +9,7 @@ $view['slots']->start('modal-body') ?>
     </ul>
     <div class="tab-content">
         <div id="add-entity-template" class="tab-pane active template">
-            <?php print $this->render('AdminBundle:Admin:row-collection.html.php', ['tables' => [], 'entities' => []]); ?>
+            <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => [], 'entities' => []]); ?>
         </div>
     </div>
 </form>

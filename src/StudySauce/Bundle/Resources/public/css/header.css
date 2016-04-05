@@ -27,16 +27,17 @@
     width:auto;
     display:inline-block;
     min-width:200px;
+    margin:0;
 }
 
 #site-name
 {
     font-family: 'Ubuntu',Arial,sans-serif;
-    width: 50%;
+    width: 400px;
     display: inline-block;
     clear: left;
     text-align: left;
-    padding-left: 240px;
+    padding-left: 100px;
     vertical-align: top;
 }
 
@@ -114,7 +115,7 @@
 
 #welcome-message
 {
-    width: 50%;
+    width: 400px;
     display: inline-block;
     text-align: right;
     left: auto;

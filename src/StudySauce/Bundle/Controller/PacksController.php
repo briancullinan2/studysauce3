@@ -29,20 +29,18 @@ use Symfony\Component\Security\Acl\Exception\Exception;
  */
 class PacksController extends Controller
 {
-    public function indexAction(Pack $pack = null)
+    public function indexAction(Request $request, Pack $pack = null)
     {
-        if ($pack === 0) {
+        if ($request->get('_route') === 'packs_new') {
             $pack = new Pack();
         }
 
-        return $this->render('StudySauceBundle:Packs:tab.html.php', [
-            'entity' => $pack
-        ]);
+        return $this->render('StudySauceBundle:Packs:tab.html.php', ['entity' => $pack]);
     }
 
-    public function groupsAction(Group $group = null)
+    public function groupsAction(Request $request, Group $group = null)
     {
-        if ($group === 0) {
+        if ($request->get('_route') === 'groups_new') {
             $group = new Group();
         }
 

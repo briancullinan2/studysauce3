@@ -1,1 +1,1 @@
-<?php print ucfirst($field); ?>
+<?php print ucfirst($field);

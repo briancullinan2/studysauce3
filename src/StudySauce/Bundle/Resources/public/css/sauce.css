@@ -546,8 +546,7 @@ input[type="button"].more
     text-align: center;
     padding: 10px 20px;
     font-weight: 700;
-    border-radius: 4px;
-    -webkit-border-radius: 5px;
+    border-radius: 1px;
     display:inline-block;
     cursor: pointer;
     white-space: normal;
@@ -571,7 +570,6 @@ input[type="button"].more
     color: #222222;
     background-color: #FF9900;
     border-color: #FF9900;
-    text-shadow: 0 1px 2px rgba(255,255,255,.5);
 }
 
 .btn:hover,
@@ -762,7 +760,7 @@ a,
 a span.reveal
 {
     text-decoration: none;
-    color: #0099BB;
+    color: #555555;
     outline:none;
     position: relative;
 }
@@ -790,7 +788,7 @@ a:hover,
 a:active span.reveal,
 a:active
 {
-    color: #00CCEE;
+    color: #0099BB;
     text-decoration: none;
     outline:none;
 }
@@ -841,12 +839,9 @@ input[type=month],
     padding: 2px 5px;
     width: 100%;
     outline: none;
-    border-radius: 2px;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
+    border-radius: 1px;
     border: 1px solid #BBB;
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-shadow: none;
     height:27px;
     transition: opacity ease-in-out .15s, border-color ease-in-out .15s, background-color ease-in-out .15s;

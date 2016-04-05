@@ -36,18 +36,22 @@ foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/p
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="packs<?php print ($entity !== null ? ('-pack' . $entity->getId()) : ''); ?>">
+    <div class="panel-pane" id="packs<?php print ($entity !== null ? ('-pack' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php
             $tables = ['tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']]];
             if($entity !== null) {
                 $tables['pack-id'] = $entity->getId();
                 $tables['headers'] = false;
+                $tables['new'] = empty($entity->getId());
                 $tables['edit'] = true;
-                $tables['count-card'] = 0;
+                $tables['count-pack'] = 1;
+                $tables['count-card'] = empty($entity->getId()) ? 5 : 0;
             }
             else {
+                $tables['headers'] = ['pack' => 'new'];
                 $tables['card-id'] = 0;
+                $tables['footers'] = ['pack' => 'new'];
             }
             print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)); ?>
         </div>

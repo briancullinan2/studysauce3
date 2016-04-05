@@ -8,11 +8,12 @@ $view['slots']->start('modal-body') ?>
             <img width="300" height="100" src="<?php echo $view->escape($url) ?>" alt="Upload" />
         <?php endforeach; ?>
     </div>
-    <a href="#file-select" class="plup-select" id="file-upload-select">Click here to select an image</a>
+    <a href="#file-select" class="plup-select" id="file-upload-select">Click here to select an image (1gb max)</a>
     <input type="hidden" name="">
 </div>
 <?php $view['slots']->stop();
 
 $view['slots']->start('modal-footer') ?>
+<a href="#close" class="btn" data-dismiss="modal">Cancel</a>
 <a href="#submit-upload" class="btn btn-primary" data-dismiss="modal">Save</a>
 <?php $view['slots']->stop() ?>

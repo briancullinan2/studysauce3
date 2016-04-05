@@ -10,13 +10,18 @@ $(document).ready(function () {
     function activateMenu(path, noPush) {
         var that = $(this);
         var routes = Routing.match(path),
-            subKey = routes[0].name,
+            subKey = routes[0].name.split('_')[0],
             subPath = Routing.generate(subKey),
-            key = Routing.match(subPath)[0].name;
+            key = subKey;
         // add route parameter to tab id if loading a specific page like /packs/2 or /adviser/1
         for (var r in routes[0].route.requirements) {
-            if (routes[0].route.requirements.hasOwnProperty(r) && r != '_format' && routes[0].route.requirements[r] == '[0-9]*' || routes[0].route.requirements[r] == '[0-9]+') {
-                key += '-' + r + routes[0].params[r];
+            if (routes[0].route.requirements.hasOwnProperty(r) && r != '_format') {
+                if (typeof routes[0].params[r] == 'undefined' && !isNaN(parseInt(routes[0].route.requirements[r]))) {
+                    key += '-' + r + routes[0].route.requirements[r];
+                }
+                else {
+                    key += '-' + r + routes[0].params[r];
+                }
             }
         }
         var panel = $('#' + key + '.panel-pane'),
@@ -62,7 +67,7 @@ $(document).ready(function () {
                 window.sincluding[window.sincluding.length] = path;
             }, 15);
             $.ajax({
-                url: Routing.generate(subKey, $.extend({_format: 'tab'}, routes[0].params)),
+                url: Routing.generate(routes[0].name, $.extend({_format: 'tab'}, routes[0].params)),
                 type: 'GET',
                 dataType: 'text',
                 success: function (tab) {
@@ -303,7 +308,7 @@ $(document).ready(function () {
             drop_element: 'upload-file',
             dragdrop: true,
             browse_button: 'file-upload-select', // you can pass in id...
-            container: 'upload-file', // ... or DOM Element itself
+            container: plupload[0], // ... or DOM Element itself
             url: Routing.generate('file_create'),
             unique_names: true,
             max_files: 0,
@@ -314,10 +319,16 @@ $(document).ready(function () {
                 max_file_size: '1gb',
                 mime_types: [
                     {
-//                        title : "Video files",
-//                        extensions : "mov,avi,mpg,mpeg,wmv,mp4,webm,flv,m4v,mkv,ogv,ogg,rm,rmvb,m4v"
                         title: "Image files",
                         extensions: "jpg,jpeg,gif,png,bmp,tiff"
+                    },
+                    {
+                        title: "Audio files",
+                        extensions: "mp3,ogg,m4a,mp4"
+                    },
+                    {
+                        title : "Video files",
+                        extensions : "mov,avi,mpg,mpeg,wmv,mp4,webm,flv,m4v,mkv,ogv,ogg,rm,rmvb,m4v"
                     }
                 ]
             },

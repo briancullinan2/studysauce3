@@ -15,7 +15,7 @@ $(document).ready(function () {
         }
 
         // do not autosave from selectize because the input underneath will change
-        if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input')) {
+        if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input').length > 0) {
             return;
         }
 
@@ -59,16 +59,43 @@ $(document).ready(function () {
         row.removeClass('removed');
     });
 
+    body.on('click', '[id^="groups"] .ss_group-row [href="#remove-confirm-group"]', function (evt) {
+        evt.preventDefault();
+        var tab = $(this).parents('.group-list .results');
+        var row = $(this).parents('.ss_group-row');
+        var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
+        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
+            row.addClass('removed');
+            $.ajax({
+                url: Routing.generate('save_group'),
+                type: 'POST',
+                dataType: 'text',
+                data: {
+                    groupId: groupId,
+                    remove: true
+                },
+                success: function (data) {
+                    // copy rows and select
+                    var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                    loadContent.apply(tab, [data, ['ss_groups']]);
+                    if (selected) {
+                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+                    }
+                }
+            });
+        });
+        row.removeClass('removed');
+    });
+
     body.on('hidden.bs.modal', '#confirm-remove', function () {
         setTimeout(function () {
             body.off('click.remove');
         }, 100);
     });
 
-    body.on('click', '[id^="groups-"] .ss_group-row .packs a[href="/packs"]', function () {
-        body.one('show', '#packs', function () {
-            $(this).find('a[href="#add-pack"]').first().trigger('click');
-        });
+    body.on('click', '[id^="groups"] a[href="#add-new-ss_group"]', function (evt) {
+        evt.preventDefault();
+        window.activateMenu(Routing.generate('groups_new'));
     });
 
     function autoSave(close) {
@@ -85,6 +112,7 @@ $(document).ready(function () {
             type: 'POST',
             dataType: close ? 'text' : 'json',
             data: {
+                logo: row.find('.id img:not(.default)').attr('src'),
                 groupName: row.find('input[name="name"]').val().trim(),
                 description: row.find('textarea[name="description"]').val().trim(),
                 roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),

@@ -378,12 +378,13 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 
 .results .pane-top {
     position: fixed;
-    width:100%;
-    padding-right:70px;
-    top:50px;
+    width: auto;
+    top: 50px;
     z-index: 10;
-    height:130px;
-    margin-bottom:-20px;
+    height: 130px;
+    margin-bottom: -20px;
+    left: 120px;
+    right: 120px;
 }
 
 .paginate {
@@ -438,7 +439,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 }
 
 .results h2 a[href^="#add-"]:hover {
-    border-color: #00CCEE;
+    border-color: #0099BB;
 }
 
 .results h2 {
@@ -552,7 +553,6 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 @media (min-width: 1500px)
 {
     .results .pane-top {
-        padding-right: 240px;
     }
 
     .results.empty header:after {

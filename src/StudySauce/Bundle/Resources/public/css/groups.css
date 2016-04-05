@@ -1,7 +1,20 @@
 
+#groups .pane-content {
+    background: #bbb;
+}
+
 [id^="groups"] .pane-content
 {
     min-height: 600px;
+}
+
+.group-list {
+    margin: -20px;
+    background:#bbb;
+}
+
+.group-list .results {
+    text-align: center;
 }
 
 .group-list .ss_group-row {
@@ -11,6 +24,9 @@
     padding: 10px;
     border: 1px solid #bbb;
     position:relative;
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
+    text-align: left;
+    border-radius:1px;
 }
 
 .group-list .ss_group-row .id {
@@ -182,11 +198,9 @@
 }
 
 .group-edit .results .pack-row {
-    width: 100%;
-    display:inline-block;
     vertical-align: top;
-    padding-right:40%;
-    margin-right:-40%;
+    padding-right: 20px;
+    margin-right: 40%;
 }
 
 .group-edit .pack-row.selected + .expandable .members
@@ -198,6 +212,7 @@
     width:40%;
     padding-bottom:400px;
     margin-top:300px;
+    padding-left:20px;
 }
 
 .group-edit .empty-members {
@@ -236,6 +251,7 @@
     width: 100%;
     left: 0;
     top: 10px;
+    padding-left:20px;
 }
 
 .group-list .empty-members,
@@ -256,10 +272,6 @@
 
 .right-pad .group-edit .ss_group-row > .packs {
     display:inline-block;
-}
-
-.group-list .results {
-    padding:20px;
 }
 
 .group-edit .highlighted-link.pack

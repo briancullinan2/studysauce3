@@ -15,6 +15,7 @@ use StudySauce\Bundle\Entity\Coupon;
 use StudySauce\Bundle\Entity\Course;
 use StudySauce\Bundle\Entity\Deadline;
 use StudySauce\Bundle\Entity\Event;
+use StudySauce\Bundle\Entity\File;
 use StudySauce\Bundle\Entity\Goal;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Schedule;
@@ -312,7 +313,7 @@ class AdminController extends Controller
 
             $resultCount = isset($searchRequest['count-' . $table]) ? intval($searchRequest['count-' . $table]) : 25;
             // for templating purposes only
-            if($resultCount == -1) {
+            if($resultCount == -1 || isset($searchRequest['new']) && ($searchRequest['new'] === true || is_array($searchRequest['new']) && in_array($table, $searchRequest['new']))) {
                 $vars[$table] = [];
                 $vars[$table . '_total'] = 0;
                 continue;
@@ -340,7 +341,7 @@ class AdminController extends Controller
                 if($page == 'last') {
                     $page = $total / $resultCount;
                 }
-                $resultOffset = (min(max(1, ceil($total / $resultCount)), max(1, intval($page))) - 1) * 25;
+                $resultOffset = (min(max(1, ceil($total / $resultCount)), max(1, intval($page))) - 1) * $resultCount;
             }
             else {
                 $resultOffset = 0;
@@ -381,7 +382,7 @@ class AdminController extends Controller
             }
             $query = $qb->setFirstResult($resultOffset);
             if($resultCount > 0) {
-                $query = $query->setMaxResults(25);
+                $query = $query->setMaxResults($resultCount);
             }
 
             $vars[$table] = $query->getQuery()->getResult();
@@ -536,6 +537,13 @@ class AdminController extends Controller
             $g = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $request->get('groupId')]);
         }
 
+        if(!empty($request->get('logo'))) {
+            $logo = $user->getFiles()->filter(function (File $f) use ($request) {
+                return $f->getUrl() == $request->get('logo');
+            })->first();
+            $g->setLogo($logo);
+        }
+
         if(!empty($request->get('parent'))) {
             /** @var Group $parent */
             $parent = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $request->get('parent')]);
@@ -552,7 +560,7 @@ class AdminController extends Controller
         if(!empty($name = $request->get('groupName'))) {
             $g->setName($name);
         }
-        if(!empty($request->get('description'))) {
+        if($request->get('description') !== false) {
             $g->setDescription(!empty($request->get('description')) ? $request->get('description') : '');
         }
 
@@ -575,7 +583,7 @@ class AdminController extends Controller
 
         if(empty($g->getId()))
             $orm->persist($g);
-        elseif($request->get('remove') == '1') {
+        elseif($request->get('remove') == 'true') {
             // remove group from users
             $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
             foreach($invites as $i => $in) {
@@ -599,9 +607,8 @@ class AdminController extends Controller
         $orm->flush();
 
         return $this->forward('AdminBundle:Admin:results', [
-            'tables' => ['ss_group', 'pack' => ['name' => ['title'], 'counts', 'actions', ['group','groups']]],
-            'ss_group-id' => $g->getId(),
-            'expandable' => ['pack' => ['members']],
+            'tables' => ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]],
+            'ss_group-id' => $request->get('remove') == 'true' ? null : $g->getId(),
             'edit' => ['ss_group'],
             'count-pack' => 0]);
     }

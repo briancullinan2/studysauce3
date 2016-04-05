@@ -9,7 +9,7 @@ $entityIds = [];
 ?>
 
 <div>
-    <a href="<?php print $view['router']->generate('packs'); ?>" class="big-add">Create
+    <a href="<?php print $view['router']->generate('packs_new'); ?>" class="big-add">Create
         <span>+</span> new pack</a><br/>
     <label class="input">
         <input type="text" name="packs" value=""

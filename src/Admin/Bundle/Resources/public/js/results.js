@@ -174,7 +174,7 @@ $(document).ready(function () {
 
     var radioCounter = 5000;
 
-    body.on('click', '.results a[href^="#add-"]', function (evt) {
+    body.on('click', '.results a[href^="#add-"]:not([href^="#add-new-"])', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);

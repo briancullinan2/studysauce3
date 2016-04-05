@@ -308,16 +308,9 @@ $(document).ready(function () {
         updatePreview.apply($(this));
     });
 
-    body.on('click', '#packs a[href="#add-pack"]', function () {
-        var results = $(this).parents('.results');
-        var row = results.find('.pack-row.empty:not(.template)').first().detach()
-            .add(results.find('.highlighted-link.pack, .highlighted-link.card, .pack-row.template, .card-row.template, .card-row.template + .expandable').clone());
-        var pane = $('<div class="panel-pane" id="packs-pack01"><div class="pane-content"><div class="results"></div></div></div>').insertBefore(body.find('.footer'));
-        row.appendTo(pane.find('.results'));
-        activatePanel(pane);
-        for(var i = 0; i < 5; i++) {
-            pane.find('a[href="#add-card"]').first().trigger('click');
-        }
+    body.on('click', '#packs a[href="#add-new-pack"]', function (evt) {
+        evt.preventDefault();
+        window.activateMenu(Routing.generate('packs_new'));
     });
 
     body.on('click', '#packs a[href="#edit-pack"]', function () {
