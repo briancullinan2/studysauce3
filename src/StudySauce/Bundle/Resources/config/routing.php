@@ -95,7 +95,7 @@ $collection->add(
     )
 );
 $collection->add(
-    'app_links',
+    'app_links2',
     new Route(
         '/.well-known/apple-app-site-association',
         ['_controller' => 'StudySauceBundle:Home:appLinks']

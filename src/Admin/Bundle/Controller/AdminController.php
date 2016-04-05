@@ -541,7 +541,7 @@ class AdminController extends Controller
             $logo = $user->getFiles()->filter(function (File $f) use ($request) {
                 return $f->getUrl() == $request->get('logo');
             })->first();
-            $g->setLogo($logo);
+            $g->setLogo(empty($logo) ? null : $logo);
         }
 
         if(!empty($request->get('parent'))) {

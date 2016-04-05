@@ -206,7 +206,7 @@ EOF
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($group)) {
-                            $controller->sendNotification($group->getDescription() . ' added a new pack, "'
+                            $controller->sendNotification($group->getName() . ' added a new pack, "'
                                 . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {

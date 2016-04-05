@@ -39,12 +39,12 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         $tableTotal = $table . '_total';
         if (count($$table) > 0) {
             if(!$app->getRequest()->attributes->has('headers')) {
-                print $view->render('AdminBundle:Admin:header.html.php', ['table' => $table, 'total' => $$tableTotal]);
+                print $view->render('AdminBundle:Admin:header.html.php', ['tables' => $tables, 'table' => $table, 'total' => $$tableTotal, 'allGroups' => $allGroups]);
             }
             else if (is_array($headers = $app->getRequest()->attributes->get('headers'))
                 && isset($headers[$table])
                 && $view->exists('AdminBundle:Admin:header-' . $headers[$table] . '.html.php')) {
-                print $view->render('AdminBundle:Admin:header-' . $headers[$table] . '.html.php', ['table' => $table, 'total' => $$tableTotal]);
+                print $view->render('AdminBundle:Admin:header-' . $headers[$table] . '.html.php', ['tables' => $tables, 'table' => $table, 'total' => $$tableTotal, 'allGroups' => $allGroups]);
             }
         }
 

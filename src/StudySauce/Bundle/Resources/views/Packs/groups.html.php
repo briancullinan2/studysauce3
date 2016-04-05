@@ -44,7 +44,7 @@ $view['slots']->start('body'); ?>
                 <div class="group-edit">
                     <?php
                     $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]];
-                    $tables['pack'] = ['name' => ['title'], 'counts', 'actions', ['groups'] /* search field but don't display a template */];
+                    $tables['pack'] = ['title', 'counts', 'members' => ['groups'], 'actions' /* search field but don't display a template */];
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-pack' => empty($entity->getId()) ? -1 : 0,
                         'count-ss_group' => 1,
@@ -52,8 +52,7 @@ $view['slots']->start('body'); ?>
                         'edit' => ['ss_group'],
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
-                        'headers' => false,
-                        'expandable' => ['pack' => ['members']]]));
+                        'headers' => ['pack' => 'groupPacks']]));
                     if ($entity->getGroupPacks()->count() > 0) {
                         ?>
                         <div class="empty-members">
@@ -66,20 +65,16 @@ $view['slots']->start('body'); ?>
                 <?php
                 if (empty($entity)) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'count-pack' => -1,
                         'parent-ss_group-id' => 'NULL',
-                        'tables' => ['ss_group', 'pack'],
+                        'tables' => ['ss_group'],
                         'headers' => ['ss_group' => 'new'],
-                        'footers' => ['ss_group' => 'new'],
-                        'expandable' => ['pack' => ['members']]]));
+                        'footers' => ['ss_group' => 'new']]));
                 } else if ($entity->getSubgroups()->count() > 0) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'count-pack' => -1,
                         'parent-ss_group-id' => $entity->getId(),
                         'tables' => ['ss_group'],
                         'headers' => ['ss_group' => 'new'],
-                        'footers' => ['ss_group' => 'new'],
-                        'expandable' => ['pack' => ['members']]]));
+                        'footers' => ['ss_group' => 'new']]));
                 }
                 ?>
             </div>

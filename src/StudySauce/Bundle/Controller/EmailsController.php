@@ -74,12 +74,12 @@ class EmailsController extends Controller
 
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
-            ->setSubject((!empty($group) ? ($group->getDescription() . ' + ') : '') . 'Study Sauce welcomes you!')
+            ->setSubject((!empty($group) ? ($group->getName() . ' + ') : '') . 'Study Sauce welcomes you!')
             ->setFrom('admin@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-parent.html.php', [
                 'link' => false,
-                'group' => !empty($group) ? $group->getDescription() : '',
+                'group' => !empty($group) ? $group->getName() : '',
                 'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
                 'child' => !empty($groupInvite) ? $groupInvite->getInvitee()->getFirst() : '',
                 'greeting' => (empty($user->getFirst()) ? 'Howdy partner' : ('Hello ' . $user->getFirst())) . ','
@@ -140,13 +140,13 @@ class EmailsController extends Controller
 
         /** @var \Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
-            ->setSubject(!empty($group) ? ($group->getDescription() . ' has added ' . $notify[0]->getTitle() . ' to Study Sauce') : 'We have added ' . $notify[0]->getTitle() . ' to Study Sauce')
+            ->setSubject(!empty($group) ? ($group->getName() . ' has added ' . $notify[0]->getTitle() . ' to Study Sauce') : 'We have added ' . $notify[0]->getTitle() . ' to Study Sauce')
             ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
                 'greeting' => 'Hello ' . $user->getFirst() . ',',
                 'child' => $child,
-                'group' => !empty($group) ? $group->getDescription() : '',
+                'group' => !empty($group) ? $group->getName() : '',
                 'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
                 'packName' => $notify[0]->getTitle(),
                 'packCount' => $notify[0]->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(),
@@ -247,7 +247,7 @@ class EmailsController extends Controller
             ->setFrom($user->getEmail())
             ->setTo(trim($invite->getEmail()))
             ->setBody($this->renderView('StudySauceBundle:Emails:group-invite.html.php', [
-                'group' => !empty($invite->getGroup()) ? (' by ' . $invite->getGroup()->getDescription()) : '',
+                'group' => !empty($invite->getGroup()) ? (' by ' . $invite->getGroup()->getName()) : '',
                 'greeting' => 'Dear ' . $invite->getFirst() . ' ' . $invite->getLast() . ',',
                 'link' => '<a href="' . $this->generateUrl('register', ['_code' => $invite->getCode()], UrlGeneratorInterface::ABSOLUTE_URL) . '" style="color: #FF9900;">Go to Study Sauce</a>'
             ]), 'text/html');
@@ -560,7 +560,7 @@ class EmailsController extends Controller
             ->setFrom($invite->getUser()->getEmail())
             ->setTo($invite->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:group-invite.html.php', [
-                        'group' => !empty($group) ? (' by ' . $group->getDescription()) : '',
+                        'group' => !empty($group) ? (' by ' . $group->getName()) : '',
                         'greeting' => 'Dear ' . $invite->getFirst() . ' ' . $invite->getLast() . ',',
                         'link' => '<a href="' . $codeUrl . '" style="color: #FF9900;">Go to Study Sauce</a>'
                     ]), 'text/html');

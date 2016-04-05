@@ -7,12 +7,12 @@ $(document).ready(function () {
     function groupsFunc(evt) {
         var tab = $(this).parents('.results:visible');
         var groupRow = tab.find('.ss_group-row.edit');
-        if(groupRow.find('.name input').val().trim() == '') {
-            tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
-        }
-        else {
-            tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
-        }
+        //if(groupRow.find('.name input').val().trim() == '') {
+        //    tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+        //}
+        //else {
+        //    tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
+        //}
 
         // do not autosave from selectize because the input underneath will change
         if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input').length > 0) {
@@ -102,10 +102,10 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         var tab = $(this);
         var row = tab.find('.ss_group-row.edit:not(.template)');
-        if(tab.find('.highlighted-link').is('.invalid'))
-            return;
+        //if(tab.find('.highlighted-link').is('.invalid'))
+        //    return;
         loadingAnimation(tab.find('a[href="#save-ss_group"]'));
-        tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+        //tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
 
         $.ajax({
             url: Routing.generate('save_group'),
@@ -114,7 +114,6 @@ $(document).ready(function () {
             data: {
                 logo: row.find('.id img:not(.default)').attr('src'),
                 groupName: row.find('input[name="name"]').val().trim(),
-                description: row.find('textarea[name="description"]').val().trim(),
                 roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
                 groupId: ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1],
                 parent: row.find('select[name="parent"]').val()
@@ -228,7 +227,6 @@ $(document).ready(function () {
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
 
                 // save packs
-                tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
                 loadingAnimation(tab.find('a[href="#save-pack"]'));
 
                 $.ajax({

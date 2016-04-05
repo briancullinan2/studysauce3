@@ -3,7 +3,7 @@
 {
     /* background: url(../images/grunge.png) repeat fixed 0 0 #555555; */
     /* background: #555555; */
-    background: #BBBBBB;
+    background: #DDDDDD;
 }
 
 .dashboard-home .panel-pane[id^="uid-"]
@@ -92,10 +92,9 @@ aside + .panel-pane,
 
 .pane-content
 {
-    padding: 20px;
+    padding: 20px 0;
     position: relative;
     overflow: hidden;
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
 }
 
 .pane-top {

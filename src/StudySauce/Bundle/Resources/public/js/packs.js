@@ -287,10 +287,10 @@ $(document).ready(function () {
         if(tab.find('.card-row.invalid:not(.removed)').length == 0 && (
             tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0) &&
             tab.find('.pack-row.valid:not(.empty)').length > 0) {
-            tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
+            //tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
         }
         else {
-            tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+            //tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
         }
 
         // save at most every 2 seconds, don't autosave from admin lists
@@ -383,12 +383,12 @@ $(document).ready(function () {
         if (packRows.length == 0) {
             return;
         }
-        if(tab.find('.highlighted-link').is('.invalid')) {
+        //if(tab.find('.highlighted-link').is('.invalid')) {
             // TODO: select incorrect row
-            return;
-        }
+        //    return;
+        //}
 
-        tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+        //tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
         loadingAnimation(tab.find('a[href="#save-pack"]'));
 
         // get the parsed list of cards

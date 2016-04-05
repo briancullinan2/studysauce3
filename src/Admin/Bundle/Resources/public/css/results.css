@@ -163,10 +163,6 @@ table.results > tbody > tr > td
 {
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
-    margin-left:-20px;
-    margin-right:-20px;
-    padding-left:20px;
-    padding-right:20px;
 }
 
 .results [class*="-row"]:hover:not(.selected):not(.edit),
@@ -175,7 +171,7 @@ table.results > tbody > tr:hover:not(.selected):not(.edit) > td
     box-shadow: 0 1px 4px rgba(255,255,255,.25);
     border-top: 1px solid #DDDDDD;
     border-bottom: 1px solid #DDDDDD;
-    background-color: rgba(255,255,255,.50);
+    background-color: #E9E9E9;
     cursor: pointer;
 }
 

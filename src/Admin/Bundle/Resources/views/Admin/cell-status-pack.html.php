@@ -6,7 +6,6 @@ use StudySauce\Bundle\Entity\Pack;
 ?>
 <div class="<?php print strtolower($pack->getStatus()); ?> <?php print ($pack->getProperty('schedule') > new \DateTime() ? 'pending' : ''); ?>">
     <label class="input status">
-        <span>Pack status</span><br />
         <select name="status" data-publish="<?php print (!empty($pack->getProperty('schedule')) ? $view->escape(json_encode(['schedule' => $pack->getProperty('schedule')->format('r'), 'email' => $pack->getProperty('email'), 'alert' => $pack->getProperty('alert')])) : '' ); ?>">
             <option value="" <?php print (empty($pack->getId()) ? 'selected="selected"' : ''); ?>>Set pack publish settings ></option>
             <option value="UNPUBLISHED" <?php print (!empty($pack->getId()) && $pack->getStatus() == 'UNPUBLISHED' ? 'selected="selected"' : ''); ?>>Unpublished</option>
