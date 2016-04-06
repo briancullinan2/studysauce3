@@ -34,10 +34,11 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
     }
 
     foreach ($tables as $table => $t) {
+        $isNew = $app->getRequest()->get('new') === true || is_array($app->getRequest()->get('new')) && in_array($table, $app->getRequest()->get('new'));
 
         // show header template
         $tableTotal = $table . '_total';
-        if (count($$table) > 0) {
+        if (count($$table) > 0 || $isNew) {
             if(!$app->getRequest()->attributes->has('headers')) {
                 print $view->render('AdminBundle:Admin:header.html.php', ['tables' => $tables, 'table' => $table, 'total' => $$tableTotal, 'allGroups' => $allGroups]);
             }
@@ -56,7 +57,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         // print out row template for client side to use
         $class = AdminController::$allTables[$table]->name;
         $entity = new $class();
-        $isNew = $app->getRequest()->get('new') === true || is_array($app->getRequest()->get('new')) && in_array($table, $app->getRequest()->get('new'));
         $classes = !$isNew ? 'template' : ' empty';
         $newCount = $isNew && !empty(intval($app->getRequest()->get('count-' . $table))) ? intval($app->getRequest()->get('count-' . $table)) : 1;
         for ($nc = 0; $nc < $newCount; $nc++) {

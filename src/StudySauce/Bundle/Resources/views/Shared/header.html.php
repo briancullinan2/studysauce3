@@ -28,7 +28,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
             <a title="Home" href="<?php print $view['router']->generate('_welcome'); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
                     <img width="48" height="48" src="<?php echo $view->escape($url) ?>" alt="LOGO" />
-                <?php endforeach; ?><span><strong>Study</strong> Sauce</span></a>
+                <?php endforeach; ?><span>Study Sauce</span></a>
         </div>
         <?php if($app->getRequest()->get('_format') == 'index' || ($app->getRequest()->get('_format') != 'funnel' &&
                 !empty($user) && $user->hasRole('ROLE_PARTNER'))) { ?>

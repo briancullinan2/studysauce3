@@ -6,7 +6,7 @@
     width: 100%;
     left: 0;
     z-index: 2000;
-    height: 50px;
+    height: 40px;
     top: 0;
     white-space: nowrap;
     border: none;
@@ -49,7 +49,7 @@
 
 #site-name a > span
 {
-    font-size: 42px;
+    font-size: 32px;
     line-height: 110%;
     display:inline-block;
     white-space: normal;
@@ -64,8 +64,8 @@
 {
     width: 65px;
     margin: 0 5px;
-    max-height: 48px;
-    max-width: 48px;
+    max-height: 38px;
+    max-width: 38px;
 }
 
 #partner-message
@@ -121,7 +121,7 @@
     left: auto;
     padding-right: 100px;
     vertical-align: middle;
-    line-height: 50px;
+    line-height: 40px;
 }
 
 #welcome-message > * {
@@ -208,7 +208,7 @@
 
     .header-wrapper
     {
-        height: 50px;
+        height: 40px;
         left:0;
         transition: left linear .15s;
     }

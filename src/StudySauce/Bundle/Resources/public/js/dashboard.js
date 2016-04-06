@@ -440,6 +440,11 @@ $(document).ready(function () {
 
     // entity search
     function setupFields() {
+        var plain = body.find('select:not(.selectized):not([data-tables])');
+        plain.each(function () {
+            $(this).selectize();
+        });
+
         var that = body.find('input[type="text"][data-tables]:not(.selectized)');
         that.each(function () {
             var field = $(this);

@@ -895,7 +895,7 @@ input:-webkit-autofill {
 .selectize-control.multi .selectize-input .item
 {
     background: #EEEEEE none;
-    border-radius: 3px;
+    border-radius: 1px;
     padding: 0 2px;
     margin: 0 2px;
     border: 1px solid #bbb;
@@ -1017,6 +1017,10 @@ input[type=month]:focus
 {
     border-color:#0099BB;
     background: white none;
+}
+
+.selectize-input.dropdown-active {
+    border-radius:1px;
 }
 
 .read-only .selectize-input,

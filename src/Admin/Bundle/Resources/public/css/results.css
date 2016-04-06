@@ -53,15 +53,6 @@ table.results > thead > tr > th
     background-color: rgba(238, 238, 238, 1);
 }
 
-.results [class*="-row"] > *,
-table.results > tbody > tr > td
-{
-    padding: 5px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    table-layout: fixed;
-}
-
 table.results > tbody > tr > td:first-child,
 table.results > thead > tr > th:first-child {
     padding-left:0;
@@ -84,8 +75,6 @@ table.results > tbody > tr > td .checkbox {
     display:inline-block;
     margin:0 -2px;
     padding: 5px 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -450,14 +439,14 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin:-10px 0 -30px 0;
 }
 
-.results header > * {
+.results .pane-top header > * {
     display:none;
     opacity: 0;
     visibility:hidden;
     transition: opacity ease-in-out 1s, visibility ease-in-out 1s;
 }
 
-.results header > *:first-child
+.results .pane-top header > *:first-child
 {
     display:inline-block;
     opacity: 1;

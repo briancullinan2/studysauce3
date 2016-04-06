@@ -37,7 +37,7 @@ $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
     <div
-        class="panel-pane <?php print (!empty($entity) && $entity->getGroupPacks()->count() > 0 ? 'right-pad' : ''); ?>"
+        class="panel-pane <?php print (!empty($entity) && $entity->getGroupPacks()->count() > 0 || !empty($entity) && empty($entity->getId()) ? 'right-pad' : ''); ?>"
         id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
@@ -52,7 +52,7 @@ $view['slots']->start('body'); ?>
                         'edit' => ['ss_group'],
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
-                        'headers' => ['pack' => 'groupPacks']]));
+                        'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks']]));
                     if ($entity->getGroupPacks()->count() > 0) {
                         ?>
                         <div class="empty-members">

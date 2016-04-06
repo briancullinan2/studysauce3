@@ -38,7 +38,6 @@
 [id^="packs-"] .pack-row .id {
     text-align: center;
     position:relative;
-    overflow:visible;
     vertical-align: top;
 }
 
@@ -50,7 +49,7 @@
 #packs .pack-row .pack-icon,
 [id^="packs-"] .pack-row .pack-icon {
     position: absolute;
-    padding:20px;
+    padding:0 20px 0 5px;
     height:100%;
     width:100%;
     top:0;
@@ -66,26 +65,38 @@
     position:relative;
 }
 
+#packs .pack-row .status .unpublished .selectize-input,
+[id^="packs-"] .pack-row .status .unpublished .selectize-input,
 #packs .pack-row .status .unpublished select,
 [id^="packs-"] .pack-row .status .unpublished select {
     background-color: #FF9900;
 }
+#packs .pack-row .status .public .selectize-input,
+[id^="packs-"] .pack-row .status .public .selectize-input,
 #packs .pack-row .status .public select,
 [id^="packs-"] .pack-row .status .public select {
     background-color: #11CC33;
 }
+#packs .pack-row .status .group .selectize-input,
+[id^="packs-"] .pack-row .status .group .selectize-input,
 #packs .pack-row .status .group select,
 [id^="packs-"] .pack-row .status .group select {
     background-color: #1199CC;
 }
+#packs .pack-row .status .group.pending .selectize-input,
+[id^="packs-"] .pack-row .status .group.pending .selectize-input,
 #packs .pack-row .status .group.pending select,
 [id^="packs-"] .pack-row .status .group.pending select {
     background-color: #EECC11;
 }
+#packs .pack-row .status .unlisted .selectize-input,
+[id^="packs-"] .pack-row .status .unlisted .selectize-input,
 #packs .pack-row .status .unlisted select,
 [id^="packs-"] .pack-row .status .unlisted select {
     background-color: #AAAAAA;
 }
+#packs .pack-row .status .deleted .selectize-input,
+[id^="packs-"] .pack-row .status .deleted .selectize-input,
 #packs .pack-row .status .deleted select,
 [id^="packs-"] .pack-row .status .deleted select {
     background-color: #FF4433;
@@ -102,7 +113,9 @@
 [id^="packs-"] .pack-row > .groups {
     padding-left:10%;
     width:60%;
-    overflow: visible;
+    margin-left: 0;
+    margin-right: -4px;
+    padding-right:4px;
 }
 
 [id^="packs-"] .pack-row > .properties,

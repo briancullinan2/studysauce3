@@ -25,7 +25,8 @@ print (!empty($classes) ? $classes : ''); ?>">
     <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
 </div>
 <?php if (isset($expandable[$table])) { ?>
-    <div class="expandable">
+    <div class="expandable <?php
+    print (!empty($classes) ? $classes : ''); ?>">
     <?php print $view->render('AdminBundle:Admin:cells.html.php', ['entity' => $entity, 'tables' => $expandable, 'table' => $table, 'allGroups' => $allGroups]); ?>
     </div><?php
 }
