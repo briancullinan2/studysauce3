@@ -26,7 +26,7 @@
 #welcome-message .input {
     width:auto;
     display:inline-block;
-    min-width:200px;
+    min-width:300px;
     margin:0;
 }
 
@@ -115,7 +115,7 @@
 
 #welcome-message
 {
-    width: 400px;
+    width: 600px;
     display: inline-block;
     text-align: right;
     left: auto;

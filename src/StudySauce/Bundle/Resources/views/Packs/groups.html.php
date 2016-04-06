@@ -37,22 +37,25 @@ $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
     <div
-        class="panel-pane <?php print (!empty($entity) && $entity->getGroupPacks()->count() > 0 || !empty($entity) && empty($entity->getId()) ? 'right-pad' : ''); ?>"
+        class="panel-pane <?php print (!empty($entity) && $entity->getGroupPacks()->count() > 0 ? 'right-pad' : ''); ?>"
         id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
                 <div class="group-edit">
                     <?php
-                    $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]];
-                    $tables['pack'] = ['title', 'counts', 'members' => ['groups'], 'actions' /* search field but don't display a template */];
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'count-pack' => empty($entity->getId()) ? -1 : 0,
                         'count-ss_group' => 1,
                         'new' => empty($entity->getId()),
-                        'edit' => ['ss_group'],
                         'ss_group-id' => $entity->getId(),
-                        'tables' => $tables,
-                        'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks']]));
+                        'tables' => ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]],
+                        'headers' => ['ss_group' => 'groupGroups']]));
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                        'count-pack' => empty($entity->getId()) ? -1 : 0,
+                        'new' => empty($entity->getId()),
+                        'edit' => [],
+                        'ss_group-id' => $entity->getId(),
+                        'tables' => ['pack' => ['title', 'counts', 'members' => ['groups'], 'actions' /* search field but don't display a template */]],
+                        'headers' => ['pack' => 'groupPacks']]));
                     if ($entity->getGroupPacks()->count() > 0) {
                         ?>
                         <div class="empty-members">

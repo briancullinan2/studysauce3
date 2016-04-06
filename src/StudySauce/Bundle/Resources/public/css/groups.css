@@ -8,13 +8,29 @@
     min-height: 600px;
 }
 
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href="#cancel-edit"],
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href="#save-ss_group"],
+.group-edit .highlighted-link a[href="#edit-ss_group"] {
+    display:inline-block;
+}
+
+
+.group-edit .highlighted-link.ss_group a[href="#cancel-edit"],
+.group-edit .highlighted-link.ss_group a[href="#save-ss_group"],
+.group-edit .highlighted-link.ss_group a[href="#add-ss_group"],
+.group-list .highlighted-link.ss_group a[href="#add-new-ss_group"],
+.group-edit .ss_group-row.edit ~ .highlighted-link a[href="#edit-ss_group"] {
+    display:none;
+}
+
 .group-list {
-    margin: 0 -10px;
+    margin: 0;
     background:#DDDDDD;
+    padding: 0 4px 0 0;
 }
 
 .group-list .results {
-
+    margin-left:-1%;
 }
 
 .group-list .highlighted-link {
@@ -22,7 +38,7 @@
 }
 
 .group-list .results > .highlighted-link {
-    padding: 0 10px;
+    padding: 0 1%;
 }
 
 .group-list .ss_group-row:hover {
@@ -32,8 +48,8 @@
 
 .group-list .ss_group-row {
     display:inline-block;
-    width:23.33%;
-    margin: 10px .66%;
+    width:24%;
+    margin: 10px -4px 10px 1%;
     padding: 10px;
     border: 1px solid #bbb;
     position:relative;
@@ -105,8 +121,10 @@
 
 .group-edit .ss_group-row > .parent
 {
-    width: 50%;
+    width: 45%;
     padding-left:150px;
+    margin-right:-4px;
+    padding-right:4px;
 }
 
 
@@ -118,9 +136,14 @@
 {
     width: 45%;
     position: absolute;
-    display: none;
-    top: 200px;
+    top: 150px;
     left: 0;
+}
+
+.group-edit .results .ss_group-row.read-only:hover
+{
+    background-color:transparent;
+    border-color:transparent;
 }
 
 .group-list .ss_group-row .name span.count {
@@ -149,27 +172,42 @@
     display:none;
 }
 
-.group-edit .ss_group-row .actions,
-.group-edit .pack-row .actions
+.group-edit .results .pack-row .actions
 {
     width:5%;
     padding-right:2px;
     margin-right: -2px;
 }
 
+.group-edit .results .ss_group-row .actions
+{
+    position:absolute;
+    width:50px;
+    top:0;
+    padding-right:2px;
+    margin-right: -2px;
+}
+
+.group-edit .ss_group-row
+{
+    position:relative;
+}
+
 .group-edit .ss_group-row .name
 {
     width:40%;
     padding-left:152px;
+    margin-right:5%;
+    margin-left:10%;
 }
 
 .group-edit .ss_group-row .invites
 {
     width: 40%;
-    padding-left:150px;
+    padding-left:152px;
     margin-left:10%;
-    margin-right:-4px;
-    padding-right:4px;
+    margin-right:-2px;
+    padding-right:2px;
 }
 
 .group-edit .pane-content {
@@ -180,11 +218,17 @@
     display:none;
 }
 
-.group-edit .ss_group-row .id,
 .group-list .ss_group-row .id {
     text-align: center;
     position: relative;
     vertical-align: top;
+}
+
+.group-edit .ss_group-row .id {
+    text-align: center;
+    position: absolute;
+    vertical-align: top;
+    height: 100%;
 }
 
 .group-edit .ss_group-row .pack-icon {
@@ -195,6 +239,13 @@
     top:0;
     left:0;
 
+}
+
+.group-edit .ss_group-row .pack-icon img {
+    max-height:100%;
+    max-width: 100%;
+    width:auto;
+    height:auto;
 }
 
 .group-edit header.pack
@@ -212,11 +263,15 @@
 .group-edit header.ss_group label:nth-child(1) {
     padding-left:10%;
     width:50%;
+    margin-right:5%;
 }
 
-.group-edit header.ss_group label:nth-child(2),
 .group-edit header.ss_group label:nth-child(3) {
     width:50%;
+}
+
+.group-edit header.ss_group label:nth-child(2) {
+    width:45%;
 }
 
 .group-edit header.ss_group label:nth-child(3) {
@@ -266,8 +321,8 @@
     height: 100%;
     position:absolute;
     width:50%;
-    padding-bottom:380px;
-    margin-top:280px;
+    padding-bottom:365px;
+    margin-top:265px;
     padding-left:20px;
     background: #E9E9E9;
     z-index: 110;
@@ -326,7 +381,7 @@
 .group-edit .pack-row .members > div label
 {
     display:block;
-    line-height: 140%;
+    height:29px;
 }
 
 .group-edit .pack-row .members > div label a
@@ -346,11 +401,7 @@
 }
 
 .right-pad .group-list .ss_group-row {
-    width:31%;
-}
-
-.right-pad .group-edit .ss_group-row > .packs {
-    display:inline-block;
+    width:49%;
 }
 
 .group-edit .highlighted-link.pack
@@ -362,11 +413,6 @@
 .group-edit .ss_group-row > label.checkbox:nth-last-child(1),
 .group-edit .pack-row > label.checkbox:nth-last-child(1) {
     display:none;
-}
-
-.group-edit .highlighted-link.ss_group,
-.group-list .highlighted-link.pack {
-    visibility: hidden;
 }
 
 .group-edit .ss_group-row.edit ~ .highlighted-link.ss_group
@@ -381,6 +427,7 @@
 }
 
 
+.group-list .ss_group-row.read-only .input,
 .group-list .ss_group-row.read-only .pack-icon br,
 .group-list .ss_group-row.read-only .pack-icon a,
 .group-list .ss_group-row.read-only .big-add,

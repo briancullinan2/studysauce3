@@ -894,11 +894,11 @@ input:-webkit-autofill {
 .selectize-control.single .selectize-input .item,
 .selectize-control.multi .selectize-input .item
 {
-    background: #EEEEEE none;
+    background: transparent;
     border-radius: 1px;
     padding: 0 2px;
     margin: 0 2px;
-    border: 1px solid #bbb;
+    border: 1px solid transparent;
     vertical-align: top;
     color: inherit;
     text-shadow: none;

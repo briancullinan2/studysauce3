@@ -20,11 +20,11 @@ $(document).ready(function () {
         }
 
         // save at most every 2 seconds, don't autosave from admin lists
-        if (autoSaveTimeout === null && $('.panel-pane[id^="groups-"]:visible').length > 0) {
-            autoSaveTimeout = setTimeout(function () {
-                autoSave.apply(tab);
-            }, 2000);
-        }
+        //if (autoSaveTimeout === null && $('.panel-pane[id^="groups-"]:visible').length > 0) {
+        //    autoSaveTimeout = setTimeout(function () {
+        //        autoSave.apply(tab);
+        //    }, 2000);
+        //}
 
     }
 
@@ -256,6 +256,10 @@ $(document).ready(function () {
         });
     });
 
+    body.on('click', '[id^="groups-"] a[href="#edit-ss_group"]', function () {
+        $(this).parents('.results').find('.ss_group-row').removeClass('read-only').addClass('edit');
+    });
+
     body.on('click', '[id^="groups-"] a[href="#edit-pack"]', function () {
         var results = $(this).parents('.results');
         var row = $(this).parents('.pack-row');
@@ -279,7 +283,7 @@ $(document).ready(function () {
 
     body.on('click', '[id^="groups-"] *:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
         var tab = $(this).parents('.results'),
-            row = $(this).parents('.expandable').prev('.pack-row'),
+            row = $(this).parents('.pack-row'),
             rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
             groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row.edit').first().attr('class'))[1],
             field = $(this).siblings('*:has(input[data-ss_user])').find('input[data-ss_user]');

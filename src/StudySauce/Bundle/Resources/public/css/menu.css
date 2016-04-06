@@ -162,10 +162,10 @@
 .header nav
 {
     width:100%;
-    margin:0 -406px;
-    padding: 0 410px;
+    margin:0 -606px 0 -406px;
+    padding: 0 610px 0 406px;
     display:inline-block;
-    vertical-align: middle;
+    vertical-align: top;
 }
 
 .main-menu li
