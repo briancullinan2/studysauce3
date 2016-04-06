@@ -902,6 +902,7 @@ input:-webkit-autofill {
     vertical-align: top;
     color: inherit;
     text-shadow: none;
+    box-shadow: none;
 }
 
 .read-only .selectize-control.single .selectize-input .item,

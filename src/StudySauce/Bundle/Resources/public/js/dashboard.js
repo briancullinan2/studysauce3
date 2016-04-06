@@ -442,13 +442,16 @@ $(document).ready(function () {
     function setupFields() {
         var plain = body.find('select:not(.selectized):not([data-tables])');
         plain.each(function () {
+            if(field.parents('.template,.read-only').length > 0) {
+                return;
+            }
             $(this).selectize();
         });
 
         var that = body.find('input[type="text"][data-tables]:not(.selectized)');
         that.each(function () {
             var field = $(this);
-            if(field.parents('.template').length > 0) {
+            if(field.parents('.template,.read-only').length > 0) {
                 return;
             }
             var options = [];

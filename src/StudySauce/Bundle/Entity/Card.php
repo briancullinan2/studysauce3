@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -92,8 +93,9 @@ class Card
     }
 
     public function getIndex() {
-        return !empty($this->getPack()) ? $this->getPack()->getCards()
-            ->filter(function (Card $c) {return !$c->getDeleted();})->indexOf($this) : 0;
+        $cards = new ArrayCollection(array_values($this->getPack()->getCards()
+            ->filter(function (Card $c) {return !$c->getDeleted();})->toArray()));
+        return !empty($this->getPack()) ? $cards->indexOf($this) : 0;
     }
 
     /**
