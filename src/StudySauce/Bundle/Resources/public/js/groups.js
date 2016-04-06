@@ -174,10 +174,6 @@ $(document).ready(function () {
 
     body.on('click', '[id^="groups-"] .ss_group-row.edit a[href^="#cancel-"], [id^="groups-"] .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
-        var results = $(this).parents('.results'),
-            row = $(this).parents('.ss_group-row');
-        results.find('.search .input').removeClass('read-only');
-        row.removeClass('read-only').addClass('edit');
         window.activateMenu(Routing.generate('groups'));
     });
 
@@ -256,7 +252,8 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '[id^="groups-"] a[href="#edit-ss_group"]', function () {
+    body.on('click', '[id^="groups-"] a[href="#edit-ss_group"]', function (evt) {
+        evt.preventDefault();
         $(this).parents('.results').find('.ss_group-row').removeClass('read-only').addClass('edit');
     });
 

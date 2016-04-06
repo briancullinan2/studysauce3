@@ -18,7 +18,9 @@ if (!is_array($expandable)) {
 print $rowId; ?> <?php
 print ($app->getRequest()->get('edit') === true || is_array($app->getRequest()->get('edit')) && in_array($table, $app->getRequest()->get('edit'))
     ? 'edit'
-    : (is_array($app->getRequest()->get('edit')) && !in_array($table, $app->getRequest()->get('edit')) ? '' : 'read-only')); ?> <?php
+    : (is_array($app->getRequest()->get('read-only')) && !in_array($table, $app->getRequest()->get('read-only'))
+        ? ''
+        : 'read-only')); ?> <?php
 print (isset($expandable[$table]) ? 'expandable' : ''); ?> <?php
 print (!empty($classes) ? $classes : ''); ?>">
     <?php print $view->render('AdminBundle:Admin:cells.html.php', ['entity' => $entity, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups]); ?>

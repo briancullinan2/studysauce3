@@ -255,7 +255,6 @@
 
 .group-edit header.ss_group {
     position:absolute;
-    line-height: 27px;
     width:100%;
     z-index: -1;
 }
@@ -367,6 +366,7 @@
     overflow: auto;
     height:100%;
     margin-top:50px;
+    overflow-y:scroll;
 }
 
 .group-edit .pack-row .members > div label.input {
