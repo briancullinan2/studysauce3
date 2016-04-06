@@ -213,6 +213,7 @@
     position:absolute;
     line-height: 27px;
     width:100%;
+    z-index: -1;
 }
 
 .group-edit header.ss_group label:nth-child(1) {
