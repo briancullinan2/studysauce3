@@ -123,11 +123,6 @@
     left: 0;
 }
 
-.group-edit .ss_group-row .actions
-{
-    width:5%;
-}
-
 .group-list .ss_group-row .name span.count {
     position:absolute;
     right:0;
@@ -154,14 +149,12 @@
     display:none;
 }
 
-.group-list .ss_group-row label.checkbox {
-    display:none;
-}
-
+.group-edit .ss_group-row .actions,
 .group-edit .pack-row .actions
 {
     width:5%;
-    padding-right:0;
+    padding-right:2px;
+    margin-right: -2px;
 }
 
 .group-edit .ss_group-row .name
@@ -365,7 +358,9 @@
     display:none;
 }
 
-.group-edit .pack-row > .checkbox:nth-last-child(1) {
+.group-list .ss_group-row > label.checkbox:nth-last-child(1),
+.group-edit .ss_group-row > label.checkbox:nth-last-child(1),
+.group-edit .pack-row > label.checkbox:nth-last-child(1) {
     display:none;
 }
 

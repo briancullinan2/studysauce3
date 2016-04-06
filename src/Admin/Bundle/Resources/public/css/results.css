@@ -483,8 +483,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:none;
 }
 
-.results header > *:last-child,
-.results [class*="-row"] > *:nth-last-child(1)
+.results header > label.checkbox:last-child,
+.results [class*="-row"] > label.checkbox:nth-last-child(1)
 {
     width: auto;
     display:inline-block;
