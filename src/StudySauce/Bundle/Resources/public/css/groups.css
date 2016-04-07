@@ -257,6 +257,7 @@
     position:absolute;
     width:100%;
     z-index: -1;
+    line-height:27px;
 }
 
 .group-edit header.ss_group label:nth-child(1) {
@@ -329,6 +330,12 @@
     display:none;
     margin-left: 0;
     margin-right: 0;
+}
+
+.group-edit .pack-row .members > label:first-child {
+    position:relative;
+    top:40px;
+    color:#BBB;
 }
 
 .group-edit .pack-row.selected .members,

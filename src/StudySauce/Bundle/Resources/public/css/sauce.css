@@ -1079,10 +1079,9 @@ input[type=month][disabled]
     overflow:hidden;
     display:inline;
     pointer-events:none;
-    padding:0;
     resize: none;
     height: auto;
-    border: 0;
+    border-color: transparent;
 }
 
 .read-only input:-webkit-autofill,
