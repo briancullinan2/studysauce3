@@ -48,7 +48,8 @@ $view['slots']->start('body'); ?>
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-pack' => empty($entity->getId()) ? -1 : 0,
                         'count-ss_group' => 1,
-                        'read-only' => ['ss_group'],
+                        'edit' => !empty($entity->getId()) ? false : ['ss_group'],
+                        'read-only' => empty($entity->getId()) ? false : ['ss_group'],
                         'new' => empty($entity->getId()),
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,

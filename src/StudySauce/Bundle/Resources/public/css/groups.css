@@ -254,8 +254,9 @@
     text-align: center;
     position: absolute;
     vertical-align: top;
-    padding-top: 5%;
-    padding-bottom: 5%;
+    padding-top: 0;
+    padding-bottom: 10%;
+    top: -30px;
 }
 
 .group-edit .ss_group-row .pack-icon {
@@ -263,7 +264,7 @@
     padding: 0 20px 0 5px;
     height:100%;
     width:100%;
-    top:-30px;
+    top:0;
     left:0;
 
 }

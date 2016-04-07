@@ -492,7 +492,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     visibility: visible;
 }
 
-.results.empty header > *:last-child
+.results.empty header > label.checkbox:last-child
 {
     display:none;
 }
