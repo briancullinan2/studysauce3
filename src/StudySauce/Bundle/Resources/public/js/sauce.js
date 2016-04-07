@@ -625,13 +625,22 @@ function centerize() {
         .css('width', 1).appendTo('body');
 
     $(this).each(function () {
+        if(!($(this).is('.centerized'))) {
+            $(this).addClass('centerized');
+        }
         $(this).css('padding-top', '');
         text.val($(this).text());
         text.width($(this).outerWidth() + 18);
         text.css('font-size', $(this).css('font-size'));
-        var height = $(this).is('img') ? $(this).parent().height() : text[0].scrollHeight;
-        if (height < $(this).height()) {
-            $(this).css('padding-top', (($(this).height() - height) / 2) + 'px')
+        if ($(this).is('img')) {
+            if ($(this).parent().height() > $(this).height()) {
+                $(this).css('padding-top', (($(this).parent().height() - $(this).height()) / 2) + 'px')
+            }
+        }
+        else {
+            if (text[0].scrollHeight < $(this).height()) {
+                $(this).css('padding-top', (($(this).height() - text[0].scrollHeight) / 2) + 'px')
+            }
         }
     });
 
@@ -829,6 +838,8 @@ function ssMergeScripts(content)
     return scripts;
 }
 
+centerize.apply($('body').find('.centerized:visible'));
+
 $(document).ready(function () {
     var body = $('body');
 
@@ -879,8 +890,15 @@ $(document).ready(function () {
         }
     });
 
+    var centerTimeout = null;
     $(window).resize(function () {
         DASHBOARD_MARGINS = {padding: {top: $('.header-wrapper').outerHeight(), bottom: 0, left: 0, right: 0}};
+        if (centerTimeout != null) {
+            clearTimeout(centerTimeout);
+        }
+        centerTimeout = setTimeout(function () {
+            centerize.apply(body.find('.centerized:visible'));
+        }, 50);
     });
     $(window).trigger('resize');
 

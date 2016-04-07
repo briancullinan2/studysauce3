@@ -203,7 +203,7 @@ $(document).ready(function () {
         }
     });
 
-    body.on('show', 'panel-pane', function () {
+    body.on('show', '.panel-pane', function () {
         centerize.apply(body.find('.centerized:visible'));
     });
 
