@@ -189,7 +189,7 @@
     padding:5px 10px;
     background-color:#0099BB;
     border-left:0;
-    color:#fff;
+    color:#eee;
     font-weight: inherit;
 }
 
@@ -203,7 +203,7 @@
 }
 
 .header .main-menu li a {
-    color:#fff;
+    color:#eee;
     padding:5px 10px;
     height:40px;
     line-height: 30px;

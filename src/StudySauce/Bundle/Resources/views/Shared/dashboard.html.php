@@ -10,7 +10,40 @@ $router = $this->container->get('router');
 $collection = $router->getRouteCollection();
 
 /** @var $app \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables */
+$request = $app->getRequest();
+if(empty($request->get('_route')) && $request->get('_format') == 'tab') {
+    /** @var $router \Symfony\Component\Routing\Router */
+    $router = $this->container->get('router');
+    /** @var $collection \Symfony\Component\Routing\RouteCollection */
+    $collection = $router->getRouteCollection();
+    if(strpos($request->get('_controller'), '::') === false) {
+        $parser = new \Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser(
+            $this->container->get('kernel')
+        );
+        $name = $parser->parse($request->get('_controller'));
+    }
+    else {
+        $name = $request->get('_controller');
+    }
+    foreach ($collection->all() as $route => $params) {
+        /** @var $params \Symfony\Component\Routing\Route */
+        if ($params->getDefault('_controller') == $name &&
+            strpos($params->getRequirement('_format'), 'tab') > -1) {
+            $pane = $route;
+            break;
+        }
+    }
+}
+if(!empty($request->get('_route'))) {
+    $pane = explode('_', $request->get('_route'))[0];
+    $route = $collection->get($request->get('_route'));
 
+    foreach($route->getRequirements() as $r => $regex) {
+        if ($r != '_format') {
+            $pane .= '-' . $r . $request->attributes->get('_route_params')[$r];
+        }
+    }
+}
 if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_format') == 'funnel' ||
     $app->getRequest()->get('_format') == 'adviser') {
     $view->extend('StudySauceBundle:Shared:layout.html.php');
@@ -49,6 +82,12 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         <?php endforeach;
     }
     $view['slots']->output('tmp-stylesheets');
+    if(!empty($pane)) { ?>
+        <style type="text/css">.css-loaded.<?php print $pane; ?> {
+                content: "loading-<?php print $pane ?>";
+            }</style>
+        <?php
+    }
     $view['slots']->stop();
 
 
@@ -98,14 +137,7 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         $view['slots']->output('javascripts');
         $view['slots']->stop();
         $view['slots']->start('javascripts');
-        foreach ($view['assetic']->javascripts(
-            [
-                '@funnel',
-            ],
-            [],
-            ['output' => 'bundles/studysauce/js/*.js']
-        ) as $url):
-            ?>
+        foreach ($view['assetic']->javascripts(['@funnel',],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
             <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
         <?php endforeach;
         $view['slots']->output('tmp-javascripts');
@@ -123,46 +155,13 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
 
 if($app->getRequest()->get('_format') == 'tab' && empty($exclude_layout)) {
     $view['slots']->output('stylesheets');
-    $request = $app->getRequest();
-    if(empty($request->get('_route')) && $request->get('_format') == 'tab') {
-        /** @var $router \Symfony\Component\Routing\Router */
-        $router = $this->container->get('router');
-        /** @var $collection \Symfony\Component\Routing\RouteCollection */
-        $collection = $router->getRouteCollection();
-        if(strpos($request->get('_controller'), '::') === false) {
-            $parser = new \Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser(
-                $this->container->get('kernel')
-            );
-            $name = $parser->parse($request->get('_controller'));
-        }
-        else {
-            $name = $request->get('_controller');
-        }
-        foreach ($collection->all() as $route => $params) {
-            /** @var $params \Symfony\Component\Routing\Route */
-            if ($params->getDefault('_controller') == $name &&
-                strpos($params->getRequirement('_format'), 'tab') > -1) {
-                $pane = $route;
-                break;
-            }
-        }
-    }
-    if(!empty($request->get('_route'))) {
-        $pane = explode('_', $request->get('_route'))[0];
-        $route = $collection->get($request->get('_route'));
-
-        foreach($route->getRequirements() as $r => $regex) {
-            if ($r != '_format') {
-                $pane .= '-' . $r . $request->attributes->get('_route_params')[$r];
-            }
-        }
-    }
     if(!empty($pane)) { ?>
         <style type="text/css">.css-loaded.<?php print $pane; ?> {
                 content: "loading-<?php print $pane ?>";
             }</style>
-    <?php
+        <?php
     }
+
     $view['slots']->output('body');
     $view['slots']->output('javascripts');
     $view['slots']->output('sincludes');

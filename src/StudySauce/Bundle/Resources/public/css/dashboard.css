@@ -1,9 +1,7 @@
 
 .dashboard-home
 {
-    /* background: url(../images/grunge.png) repeat fixed 0 0 #555555; */
-    /* background: #555555; */
-    background: #DDDDDD;
+    background: url(../images/ajax-loader.gif) no-repeat fixed center center #DDDDDD;
 }
 
 .dashboard-home .panel-pane[id^="uid-"]
@@ -72,6 +70,7 @@
     padding:50px 100px 0 0;
     box-sizing: border-box;
     position:relative;
+    background: #DDDDDD;
 }
 
 .admin aside + .panel-pane,
@@ -81,13 +80,6 @@
     display:inline-block;
     width:auto;
     max-width: none;
-}
-
-aside + .panel-pane,
-.header-wrapper ~ .panel-pane:nth-of-type(2),
-.tipsy ~ .panel-pane:nth-of-type(3)
-{
-    display:block;
 }
 
 .pane-content

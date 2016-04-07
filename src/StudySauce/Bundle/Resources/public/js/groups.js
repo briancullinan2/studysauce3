@@ -255,6 +255,7 @@ $(document).ready(function () {
     body.on('click', '[id^="groups-"] a[href="#edit-ss_group"]', function (evt) {
         evt.preventDefault();
         $(this).parents('.results').find('.ss_group-row').removeClass('read-only').addClass('edit');
+        window.setupFields();
     });
 
     body.on('click', '[id^="groups-"] a[href="#edit-pack"]', function () {

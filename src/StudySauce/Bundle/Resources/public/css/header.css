@@ -17,10 +17,9 @@
 }
 
 .header-wrapper,
-#site-name a,
 #partner-message a
 {
-    color: #F90;
+    color: #EEE;
 }
 
 #welcome-message .input {
@@ -39,12 +38,14 @@
     text-align: left;
     padding-left: 100px;
     vertical-align: top;
+    color: #F90;
 }
 
 #site-name a
 {
     padding: 0;
     display: inline-block;
+    color: #F90;
 }
 
 #site-name a > span
@@ -130,9 +131,9 @@
 
 .header-wrapper a[href$="/logout"] {
     display: inline-block;
-    height: 32px;
-    width: 32px;
-    background: url(../images/menu_new_compressed.png) no-repeat -10px -2810px;
+    height: 24px;
+    width: 24px;
+    background: url(../images/logout.png) no-repeat center center;
     overflow: hidden;
     color: transparent;
     margin-left: 10px;

@@ -201,7 +201,7 @@ $(document).ready(function () {
 
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         // center some preview fields
-        centerize.apply(row.find(' + .expandable .preview-content, + .expandable .preview-response, + .expandable img'));
+        centerize.apply(row.find(' + .expandable .preview-content, + .expandable .preview-response, + .expandable img, .pack-icon img'));
     }
 
     body.on('click', '[id^="packs-"] .preview-play .play', function () {
@@ -211,32 +211,6 @@ $(document).ready(function () {
         });
         player.jPlayer("play");
     });
-
-    function centerize() {
-        var text = $('<textarea></textarea>')
-            .css('padding', 0)
-            .css('margin', 0)
-            .css('position', 'fixed')
-            .css('top', 0)
-            .css('left', -10000)
-            .css('opacity', '0')
-            .css('height', 1)
-            .css('border', 0)
-            .css('width', 1).appendTo('body');
-
-        $(this).each(function () {
-            $(this).css('padding-top', '');
-            text.val($(this).text());
-            text.width($(this).outerWidth() + 18);
-            text.css('font-size', $(this).css('font-size'));
-            var height = $(this).is('img') ? $(this).parent().height() : text[0].scrollHeight;
-            if (height < $(this).height()) {
-                $(this).css('padding-top', (($(this).height() - height) / 2) + 'px')
-            }
-        });
-
-        text.remove();
-    }
 
     function packsFunc () {
         var tab = $(this).parents('.results:visible');

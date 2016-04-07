@@ -196,6 +196,10 @@ $(document).ready(function () {
         }
     });
 
+    body.on('show', 'panel-pane', function () {
+        centerize.apply(body.find('.centerized:visible'));
+    });
+
     // remove it so it never comes up more than once
     body.on('hidden.bs.modal', '#bookmark', function () {
         $(this).remove();
@@ -538,6 +542,7 @@ $(document).ready(function () {
             //});
         });
     }
+    window.setupFields = setupFields;
 
     body.on('click', '[class*="-row"] a[href^="#edit-"]', setupFields);
     body.on('shown.bs.modal', setupFields);
@@ -783,4 +788,20 @@ $(document).ready(function () {
 
     window.createEntityRow = createEntityRow;
 
+
+    // show the already visible tabs
+    var panel = body.find('.panel-pane').first();
+    if(panel.length > 0) {
+        var key = panel.attr('id').replace(/-[a-z]+[0-9]+$/ig, '');
+        if (Routing.getRoute(key)) {
+            var path = Routing.generate(key),
+                item = body.find('.main-menu a[href^="' + path + '"]').first();
+
+            if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
+                item.parents('nav').find('ul.collapse.in').removeClass('in');
+            item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
+        }
+        ssMergeStyles(body);
+        activatePanel.apply(body, [panel]);
+    }
 });

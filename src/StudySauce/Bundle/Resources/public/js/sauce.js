@@ -612,6 +612,32 @@ $.datepicker._updateDatepicker = function( inst ) {
             [(inst.input ? inst.input.val() : ''), inst]);
 };
 
+function centerize() {
+    var text = $('<textarea></textarea>')
+        .css('padding', 0)
+        .css('margin', 0)
+        .css('position', 'fixed')
+        .css('top', 0)
+        .css('left', -10000)
+        .css('opacity', '0')
+        .css('height', 1)
+        .css('border', 0)
+        .css('width', 1).appendTo('body');
+
+    $(this).each(function () {
+        $(this).css('padding-top', '');
+        text.val($(this).text());
+        text.width($(this).outerWidth() + 18);
+        text.css('font-size', $(this).css('font-size'));
+        var height = $(this).is('img') ? $(this).parent().height() : text[0].scrollHeight;
+        if (height < $(this).height()) {
+            $(this).css('padding-top', (($(this).height() - height) / 2) + 'px')
+        }
+    });
+
+    text.remove();
+}
+
 function loadingAnimation(that)
 {
     if(typeof that != 'undefined' && that.length > 0 && that.find('.squiggle').length == 0)
@@ -806,6 +832,8 @@ function ssMergeScripts(content)
 $(document).ready(function () {
     var body = $('body');
 
+    centerize.apply(body.find('.centerized:visible'));
+
     if(!body.is('.landing-home')) {
         var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
 
@@ -903,23 +931,6 @@ $(document).ready(function () {
             });
     });
 
-    // show the already visible tabs
-    var panel = body.find('.panel-pane:visible').first();
-    if(panel.length > 0) {
-        var key = panel.attr('id').replace(/-[a-z]+[0-9]+$/ig, '');
-        if (Routing.getRoute(key)) {
-            var path = Routing.generate(key),
-                item = body.find('.main-menu a[href^="' + path + '"]').first();
-
-            if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
-                item.parents('nav').find('ul.collapse.in').removeClass('in');
-            item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
-        }
-        var triggerShow = function () {
-            panel.scrollintoview(DASHBOARD_MARGINS).trigger('show');
-        };
-        setTimeout(triggerShow, 150);
-    }
 });
 
 $.ajaxPrefilter(function (options, originalOptions) {

@@ -436,7 +436,7 @@ class Pack
     public function getGroupNames()
     {
         $names = array();
-        foreach ($this->getGroups() as $group) {
+        foreach ($this->groups->toArray() as $group) {
             $names[] = $group->getName();
         }
 
