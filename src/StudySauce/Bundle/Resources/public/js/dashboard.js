@@ -116,13 +116,20 @@ $(document).ready(function () {
         // animate panels
         var triggerShow = setInterval(function () {
             if (window.sincluding.length == 0) {
-                var panels = body.find('.panel-pane:visible').fadeOut(75);
+                body.css('overflow', 'hidden');
+                var panels = body.find('.panel-pane:visible')
+                    .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
+                        panels.hide();
+                    } });
+                panel.css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
+                    panel.css('position', '');
+                    body.css('overflow', '');
+                } });
                 // poll for panel visibility and fire events
                 var triggerHide = setInterval(function () {
                     if (panels.is(':visible'))
                         return;
                     panels.trigger('hide');
-                    panel.fadeIn(75);
                     setTimeout(function () {
                         panel.scrollintoview(DASHBOARD_MARGINS).trigger('show')
                     }, 75);
