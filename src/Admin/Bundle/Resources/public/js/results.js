@@ -250,6 +250,7 @@ $(document).ready(function () {
             searchRequest.abort();
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
+        var that = $(this);
 
         searchTimeout = setTimeout(function () {
             searchRequest = $.ajax({
@@ -257,7 +258,9 @@ $(document).ready(function () {
                 type: 'GET',
                 dataType: 'text',
                 data: getData(),
-                success: loadContent
+                success: function (data) {
+                    loadContent.apply(that, [data]);
+                }
             });
         }, 100);
     }
@@ -314,7 +317,7 @@ $(document).ready(function () {
     body.on('submit', '.results header form', function (evt) {
         evt.preventDefault();
 
-        loadResults();
+        loadResults.apply($(this).parents('.results'));
     });
 
     body.on('change', '.results header .input > select, .results header .input > input', function () {
@@ -359,7 +362,7 @@ $(document).ready(function () {
             $(this).trigger('change');
         });
 
-        loadResults();
+        loadResults.apply(admin);
     });
 
 });
