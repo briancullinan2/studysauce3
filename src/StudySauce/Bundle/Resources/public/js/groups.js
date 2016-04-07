@@ -61,7 +61,6 @@ $(document).ready(function () {
 
     body.on('click', '[id^="groups"] .ss_group-row [href="#remove-confirm-group"]', function (evt) {
         evt.preventDefault();
-        var tab = $(this).parents('.group-list .results');
         var row = $(this).parents('.ss_group-row');
         var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
         body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
@@ -75,12 +74,12 @@ $(document).ready(function () {
                     remove: true
                 },
                 success: function (data) {
-                    // copy rows and select
-                    var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                    loadContent.apply(tab, [data, ['ss_groups']]);
-                    if (selected) {
-                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
+                    // copy rows and redirect
+                    var groups;
+                    if ((groups = $('#groups')).length > 0) {
+                        loadContent.apply(groups.find('.results'), [data, ['ss_group']]);
                     }
+                    activateMenu(Routing.generate('groups'));
                 }
             });
         });

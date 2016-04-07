@@ -219,13 +219,13 @@ $(document).ready(function () {
     });
 
     function loadContent (data, tables) {
+        var admin = $(this).closest('.results'),
+            content = $(data).filter('.results');
         if(!tables) {
             tables = $.unique(admin.find('[class*="-row"].template').map(function () {
                 return (/(.*)-row/i).exec($(this).attr('class'))[1];
             }).toArray());
         }
-        var admin = $(this).closest('.results:visible'),
-            content = $(data).filter('.results');
         for(var t = 0; t < tables.length; t++) {
             var table = tables[t];
             (function (table) {
