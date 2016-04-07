@@ -180,7 +180,7 @@ $(document).ready(function () {
     body.on('click', '[id^="groups-"] .ss_group-row a[href="#upload-image"]', function () {
         var row = $(this).parents('.ss_group-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
-            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('.default');
+            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('default');
             groupsFunc.apply(row);
         });
     });

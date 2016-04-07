@@ -6,7 +6,7 @@ use StudySauce\Bundle\Entity\User;
 
 $entityIds = [];
 ?>
-
+<label><?php print $pack->getUsers()->count(); ?> users</label>
 <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => ['ss_user' => ['first', 'last', 'email', 'id']], 'entities' => $pack->getUsers()->toArray()]); ?>
 
 <a href="#add-entity" class="big-add" data-toggle="modal" data-target="#add-entity">Add

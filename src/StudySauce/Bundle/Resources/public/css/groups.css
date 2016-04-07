@@ -427,7 +427,9 @@
 }
 
 
-.group-list .ss_group-row.read-only .input,
+.group-list .ss_group-row.read-only .packs .input,
+.group-edit .ss_group-row.read-only .pack-icon br,
+.group-edit .ss_group-row.read-only .pack-icon a,
 .group-list .ss_group-row.read-only .pack-icon br,
 .group-list .ss_group-row.read-only .pack-icon a,
 .group-list .ss_group-row.read-only .big-add,
