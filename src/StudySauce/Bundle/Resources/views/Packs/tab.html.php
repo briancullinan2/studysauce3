@@ -42,7 +42,7 @@ $view['slots']->start('body'); ?>
             $tables = ['tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']]];
             if($entity !== null) {
                 $tables['pack-id'] = $entity->getId();
-                $tables['headers'] = false;
+                $tables['headers'] = ['pack' => 'packs'];
                 $tables['new'] = empty($entity->getId());
                 $tables['edit'] = true;
                 $tables['count-pack'] = 1;

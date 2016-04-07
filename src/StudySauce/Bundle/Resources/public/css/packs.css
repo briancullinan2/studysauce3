@@ -111,20 +111,18 @@
     background-color: #FF4433;
 }
 
+[id^="packs-"] .pack-row > .groups,
 [id^="packs-"] .pack-row .name {
-    width: 50%;
+    width: 40%;
+    margin-left:10%;
+    padding-left:150px;
+    margin-right:5%;
 }
 
 [id^="packs-"] .pack-row > .status {
-    width: 40%;
-}
-
-[id^="packs-"] .pack-row > .groups {
-    padding-left:10%;
-    width:60%;
-    margin-left: 0;
-    margin-right: -4px;
-    padding-right:4px;
+    width: 45%;
+    padding-left:150px;
+    margin-left:-4px;
 }
 
 [id^="packs-"] .pack-row > .properties,
@@ -134,7 +132,9 @@
 
 [id^="packs-"] .pack-row > .properties
 {
-    width: 35%;
+    width: 40%;
+    padding-left:150px;
+    margin-left:-4px;
 }
 
 [id^="packs-"] .pack-row .actions
@@ -201,6 +201,10 @@
     vertical-align: middle;
 }
 
+[id^="packs-"] .pack-row {
+    position: relative;
+}
+
 [id^="packs-"] .card-row .input.type span {
     width:40px;
     display:block;
@@ -209,6 +213,30 @@
     left:0;
     top:50%;
     margin-top:-9px;
+}
+
+[id^="packs-"] header.pack {
+    position:absolute;
+    width:100%;
+    z-index: 0;
+    line-height:27px;
+}
+
+[id^="packs-"] header.pack label:nth-child(1) {
+    padding-left:10%;
+    width:55%;
+}
+
+[id^="packs-"] header.pack label:nth-child(3) {
+    width:55%;
+}
+
+[id^="packs-"] header.pack label:nth-child(2) {
+    width:45%;
+}
+
+[id^="packs-"] header.pack label:nth-child(3) {
+    padding-left:10%;
 }
 
 [id^="packs-"] .card-row.type-tf .correct.type-tf
