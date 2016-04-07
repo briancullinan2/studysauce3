@@ -23,8 +23,6 @@
 
 .group-edit .highlighted-link.ss_group a[href="#cancel-edit"],
 .group-edit .highlighted-link.ss_group a[href="#save-ss_group"],
-.group-edit .highlighted-link.ss_group a[href="#add-ss_group"],
-.group-list .highlighted-link.ss_group a[href="#add-new-ss_group"],
 .group-edit .ss_group-row.edit ~ .highlighted-link a[href="#edit-ss_group"] {
     display:none;
 }
