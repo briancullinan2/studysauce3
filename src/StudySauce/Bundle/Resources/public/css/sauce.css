@@ -1097,6 +1097,11 @@ textarea
     height:8em;
 }
 
+.selectize-dropdown-header
+{
+    padding:0;
+}
+
 .read-only .radio,
 .radio.read-only,
 .read-only .checkbox,
