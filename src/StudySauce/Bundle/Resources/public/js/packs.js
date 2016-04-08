@@ -261,10 +261,10 @@ $(document).ready(function () {
         if(tab.find('.pack-row.read-only').length > 0 || tab.find('.card-row.invalid:not(.removed)').length == 0 && (
             tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0) &&
             tab.find('.pack-row.valid:not(.empty)').length > 0) {
-            tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
+            tab.find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
         }
         else {
-            tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+            tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
         }
 
         // save at most every 2 seconds, don't autosave from admin lists
@@ -357,12 +357,12 @@ $(document).ready(function () {
         if (packRows.length == 0) {
             return;
         }
-        if(tab.find('.highlighted-link').is('.invalid')) {
+        if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]')) {
             // TODO: select incorrect row
             return;
         }
 
-        tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+        tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
         loadingAnimation(tab.find('a[href="#save-pack"]'));
 
         // get the parsed list of cards
@@ -451,6 +451,7 @@ $(document).ready(function () {
     });
 
     body.on('show', '.panel-pane[id^="packs-"]', function () {
+        autoSaveTimeout = 0;
         packsFunc.apply($(this).find('.pack-row'));
         packsFunc.apply($(this).find('.card-row'));
         autoSaveTimeout = null;

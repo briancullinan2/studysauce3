@@ -8,10 +8,10 @@ $(document).ready(function () {
         var tab = $(this).parents('.results:visible');
         var groupRow = tab.find('.ss_group-row.edit');
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
-            tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+            tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
         }
         else {
-            tab.find('.highlighted-link').removeClass('invalid').addClass('valid');
+            tab.find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
         }
 
         // do not autosave from selectize because the input underneath will change
@@ -101,10 +101,10 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         var tab = $(this);
         var row = tab.find('.ss_group-row.edit:not(.template)');
-        if(tab.find('.highlighted-link').is('.invalid'))
+        if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]'))
             return;
         loadingAnimation(tab.find('a[href="#save-ss_group"]'));
-        tab.find('.highlighted-link').removeClass('valid').addClass('invalid');
+        tab.find('.highlighted-link').attr('disabled', 'disabled');
 
         $.ajax({
             url: Routing.generate('save_group'),
@@ -142,6 +142,7 @@ $(document).ready(function () {
     }
 
     body.on('show', '.panel-pane[id^="groups-"]', function () {
+        autoSaveTimeout = 0;
         groupsFunc.apply($(this).find('.ss_group-row'));
         autoSaveTimeout = null;
     });
