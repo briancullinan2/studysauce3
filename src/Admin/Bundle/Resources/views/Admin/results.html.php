@@ -57,11 +57,15 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         // print out row template for client side to use
         $class = AdminController::$allTables[$table]->name;
         $entity = new $class();
-        $classes = !$isNew ? 'template' : ' empty';
-        $newCount = $isNew && !empty(intval($app->getRequest()->get('count-' . $table))) ? intval($app->getRequest()->get('count-' . $table)) : 1;
-        for ($nc = 0; $nc < $newCount; $nc++) {
-            print $view->render('AdminBundle:Admin:row.html.php', ['classes' => $classes, 'entity' => $entity, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups]);
+        if($isNew) {
+            $classes = ' empty';
+            $newCount = $isNew && !empty(intval($app->getRequest()->get('count-' . $table))) ? intval($app->getRequest()->get('count-' . $table)) : 1;
+            for ($nc = 0; $nc < $newCount; $nc++) {
+                print $view->render('AdminBundle:Admin:row.html.php', ['classes' => $classes, 'entity' => $entity, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups]);
+            }
         }
+        $classes = 'template empty';
+        print $view->render('AdminBundle:Admin:row.html.php', ['classes' => $classes, 'entity' => $entity, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups]);
 
         // show footer at the end of each result list
         if (count($$table) > 0 || $isNew) {
