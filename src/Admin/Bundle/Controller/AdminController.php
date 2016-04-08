@@ -607,9 +607,12 @@ class AdminController extends Controller
         $orm->flush();
 
         return $this->forward('AdminBundle:Admin:results', [
-            'tables' => ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']]],
+            'tables' => [
+                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']],
+                'pack' => ['title', 'counts', 'members' => ['groups'], 'actions' => ['status'] /* search field but don't display a template */]],
             'ss_group-id' => $request->get('remove') == 'true' ? null : $g->getId(),
             'edit' => ['ss_group'],
+            'count-group' => 1,
             'count-pack' => 0]);
     }
 

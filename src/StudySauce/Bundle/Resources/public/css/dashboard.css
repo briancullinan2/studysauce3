@@ -1,7 +1,7 @@
 
 .dashboard-home
 {
-    background: url(../images/ajax-loader.gif) no-repeat fixed center center #DDDDDD;
+    background: #DDDDDD;
 }
 
 .dashboard-home .panel-pane[id^="uid-"]
@@ -70,7 +70,6 @@
     padding:50px 100px 0 0;
     box-sizing: border-box;
     position:relative;
-    background: #DDDDDD;
 }
 
 .admin aside + .panel-pane,
@@ -84,7 +83,7 @@
 
 .pane-content
 {
-    padding: 20px 0;
+    padding: 20px 0 40px 0;
     position: relative;
     overflow: hidden;
 }

@@ -457,7 +457,11 @@ $(document).ready(function () {
             if(field.parents('.template,.read-only').length > 0) {
                 return;
             }
-            field.selectize();
+            field.selectize({
+                plugins: {
+                    'clear_selection': {}
+                }
+            });
         });
 
         var that = body.find('input[type="text"][data-tables]:not(.selectized)');
@@ -482,6 +486,9 @@ $(document).ready(function () {
                 dropdownParent: null,
                 closeAfterSelect: true,
                 options: options,
+                plugins: {
+                    'clear_selection': {}
+                },
                 render: {
                     option: function (item) {
                         var desc = '<span class="title">'

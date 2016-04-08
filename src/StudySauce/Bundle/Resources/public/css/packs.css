@@ -205,7 +205,7 @@
     position: relative;
 }
 
-[id^="packs-"] .card-row .input.type span {
+[id^="packs-"] .card-row .input.type > span {
     width:40px;
     display:block;
     margin-right:-4px;
