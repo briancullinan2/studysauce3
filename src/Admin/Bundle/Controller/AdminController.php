@@ -522,6 +522,8 @@ class AdminController extends Controller
 
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
+        /** @var $userManager UserManager */
+        $userManager = $this->get('fos_user.user_manager');
 
         /** @var $user User */
         $user = $this->getUser();
@@ -599,8 +601,15 @@ class AdminController extends Controller
                 $orm->remove($g);
             }
             else {
+                $g->setName($g->getName() . '-Deleted On ' . time());
                 $g->setDeleted(true);
             }
+            //foreach($g->getUsers()->toArray() as $i => $u) {
+            //    /** @var User $u */
+            //    $u->removeGroup($g);
+            //    $g->removeUser($u);
+            //    $userManager->updateUser($u, false);
+            //}
         }
         else
             $orm->merge($g);

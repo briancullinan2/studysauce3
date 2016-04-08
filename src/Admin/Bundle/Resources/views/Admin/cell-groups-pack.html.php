@@ -23,7 +23,7 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 <div>
     <label class="input">
         <input type="text"
-               data-tables="<?php print $view->escape(json_encode(['ss_user' => ['first', 'last', 'email', 'id'], 'ss_group' => ['name', 'userCountStr', 'description', 'id']])); ?>"
+               data-tables="<?php print $view->escape(json_encode(['ss_user' => ['first', 'last', 'email', 'id', 'deleted'], 'ss_group' => ['name', 'userCountStr', 'description', 'id', 'deleted']])); ?>"
                data-ss_group="<?php print $view->escape(json_encode(array_map(function (Group $u) use (&$entityIds, &$groupIds) {
                    $entityIds[] = 'ss_group-' . $u->getId();
                    $groupIds[] = 'ss_group-' . $u->getId();

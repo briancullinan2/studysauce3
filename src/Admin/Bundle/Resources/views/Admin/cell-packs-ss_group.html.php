@@ -23,7 +23,7 @@ $entityIds = [];
                    ];
                }, $ss_group->getPacks()->toArray()))); ?>"
                data-tables="<?php print $view->escape(json_encode([
-                   'pack' => ['title', 'userCountStr', 'cardCountStr', 'id']])); ?>"
+                   'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status']])); ?>"
                data-entities="<?php print $view->escape(json_encode($entityIds)); ?>" placeholder="Search for existing pack"/></label>
     <?php
     foreach ($ss_group->getGroupPacks()->toArray() as $p) {

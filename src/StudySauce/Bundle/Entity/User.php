@@ -863,7 +863,6 @@ class User extends BaseUser implements EncoderAwareInterface
      *
      * @param GroupInterface $group
      * @return User
-     * @internal param Group $groups
      */
     public function addGroup(GroupInterface $group)
     {
@@ -875,7 +874,6 @@ class User extends BaseUser implements EncoderAwareInterface
      *
      * @param GroupInterface $group
      * @return $this|\FOS\UserBundle\Model\GroupableInterface|void
-     * @internal param Group $groups
      */
     public function removeGroup(GroupInterface $group)
     {

@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
         visibility: visible;
     }
 
+    .results .<?php print $table; ?>-row.edit ~ .highlighted-link.<?php print $table; ?> a[href^="#edit-"],
     .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .highlighted-link.<?php print $table; ?>,
     .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .<?php print $table; ?>-row {
         display: none;

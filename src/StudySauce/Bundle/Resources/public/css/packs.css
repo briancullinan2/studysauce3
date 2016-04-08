@@ -12,6 +12,7 @@
 }
 
 [id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
+[id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .pack-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#add-"],
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#edit-"],
@@ -49,6 +50,7 @@
     vertical-align: top;
     padding-top: 5%;
     padding-bottom: 5%;
+    top:-30px;
 }
 
 #packs .pack-row .id {

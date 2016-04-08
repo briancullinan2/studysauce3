@@ -49,9 +49,9 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         <?php if($app->getRequest()->get('_format') != 'funnel') { ?>
             <div id="welcome-message">
                 <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode([
-                        'pack' => ['title', 'userCountStr', 'cardCountStr', 'id'],
-                        'ss_user' => ['first', 'last', 'email', 'id'],
-                        'ss_group' => ['name', 'userCountStr', 'description', 'id']])); ?>" placeholder="Search" /></label>
+                        'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
+                        'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
+                        'ss_group' => ['name', 'userCountStr', 'description', 'id', 'deleted']])); ?>" placeholder="Search" /></label>
                 <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>
                 <a href="<?php print $view['router']->generate('logout'); ?>" title="Log out">logout</a></div>
             <div id="jquery_jplayer" style="width: 0; height: 0;"></div>
