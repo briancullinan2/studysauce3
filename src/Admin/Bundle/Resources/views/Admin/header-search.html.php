@@ -48,7 +48,7 @@
         $tableTotal = $table . '_total';
         ?>
         <h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a
-            href="#add-<?php print $table; ?>">+</a>
+            href="#add-new-<?php print $table; ?>">+</a>
         <small>(<?php print $$tableTotal; ?>)</small></h2><?php
     }
 

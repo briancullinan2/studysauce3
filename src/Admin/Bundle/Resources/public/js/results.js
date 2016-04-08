@@ -264,6 +264,7 @@ $(document).ready(function () {
             });
         }, 100);
     }
+    window.loadResults = loadResults;
 
     body.on('mouseover click', '.results [class*="-row"]', resetHeader);
 

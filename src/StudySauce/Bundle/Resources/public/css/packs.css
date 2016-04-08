@@ -11,6 +11,7 @@
     display:none;
 }
 
+[id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .pack-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#add-"],
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#edit-"],
@@ -549,7 +550,7 @@
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1302px transparent;
 }
 
-[id^="packs-"]  .results .pack-row .actions
+[id^="packs-"] .results .pack-row .actions
 {
     position: absolute;
     width: 40px;
@@ -560,6 +561,11 @@
     margin-top: -12px;
 }
 
+[id^="packs-"] .results .card-row .actions
+{
+    padding-right: 2px;
+    margin-right: -2px;
+}
 
 #packs .highlighted-link.card,
 #packs a[href="#add-entity"],

@@ -404,16 +404,21 @@ $(document).ready(function () {
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
+
+                // rename tab if working with a new pack
+                if (tab.closest('.panel-pane').is('#packs-pack0')) {
+                    tab.closest('.panel-pane').attr('id', 'packs-pack' + data.pack[0].id);
+                    if (!close) {
+                        window.activateMenu(Routing.generate('packs_edit', {pack: data.pack[0].id}));
+                    }
+                }
+
                 if (close) {
-                    packRows.removeClass('edit').addClass('read-only');
-                    tab.find('.card-row.valid').removeClass('edit').addClass('read-only');
                     loadContent.apply(tab, [data]);
-                    packRows.removeClass('read-only').addClass('edit');
-                    cardRows.removeClass('read-only').addClass('edit');
                     packsFunc.apply(tab.find('.card-row'));
-                    var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.pack-row:visible').first().attr('class'))[1];
-                    tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
-                    tab.find('.search .input').removeClass('read-only');
+                    //var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.pack-row:visible').first().attr('class'))[1];
+                    //tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
+                    //tab.find('.search .input').removeClass('read-only');
                     window.activateMenu(Routing.generate('packs'));
                 }
                 else {
@@ -422,8 +427,6 @@ $(document).ready(function () {
                         if(packRows.filter('.pack-id-' + data.pack[i].id).length == 0) {
                             packRows.filter('.edit.pack-id-:not(.template)').first().removeClass('pack-id-').addClass('pack-id-' + data.pack[i].id);
                             // set pack id on panel
-                            tab.closest('.panel-pane').attr('id', 'packs-pack' + data.pack[i].id);
-                            window.activateMenu(Routing.generate('packs_edit', {pack: data.pack[i].id}));
                         }
                     }
                     for(var j = 0; j < data.card.length; j++) {
@@ -431,7 +434,9 @@ $(document).ready(function () {
                             cardRows.filter('.edit.card-id-:not(.template)').first().removeClass('card-id-').addClass('card-id-' + data.card[j].id);
                         }
                     }
+                    tab.trigger('resulted');
                 }
+
                 // if done in the background, don't refresh the tab with loadContent
             },
             error: function () {
@@ -440,9 +445,21 @@ $(document).ready(function () {
         });
     }
 
+    var shouldRefresh = false;
+    body.on('resulted', '[id^="packs"] .results', function () {
+        shouldRefresh = true;
+    });
+
     body.on('show', '.panel-pane[id^="packs-"]', function () {
         packsFunc.apply($(this).find('.pack-row'));
         packsFunc.apply($(this).find('.card-row'));
+        autoSaveTimeout = null;
+    });
+
+    body.on('show', '#packs', function () {
+        if (shouldRefresh) {
+            loadResults.apply($(this).find('.results'));
+        }
     });
 
     body.on('change keyup keydown', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
