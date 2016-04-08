@@ -187,6 +187,14 @@ $collection->add('demoadviser',
         [],
         ['page' => 'demoadviser|demoadvisor']));
 $collection->add(
+    'error',
+    new Route(
+        '/error',
+        ['_controller' => 'StudySauceBundle:Landing:error', '_format' => 'funnel'],
+        ['_format' => 'funnel']
+    )
+);
+$collection->add(
     'error403',
     new Route(
         '/denied',

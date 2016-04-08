@@ -141,10 +141,21 @@ $(document).ready(function () {
         });
     }
 
+    var shouldRefresh = false;
+    body.on('resulted', '[id^="groups-"] .results', function () {
+        shouldRefresh = true;
+    });
+
     body.on('show', '.panel-pane[id^="groups-"]', function () {
         autoSaveTimeout = 0;
         groupsFunc.apply($(this).find('.ss_group-row'));
         autoSaveTimeout = null;
+    });
+
+    body.on('show', '#groups', function () {
+        if (shouldRefresh) {
+            loadResults.apply($(this).find('.results'));
+        }
     });
 
     body.on('click', '[id^="groups-"] a[href="#save-ss_group"], [id^="groups-"] [value="#save-ss_group"]', function (evt) {
@@ -174,6 +185,7 @@ $(document).ready(function () {
 
     body.on('click', '[id^="groups-"] .ss_group-row.edit a[href^="#cancel-"], [id^="groups-"] .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
+        $(this).parents('.results').find('.ss_group-row').removeClass('edit').addClass('read-only');
         window.activateMenu(Routing.generate('groups'));
     });
 
@@ -185,10 +197,10 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '[id^="groups-"] .ss_group-row .packs input.selectized', function (evt) {
+    body.on('change', '[id^="groups-"] .highlighted-link .packs input.selectized', function (evt) {
         var dialog = $('#pack-publish').modal({show: true, backdrop: true});
         var tab = $(this).parents('.results'),
-            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec($(this).parents('.ss_group-row').attr('class'))[1],
+            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row:not(.template)').attr('class'))[1],
             label = $(this).parents('label');
 
 
@@ -207,8 +219,8 @@ $(document).ready(function () {
             inline: true,
             minDate: 0
         });
-        dialog.one('click.publish', 'a[href="#submit-publish"]', function () {
 
+        dialog.one('click.publish', 'a[href="#submit-publish"]', function () {
 
             var publish = {
                 schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? 'now' : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),

@@ -446,7 +446,7 @@ $(document).ready(function () {
     }
 
     var shouldRefresh = false;
-    body.on('resulted', '[id^="packs"] .results', function () {
+    body.on('resulted', '[id^="packs-"] .results', function () {
         shouldRefresh = true;
     });
 

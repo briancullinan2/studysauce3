@@ -71,7 +71,7 @@
     position:relative;
 }
 
-.group-list .ss_group-row .packs {
+.group-list .ss_group-row .packList {
     display:block;
     width:auto;
     height: 120px;
@@ -143,12 +143,9 @@
     font-weight: normal;
 }
 
-.group-edit .ss_group-row > .packs
+.group-edit .highlighted-link > .packs
 {
     width: 45%;
-    position: absolute;
-    top: 150px;
-    left: 0;
 }
 
 .group-edit .results .ss_group-row.read-only:hover
@@ -186,7 +183,7 @@
     max-width: 100%;
 }
 
-.group-list .ss_group-row .packs span {
+.group-list .ss_group-row .packList span {
     float:right;
 }
 
@@ -204,13 +201,13 @@
 .group-edit .results .ss_group-row .actions
 {
     position:absolute;
-    width:50px;
+    width:40px;
     top:0;
     padding-right:2px;
     margin-right: -2px;
+    left:50%;
 }
 
-.group-edit .results .ss_group-row.read-only .packs,
 .group-edit .results .ss_group-row.read-only .actions {
     display:none;
 }
@@ -281,11 +278,6 @@
     width:100%;
 }
 
-.group-edit header.pack
-{
-    padding: 40px 0 10px;
-}
-
 .group-edit header.ss_group {
     position:absolute;
     width:100%;
@@ -331,10 +323,6 @@
     display:block;
 }
 
-.group-edit .ss_group-row .packs .pack-list {
-    display:none;
-}
-
 .group-edit .pack-row .counts label {
     width:50%;
     margin:0 -2px;
@@ -354,8 +342,8 @@
     height: 100%;
     position:absolute;
     width:50%;
-    padding-bottom:365px;
-    margin-top:250px;
+    padding-bottom:385px;
+    margin-top:270px;
     padding-left:20px;
     background: #E9E9E9;
     z-index: 110;
@@ -444,11 +432,6 @@
     width:49%;
 }
 
-.group-edit .highlighted-link.pack
-{
-    display:none;
-}
-
 .group-list .ss_group-row > label.checkbox:nth-last-child(1),
 .group-edit .ss_group-row > label.checkbox:nth-last-child(1),
 .group-edit .pack-row > label.checkbox:nth-last-child(1) {
@@ -467,13 +450,11 @@
 }
 
 
-.group-list .ss_group-row.read-only .packs .input,
 .group-edit .ss_group-row.read-only .pack-icon br,
 .group-edit .ss_group-row.read-only .pack-icon a,
 .group-list .ss_group-row.read-only .pack-icon br,
-.group-list .ss_group-row.read-only .pack-icon a,
-.group-list .ss_group-row.read-only .big-add,
-.group-list .ss_group-row.read-only .big-add ~ br {
+.group-list .ss_group-row.read-only .pack-icon a
+{
     display:none;
 }
 

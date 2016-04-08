@@ -34,14 +34,11 @@ foreach($fields as $subfield) {
     }
 }
 
-if (method_exists($entity, 'get' . ucfirst($field))) {
-    $result = $entity->{'get' . ucfirst($field)}();
+if (count($searchTables) > 0 && method_exists($entity, 'get' . ucfirst($field))) {
+    $result = $entity->{'get' . ucfirst($field)}()->toArray();
 
     if ($result instanceof \Doctrine\Common\Collections\ArrayCollection) {
-        print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $searchTables, 'entities' => $result->slice(0, 5)]);
-        if ($result->count() > 5) {
-            print ' <a href="#search-' . $table . ':' . $entity->getId() . '">+' . ($result->count() - 5) . ' more</a>';
-        }
+        print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $searchTables, 'entities' => $result]);
     }
 }
 

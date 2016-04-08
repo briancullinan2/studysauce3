@@ -9,22 +9,6 @@ $entityIds = [];
 ?>
 
 <div>
-    <a href="<?php print $view['router']->generate('packs_new'); ?>" class="big-add">Create
-        <span>+</span> new pack</a><br/>
-    <label class="input">
-        <input type="text" name="packs" value=""
-               data-pack="<?php print $view->escape(json_encode(array_map(function (Pack $u) use (&$entityIds) {
-                   $entityIds[] = 'pack-' . $u->getId();
-                   return [
-                       'table' => 'pack',
-                       'value' => 'pack-' . $u->getId(),
-                       'text' => $u->getTitle() . ' ' . $u->getUserCountStr(),
-                       0 => $u->getCardCountStr()
-                   ];
-               }, $ss_group->getPacks()->toArray()))); ?>"
-               data-tables="<?php print $view->escape(json_encode([
-                   'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status']])); ?>"
-               data-entities="<?php print $view->escape(json_encode($entityIds)); ?>" placeholder="Search for existing pack"/></label>
     <?php
     foreach ($ss_group->getGroupPacks()->toArray() as $p) {
         /** @var Pack $p */
