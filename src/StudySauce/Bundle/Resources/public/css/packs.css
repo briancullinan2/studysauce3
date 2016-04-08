@@ -11,10 +11,12 @@
     display:none;
 }
 
+[id^="packs-"] .pack-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#add-"],
+[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#edit-"],
 [id^="packs-"] .pack-row.read-only ~ .highlighted-link.pack a[href^="#save-"]
 {
-    visibility: hidden;
+    display: none;
 }
 
 [id^="packs-"] .card-row.edit.selected .highlighted-link > *:not(.more),
@@ -70,10 +72,6 @@
     padding:0;
 }
 
-[id^="packs-"] .pack-row .status {
-    position:relative;
-}
-
 #packs .pack-row .status .unpublished .selectize-input,
 [id^="packs-"] .pack-row .status .unpublished .selectize-input,
 #packs .pack-row .status .unpublished select,
@@ -112,17 +110,20 @@
 }
 
 [id^="packs-"] .pack-row > .groups,
-[id^="packs-"] .pack-row .name {
-    width: 40%;
+[id^="packs-"] .pack-row > .name {
+    width: 45%;
     margin-left:10%;
     padding-left:150px;
-    margin-right:5%;
+    margin-right:0;
+    padding-right:5%;
 }
 
 [id^="packs-"] .pack-row > .status {
     width: 45%;
     padding-left:150px;
     margin-left:-4px;
+    position:relative;
+    padding-right: 30px;
 }
 
 [id^="packs-"] .pack-row > .properties,
@@ -132,9 +133,10 @@
 
 [id^="packs-"] .pack-row > .properties
 {
-    width: 40%;
+    width: 45%;
     padding-left:150px;
     margin-left:-4px;
+    padding-right: 30px;
 }
 
 [id^="packs-"] .pack-row .actions
@@ -529,10 +531,11 @@
     position: absolute;
     z-index: 1;
     top: 50%;
-    right: 0;
+    right: auto;
     margin-top: -10px;
     font-size: 50px;
     vertical-align: middle;
+    left:90%;
 }
 
 [id^="packs-"] a[href="#pack-publish"] {
@@ -546,10 +549,17 @@
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1302px transparent;
 }
 
-[id^="packs-"] .pack-row.edit .status label,
-[id^="packs-"] .pack-row.edit .groups label {
-    padding-right: 30px;
+[id^="packs-"]  .results .pack-row .actions
+{
+    position: absolute;
+    width: 40px;
+    top: 25%;
+    padding-right: 2px;
+    margin-right: -2px;
+    left: 50%;
+    margin-top: -12px;
 }
+
 
 #packs .highlighted-link.card,
 #packs a[href="#add-entity"],
@@ -564,7 +574,6 @@
     display:none;
 }
 
-[id^="packs-"] .pack-row .status,
 [id^="packs-"] .pack-row .groups {
     position:relative;
 }
