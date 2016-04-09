@@ -28,7 +28,7 @@ $(document).ready(function () {
             panelIds = body.find('.panel-pane').map(function () {
                 return $(this).attr('id');
             }).toArray(),
-            item = body.find('.main-menu a[href^="' + subPath + '"]').first();
+            item = body.find('.main-menu a[href$="' + subPath + '"]').first();
 
         // activate the menu
         body.find('.main-menu .active').removeClass('active');
@@ -47,6 +47,11 @@ $(document).ready(function () {
                 item.parents('ul.collapse')[0] != body.find('.main-menu ul.collapse.in')[0])
                 body.find('.main-menu ul.collapse.in').removeClass('in');
             item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
+            body.find('#welcome-message .main-menu a').each(function () {
+                var parts = $(this).attr('href').split('/');
+                parts[parts.length-1] = subPath.substr(1);
+                $(this).attr('href', parts.join('/'));
+            });
         }
         if (that.is('a')) {
             item = item.add(that);
@@ -814,6 +819,15 @@ $(document).ready(function () {
             if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
                 item.parents('nav').find('ul.collapse.in').removeClass('in');
             item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
+            var host;
+            body.find('#welcome-message .main-menu a').each(function () {
+                var parts = $(this).attr('href').split('/');
+                parts[parts.length-1] = path.substr(1);
+                $(this).attr('href', parts.join('/'));
+            });
+            if(!(host = body.find('#welcome-message .main-menu a[href*="' + window.location.hostname +  '"]')).is('.active')) {
+                host.addClass('active');
+            }
         }
         ssMergeStyles(body);
         activatePanel.apply(body, [panel]);
