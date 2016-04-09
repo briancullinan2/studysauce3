@@ -61,6 +61,7 @@
     background: #e9e9e9;
     text-align: left;
     border-radius:1px;
+    z-index: 1;
 }
 
 .group-list .ss_group-row .id {
@@ -252,8 +253,7 @@
     text-align: center;
     position: absolute;
     vertical-align: top;
-    padding-top: 0;
-    padding-bottom: 10%;
+    padding-top: 10%;
     top: -30px;
 }
 
@@ -449,11 +449,15 @@
     float:none;
 }
 
+.group-edit .ss_group-row.read-only .pack-icon,
+.group-list .ss_group-row.read-only .pack-icon
+{
+    z-index: -1;
+}
 
-.group-edit .ss_group-row.read-only .pack-icon br,
-.group-edit .ss_group-row.read-only .pack-icon a,
+.group-edit .ss_group-row.read-only .pack-icon .reveal,
 .group-list .ss_group-row.read-only .pack-icon br,
-.group-list .ss_group-row.read-only .pack-icon a
+.group-list .ss_group-row.read-only .pack-icon .reveal
 {
     display:none;
 }

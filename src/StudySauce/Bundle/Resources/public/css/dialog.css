@@ -2,7 +2,7 @@
 .modal-content
 {
     border: none;
-    border-radius: 10px;
+    border-radius: 1px;
 }
 
 .modal
@@ -154,7 +154,7 @@
     padding: 2px 3px;
     border: 2px solid #CC0000;
     color:#660000;
-    border-radius: 5px;
+    border-radius: 1px;
 }
 
 #contact-support.invalid-only .invalid-only
@@ -289,7 +289,7 @@ body.right-menu #bookmark
 .modal .modal-header
 {
     background-color: #0099BB;
-    border-radius: 10px 10px 0 0;
+    border-radius: 1px 1px 0 0;
     border-bottom: none;
     color: #fff;
     padding-right:70px;
@@ -334,7 +334,7 @@ body.right-menu #bookmark
     position: absolute;
     height: 100%;
     background-color: rgba(255,255,255,.2);
-    border-top-right-radius: 10px;
+    border-top-right-radius: 1px;
     width:50px;
     transition: background-color ease-in-out .15s;
 }
@@ -400,7 +400,7 @@ body.right-menu #bookmark
     padding: 20px;
     background: url("../images/noise_gray.png") repeat scroll 0 0 #DDDDDD;
     box-shadow: 0 0 20px rgba(0,0,0,.75);
-    border-radius: 10px;
+    border-radius: 1px;
     position: relative;
     text-align: left;
     display: none;

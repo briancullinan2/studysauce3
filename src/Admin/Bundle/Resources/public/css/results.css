@@ -207,32 +207,6 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
     transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
 }
 
-.results [class*="-row"] a[href^="#edit-"]
-{
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1552px transparent;
-}
-
-.results [class*="-row"] a[href^="#edit-"]:hover
-{
-    background-position: left -1602px;
-}
-
-.results [class*="-row"] a[href^="#remove-"]:not(.more)
-{
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
-}
-
-.results [class*="-row"] a[href^="#remove-"]:not(.more):hover
-{
-    background-position: left -1702px;
-}
-
 .results [class*="-row"].read-only .highlighted-link > *
 {
     margin: -3px 0;

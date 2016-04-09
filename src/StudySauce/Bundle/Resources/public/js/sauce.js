@@ -868,6 +868,10 @@ $(document).ready(function () {
 
     centerize.apply(body.find('.centerized:visible'));
 
+    body.on('shown.bs.modal', function () {
+        centerize.apply($('body').find('.centerized:visible'));
+    });
+
     if(!body.is('.landing-home')) {
         var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
 
