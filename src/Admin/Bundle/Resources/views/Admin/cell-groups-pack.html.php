@@ -4,7 +4,7 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
 /** @var Pack $pack */
-$groups = $pack->getGroups()->toArray();
+$groups = $pack->getGroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();
 $users = $pack->getUsers()->toArray();
 $entityIds = [];
 $groupIds = [];

@@ -322,7 +322,7 @@ class AdminController extends Controller
             /** @var QueryBuilder $qb */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
             $where = self::searchBuilder($qb, $table, $table, $searchRequest);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, self::$defaultSearch);
+            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest));
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }
@@ -366,7 +366,7 @@ class AdminController extends Controller
             */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
             $where = self::searchBuilder($qb, $table, $table, $searchRequest);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, self::$defaultSearch);
+            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest));
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }

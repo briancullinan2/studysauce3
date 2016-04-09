@@ -8,7 +8,7 @@ use StudySauce\Bundle\Entity\User;
 $entityIds = [];
 /** @var Pack $pack */
 
-$groups = $pack->getGroups()->toArray();
+$groups = $pack->getGroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();
 $users = $pack->getUsers()->toArray();
 $entityIds = [];
 $groupIds = [];
@@ -28,13 +28,13 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
     foreach ($groups as $p) {
         /** @var Group $p */
         ?>
-        <a href="<?php print $view['router']->generate('packs_edit', ['pack' => $p->getId()]); ?>" class="pack-list"><?php print $p->getName(); ?>
+        <a href="<?php print $view['router']->generate('groups_edit', ['group' => $p->getId()]); ?>" class="pack-list"><?php print $p->getName(); ?>
             <span><?php print $p->getUsers()->count(); ?></span></a>
     <?php }
     foreach ($diffUsers as $g) {
         /** @var User $g */
         ?>
-        <a href="<?php print $view['router']->generate('groups_edit', ['group' => $g->getId()]); ?>" class="pack-list"><?php print $g->getFirst() . ' ' . $g->getLast(); ?>
+        <a href="#<?php //print $view['router']->generate('groups_edit', ['group' => $g->getId()]); ?>" class="pack-list"><?php print $g->getFirst() . ' ' . $g->getLast(); ?>
             <span>1</span></a>
     <?php } ?>
 
