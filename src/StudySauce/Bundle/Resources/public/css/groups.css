@@ -30,7 +30,6 @@
 
 .group-list {
     margin: 0;
-    background:#DDDDDD;
     padding: 0;
 }
 
@@ -327,6 +326,10 @@
     width:49%;
 }
 
+.right-pad .group-list .results {
+    padding-right:15px;
+}
+
 .group-edit .ss_group-row > label.checkbox:nth-last-child(1),
 .group-edit .pack-row > label.checkbox:nth-last-child(1) {
     display:none;
@@ -373,4 +376,12 @@
 .group-edit .pack-row .highlighted-link > [value^="#save-"]
 {
     display:none !important;
+}
+
+@media all and (max-width: 1000px) {
+
+    .right-pad .group-list .ss_group-row {
+        width: 99%;
+    }
+
 }

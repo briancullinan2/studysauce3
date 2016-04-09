@@ -640,3 +640,24 @@ table.results.expandable > tbody > tr:nth-child(even) > td
         margin-left:-320px
     }
 }
+
+@media (max-width: 1000px) {
+    .tiles [class*="-row"]
+    {
+        width:32.33%;
+    }
+}
+
+@media (max-width: 700px) {
+    .tiles [class*="-row"]
+    {
+        width:49%;
+    }
+}
+
+@media (max-width: 500px) {
+    .tiles [class*="-row"]
+    {
+        width:99%;
+    }
+}

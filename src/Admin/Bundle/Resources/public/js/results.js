@@ -72,38 +72,41 @@ $(document).ready(function () {
     });
 
     function resetHeader() {
-        var command = $('.results:visible').first();
+        var command = $('.results.collapsible:visible').first();
         if (command.length == 0) {
             return;
         }
-        var selected = $('[class*="-row"]:visible.selected').filter(function () {
-            return isElementInViewport($(this));
-        });
+        command.each(function () {
+            var command = $(this);
+            var selected = $('[class*="-row"]:visible.selected').filter(function () {
+                return isElementInViewport($(this));
+            });
 
-        if (selected.length == 0) {
-            if ($(this).is('[class*="-row"]:visible') && isElementInViewport($(this))) {
-                selected = $(this);
+            if (selected.length == 0) {
+                if ($(this).is('[class*="-row"]:visible') && isElementInViewport($(this))) {
+                    selected = $(this);
+                }
+                else {
+                    selected = command.find('[class*="-row"]:visible').filter(function () {
+                        return isElementInViewport($(this));
+                    });
+                }
+            }
+
+            if(selected.length == 0) {
+                command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
+                command.addClass('empty');
             }
             else {
-                selected = command.find('[class*="-row"]:visible').filter(function () {
-                    return isElementInViewport($(this));
-                });
+                command.removeClass('empty');
+                var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
+                table = 'showing-' + table;
+                if(!command.is('.' + table)) {
+                    command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
+                    command.addClass(table);
+                }
             }
-        }
-
-        if(selected.length == 0) {
-            command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
-            command.addClass('empty');
-        }
-        else {
-            command.removeClass('empty');
-            var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
-            table = 'showing-' + table;
-            if(!command.is('.' + table)) {
-                command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
-                command.addClass(table);
-            }
-        }
+        });
     }
 
     body.on('show', '.panel-pane', function () {

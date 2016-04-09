@@ -31,7 +31,7 @@
 #site-name
 {
     font-family: 'Ubuntu',Arial,sans-serif;
-    width: 400px;
+    width: 350px;
     display: inline-block;
     clear: left;
     text-align: left;
@@ -120,16 +120,15 @@
     text-align: right;
     left: auto;
     padding-right: 100px;
-    vertical-align: middle;
     line-height: 40px;
 }
 
 #welcome-message > * {
     display:inline-block;
-    vertical-align: middle;
+    vertical-align: top;
 }
 
-.header-wrapper a[href$="/logout"] {
+#welcome-message > a[href$="/logout"] {
     display: inline-block;
     height: 24px;
     width: 24px;
@@ -137,38 +136,32 @@
     overflow: hidden;
     color: transparent;
     margin-left: 10px;
+    vertical-align: middle;
 }
 
 @media all and (max-width:1300px)
 {
     #site-name
     {
-        padding-left:20px;
+        padding-left:10px;
+        width:270px;
     }
 
     #welcome-message
     {
-        padding-right:20px;
+        padding-right:10px;
+        width:355px;
     }
 
-    .header
+    #welcome-message .input
     {
-        margin:0 auto;
-        max-width: 900px;
+        min-width:100px;
     }
+
 }
 
 @media all and (max-width: 1000px)
 {
-    #site-name
-    {
-        padding-left:60px;
-    }
-
-    #welcome-message
-    {
-        padding-right:60px;
-    }
 
     #partner-message
     {
@@ -203,8 +196,6 @@
 
     #site-name img
     {
-        max-height: 48px;
-        max-width: 48px;
     }
 
     .header-wrapper

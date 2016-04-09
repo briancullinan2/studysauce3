@@ -67,7 +67,7 @@
     margin:0 auto;
     max-width: none;
     width: 100%;
-    padding:50px 100px 0 0;
+    padding:50px 10px 0 10px;
     box-sizing: border-box;
     position:relative;
 }
@@ -460,7 +460,7 @@ a[href="#subtract-entity"]:hover {
 
 }
 
-@media all and (min-width: 1500px) {
+@media all and (min-width: 1300px) {
     .panel-pane {
         padding-right: 100px;
         padding-left: 100px;
