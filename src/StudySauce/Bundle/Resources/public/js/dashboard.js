@@ -52,6 +52,9 @@ $(document).ready(function () {
                 parts[parts.length-1] = subPath.substr(1);
                 $(this).attr('href', parts.join('/'));
             });
+            if(!(host = body.find('#welcome-message .main-menu a[href*="' + window.location.hostname +  '"]')).is('.active')) {
+                host.addClass('active');
+            }
         }
         if (that.is('a')) {
             item = item.add(that);
