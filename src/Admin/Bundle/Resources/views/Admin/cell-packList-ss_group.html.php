@@ -23,7 +23,7 @@ $entityIds = [];
     <?php }
     foreach ($ss_group->getSubgroups()->toArray() as $g) {
         /** @var Group $g */
-        if($g->getDeleted()) {
+        if($g->getDeleted() || $g->getUsers()->count() == 0) {
             continue;
         }
         ?>

@@ -20,4 +20,4 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 
 ?>
 <label class="input"><input type="text" name="title" value="<?php print $view->escape($pack->getTitle()); ?>" /></label>
-<span class="count"><?php print array_sum($pack->getGroups()->map(function (Group $g) {return $g->getUsers()->count();})->toArray()) + count($diffUsers); ?></span>
+<span class="count"><?php print array_sum(array_map(function (Group $g) {return $g->getUsers()->count();}, $groups)) + count($diffUsers); ?></span>
