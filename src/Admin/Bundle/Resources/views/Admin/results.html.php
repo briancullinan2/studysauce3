@@ -6,6 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var GlobalVariables $app */
 
+$request = $app->getRequest();
+
+$classes = $request->get('classes');
+
 ?>
 <style>
     <?php foreach($tables as $table => $t) { ?>
@@ -29,7 +33,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
     <?php } ?>
 </style>
-<div class="results collapsible">
+<div class="results <?php print (is_array($classes) ? implode(' ', $classes) : ''); ?>">
     <?php if (!$app->getRequest()->attributes->has('headers')) {
         print $view->render('AdminBundle:Admin:header-search.html.php', ['tables' => $tables, 'allGroups' => $allGroups] + compact(array_map(function ($t) {return $t . '_total';}, array_keys($tables))));
     }

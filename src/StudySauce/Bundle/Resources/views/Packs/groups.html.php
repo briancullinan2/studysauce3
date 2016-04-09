@@ -67,16 +67,18 @@ $view['slots']->start('body'); ?>
             <?php } ?>
             <div class="group-list">
                 <?php
-                $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description','userCountStr'], 'parent', 'invites', 'packList' => ['groupPacks'], 'actions' => ['deleted']]];
+                $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description','userCountStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
                 if (empty($entity)) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'parent-ss_group-id' => 'NULL',
+                        'classes' => ['tiles'],
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],
                         'footers' => ['ss_group' => 'new']]));
                 } else if ($entity->getSubgroups()->count() > 0) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'parent-ss_group-id' => $entity->getId(),
+                        'classes' => ['tiles'],
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],
                         'footers' => ['ss_group' => 'new']]));

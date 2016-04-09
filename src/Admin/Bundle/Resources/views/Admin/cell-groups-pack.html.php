@@ -20,7 +20,7 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 
 ?>
 
-<div>
+<div class="entity-search">
     <label class="input">
         <input type="text"
                data-tables="<?php print $view->escape(json_encode(['ss_user' => ['first', 'last', 'email', 'id', 'deleted'], 'ss_group' => ['name', 'userCountStr', 'description', 'id', 'deleted']])); ?>"

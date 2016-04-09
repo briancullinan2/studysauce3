@@ -568,16 +568,11 @@
     margin-right: -2px;
 }
 
+#packs .pack-row > label.checkbox:nth-last-child(1),
 #packs .highlighted-link.card,
 #packs a[href="#add-entity"],
 [id^="packs-"] .read-only a[href="#add-entity"],
-#packs .pack-row .properties,
-#packs .pack-row .id img[alt="Upload"],
-#packs .pack-row .id img[alt="Upload"] ~ *,
-#packs .pack-row .id a[href="#upload-image"],
-#packs a[href="#pack-publish"],
-#packs .pack-row.read-only label > span,
-#packs .pack-row.read-only label > span ~ br {
+#packs a[href="#pack-publish"] {
     display:none;
 }
 

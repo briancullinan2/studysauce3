@@ -49,7 +49,9 @@ $view['slots']->start('body'); ?>
                 $tables['count-card'] = empty($entity->getId()) ? 5 : 0;
             }
             else {
-                $tables['tables'] = ['pack'];
+                $tables['tables'] = ['pack' => ['id' => ['created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
+                $tables['classes'] = ['tiles'];
+                $tables['headers'] = ['pack' => 'new'];
                 $tables['footers'] = ['pack' => 'new'];
             }
             print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)); ?>

@@ -54,7 +54,7 @@ class AdminController extends Controller
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
 
-    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user-deleted' => false, 'ss_group-deleted' => false, 'pack-status' => '!DELETED', 'card-deleted' => false];
+    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
 
     private static function getSearchValue($field, $k, $f, $table, $request) {

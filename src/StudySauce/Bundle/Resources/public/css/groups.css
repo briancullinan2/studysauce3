@@ -31,73 +31,7 @@
 .group-list {
     margin: 0;
     background:#DDDDDD;
-    padding: 0 4px 0 0;
-}
-
-.group-list .results {
-    margin-left:-1%;
-}
-
-.group-list .highlighted-link {
     padding: 0;
-}
-
-.group-list .results > .highlighted-link {
-    padding: 0 1%;
-}
-
-.group-list .ss_group-row:hover {
-    border:1px solid #09B !important;
-    background: #e9e9e9;
-}
-
-.group-list .ss_group-row {
-    display:inline-block;
-    width:24%;
-    margin: 10px -4px 10px 1%;
-    padding: 10px;
-    border: 1px solid #bbb;
-    position:relative;
-    background: #e9e9e9;
-    text-align: left;
-    border-radius:1px;
-    z-index: 1;
-}
-
-.group-list .ss_group-row .id {
-    display:block;
-    width:auto;
-    height: 120px;
-    text-align: center;
-    position:relative;
-}
-
-.group-list .ss_group-row .packList {
-    display:block;
-    width:auto;
-    height: 120px;
-    background: #FFF;
-    white-space: normal;
-    overflow: auto;
-    padding:10px;
-    line-height: 140%;
-}
-
-.group-list .ss_group-row .actions {
-    position:absolute;
-    right:10px;
-    top:10px;
-    padding:0;
-    margin:0;
-    width:auto;
-}
-
-.group-list .ss_group-row .id .pack-icon {
-    position:absolute;
-    height:100%;
-    width:100%;
-    top:0;
-    left:0;
 }
 
 .group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href^="#add-"],
@@ -120,14 +54,6 @@
 
 .group-edit .pack-row {
     margin-left:-10px;
-    padding-left:10px;
-}
-
-.group-list .ss_group-row .name {
-    display:block;
-    width:auto;
-    padding-right: 50px;
-    position:relative;
     padding-left:10px;
 }
 
@@ -155,37 +81,13 @@
     border-color:transparent;
 }
 
-.group-edit .results .pack-row .title,
-.group-list .results .ss_group-row.read-only .name input
+.group-edit .results .pack-row .title
 {
     cursor: pointer;
 }
 
-.group-edit .results .pack-row:hover .title,
-.group-list .results .ss_group-row.read-only:hover .name input {
+.group-edit .results .pack-row:hover .title {
     color:#09B;
-}
-
-.group-list .ss_group-row .name span.count {
-    position:absolute;
-    right:10px;
-    top:50%;
-    margin-top:-8px;
-}
-
-.group-list .ss_group-row .invites {
-    display:none;
-}
-
-.group-list .ss_group-row .id img {
-    height: auto;
-    width: auto;
-    max-height: 100%;
-    max-width: 100%;
-}
-
-.group-list .ss_group-row .packList span {
-    float:right;
 }
 
 .group-edit .results .ss_group-row .name span.count {
@@ -319,10 +221,6 @@
     width:10%;
 }
 
-.group-list .pack-list {
-    display:block;
-}
-
 .group-edit .pack-row .counts label {
     width:50%;
     margin:0 -2px;
@@ -417,10 +315,7 @@
     display:inline-block !important;
 }
 
-.group-list .empty-members,
-.group-list .ss_group-row.read-only label > br,
-.group-list .ss_group-row.read-only label > span:first-of-type
-{
+.group-list .empty-members {
     display:none;
 }
 
@@ -432,7 +327,6 @@
     width:49%;
 }
 
-.group-list .ss_group-row > label.checkbox:nth-last-child(1),
 .group-edit .ss_group-row > label.checkbox:nth-last-child(1),
 .group-edit .pack-row > label.checkbox:nth-last-child(1) {
     display:none;
@@ -449,15 +343,12 @@
     float:none;
 }
 
-.group-edit .ss_group-row.read-only .pack-icon,
-.group-list .ss_group-row.read-only .pack-icon
+.group-edit .ss_group-row.read-only .pack-icon
 {
     z-index: -1;
 }
 
-.group-edit .ss_group-row.read-only .pack-icon .reveal,
-.group-list .ss_group-row.read-only .pack-icon br,
-.group-list .ss_group-row.read-only .pack-icon .reveal
+.group-edit .ss_group-row.read-only .pack-icon .reveal
 {
     display:none;
 }

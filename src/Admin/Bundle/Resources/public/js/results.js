@@ -72,7 +72,7 @@ $(document).ready(function () {
     });
 
     function resetHeader() {
-        var command = $('.results:visible');
+        var command = $('.results:visible').first();
         if (command.length == 0) {
             return;
         }

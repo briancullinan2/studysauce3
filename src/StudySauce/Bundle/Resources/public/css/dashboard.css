@@ -88,16 +88,9 @@
     overflow: hidden;
 }
 
+.pane-bottom,
 .pane-top {
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
-    margin:-20px -20px 20px -20px;
-    padding: 20px 20px 1px 20px;
-}
-
-.pane-bottom {
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
-    margin: 0 -20px -20px -20px;
-    padding: 20px;
+    background: #EEEEEE;
 }
 
 .pane-content form > .highlighted-link:last-child {

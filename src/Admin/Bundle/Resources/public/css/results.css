@@ -337,17 +337,17 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results .pane-top {
     position: fixed;
     width: auto;
-    top: 50px;
+    top: 40px;
     z-index: 10;
-    height: 130px;
-    margin-bottom: -20px;
-    left: 120px;
-    right: 120px;
+    height: 120px;
+    margin-bottom: -10px;
+    left: 100px;
+    right: 100px;
 }
 
 .paginate {
     display: inline-block;
-    width: 300px;
+    width: 100%;
     margin: 0 -4px;
     padding: 0 2px;
     vertical-align: middle;
@@ -355,8 +355,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 }
 
 .paginate label {
-    margin: 0 -80px;
-    padding: 0 80px;
+    margin: 0 -100px;
+    padding: 0 100px;
     width:100%;
     display: inline-block;
 }
@@ -429,7 +429,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results header > *,
 .results [class*="-row"] > *
 {
-    width: 16.66%;
+    width: 20%;
 }
 
 .results header > *:nth-child(1) {
@@ -495,8 +495,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results .search {
     display:inline-block;
     width:100%;
-    margin-right:-16.66%;
-    padding-right:16.66%;
+    margin-right:-20%;
+    padding-right:20%;
 }
 
 .results .search .class-names + .input {
@@ -508,6 +508,128 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:inline-block;
 }
 
+.tiles {
+    margin-left:-1%;
+    padding-right:4px;
+}
+
+.tiles .highlighted-link {
+    padding: 0;
+}
+
+.tiles > .highlighted-link {
+    padding: 0 1%;
+}
+
+.tiles [class*="-row"]:hover {
+    border:1px solid #09B !important;
+    background: #e9e9e9;
+}
+
+.tiles [class*="-row"] {
+    display:inline-block;
+    width:24%;
+    margin: 10px -4px 10px 1%;
+    padding: 10px;
+    border: 1px solid #bbb;
+    position:relative;
+    background: #e9e9e9;
+    text-align: left;
+    border-radius:1px;
+    z-index: 1;
+}
+
+.tiles [class*="-row"] .id {
+    display:block;
+    width:auto;
+    height: 120px;
+    text-align: center;
+    position:relative;
+}
+
+.tiles [class*="-row"] .packList {
+    display:block;
+    width:auto;
+    height: 120px;
+    background: #FFF;
+    white-space: normal;
+    overflow: auto;
+    padding:10px;
+    line-height: 140%;
+}
+
+.tiles [class*="-row"] .actions {
+    position:absolute;
+    right:10px;
+    top:10px;
+    padding:0;
+    margin:0;
+    width:auto;
+}
+
+.tiles [class*="-row"] .id .pack-icon {
+    position:absolute;
+    height:100%;
+    width:100%;
+    top:0;
+    left:0;
+}
+
+.tiles .pack-list {
+    display:block;
+}
+
+.tiles [class*="-row"].read-only .pack-icon
+{
+    z-index: -1;
+}
+
+.tiles [class*="-row"] > label.checkbox:nth-last-child(1),
+.tiles [class*="-row"].read-only .pack-icon br,
+.tiles [class*="-row"].read-only .pack-icon .reveal
+{
+    display:none;
+}
+
+.tiles [class*="-row"] .name {
+    display:block;
+    width:auto;
+    padding-right: 50px;
+    position:relative;
+    padding-left:10px;
+}
+
+.tiles [class*="-row"].read-only .name input
+{
+    cursor: pointer;
+}
+
+.tiles [class*="-row"].read-only:hover .name input {
+    color:#09B;
+}
+
+.tiles [class*="-row"] .name span.count {
+    position:absolute;
+    right:10px;
+    top:50%;
+    margin-top:-8px;
+}
+
+.results:not(.tiles) [class*="-row"] .name span.count,
+.results [class*="-row"].edit .name span.count {
+    display:none;
+}
+
+.tiles [class*="-row"] .id img {
+    height: auto;
+    width: auto;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.tiles [class*="-row"] .packList span {
+    float:right;
+}
 
 @media (min-width: 1500px)
 {
