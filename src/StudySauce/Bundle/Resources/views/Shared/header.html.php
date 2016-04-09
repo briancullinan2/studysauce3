@@ -48,7 +48,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         </nav>
         <?php if($app->getRequest()->get('_format') != 'funnel') { ?>
             <div id="welcome-message">
-                <?php if ($user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
+                <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
                     <ul class="main-menu">
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
