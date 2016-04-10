@@ -1,12 +1,7 @@
 <?php
-use StudySauce\Bundle\Entity\User;
+
 
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
-
-/** @var User $user */
-$user = $app->getUser();
-$groups = $user->getGroups()->toArray();
-$roles = $user->getRoles();
 
 $view['slots']->start('body'); ?>
 <div class="panel-pane" id="error403">

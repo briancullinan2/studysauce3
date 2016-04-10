@@ -643,7 +643,8 @@ $(document).ready(function () {
     body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"]', function (evt) {
         evt.preventDefault();
         var field = $(this).parents('.entity-search').find('label.input');
-        var id = parseInt($(this).parents('label').find('input').val());
+        var check = $(this).parents('label').find('input');
+        var id = check.attr('name').split('[')[0] + parseInt(check.val());
         createEntityRow.apply(field, [field.find('input')[0].selectize.options[id], $(this).is('[href="#subtract-entity"]')]);
         field.find('input')[0].selectize.renderCache = {};
     });

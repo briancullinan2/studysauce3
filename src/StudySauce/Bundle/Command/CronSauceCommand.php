@@ -203,15 +203,16 @@ EOF
                     return $p->getProperty('alert') == true;
                 }));
 
+                // TODO: uncomment this when notifications are working
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($group)) {
-                            $controller->sendNotification($group->getName() . ' added a new pack, "'
-                                . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
+                            //$controller->sendNotification($group->getName() . ' added a new pack, "'
+                            //    . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
-                            $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
-                                . '" on Study Sauce!', count($notify), str_replace([' ', '<', '>'], '', $d));
+                            //$controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
+                            //    . '" on Study Sauce!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                     }
                 }
@@ -224,7 +225,7 @@ EOF
                 $child = array_values(array_filter($notify, function ($n) use ($u) { return $n[1] != $u; }));
 
                 if(count($emailing) > 0) {
-                    $emails->sendNewPacksNotification($u, $emailing, !empty($child) ? $child[1]->getFirst() : '');
+                    //$emails->sendNewPacksNotification($u, $emailing, !empty($child) ? $child[1]->getFirst() : '');
                 }
             }
         }
