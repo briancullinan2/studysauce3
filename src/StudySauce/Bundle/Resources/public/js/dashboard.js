@@ -644,7 +644,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var field = $(this).parents('.entity-search').find('label.input');
         var check = $(this).parents('label').find('input');
-        var id = check.attr('name').split('[')[0] + parseInt(check.val());
+        var id = check.attr('name').split('[')[0] + '-' + parseInt(check.val());
         createEntityRow.apply(field, [field.find('input')[0].selectize.options[id], $(this).is('[href="#subtract-entity"]')]);
         field.find('input')[0].selectize.renderCache = {};
     });
