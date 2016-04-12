@@ -119,6 +119,15 @@ $(document).ready(function () {
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
+
+                // rename tab if working with a new group
+                if (tab.closest('.panel-pane').is('#groups-group0')) {
+                    tab.closest('.panel-pane').attr('id', 'groups-group' + data.ss_group[0].id);
+                    if (!close) {
+                        window.activateMenu(Routing.generate('groups_edit', {pack: data.ss_group[0].id}));
+                    }
+                }
+
                 if (close) {
 
                 }
@@ -127,12 +136,9 @@ $(document).ready(function () {
                     for(var i = 0; i < data.ss_group.length; i++) {
                         if(row.filter('.ss_group-id-' + data.ss_group[i].id).length == 0) {
                             row.filter('.edit.ss_group-id-:not(.template)').first().removeClass('ss_group-id-').addClass('ss_group-id-' + data.ss_group[i].id);
-                            // set pack id on panel
-                            tab.closest('.panel-pane').attr('id', 'groups-group' + data.ss_group[i].id);
-                            window.activateMenu(Routing.generate('groups_edit', {group: data.ss_group[i].id}));
                         }
                     }
-
+                    tab.trigger('resulted');
                 }
             },
             error: function () {
@@ -165,7 +171,7 @@ $(document).ready(function () {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        autoSave.apply($(this).parents('.results:visible'), [true]);
+        autoSave.apply($(this).parents('.results:visible'), [false]);
 
     });
 
@@ -299,7 +305,7 @@ $(document).ready(function () {
         var tab = $(this).parents('.results'),
             row = $(this).parents('.pack-row'),
             rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
-            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row.edit').first().attr('class'))[1],
+            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row').first().attr('class'))[1],
             field = $(this).siblings('*:has(input[data-ss_user])').find('input[data-ss_user]');
 
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {

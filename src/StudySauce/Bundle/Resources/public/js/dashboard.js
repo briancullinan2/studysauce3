@@ -434,7 +434,7 @@ $(document).ready(function () {
                 },
                 FilesAdded: function (up, files) {
                     plupload.each(files, function (file) {
-                        $('<div id="' + file.id + '" class="file">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>').appendTo(dialog.find('.plupload'));
+                        $('<div id="' + file.id + '" class="file">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>').appendTo(dialog.find('.plup-filelist'));
                     });
                     up.start();
                 },
@@ -454,7 +454,9 @@ $(document).ready(function () {
                     dialog.find('input[type="hidden"]').val(data.fid);
                     dialog.find('.plup-filelist .squiggle').stop().remove();
                     dialog.find('#' + file.id).find('.squiggle').stop().remove();
-                    dialog.find('.plupload img').attr('src', data.src);
+                    dialog.find('.plupload img').attr('src', data.src).load(function () {
+                        centerize.apply($(this))
+                    });
                 },
                 Error: function (up, err) {
                 }
@@ -573,9 +575,9 @@ $(document).ready(function () {
                 },
                 render: {
                     option: function (item) {
-                        var desc = '<span class="title">'
-                            + '<span class="name"><i class="icon source"></i>' + item.text + '</span>'
-                            + '<span class="by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
+                        var desc = '<span class="entity-title">'
+                            + '<span class="entity-name"><i class="icon source"></i>' + item.text + '</span>'
+                            + '<span class="entity-by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
                             + '</span>';
                         var buttons = 1,
                             entities;
@@ -645,7 +647,7 @@ $(document).ready(function () {
     body.on('show', '.panel-pane', setupFields);
 
     // collection control for entity search
-    body.on('change', '.entity-search input.selectized[data-tables]', function () {
+    body.on('change', '.entity-search label:has(~ .checkbox.template) input.selectized[data-tables][data-entities]', function () {
         var field = $(this);
         if (field.val().trim() == '') {
             return;
@@ -744,7 +746,7 @@ $(document).ready(function () {
                         .attr('id', 'add-entity-' + tableName).insertBefore(dialog.find('.tab-pane.template'));
                     newTemplate.removeClass('template active');
                     var title = tableName.replace('ss_', '').substr(0, 1).toUpperCase() + tableName.replace('ss_', '').substr(1);
-                    entityField = newTemplate.find('input').attr('name', tableName);
+                    entityField = newTemplate.find('input').attr('name', tableName).attr('placeholder', 'Search for ' + title);
                     dialog.find('li.template').clone().appendTo(dialog.find('ul')).removeClass('template active')
                         .find('a').attr('href', '#add-entity-' + tableName).data('target', '#add-entity-' + tableName).text(title);
                 }
@@ -753,7 +755,6 @@ $(document).ready(function () {
                 tmpTables[tableName] = tables[tableName];
                 entityField.data('tables', tmpTables);
                 entityField.data('entities', field.data('entities'));
-
             }
         }
 
@@ -767,6 +768,12 @@ $(document).ready(function () {
 
                     // remove existing rows
                     dialog.find('.checkbox:not(.template)').remove();
+
+                    if(entityField.is('.selectized')) {
+                        entityField.val('');
+                        entityField[0].selectize.setValue('');
+                        entityField[0].selectize.renderCache = {};
+                    }
 
                     // create these rows
                     /*setTimeout(function () {

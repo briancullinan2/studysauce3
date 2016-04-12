@@ -80,12 +80,12 @@
     border-color:transparent;
 }
 
-.group-edit .results .pack-row .title
+.group-edit .results .pack-row > .title
 {
     cursor: pointer;
 }
 
-.group-edit .results .pack-row:hover .title {
+.group-edit .results .pack-row:hover > .title {
     color:#09B;
 }
 
@@ -104,10 +104,11 @@
 {
     position:absolute;
     width:40px;
-    top:0;
+    top:25%;
     padding-right:2px;
     margin-right: -2px;
     left:50%;
+    margin-top:-9px;
 }
 
 .group-edit .results .ss_group-row.read-only .actions {
@@ -119,7 +120,7 @@
     position:relative;
 }
 
-.group-edit .ss_group-row .name
+.group-edit .ss_group-row > .name
 {
     width:40%;
     padding-left:150px;
@@ -155,7 +156,7 @@
     position: absolute;
     vertical-align: top;
     padding-top: 10%;
-    top: -30px;
+    top: -20px;
 }
 
 .group-edit .ss_group-row .pack-icon {
@@ -349,6 +350,7 @@
 .group-edit .ss_group-row.read-only .pack-icon
 {
     z-index: -1;
+    pointer-events: none;
 }
 
 .group-edit .ss_group-row.read-only .pack-icon .reveal

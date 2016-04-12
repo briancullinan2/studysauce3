@@ -72,6 +72,7 @@ $view['slots']->start('body'); ?>
                 if (empty($entity)) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'parent-ss_group-id' => 'NULL',
+                        'count-ss_group' => 0,
                         'classes' => ['tiles'],
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],
@@ -79,6 +80,7 @@ $view['slots']->start('body'); ?>
                 } else if ($entity->getSubgroups()->count() > 0) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'parent-ss_group-id' => $entity->getId(),
+                        'count-ss_group' => 0,
                         'classes' => ['tiles'],
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],

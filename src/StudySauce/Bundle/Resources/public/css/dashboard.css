@@ -308,7 +308,7 @@
     position:relative;
 }
 
-.entity-search .title {
+.entity-search .entity-title {
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -316,13 +316,13 @@
     vertical-align: middle;
 }
 
-.entity-search.buttons-1 .title {
+.entity-search.buttons-1 .entity-title {
     padding:0 50px 0 10px;
     margin-right:-40px;
     width:100%;
 }
 
-.entity-search.buttons-2 .title {
+.entity-search.buttons-2 .entity-title {
     padding:0 90px 0 10px;
     margin-right:-80px;
     width:100%;
@@ -424,7 +424,7 @@ a[href="#subtract-entity"]:hover {
     background-color: #faa;
 }
 
-.entity-search .name {
+.entity-search .entity-name {
     font-weight: bold;
     margin-right: 5px;
     display:block;
@@ -439,7 +439,7 @@ a[href="#subtract-entity"]:hover {
     overflow: hidden;
 }
 
-.entity-search .by {
+.entity-search .entity-by {
     opacity: 0.8;
 }
 

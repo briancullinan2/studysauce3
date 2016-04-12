@@ -117,14 +117,26 @@ $(document).ready(function () {
         resetHeader();
     });
 
-    function getData()
+    function getDataRequest()
     {
-        var admin = $('.results:visible');
-        var result = {
-            order: orderBy,
-            tables: admin.find('.class-names input:checked').map(function () { return $(this).val(); }).toArray(),
-            search: (admin.find('input[name="search"]').val() || '').trim()
-        };
+        var admin = $(this).closest('.results');
+        var result = $.extend({}, admin.data('request'));
+        var dataTables = result['tables'];
+        var tables = {};
+        if (admin.find('.class-names').length > 0) {
+            admin.find('.class-names input:checked').each(function () {
+                if(dataTables.hasOwnProperty($(this).val())) {
+                    tables[$(this).val()] = dataTables[$(this).val()];
+                }
+            });
+        }
+        else {
+            tables = dataTables;
+        }
+        result['order'] = orderBy;
+        result['tables'] = tables;
+        result['search'] = (admin.find('input[name="search"]').val() || '').trim();
+
 
         admin.find('input[name="page"]').each(function () {
             var table = $(this).parents('.paginate > .paginate').parent().attr('class').replace('paginate', '').trim();
@@ -137,7 +149,7 @@ $(document).ready(function () {
 
         return result;
     }
-    window.getData = getData;
+    window.getDataRequest = getDataRequest;
 
     body.on('click', '.results .class-names .checkbox a', function (evt) {
         evt.preventDefault();
@@ -244,6 +256,7 @@ $(document).ready(function () {
         }
         resetHeader();
         admin.trigger('resulted');
+        centerize.apply(admin);
     }
     // make available to save functions that always lead back to index
     window.loadContent = loadContent;
@@ -260,7 +273,7 @@ $(document).ready(function () {
                 url: Routing.generate('command_callback'),
                 type: 'GET',
                 dataType: 'text',
-                data: getData(),
+                data: getDataRequest.apply(that),
                 success: function (data) {
                     loadContent.apply(that, [data]);
                 }

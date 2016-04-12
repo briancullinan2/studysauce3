@@ -21,5 +21,5 @@ use StudySauce\Bundle\Entity\Pack;
             <option value="DELETED" <?php print (!empty($pack->getId()) && $pack->getStatus() == 'DELETED' ? 'selected="selected"' : ''); ?>>Deleted</option>
         </select>
     </label>
-    <a href="#pack-publish" data-target="#pack-publish" data-toggle="modal"> </a>
+    <a href="#pack-publish" data-target="#pack-publish" data-toggle="modal">&nbsp;</a>
 </div>

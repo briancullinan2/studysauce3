@@ -1,11 +1,4 @@
 
-[id^="packs-"] .card-row a[href="#upload-audio"].active,
-[id^="packs-"] .card-row a[href="#upload-video"].active,
-[id^="packs-"] .card-row a[href="#upload-image"].active
-{
-    background-color:#09B;
-}
-
 [id^="packs-"] .card-row.edit .highlighted-link > *
 {
     display:none;
@@ -130,7 +123,24 @@
     padding-left:150px;
     margin-left:-4px;
     position:relative;
-    padding-right: 30px;
+}
+
+[id^="packs-"] .pack-row > .status label {
+    margin-right:-30px;
+    padding-right:30px;
+    width:100%;
+    display:inline-block;
+}
+
+[id^="packs-"] .pack-row.read-only .pack-icon
+{
+    z-index: -1;
+    pointer-events: none;
+}
+
+[id^="packs-"] .pack-row.read-only .pack-icon .reveal
+{
+    display:none;
 }
 
 [id^="packs-"] .pack-row > .properties,
@@ -163,16 +173,37 @@
     text-align: center;
 }
 
-[id^="packs-"] .pack-row.read-only .status select {
-    width: auto;
-}
-
 [id^="packs-"] .card-row > * {
     width: 20%;
 }
 
 [id^="packs-"] .card-row .id {
     width: 25%;
+}
+
+[id^="packs-"] .card-row .id a.active
+{
+    background-color:#09B;
+}
+
+[id^="packs-"] .card-row .id a[href^="#upload-image"].active:before
+{
+    background-position: left -52px;
+}
+
+[id^="packs-"] .card-row .id a[href^="#upload-audio"].active:before
+{
+    background-position: left -102px;
+}
+
+[id^="packs-"] .card-row .id a[href^="#upload-video"].active:before
+{
+    background-position: left -2px;
+}
+
+[id^="packs-"] .card-row.read-only .id a {
+    z-index:0;
+    pointer-events: none;
 }
 
 [id^="packs-"] .card-row > *:nth-last-child(2)
@@ -503,6 +534,7 @@
 }
 
 [id^="packs-"] .card-row .radios input:checked ~ i,
+[id^="packs-"] .card-row .radios input:checked ~ i,
 [id^="packs-"] .card-row .correct.editing .radios i {
     z-index: 10;
     position:relative;
@@ -565,17 +597,6 @@
     left:90%;
 }
 
-[id^="packs-"] a[href="#pack-publish"] {
-    position:absolute;
-    right:0;
-    top:65%;
-    margin-top:-12px;
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1302px transparent;
-}
-
 [id^="packs-"] .results .pack-row .actions
 {
     position: absolute;
@@ -584,7 +605,12 @@
     padding-right: 2px;
     margin-right: -2px;
     left: 50%;
-    margin-top: -12px;
+    margin-top: -9px;
+}
+
+[id^="packs-"] .results .pack-row.read-only .actions
+{
+    display:none;
 }
 
 [id^="packs-"] .results .card-row .actions

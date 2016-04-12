@@ -74,6 +74,8 @@ $collection = $router->getRouteCollection();
                 98 => ['#search-'],
                 79 => ['/reset'],
                 -80 => ['/reset'],
+                -27 => ['#pack-publish'],
+                28 => ['#pack-publish'],
                 -32 => ['#edit-'],
                 33 => ['#edit-'],
                 -34 => ['#remove-'],
@@ -81,10 +83,10 @@ $collection = $router->getRouteCollection();
             ],
             '/bundles/studysauce/images/menu_new2_half.png' => [
                 -1 => ['#upload-video'],
-                1 => ['#upload-video'],
-                2 => ['#upload-image'],
+                4 => ['#upload-video'],
+                5 => ['#upload-image'],
                 -2 => ['#upload-image'],
-                3 => ['#upload-audio'],
+                6 => ['#upload-audio'],
                 -3 => ['#upload-audio']
             ]];
         ?>
@@ -127,9 +129,9 @@ $collection = $router->getRouteCollection();
             a[href^="<?php print $p; ?>"]:not(.more):not(.btn):not(.cloak):focus:before,
             a[href^="<?php print $p; ?>"]:not(.more):not(.btn):not(.cloak):active:before,
             a[href^="<?php print $p; ?>"].active:not(.more):not(.btn):not(.cloak):before,
-            a[href^="<?php print $p; ?>"].cloak:not(.btn):not(.more) .reveal:hover:before,
-            a[href^="<?php print $p; ?>"].cloak:not(.btn):not(.more) .reveal:focus:before,
-            a[href^="<?php print $p; ?>"].cloak:not(.btn):not(.more) .reveal:active:before,
+            a[href^="<?php print $p; ?>"].cloak:not(.btn):not(.more):hover .reveal:before,
+            a[href^="<?php print $p; ?>"].cloak:not(.btn):not(.more):focus .reveal:before,
+            a[href^="<?php print $p; ?>"].cloak:not(.btn):not(.more):active .reveal:before,
             a[href^="<?php print $p; ?>"].cloak.active:not(.btn):not(.more) .reveal:before<?php print ($c == count($paths) -1 ? '' : ','); ?>
             <?php } ?> {
                 background-position: left -<?php print ($i - 1) * 50 + 2; ?>px;

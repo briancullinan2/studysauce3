@@ -1,17 +1,34 @@
 <?php
 $entityIds = isset($entityIds) && is_array($entityIds) ? $entityIds : [];
+$listIds = [];
 $dataTypes = [];
 if (isset($entities)) {
     foreach ($entities as $u) {
-        $type = gettype($u);
+        $type = get_class($u);
         $ti = array_search($type, \Admin\Bundle\Controller\AdminController::$allTableClasses);
         $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
-        $entityIds[] = $joinTable . '-' . $u->getId();
+        $key = $joinTable . '-' . $u->getId();
+        $listIds[] = $key;
+        if (!in_array($key, $entityIds)) {
+            $entityIds[] = $key;
+        }
+        $first = $u->{'get' . ucfirst($tables[$joinTable][0])}();
+        $second = $u->{'get' . ucfirst($tables[$joinTable][1])}();
+        $third = $u->{'get' . ucfirst($tables[$joinTable][2])}();
+        if($first instanceof \DateTime) {
+            $first = $first->format('r');
+        }
+        if($second instanceof \DateTime) {
+            $second = $second->format('r');
+        }
+        if($third instanceof \DateTime) {
+            $third = $third->format('r');
+        }
         $dataTypes[$joinTable][] = [
             'table' => $joinTable,
-            'value' => $joinTable . '-' . $u->getId(),
-            'text' => $u->{'get' . ucfirst($tables[$joinTable][0])}() . ' ' . $u->{'get' . ucfirst($tables[$joinTable][1])}(),
-            0 => $u->{'get' . ucfirst($tables[$joinTable][2])}()
+            'value' => $key,
+            'text' => $first . ' ' . $second,
+            0 => $third
         ];
     }
 }
@@ -19,23 +36,21 @@ if (isset($entities)) {
 
 <div class="entity-search <?php print implode(' ', array_keys($dataTypes)); ?>">
     <label class="input">
-        <input type="text" name="<?php print implode('_', array_keys($tables)); ?>" value=""
+        <input type="text" name="<?php print implode('_', array_keys($tables)); ?>" value="<?php print (isset($inline) && $inline === true ? implode(' ', $listIds) : ''); ?>"
                placeholder="Search for <?php print implode('/', array_map(function ($t) {
                    return ucfirst(str_replace('ss_', '', $t));
                }, array_keys($tables))); ?>"
             <?php
             foreach ($dataTypes as $t => $options) {
                 print ' data-' . $t . '="' . $view->escape(json_encode($options)) . '"';
-            }
-            if (isset($entities)) { ?>
+            } ?>
                 data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"
-            <?php } ?>
                 data-tables="<?php print $view->escape(json_encode($tables)); ?>"/></label>
     <?php
-    if (isset($entities)) {
+    if (isset($entities) && (!isset($inline) || $inline !== true)) {
         $i = 0;
         foreach ($entities as $u) {
-            $type = gettype($u);
+            $type = get_class($u);
             $ti = array_search($type, \Admin\Bundle\Controller\AdminController::$allTableClasses);
             $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
             ?>

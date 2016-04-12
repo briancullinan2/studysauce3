@@ -35,10 +35,10 @@ foreach($fields as $subfield) {
 }
 
 if (count($searchTables) > 0 && method_exists($entity, 'get' . ucfirst($field))) {
-    $result = $entity->{'get' . ucfirst($field)}()->toArray();
+    $result = $entity->{'get' . ucfirst($field)}();
 
-    if ($result instanceof \Doctrine\Common\Collections\ArrayCollection) {
-        print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $searchTables, 'entities' => $result]);
+    if ($result instanceof \Doctrine\Common\Collections\Collection) {
+        print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $searchTables, 'entities' => $result->toArray(), 'inline' => true]);
     }
 }
 

@@ -428,7 +428,7 @@ $(document).ready(function () {
 
                 if (close) {
                     loadContent.apply(tab, [data]);
-                    packsFunc.apply(tab.find('.card-row'));
+                    packsFunc.apply(packRows.add(cardRows));
                     //var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.pack-row:visible').first().attr('class'))[1];
                     //tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
                     //tab.find('.search .input').removeClass('read-only');
@@ -501,7 +501,7 @@ $(document).ready(function () {
     body.on('click', '[id^="packs-"] .pack-row a[href="#upload-image"]', function () {
         var row = $(this).parents('.pack-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
-            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('.default');
+            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('default');
             packsFunc.apply(row);
         });
     });

@@ -432,7 +432,7 @@ $(document).ready(function () {
 
     body.on('click', 'a[href="#remove-confirm-user"]', function (evt) {
         evt.preventDefault();
-        var data = getData();
+        var data = getDataRequest.apply($(this).parents('.results'));
         data.userId = $('#confirm-remove-user').data('userId');
         $.ajax({
             url: Routing.generate('remove_user'),
@@ -444,7 +444,7 @@ $(document).ready(function () {
     });
 
     body.on('click', '#confirm-cancel-user a[href="#cancel-user"]', function () {
-        var data = getData();
+        var data = getDataRequest.apply($(this).parents('.results'));
         data.userId = $('#confirm-cancel-user').data('userId');
         $.ajax({
             url: Routing.generate('cancel_user'),
@@ -456,7 +456,7 @@ $(document).ready(function () {
     });
 
     body.on('click', '#confirm-password-reset a[href="#reset-password"]', function () {
-        var data = getData();
+        var data = getDataRequest.apply($(this).parents('.results'));
         data.userId = $('#confirm-password-reset').data('userId');
         $.ajax({
             url: Routing.generate('reset_user'),

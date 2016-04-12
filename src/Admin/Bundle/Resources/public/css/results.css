@@ -100,14 +100,6 @@ table.results > tbody > tr > td .checkbox {
     display:none;
 }
 
-.results .edit .roles label.radio,
-.results .edit .roles label.checkbox,
-.results .edit .groups label.radio,
-.results .edit .groups label.checkbox
-{
-    display:block;
-}
-
 .results .search input[name="search"]
 {
     background-image: url(../../studysauce/images/menu_new_half.png);

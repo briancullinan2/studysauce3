@@ -50,6 +50,7 @@ class AdminController extends Controller
         'ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description','userCountStr'], 'parent', 'invites', 'packs' => ['packs','groupPacks'], 'actions' => ['deleted']],
         'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'status', 'groups' => ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
         'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
+        'invite' => ['id', 'name'=> ['code', 'email', 'created'], 'actions' => ['deleted']]
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
@@ -389,6 +390,7 @@ class AdminController extends Controller
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
+        $vars['searchRequest'] = $searchRequest;
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
@@ -610,6 +612,13 @@ class AdminController extends Controller
             //    $g->removeUser($u);
             //    $userManager->updateUser($u, false);
             //}
+            $orm->flush();
+            return $this->forward('AdminBundle:Admin:results', [
+                'tables' => [
+                    'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description', 'userCountStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]],
+                'parent-ss_group-id' => 'NULL',
+                'count-ss_group' => 0,
+                'classes' => ['tiles']]);
         }
         else
             $orm->merge($g);
@@ -619,7 +628,7 @@ class AdminController extends Controller
             'tables' => [
                 'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']],
                 'pack' => ['title', 'counts', 'members' => ['groups'], 'actions' => ['status'] /* search field but don't display a template */]],
-            'ss_group-id' => $request->get('remove') == 'true' ? null : $g->getId(),
+            'ss_group-id' => $g->getId(),
             'edit' => ['ss_group'],
             'count-group' => 1,
             'count-pack' => 0]);
