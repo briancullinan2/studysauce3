@@ -308,7 +308,7 @@ $(document).ready(function () {
         window.activateMenu(Routing.generate('packs'));
     });
 
-    body.on('click', '[id^="packs-"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
+    body.on('click', '[id^="packs"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.pack-row');
         var rowId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'))[1];
@@ -356,7 +356,7 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         var tab = $(this).parents('.results:visible');
         var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
-        var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
+        var cardRows = $(this).closest('.card-row').filter(':not(.template)');
         if (packRows.length == 0) {
             packRows = tab.find('.pack-row.edit:not(.template)');
         }

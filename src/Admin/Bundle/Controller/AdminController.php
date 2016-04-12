@@ -54,7 +54,7 @@ class AdminController extends Controller
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
 
-    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'pack-status' => '!DELETED', 'card-deleted' => false];
+    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
 
     private static function getSearchValue($field, $k, $f, $table, $request) {
@@ -125,10 +125,7 @@ class AdminController extends Controller
         /** @var QueryBuilder $qb $f */
         /** @var string $op */
         $where = [];
-        if ($request == self::$defaultSearch) {
-            $searchTables = self::$defaultTables[$table];
-        }
-        else if (!isset($request['tables'][$table])) {
+        if (!isset($request['tables'][$table])) {
             return '';
         }
         else {
@@ -322,8 +319,9 @@ class AdminController extends Controller
 
             /** @var QueryBuilder $qb */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $where = self::searchBuilder($qb, $table, $table, $searchRequest);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest));
+            $joins = [];
+            $where = self::searchBuilder($qb, $table, $table, $searchRequest, $joins);
+            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest) + ['tables' => [$table => self::$defaultTables[$table]]], $joins);
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }
@@ -366,8 +364,9 @@ class AdminController extends Controller
             }
             */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $where = self::searchBuilder($qb, $table, $table, $searchRequest);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest));
+            $joins = [];
+            $where = self::searchBuilder($qb, $table, $table, $searchRequest, $joins);
+            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest) + ['tables' => [$table => self::$defaultTables[$table]]], $joins);
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }

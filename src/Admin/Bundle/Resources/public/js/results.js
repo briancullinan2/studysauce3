@@ -236,7 +236,7 @@ $(document).ready(function () {
                 admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable').remove();
                 var keepRows = admin.find('> .' + table + '-row').map(function () {
                     var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
-                    return '.' + table + '-id-' + rowId;
+                    return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
                 }).toArray().join(',');
                 content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows).insertBefore(admin.find('.' + table + '-row.template').first());
                 admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
