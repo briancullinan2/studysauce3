@@ -824,15 +824,23 @@ $(document).ready(function () {
                 + (remove != '' ? ((add != '' ? 'and ' : '') + 'remove ' + remove) : '') + '?');
 
             body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+                var entityValues = [];
                 for(var tableName in tables) {
                     if (tables.hasOwnProperty(tableName)) {
                         // copy users and groups back to field
-                        field.val(entities[tableName].map(function (g) {
+                        entityValues = $.merge(entityValues, entities[tableName].map(function (g) {
                             return g.value.trim();
-                        }).join(' '));
+                        }));
 
                         field.data(tableName, entities[tableName]);
+                        if(field.is('.selectized')) {
+                            field[0].selectize.addOption(entities[tableName]);
+                        }
                     }
+                }
+                field.val(entityValues.join(' '));
+                if(field.is('.selectized')) {
+                    field[0].selectize.setValue(entityValues);
                 }
             });
         });

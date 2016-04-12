@@ -97,10 +97,36 @@ $(document).ready(function () {
         window.activateMenu(Routing.generate('groups_new'));
     });
 
+    body.on('click', '[id^="groups-"] a[href^="/packs/0"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('.results').find('.ss_group-row:not(.template)');
+        var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
+        body.one('show', '#packs-pack0', function () {
+            $(this).find('.pack-row:not(.template) .groups label > input').val('ss_group-' + groupId);
+            if($(this).find('.pack-row .groups label > input.selectized').length > 0) {
+                var userCount = 0;
+                row.parents('pack-row').each(function () {
+                    userCount += parseInt($(this).find('.count label:first-of-type span').text());
+                });
+                $(this).find('.pack-row .groups label > input.selectized')[0].selectize.addOption({
+                    table: 'ss_group',
+                    value: 'ss_group-' + groupId,
+                    text: row.find('.name input').val(),
+                    0: '(' + userCount + ' users)'
+                });
+                $(this).find('.pack-row .groups label > input.selectized')[0].selectize.setValue('ss_group-' + groupId);
+            }
+            if(row.find('.id img:not(.default)').length > 0) {
+                $(this).find('.pack-row:not(.template) .id img').attr('src', row.find('.id img').attr('src')).removeClass('default');
+            }
+        });
+    });
+
     function autoSave(close) {
         autoSaveTimeout = null;
         var tab = $(this);
         var row = tab.find('.ss_group-row.edit:not(.template)');
+        var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
         if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]'))
             return;
         loadingAnimation(tab.find('a[href^="#save-"]'));
@@ -114,7 +140,7 @@ $(document).ready(function () {
                 logo: row.find('.id img:not(.default)').attr('src'),
                 groupName: row.find('input[name="name"]').val().trim(),
                 roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                groupId: ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1],
+                groupId: groupId,
                 parent: row.find('select[name="parent"]').val()
             },
             success: function (data) {

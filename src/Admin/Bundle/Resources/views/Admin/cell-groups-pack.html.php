@@ -24,7 +24,7 @@ foreach($groups as $g) {
 print $view->render('AdminBundle:Admin:cell-collection.html.php', [
     'tables' => [
         'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
-        'ss_group' => ['name', 'userCountStr', 'description', 'id', 'deleted']],
+        'ss_group' => ['name', 'description', 'userCountStr', 'id', 'deleted']],
     'entities' => array_merge($diffUsers, $groups),
     'entityIds' => $entityIds,
     'inline' => true]);
