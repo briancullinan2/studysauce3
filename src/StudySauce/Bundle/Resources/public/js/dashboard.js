@@ -1,3 +1,105 @@
+
+Selectize.define( 'clear_selection', function ( options ) {
+    var self = this;
+
+    if ((empty = self.$input.find('option[value=""]')).length > 0) {
+        self.plugins.settings.dropdown_header = {
+            title: empty.text()
+        };
+
+        this.require('dropdown_header');
+
+        self.setup = (function () {
+            var original = self.setup;
+
+            return function () {
+                original.apply(this, arguments);
+                this.$dropdown.on('mousedown', '.selectize-dropdown-header', function (e) {
+                    self.setValue('');
+                    self.close();
+                    self.blur();
+
+                    return false;
+                });
+            }
+        })();
+    }
+});
+
+Selectize.define('restore_on_backspace2', function(options) {
+    var self = this;
+
+    options.text = options.text || function(option) {
+            return option[this.settings.labelField];
+        };
+
+    this.onKeyDown = (function() {
+        var original = self.onKeyDown;
+        return function(e) {
+            var index, option;
+            index = this.caretPos - 1;
+
+            if (e.keyCode === 8 && this.$control_input.val() === '' && !this.$activeItems.length) {
+                if (index >= 0 && index < this.items.length) {
+                    option = this.options[this.items[index]];
+                    // prevent from deleting google
+                    if (this.deleteSelection(e)) {
+                        this.setTextboxValue(option[this.settings.valueField]);
+                        this.refreshOptions(true);
+                    }
+                    e.preventDefault();
+                    return;
+                }
+            }
+            return original.apply(this, arguments);
+        };
+    })();
+});
+
+Selectize.define('continue_editing', function(options) {
+    var self = this;
+
+    options.text = options.text || function(option) {
+            return option[this.settings.labelField];
+        };
+
+    this.onFocus = (function() {
+        var original = self.onFocus;
+
+        return function(e) {
+            original.apply(this, arguments);
+
+            var index = this.caretPos - 1;
+            if (index >= 0 && index < this.items.length) {
+                var option = this.options[this.items[index]];
+                var currentValue = options.text.apply(this, [option]);
+                if (this.deleteSelection({keyCode: 8})) {
+                    // only remove item if it is made up and not from the server
+                    if(typeof option[0] == 'undefined') {
+                        this.removeItem(currentValue);
+                    }
+                    this.setTextboxValue(option[this.settings.valueField]);
+                    this.refreshOptions(true);
+                }
+            }
+        };
+    })();
+
+    this.onBlur = (function() {
+        var original = self.onBlur;
+
+        return function(e) {
+            var v = this.$control_input.val();
+            original.apply(this, arguments);
+            if(v.trim() != '') {
+                var option = this.options[v] || { value: v, text: v };
+                this.addOption(option);
+                this.setValue(option.value);
+            }
+        };
+    })();
+});
+
 $(document).ready(function () {
 
     // TODO: remove old unused tabs
@@ -118,36 +220,6 @@ $(document).ready(function () {
     }
 
     window.activateMenu = activateMenu;
-
-    function activatePanel(panel) {
-        collapseMenu.apply(this);
-        // animate panels
-        var triggerShow = setInterval(function () {
-            if (window.sincluding.length == 0) {
-                body.css('overflow', 'hidden');
-                var panels = body.find('.panel-pane:visible')
-                    .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
-                        panels.hide();
-                    } });
-                panel.css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
-                    panel.css('position', '');
-                    body.css('overflow', '');
-                } });
-                // poll for panel visibility and fire events
-                var triggerHide = setInterval(function () {
-                    if (panels.is(':visible'))
-                        return;
-                    panels.trigger('hide');
-                    setTimeout(function () {
-                        panel.scrollintoview(DASHBOARD_MARGINS).trigger('show')
-                    }, 75);
-                    clearInterval(triggerHide);
-                }, 50);
-                clearInterval(triggerShow);
-            }
-        }, 50);
-    }
-    window.activatePanel = activatePanel;
 
     body.on('click', 'a[href*="/redirect/facebook"], a[href*="/redirect/google"]', function () {
         loadingAnimation($(this));
@@ -459,6 +531,7 @@ $(document).ready(function () {
 
     // entity search
     function setupFields() {
+        /*
         var plain = body.find('select:not(.selectized):not([data-tables])');
         plain.each(function () {
             var field = $(this);
@@ -471,6 +544,7 @@ $(document).ready(function () {
                 }
             });
         });
+        */
 
         var that = body.find('input[type="text"][data-tables]:not(.selectized)');
         that.each(function () {
@@ -811,29 +885,4 @@ $(document).ready(function () {
 
     window.createEntityRow = createEntityRow;
 
-
-    // show the already visible tabs
-    var panel = body.find('.panel-pane').first();
-    if(panel.length > 0) {
-        var key = panel.attr('id').replace(/-[a-z]+[0-9]+$/ig, '');
-        if (Routing.getRoute(key)) {
-            var path = Routing.generate(key),
-                item = body.find('.main-menu a[href^="' + path + '"]').first();
-
-            if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
-                item.parents('nav').find('ul.collapse.in').removeClass('in');
-            item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
-            var host;
-            body.find('#welcome-message .main-menu a').each(function () {
-                var parts = $(this).attr('href').split('/');
-                parts[parts.length-1] = path.substr(1);
-                $(this).attr('href', parts.join('/'));
-            });
-            if(!(host = body.find('#welcome-message .main-menu a[href*="' + window.location.hostname +  '"]')).is('.active')) {
-                host.addClass('active');
-            }
-        }
-        ssMergeStyles(body);
-        activatePanel.apply(body, [panel]);
-    }
 });

@@ -168,7 +168,7 @@
 }
 
 [id^="packs-"] .card-row > *:nth-child(2) {
-    width: 30%;
+    width: 35%;
 }
 
 [id^="packs-"] .card-row .correct.type-tf {
@@ -177,6 +177,11 @@
 
 [id^="packs-"] .card-row .correct.type-tf + .correct.type-tf {
     text-align: left;
+}
+
+#packs .packList label {
+    color: #BBB;
+    font-weight: normal;
 }
 
 [id^="packs-"] .card-row[class*="type"] .correct .correct:not([class*="type-"]),
@@ -192,7 +197,7 @@
 [id^="packs-"] .card-row > .correct,
 [id^="packs-"] .card-row[class*="type"].type-tf .correct
 {
-    width:40%;
+    width:35%;
 }
 
 [id^="packs-"] .card-row .input.type {

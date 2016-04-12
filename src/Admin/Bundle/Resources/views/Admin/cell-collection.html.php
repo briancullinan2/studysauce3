@@ -1,5 +1,5 @@
 <?php
-$entityIds = [];
+$entityIds = isset($entityIds) && is_array($entityIds) ? $entityIds : [];
 $dataTypes = [];
 if (isset($entities)) {
     foreach ($entities as $u) {
@@ -30,7 +30,7 @@ if (isset($entities)) {
             if (isset($entities)) { ?>
                 data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"
             <?php } ?>
-               data-tables="<?php print $view->escape(json_encode($tables)); ?>"/></label>
+                data-tables="<?php print $view->escape(json_encode($tables)); ?>"/></label>
     <?php
     if (isset($entities)) {
         $i = 0;

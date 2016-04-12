@@ -164,7 +164,7 @@ EOF
                 foreach($children as $c) {
                     /** @var User $c */
                     if ($p->getUserPacks()->filter(function (UserPack $up) use ($c) {
-                            return $up->getUser() == $c && !empty($up->getDownloaded());})->count() == 0
+                            return $up->getUser() == $c && !empty($up->getDownloaded()) && !$up->getRemoved();})->count() == 0
                         || $c->getResponses()->filter(function (Response $r) use ($p) {
                                 return $r->getCard()->getPack() == $p && $r->getCreated() <= new \DateTime();
                             })->count() == 0) {

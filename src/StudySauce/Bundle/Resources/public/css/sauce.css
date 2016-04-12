@@ -903,6 +903,17 @@ input:-webkit-autofill {
     color: inherit;
     text-shadow: none;
     box-shadow: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width:92%;
+}
+
+.selectize-control.single .selectize-input .item:first-of-type,
+.selectize-control.multi .selectize-input .item:first-of-type
+{
+    margin-left:0;
+    padding-left:0;
 }
 
 .read-only .selectize-control.single .selectize-input .item,

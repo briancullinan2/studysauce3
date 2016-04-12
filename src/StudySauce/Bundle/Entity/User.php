@@ -235,7 +235,7 @@ class User extends BaseUser implements EncoderAwareInterface
     public function getPacks()
     {
         $packs = [];
-        foreach(array_merge($this->getAuthored()->toArray(), array_map(function (UserPack $up) {return $up->getPack();}, $this->getUserPacks()->toArray())) as $p) {
+        foreach(array_merge($this->getAuthored()->toArray(), array_map(function (UserPack $up) {return $up->getPack();}, $this->getUserPacks()->filter(function (UserPack $up) {return !$up->getRemoved();})->toArray())) as $p) {
             if(!in_array($p, $packs)) {
                 $packs[] = $p;
             }

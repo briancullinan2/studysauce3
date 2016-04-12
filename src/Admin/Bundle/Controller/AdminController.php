@@ -79,6 +79,7 @@ class AdminController extends Controller
 
     private static function joinBuilder(QueryBuilder $qb, $joinTable, $joinName, $field, $request, &$joins = [])
     {
+        // TODO: add userPacks-removed = false search field
         $joinFields = explode('.', $field);
         foreach($joinFields as $jf) {
             $associated = self::$allTables[$joinTable]->getAssociationMappings();

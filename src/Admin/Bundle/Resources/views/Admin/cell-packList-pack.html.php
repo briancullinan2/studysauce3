@@ -24,9 +24,13 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 ?>
 
 <div>
+    <label><?php print $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(); ?> cards</label>
     <?php
     foreach ($groups as $p) {
         /** @var Group $p */
+        if ($p->getUsers()->count() == 0) {
+            continue;
+        }
         ?>
         <a href="<?php print $view['router']->generate('groups_edit', ['group' => $p->getId()]); ?>" class="pack-list"><?php print $p->getName(); ?>
             <span><?php print $p->getUsers()->count(); ?></span></a>

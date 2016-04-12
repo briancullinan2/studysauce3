@@ -143,7 +143,7 @@ class Pack
      */
     public function getUsers() {
         $users = [];
-        foreach(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->toArray())) as $u) {
+        foreach(array_merge(!empty($this->getUser()) ? [$this->getUser()] : [], array_map(function (UserPack $up) {return $up->getUser();}, $this->userPacks->filter(function (UserPack $up) {return !$up->getRemoved();})->toArray())) as $u) {
             if(!in_array($u, $users)) {
                 $users[] = $u;
             }

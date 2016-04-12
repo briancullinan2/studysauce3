@@ -149,7 +149,7 @@ class PacksController extends Controller
         // TODO: secure user access using ACLs, which admins have access to which users?
         foreach ($request->get('users') ?: [] as $u) {
             /** @var UserPack $up */
-            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first()) && isset($group['remove']) && $u['remove'] == 'true') {
+            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'] && !$up->getRemoved();})->first()) && isset($u['remove']) && $u['remove'] == 'true') {
                 $up->setRemoved(true);
             }
             else if (empty($up) && (!isset($u['remove']) || $u['remove'] != 'true')) {
@@ -206,7 +206,7 @@ class PacksController extends Controller
                 $newPack->addCard($newCard);
             }
             $newCard->setContent($c['content']);
-            if (!empty($c['type'])) {
+            if (isset($c['type'])) {
                 if ($c['type'] == 'sa exactly' || $c['type'] == 'sa contains') {
                     $newCard->setResponseType('sa');
                 }

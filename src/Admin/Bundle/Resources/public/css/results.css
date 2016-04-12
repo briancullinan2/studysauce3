@@ -410,6 +410,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .results header h2 {
     padding:0 0 20px 0;
     margin:-10px 0 -30px 0;
+    display:block;
 }
 
 .results .pane-top header > * {
@@ -604,6 +605,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     cursor: pointer;
 }
 
+.tiles [class*="-row"].read-only:hover .name span.count,
 .tiles [class*="-row"].read-only:hover .name input {
     color:#09B;
 }

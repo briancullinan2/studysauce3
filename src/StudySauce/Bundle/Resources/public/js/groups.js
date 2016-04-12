@@ -103,8 +103,8 @@ $(document).ready(function () {
         var row = tab.find('.ss_group-row.edit:not(.template)');
         if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]'))
             return;
-        loadingAnimation(tab.find('a[href="#save-ss_group"]'));
-        tab.find('.highlighted-link').attr('disabled', 'disabled');
+        loadingAnimation(tab.find('a[href^="#save-"]'));
+        tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
 
         $.ajax({
             url: Routing.generate('save_group'),
@@ -172,8 +172,8 @@ $(document).ready(function () {
     body.on('change keyup keydown', '[id^="groups-"] .ss_group-row input, [id^="groups-"] .ss_group-row select, [id^="groups-"] .ss_group-row textarea', groupsFunc);
 
     body.on('click', '.group-list .ss_group-row', function (evt) {
-        if($(evt.target).is('a[href="#edit-group"]') || !$(evt.target).is('a, .ss_group-row > .packs')
-            && $(evt.target).parents('.ss_group-row > .packs').length == 0)
+        if($(evt.target).is('a[href="#edit-group"]') || !$(evt.target).is('a, .ss_group-row > .packList')
+            && $(evt.target).parents('.ss_group-row > .packList').length == 0)
         {
             var results = $(this).parents('.results');
             var row = $(this).closest('.ss_group-row');
@@ -275,7 +275,7 @@ $(document).ready(function () {
         var row = $(this).parents('.pack-row');
         var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
         window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
-        row.removeClass('edit').addClass('read-only');
+        row.removeClass('edit read-only');
     });
 
     body.on('hidden.bs.modal', '#general-dialog', function () {

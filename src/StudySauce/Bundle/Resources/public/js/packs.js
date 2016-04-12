@@ -270,7 +270,7 @@ $(document).ready(function () {
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
-                autoSave.apply(tab);
+                autoSave.apply(packRows.add(cardRows), [false] /* do not close and return to /packs from edits */);
             }, 2000);
         }
     }
@@ -287,12 +287,16 @@ $(document).ready(function () {
         window.activateMenu(Routing.generate('packs_new'));
     });
 
-    body.on('click', '#packs a[href="#edit-pack"]', function () {
-        var results = $(this).parents('.results');
-        var row = $(this).parents('.pack-row');
-        var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
-        row.removeClass('edit').addClass('read-only');
+    body.on('click', '#packs .pack-row', function (evt) {
+        if($(evt.target).is('a[href="#edit-pack"]') || !$(evt.target).is('a, .pack-row > .packList')
+            && $(evt.target).parents('.pack-row > .packList').length == 0)
+        {
+            var results = $(this).parents('.results');
+            var row = $(this).closest('.pack-row');
+            var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
+            window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
+            row.removeClass('edit').addClass('read-only');
+        }
     });
 
     body.on('click', '[id^="packs-"] .pack-row.edit a[href^="#cancel-"], [id^="packs-"] .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
@@ -345,15 +349,17 @@ $(document).ready(function () {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        autoSave.apply($(this).parents('.results:visible'), [true]);
-
+        autoSave.apply($(this).parents('.results:visible').find('.pack-row,.card-row'), [true]);
     });
 
     function autoSave(close) {
         autoSaveTimeout = null;
-        var tab = $(this);
-        var packRows = tab.find('.pack-row.edit:not(.template)');
-        var packId = (/pack-id-([0-9]+)(\s|$)/i).exec(packRows.attr('class'));
+        var tab = $(this).parents('.results:visible');
+        var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
+        var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
+        if (packRows.length == 0) {
+            packRows = tab.find('.pack-row.edit:not(.template)');
+        }
         if (packRows.length == 0) {
             return;
         }
@@ -366,8 +372,8 @@ $(document).ready(function () {
         loadingAnimation(tab.find('a[href="#save-pack"]'));
 
         // get the parsed list of cards
+        var packId = (/pack-id-([0-9]+)(\s|$)/i).exec(packRows.attr('class'));
         var cards = [];
-        var cardRows = tab.find('.card-row.valid:not(.empty):not(.template)');
         cardRows.each(function () {
             var rowId = (/card-id-([0-9]+)(\s|$)/i).exec($(this).attr('class'));
             if($(this).is('.removed')) {
