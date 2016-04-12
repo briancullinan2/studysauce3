@@ -281,12 +281,7 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 
 .results [class*="-row"] textarea
 {
-    height: 1.7em;
-}
-
-.results [class*="-row"].read-only textarea
-{
-    height: 1.2em;
+    height: 27px;
 }
 
 .results.empty header:after {

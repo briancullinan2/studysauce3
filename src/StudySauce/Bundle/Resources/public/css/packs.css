@@ -11,6 +11,9 @@
     display:none;
 }
 
+[id^="packs-"] .highlighted-link.pack a[href="#add-pack"],
+[id^="packs-"] .highlighted-link.pack a[href="#cancel-edit"],
+[id^="packs-"] .highlighted-link.pack a[href="#save-ss_group"],
 [id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .pack-row > label.checkbox:nth-last-child(1),
@@ -21,6 +24,8 @@
     display: none;
 }
 
+[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href="#cancel-edit"],
+[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href="#save-ss_group"],
 [id^="packs-"] .card-row.edit.selected .highlighted-link > *:not(.more),
 [id^="packs-"] .card-row.edit:hover .highlighted-link > *:not(.more)
 {
@@ -139,6 +144,14 @@
     padding-left:150px;
     margin-left:-4px;
     padding-right: 30px;
+}
+
+[id^="packs-"] .highlighted-link.card {
+    display:none;
+}
+
+[id^="packs-"] .card-row.edit ~ .highlighted-link.card {
+    display:block;
 }
 
 [id^="packs-"] .pack-row .actions
@@ -493,6 +506,13 @@
 [id^="packs-"] .card-row .correct.editing .radios i {
     z-index: 10;
     position:relative;
+    display:inline-block;
+}
+
+[id^="packs-"] .results .pack-row.read-only:hover
+{
+    background-color:transparent;
+    border-color:transparent;
 }
 
 [id^="packs-"] .card-row .correct.editing .radios span {

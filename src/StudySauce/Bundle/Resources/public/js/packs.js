@@ -115,7 +115,7 @@ $(document).ready(function () {
         else {
             row.find('.correct').removeClass('editing');
             if (row.find('.correct .radios :checked').length > 0) {
-                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios :checked').parents('label').position().top - 2);
+                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 24 - 2);
             }
         }
 
@@ -238,7 +238,7 @@ $(document).ready(function () {
             }
 
             if (row.find('.correct .radios :checked').length > 0) {
-                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios :checked').parents('label').position().top - 2);
+                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 24 - 2);
             }
 
             if(previewTimeout != null) {
@@ -299,12 +299,19 @@ $(document).ready(function () {
         }
     });
 
+    body.on('click', '[id^="packs-"] a[href="#edit-pack"]', function (evt) {
+        evt.preventDefault();
+        var tab = $(this).parents('.results');
+        tab.find('.pack-row,.card-row').removeClass('read-only').addClass('edit');
+        window.setupFields();
+        autoSaveTimeout = 0;
+        packsFunc.apply(tab.find('.pack-row').add(tab.find('.card-row')));
+        autoSaveTimeout = null;
+    });
+
     body.on('click', '[id^="packs-"] .pack-row.edit a[href^="#cancel-"], [id^="packs-"] .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
-        var results = $(this).parents('.results'),
-            row = $(this).parents('.pack-row');
-        results.find('.search .input').removeClass('read-only');
-        row.removeClass('read-only').addClass('edit');
+        $(this).parents('.results').find('.pack-row,.card-row').removeClass('edit').addClass('read-only');
         window.activateMenu(Routing.generate('packs'));
     });
 
@@ -458,8 +465,7 @@ $(document).ready(function () {
 
     body.on('show', '.panel-pane[id^="packs-"]', function () {
         autoSaveTimeout = 0;
-        packsFunc.apply($(this).find('.pack-row'));
-        packsFunc.apply($(this).find('.card-row'));
+        packsFunc.apply($(this).find('.pack-row').add($(this).find('.card-row')));
         autoSaveTimeout = null;
     });
 

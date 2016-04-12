@@ -148,7 +148,7 @@ $(document).ready(function () {
 
     body.on('show', '.panel-pane[id^="groups-"]', function () {
         autoSaveTimeout = 0;
-        groupsFunc.apply($(this).find('.ss_group-row'));
+        groupsFunc.apply($(this).find('.ss_group-row.edit'));
         autoSaveTimeout = null;
     });
 
@@ -266,8 +266,12 @@ $(document).ready(function () {
 
     body.on('click', '[id^="groups-"] a[href="#edit-ss_group"]', function (evt) {
         evt.preventDefault();
-        $(this).parents('.results').find('.ss_group-row').removeClass('read-only').addClass('edit');
+        var tab = $(this).parents('.results');
+        tab.find('.ss_group-row').removeClass('read-only').addClass('edit');
         window.setupFields();
+        autoSaveTimeout = 0;
+        groupsFunc.apply(tab.find('.ss_group-row.edit'));
+        autoSaveTimeout = null;
     });
 
     body.on('click', '[id^="groups-"] a[href="#edit-pack"]', function () {

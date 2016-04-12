@@ -1088,7 +1088,7 @@ input[type=month][disabled]
     text-indent: 0.01px;
     text-overflow: '';
     overflow:hidden;
-    display:inline;
+    display:inline-block;
     pointer-events:none;
     resize: none;
     height: auto;
