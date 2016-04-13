@@ -256,7 +256,7 @@ $(document).ready(function () {
         }
         resetHeader();
         admin.trigger('resulted');
-        centerize.apply(admin);
+        centerize.apply(admin.find('.centerized'));
     }
     // make available to save functions that always lead back to index
     window.loadContent = loadContent;

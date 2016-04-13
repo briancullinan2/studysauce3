@@ -212,7 +212,7 @@ $(document).ready(function () {
         player.jPlayer("play");
     });
 
-    function packsFunc () {
+    function packsFunc (evt) {
         var tab = $(this).parents('.results:visible');
         var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
         var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
@@ -265,6 +265,11 @@ $(document).ready(function () {
         }
         else {
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
+        }
+
+        // do not autosave from selectize because the input underneath will change
+        if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input').length > 0) {
+            return;
         }
 
         // save at most every 2 seconds, don't autosave from admin lists
@@ -523,7 +528,8 @@ $(document).ready(function () {
                 dialog.find('input[name="publish-schedule"][value="now"]').prop('checked', true);
             }
             else {
-                dialog.find('input[name="publish-date"]').datetimepicker('setValue', new Date(publish.schedule));
+                dialog.find('input[name="publish-schedule"][value="later"]').prop('checked', true);
+                dialog.find('input[name="publish-date"]').datetimepicker('setOptions', {value: new Date(publish.schedule)});
             }
         }
         else {
@@ -545,7 +551,7 @@ $(document).ready(function () {
         }
 
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
-            var entityField = row.find('.groups');
+            var entityField = row.find('.groups input');
             var newValue = entityField.val().split(' ');
             var groupStr = '';
             for(var v in newValue) {

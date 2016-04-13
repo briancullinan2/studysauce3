@@ -169,10 +169,6 @@
     width:5%;
 }
 
-[id^="packs-"] .pack-row.read-only .status {
-    text-align: center;
-}
-
 [id^="packs-"] .card-row > * {
     width: 20%;
 }
@@ -619,6 +615,7 @@
     margin-right: -2px;
 }
 
+[id^="packs-"] .pack-row.read-only a[href="#pack-publish"],
 #packs .pack-row > label.checkbox:nth-last-child(1),
 #packs .highlighted-link.card,
 #packs a[href="#add-entity"],

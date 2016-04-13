@@ -150,7 +150,7 @@ $(document).ready(function () {
                 if (tab.closest('.panel-pane').is('#groups-group0')) {
                     tab.closest('.panel-pane').attr('id', 'groups-group' + data.ss_group[0].id);
                     if (!close) {
-                        window.activateMenu(Routing.generate('groups_edit', {pack: data.ss_group[0].id}));
+                        window.activateMenu(Routing.generate('groups_edit', {group: data.ss_group[0].id}));
                     }
                 }
 
