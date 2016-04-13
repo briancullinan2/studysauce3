@@ -174,9 +174,15 @@ $(document).ready(function () {
         // replace with image
         var url;
         if((url = row.find('input[name="url"]').val().trim()) != '') {
-            template.find('img').attr('src', url);
-            template.filter(':not(.preview-answer)').find('.preview-content').replaceWith('<img src="' + url + '" />');
-            template.filter('.preview-answer').find('.preview-prompt .preview-content').replaceWith('<img src="' + url + '" />');
+            template.find('img').attr('src', url).load(function () {
+                centerize.apply($(this));
+            });
+            template.filter(':not(.preview-answer)').find('.preview-content').replaceWith($('<img src="' + url + '" />').load(function () {
+                centerize.apply($(this));
+            }));
+            template.filter('.preview-answer').find('.preview-prompt .preview-content').replaceWith($('<img src="' + url + '" />').load(function () {
+                centerize.apply($(this));
+            }));
             if(row.find('.content input').val().trim() != '') {
                 template.find('[type="text"]').val(row.find('.content input').val());
             }
