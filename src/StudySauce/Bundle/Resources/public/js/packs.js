@@ -241,6 +241,12 @@ $(document).ready(function () {
                 row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 24 - 2);
             }
 
+            // update line number
+            var rowIndex = '' + (tab.find('.card-row:not(.template):not(.removed)').index(row) + 1);
+            if(row.find('.input.type > span').text() != rowIndex) {
+                row.find('.input.type > span').text(rowIndex);
+            }
+
             if(previewTimeout != null) {
                 clearTimeout(previewTimeout);
             }
