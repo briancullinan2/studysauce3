@@ -49,7 +49,7 @@ $view['slots']->start('body'); ?>
                 $tables['count-card'] = empty($entity->getId()) ? 5 : 0;
             }
             else {
-                $tables['pack-count'] = 0;
+                $tables['count-pack'] = 0;
                 $tables['tables'] = ['pack' => ['id' => ['created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
                 $tables['classes'] = ['tiles'];
                 $tables['headers'] = ['pack' => 'new'];
