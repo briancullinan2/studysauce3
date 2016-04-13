@@ -97,7 +97,7 @@ $(document).ready(function () {
         tab.find('.card-row.empty:not(.template)').each(function () {
             var that = jQuery(this);
             if(that.find('.content input').val().trim() == '') {
-                that.add(that.next('.expandable')).remove();
+                that.add(that.next('.expandable')).addClass('removed');
             }
         });
 
@@ -331,6 +331,8 @@ $(document).ready(function () {
         $(this).parents('.results').find('.pack-row,.card-row').removeClass('edit').addClass('read-only');
         window.activateMenu(Routing.generate('packs'));
     });
+
+    body.on('click', '[id^="packs-"] .pack-row [href="#remove-confirm-card"]', packsFunc);
 
     body.on('click', '[id^="packs"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
         evt.preventDefault();
