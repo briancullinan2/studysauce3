@@ -6,6 +6,13 @@ if (isset($entities)) {
     foreach ($entities as $u) {
         $type = get_class($u);
         $ti = array_search($type, \Admin\Bundle\Controller\AdminController::$allTableClasses);
+        if($ti === false) {
+            $type = get_parent_class($u);
+            $ti = array_search($type, \Admin\Bundle\Controller\AdminController::$allTableClasses);
+        }
+        if($ti === false) {
+            continue;
+        }
         $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
         $key = $joinTable . '-' . $u->getId();
         $listIds[] = $key;
