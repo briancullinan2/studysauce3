@@ -35,15 +35,17 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         <?php } ?>
         <nav>
             <ul class="main-menu">
+                <?php /*
                 <li><a href="<?php print $view['router']->generate('command'); ?>"><span>&nbsp;</span>Users</a></li>
-                <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
-                <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
                 <li><a href="<?php print $view['router']->generate('import'); ?>"><span>&nbsp;</span>Import</a></li>
                 <li><a href="<?php print $view['router']->generate('emails'); ?>"><span>&nbsp;</span>Emails</a></li>
                 <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>
                 <li><a href="<?php print $view['router']->generate('activity'); ?>"><span>&nbsp;</span>Activity</a></li>
                 <li><a href="<?php print $view['router']->generate('results'); ?>"><span>&nbsp;</span>Results</a></li>
                 <li><a href="<?php print $view['router']->generate('account'); ?>"><span>&nbsp;</span>Account</a></li>
+                */ ?>
+                <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
+                <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
             </ul>
         </nav>
         <?php if($app->getRequest()->get('_format') != 'funnel') { ?>
