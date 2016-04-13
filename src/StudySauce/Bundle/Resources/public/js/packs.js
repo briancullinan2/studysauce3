@@ -332,7 +332,7 @@ $(document).ready(function () {
         window.activateMenu(Routing.generate('packs'));
     });
 
-    body.on('click', '[id^="packs-"] .pack-row [href="#remove-confirm-card"]', packsFunc);
+    body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
 
     body.on('click', '[id^="packs"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
         evt.preventDefault();
