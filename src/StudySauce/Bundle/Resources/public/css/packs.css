@@ -604,6 +604,7 @@
     margin-top: -9px;
 }
 
+[id^="packs-"] .results .card-row.read-only .actions,
 [id^="packs-"] .results .pack-row.read-only .actions
 {
     display:none;

@@ -287,7 +287,7 @@ $(document).ready(function () {
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
-                autoSave.apply(packRows.add(cardRows), [false] /* do not close and return to /packs from edits */);
+                autoSave.apply(packRows.add(cardRows).add(tab.find('.card-row.removed')), [false] /* do not close and return to /packs from edits */);
             }, 2000);
         }
     }
