@@ -48,8 +48,8 @@ if (isset($entities)) {
                    return ucfirst(str_replace('ss_', '', $t));
                }, array_keys($tables))); ?>"
             <?php
-            foreach ($dataTypes as $t => $options) {
-                print ' data-' . $t . '="' . $view->escape(json_encode($options)) . '"';
+            foreach (array_keys($tables) as $table) {
+                print ' data-' . $table . '="' . $view->escape(json_encode(isset($dataTypes[$table]) ? $dataTypes[$table] : [])) . '"';
             } ?>
                 data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"
                 data-tables="<?php print $view->escape(json_encode($tables)); ?>"/></label>
