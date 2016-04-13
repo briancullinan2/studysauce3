@@ -24,9 +24,9 @@ if(empty($answers)) {
     </label>
 </div>
 <label class="radio correct type-tf">
-    <span>True</span>
     <input type="radio" name="correct-<?php print $card->getId(); ?>" value="true" <?php print (!empty($card->getCorrect()) && preg_match('/t/i', $card->getCorrect()->getValue()) ? 'checked="checked"' : ''); ?> />
     <i></i>
+    <span>True</span>
 </label>
 <label class="radio correct type-tf">
     <input type="radio" name="correct-<?php print $card->getId(); ?>" value="false" <?php print (!empty($card->getCorrect()) && preg_match('/f/i', $card->getCorrect()->getValue()) ? 'checked="checked"' : ''); ?> />
