@@ -16,7 +16,7 @@ $(document).ready(function () {
     };
     body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function (evt) {
         // cancel select toggle if target of click is also interactable
-        if(($(this).parents('[class*="-row"]').is('.selected') || lastSelected != null)
+        if($(this).is('.selected')
             && $(evt.target).is('select, input, a, textarea, button, label.checkbox, label.radio, label.checkbox *, label.radio *, button *, .selectize-control, .selectize-control *')) {
             return;
         }

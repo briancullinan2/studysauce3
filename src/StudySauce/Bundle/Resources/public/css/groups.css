@@ -208,18 +208,18 @@
 
 .group-edit header.pack label:nth-child(1),
 .group-edit .pack-row .title {
-    width:30%;
+    width:25%;
 }
 
 .group-edit header.pack label:nth-child(2),
 .group-edit header.pack label:nth-child(3)
 {
-    width:5%;
+    width:7.5%;
     text-align: center;
 }
 
 .group-edit .pack-row .counts {
-    width:10%;
+    width:15%;
 }
 
 .group-edit .pack-row .counts label {
