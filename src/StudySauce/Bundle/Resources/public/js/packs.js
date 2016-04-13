@@ -553,7 +553,7 @@ $(document).ready(function () {
             for(var v in newValue) {
                 if (newValue.hasOwnProperty(v) && typeof entityField[0].selectize.options[newValue[v]] != 'undefined') {
                     var obj = entityField[0].selectize.options[newValue[v]];
-                    groupStr += (groupStr != '' ? '<br />' : '') + obj.text;
+                    groupStr += (groupStr != '' ? ', ' : '') + obj.text;
                 }
             }
 

@@ -680,8 +680,8 @@ $(document).ready(function () {
         }
         var addItems = addIds.map(function (i) {return entityField[0].selectize.options[i];});
         var removeItems = removeIds.map(function (i) {return entityField[0].selectize.options[i];});
-        var addItemsStr = addItems.map(function (e) {return e.text;}).join('<br />');
-        var removeItemsStr = removeItems.map(function (e) {return e.text;}).join('<br />');
+        var addItemsStr = addItems.map(function (e) {return e.text;}).join(', ');
+        var removeItemsStr = removeItems.map(function (e) {return e.text;}).join(', ');
 
         var assignValues = function (toField) {
             // show confirmation dialog
