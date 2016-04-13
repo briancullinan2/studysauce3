@@ -565,7 +565,7 @@ $(document).ready(function () {
 
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})
-                .find('.modal-body').html('<p>Are you sure you want to publish to <br />' + groupStr + '?');
+                .find('.modal-body').html('<p>Are you sure you want to publish to ' + groupStr + '?');
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
                 row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
