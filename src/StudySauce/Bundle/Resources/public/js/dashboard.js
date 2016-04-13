@@ -472,11 +472,13 @@ $(document).ready(function () {
     var defaultImage;
 
     body.on('hidden.bs.modal', '#upload-file', function () {
+        var dialog = $('#upload-file');
         setTimeout(function () {
             body.off('click.upload');
             dialog.find('.plupload img').attr('src', defaultImage).removeClass('add').load(function () {
                 centerize.apply($(this));
             });
+            dialog.find('.file').remove();
         }, 100);
     });
 
