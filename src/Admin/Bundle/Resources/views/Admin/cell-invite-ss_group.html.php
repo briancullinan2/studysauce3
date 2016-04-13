@@ -1,0 +1,1 @@
+<label class="input"><input type="text" name="invite" value="<?php print ($ss_group->getInvites()->count() > 0 ? $ss_group->getInvites()->first()->getCode() : ''); ?>" /></label>

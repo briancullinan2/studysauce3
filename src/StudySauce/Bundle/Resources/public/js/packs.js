@@ -551,18 +551,18 @@ $(document).ready(function () {
         }
 
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
-            var entityField = row.find('.groups input');
+            var entityField = row.find('.groups input.selectized');
             var newValue = entityField.val().split(' ');
             var groupStr = '';
             for(var v in newValue) {
-                if (newValue.hasOwnProperty(v)) {
+                if (newValue.hasOwnProperty(v) && typeof entityField[0].selectize.options[newValue[v]] != 'undefined') {
                     var obj = entityField[0].selectize.options[newValue[v]];
                     groupStr += (groupStr != '' ? '<br />' : '') + obj.text;
                 }
             }
 
             var publish = {
-                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? 'now' : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
+                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? new Date() : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
                 email: dialog.find('input[name="publish-email"]:checked').val() != null,
                 alert: dialog.find('input[name="publish-alert"]:checked').val() != null
             };
@@ -572,9 +572,9 @@ $(document).ready(function () {
                 .find('.modal-body').html('<p>Are you sure you want to publish to <br />' + groupStr + '?');
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
-                row.find('.status select option[value="GROUP"]').text(publish.schedule == 'now' ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
+                row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
                 row.find('.status select').data('publish', publish).val('GROUP');
-                row.find('.status > div').attr('class', publish.schedule == 'now' ? 'group' : 'group pending');
+                row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
                 packsFunc.apply(row);
             });
         });

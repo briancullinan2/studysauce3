@@ -541,6 +541,7 @@ $(document).ready(function () {
                 return;
             }
             field.selectize({
+                preload: 'focus',
                 plugins: {
                     'clear_selection': {}
                 }
@@ -584,11 +585,11 @@ $(document).ready(function () {
                         if((entities = field.data('entities')) != null) {
                             if (entities.indexOf(item.value) > -1)
                             {
-                                desc += '<a href="#subtract-entity" title="Remove"></a>';
+                                desc += '<a href="#subtract-entity" title="Remove">&nbsp;</a>';
                             }
                         else
                             {
-                                desc += '<a href="#insert-entity" title="Add"></a>';
+                                desc += '<a href="#insert-entity" title="Add">&nbsp;</a>';
                             }
                         }
                         return '<div class="entity-search buttons-' + buttons + '">' + desc + '</div>';
@@ -651,7 +652,8 @@ $(document).ready(function () {
         var entityField = $(this);
         var existing = (entityField.data('entities') || []);
         var tables = entityField.data('tables');
-        var isTemplated = $(this).is('label:has(~ .checkbox.template) input.selectized[data-tables][data-entities]');
+        var isTemplate = $(this).is('label:has(~ .checkbox.template) input.selectized[data-tables][data-entities]');
+        var isDialog = entityField.parents('#add-entity').length > 0;
 
         // confirm dialog
         var entities = {}, remove = '', add = '';
@@ -659,68 +661,61 @@ $(document).ready(function () {
         if(entityField.val().trim() == '') {
             newValue = [];
         }
-        for(var v in newValue) {
-            if (newValue.hasOwnProperty(v)) {
-                var table = newValue[v].split('-')[0];
-                var isRemove = isTemplated && existing.indexOf(newValue[v]) > -1;
-                if(tables.hasOwnProperty(table)) {
-                    var obj = $.extend({remove: isRemove}, entityField[0].selectize.options[newValue[v]]);
-                    var tableName = obj.table;
-                    if(typeof entities[tableName] == 'undefined') {
-                        entities[tableName] = [];
-                    }
-                    entities[tableName][entities[tableName].length] = obj;
-                    if (isRemove) {
-                        (function (obj) {
-                            existing = existing.filter(function (e) {return e != obj.value});
-                        })(obj);
-                        remove += (remove != '' ? '<br />' : '') + obj.text;
-                    }
-                    else if(existing.indexOf(newValue[v]) == -1) {
-                        existing[existing.length] = obj.value;
-                        add += (add != '' ? '<br />' : '') + obj.text;
-                    }
-                }
-            }
-        }
-        if(!isTemplated) {
+
+        var addIds = newValue.filter(function (v) {return existing.indexOf(v) == -1;});
+        var removeIds = existing.filter(function (e) {return isTemplate && newValue.indexOf(e) == -1});
+        if(isDialog) {
+            // add all actions from all tables
 
         }
+        var addItems = addIds.map(function (i) {return entityField[0].selectize.options[i];});
+        var removeItems = removeIds.map(function (i) {return entityField[0].selectize.options[i];});
+        var addItemsStr = addItems.map(function (e) {return e.text;}).join('<br />');
+        var removeItemsStr = removeItems.map(function (e) {return e.text;}).join('<br />');
 
-        var assignValues = function (entityField) {
+        var assignValues = function (toField) {
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})
                 .find('.modal-body').html('<p>Are you sure you want to <br />'
-                + (add != '' ? ('add ' + add) : '')
-                + (remove != '' ? ((add != '' ? ' and ' : '') + 'remove ' + remove) : '') + '?');
+                + (addItems.length > 0
+                    ? ('add ' + addItemsStr)
+                    : '')
+                + (removeItems.length > 0
+                    ? ((addItems.length > 0 ? ' and ' : '') + 'remove ' + removeItemsStr)
+                    : '') + '?');
 
             body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-                entityField.data('entities', existing);
-                var createRows = $(this).is('label:has(~ .checkbox.template) input.selectized[data-tables][data-entities]');
                 for (var tableName in tables) {
                     if (tables.hasOwnProperty(tableName)) {
-                        var existingEntities = entityField.data(tableName);
-                        for (var i = 0; i < entities[tableName].length; i++) {
-                            (function (tableName, i) {
-                                var entity;
-                                if((entity = existingEntities.filter(function (e) {return e.value == entities[tableName][i].value})).length > 0) {
-                                    entity[0].remove = entities[tableName][i].remove;
-                                }
-                                else {
-                                    existingEntities[existingEntities.length] = entities[tableName][i];
-                                }
-                            })(tableName, i);
-                            if(createRows) {
-                                createEntityRow.apply(entityField.parents('label'), [entities[tableName][i], entities[tableName][i].remove]);
+                        (function(tableName) {
+                            var existingEntities = toField.data(tableName) || [];
+                            var obj = $.merge(
+                                addItems.filter(function (i) {return i.value.split('-')[0] == tableName}).map(function (item) {return $.extend({remove: false}, item);}),
+                                removeItems.filter(function (i) {return i.value.split('-')[0] == tableName}).map(function (item) {return $.extend({remove: true}, item);}));
+                            for (var i = 0; i < obj.length; i++) {
+                                (function (obj) {
+                                    var entity;
+                                    if((entity = existingEntities.filter(function (e) {return e.value == obj.value})).length > 0) {
+                                        entity[0].remove = obj.remove;
+                                    }
+                                    else {
+                                        existingEntities[existingEntities.length] = obj;
+                                    }
+                                    if(isTemplate) {
+                                        createEntityRow.apply(toField.parents('label'), [obj, obj.remove]);
+                                    }
+                                })(obj[i]);
                             }
-                        }
-                        entityField.data(tableName, existingEntities);
+                            toField.data(tableName, existingEntities);
+                        })(tableName);
                     }
                 }
+                toField.data('entities', existing);
                 // set field
-                entityField.val(existing.join(' '));
-                if(field.is('.selectized')) {
-                    field[0].selectize.setValue(existing);
+                toField.val(existing.join(' '));
+                if(entityField != toField && toField.is('.selectized')) {
+                    toField[0].selectize.setValue(existing);
+                    toField[0].selectize.addOption(addItems);
                 }
             });
         };
@@ -736,7 +731,7 @@ $(document).ready(function () {
         };
 
         // TODO: add remove entities
-        if(isTemplated) {
+        if(isTemplate) {
             // toggle the row
             entityField.val('');
             this.selectize.setValue('');
@@ -747,7 +742,7 @@ $(document).ready(function () {
         body.off('click.modify_entities');
         body.off('click.modify_entities_confirm');
         // skip confirmation dialog for add-entity dialog because it is shown at the end
-        if(entityField.parents('#add-entity').length > 0) {
+        if(isDialog) {
             // update rows
             updateRows(entityField);
             body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {

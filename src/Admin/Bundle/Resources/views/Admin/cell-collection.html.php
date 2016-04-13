@@ -77,7 +77,7 @@ if (isset($entities)) {
                    checked="checked"/>
             <i></i>
             <span>{<?php print implode('_', array_keys($tables)); ?>}</span>
-            <a href="#insert-entity" title="Add"></a><a href="#subtract-entity" title="Remove"></a>
+            <a href="#insert-entity" title="Add">&nbsp;</a><a href="#subtract-entity" title="Remove">&nbsp;</a>
         </label>
 
     <?php } ?>

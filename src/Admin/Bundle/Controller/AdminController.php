@@ -18,6 +18,7 @@ use StudySauce\Bundle\Entity\Event;
 use StudySauce\Bundle\Entity\File;
 use StudySauce\Bundle\Entity\Goal;
 use StudySauce\Bundle\Entity\Group;
+use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Schedule;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\Entity\UserPack;
@@ -564,6 +565,7 @@ class AdminController extends Controller
         if(!empty($name = $request->get('groupName'))) {
             $g->setName($name);
         }
+
         if($request->get('description') !== false) {
             $g->setDescription(!empty($request->get('description')) ? $request->get('description') : '');
         }
@@ -585,8 +587,9 @@ class AdminController extends Controller
             $this->forward('StudySauceBundle:Packs:create', ['id' => $request->get('packId'), 'groups' => $request->get('groups'), 'users' => $request->get('users'), 'publish' => $request->get('publish')]);
         }
 
-        if(empty($g->getId()))
+        if(empty($g->getId())) {
             $orm->persist($g);
+        }
         elseif($request->get('remove') == 'true') {
             // remove group from users
             $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
@@ -624,12 +627,36 @@ class AdminController extends Controller
             $orm->merge($g);
         $orm->flush();
 
+        if(!empty($request->get('invite'))) {
+            $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['code' => $request->get('invite')]);
+            if (count($invites) == 0) {
+                $newInvite = new Invite();
+                $newInvite->setCode($request->get('invite'));
+            }
+            else {
+                $newInvite = $invites[0];
+            }
+            $newInvite->setFirst('');
+            $newInvite->setLast('');
+            $newInvite->setEmail('');
+            $newInvite->setGroup($g);
+            $g->addInvite($newInvite);
+            if (count($invites) == 0) {
+                $orm->persist($newInvite);
+            }
+            else {
+                $orm->merge($newInvite);
+            }
+            $orm->flush();
+        }
+
         return $this->forward('AdminBundle:Admin:results', [
             'tables' => [
-                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invites', 'packs' => ['groupPacks'], 'actions' => ['deleted']],
+                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'packs' => ['groupPacks'], 'actions' => ['deleted']],
                 'pack' => ['title', 'counts', 'members' => ['groups'], 'actions' => ['status'] /* search field but don't display a template */]],
             'ss_group-id' => $g->getId(),
             'edit' => ['ss_group'],
+            'read-only' => [],
             'count-group' => 1,
             'count-pack' => 0]);
     }

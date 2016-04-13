@@ -94,11 +94,17 @@ $(document).ready(function () {
 
     body.on('click', '[id^="groups"] a[href="#add-new-ss_group"]', function (evt) {
         evt.preventDefault();
+        if($(this).parents('.panel-pane').is('[id^="groups-"]')) {
+            var row = $(this).parents('.results').find('.ss_group-row:not(.template)');
+            var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
+            body.one('show', '#groups-group0', function () {
+                $(this).find('.ss_group-row:not(.template) .parent select').val(groupId);
+            });
+        }
         window.activateMenu(Routing.generate('groups_new'));
     });
 
-    body.on('click', '[id^="groups-"] a[href^="/packs/0"]', function (evt) {
-        evt.preventDefault();
+    body.on('click', '[id^="groups-"] a[href^="/packs/0"]', function () {
         var row = $(this).parents('.results').find('.ss_group-row:not(.template)');
         var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
         body.one('show', '#packs-pack0', function () {
@@ -139,6 +145,7 @@ $(document).ready(function () {
             data: {
                 logo: row.find('.id img:not(.default)').attr('src'),
                 groupName: row.find('input[name="name"]').val().trim(),
+                invite: row.find('.invite input').val().trim(),
                 roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
                 groupId: groupId,
                 parent: row.find('select[name="parent"]').val()
@@ -153,6 +160,8 @@ $(document).ready(function () {
                         window.activateMenu(Routing.generate('groups_edit', {group: data.ss_group[0].id}));
                     }
                 }
+
+                //tab.find('.ss_group-row .invites input').data('entities', data.ss_group[0].invites[0].code);
 
                 if (close) {
 
@@ -255,7 +264,7 @@ $(document).ready(function () {
         dialog.one('click.publish', 'a[href="#submit-publish"]', function () {
 
             var publish = {
-                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? 'now' : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
+                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? new Date() : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
                 email: dialog.find('input[name="publish-email"]:checked').val() != null,
                 alert: dialog.find('input[name="publish-alert"]:checked').val() != null
             };

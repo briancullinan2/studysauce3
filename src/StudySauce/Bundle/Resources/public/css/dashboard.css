@@ -354,11 +354,6 @@ a[href="#subtract-entity"] {
     height: 30px;
 }
 
-.checkbox > a[href="#insert-entity"]:before,
-.checkbox > a[href="#subtract-entity"]:before {
-    line-height: 30px;
-}
-
 .entity-search label.checkbox {
     display:block;
     margin:0;
@@ -387,15 +382,19 @@ a[href="#insert-entity"]:before {
     line-height: 30px;
     vertical-align: middle;
     transition: background-color ease-in-out .15s;
+    display:inline-block;
+    overflow: hidden;
 }
 
 a[href="#subtract-entity"]:before {
+    overflow: hidden;
     content: " ";
     display:inline-block;
     height: 24px;
     width: 24px;
     background: url(../../studysauce/images/menu_new_half.png) no-repeat left -1652px transparent;
     position: absolute;
+    line-height: 30px;
     top: 50%;
     margin-top: -12px;
     left: 50%;
