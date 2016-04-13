@@ -294,7 +294,7 @@ $(document).ready(function () {
 
     body.on('click', '#packs .pack-row', function (evt) {
         if($(evt.target).is('a[href="#edit-pack"]') || !$(evt.target).is('a, .pack-row > .packList')
-            && $(evt.target).parents('.pack-row > .packList').length == 0)
+            && $(evt.target).parents('.pack-row > .packList').length == 0 && !$(evt.target).is('a[href^="#remove-"]'))
         {
             var results = $(this).parents('.results');
             var row = $(this).closest('.pack-row');

@@ -99,6 +99,9 @@ $(document).ready(function () {
             var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
             body.one('show', '#groups-group0', function () {
                 $(this).find('.ss_group-row:not(.template) .parent select').val(groupId);
+                if(row.find('.id img:not(.default)').length > 0) {
+                    $(this).find('.ss_group-row:not(.template) .id img').attr('src', row.find('.id img').attr('src')).removeClass('default');
+                }
             });
         }
         window.activateMenu(Routing.generate('groups_new'));
@@ -114,13 +117,15 @@ $(document).ready(function () {
                 row.parents('pack-row').each(function () {
                     userCount += parseInt($(this).find('.count label:first-of-type span').text());
                 });
-                $(this).find('.pack-row .groups label > input.selectized')[0].selectize.addOption({
+                var option = {
+                    remove:false,
                     table: 'ss_group',
                     value: 'ss_group-' + groupId,
                     text: row.find('.name input').val(),
                     0: '(' + userCount + ' users)'
-                });
-                $(this).find('.pack-row .groups label > input.selectized')[0].selectize.setValue('ss_group-' + groupId);
+                };
+                $(this).find('.pack-row .groups label > input.selectized')[0].selectize.addOption(option);
+                $(this).find('.pack-row .groups label > input.selectized').data('entities', ['ss_group-' + groupId]).data('ss_group', [option])[0].selectize.setValue('ss_group-' + groupId);
             }
             if(row.find('.id img:not(.default)').length > 0) {
                 $(this).find('.pack-row:not(.template) .id img').attr('src', row.find('.id img').attr('src')).removeClass('default');
@@ -214,7 +219,7 @@ $(document).ready(function () {
 
     body.on('click', '.group-list .ss_group-row', function (evt) {
         if($(evt.target).is('a[href="#edit-group"]') || !$(evt.target).is('a, .ss_group-row > .packList')
-            && $(evt.target).parents('.ss_group-row > .packList').length == 0)
+            && $(evt.target).parents('.ss_group-row > .packList').length == 0 && !$(evt.target).is('a[href^="#remove-"]'))
         {
             var results = $(this).parents('.results');
             var row = $(this).closest('.ss_group-row');

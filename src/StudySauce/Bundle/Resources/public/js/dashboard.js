@@ -671,6 +671,9 @@ $(document).ready(function () {
 
         var addIds = newValue.filter(function (v) {return existing.indexOf(v) == -1;});
         var removeIds = existing.filter(function (e) {return isTemplate && newValue.indexOf(e) == -1});
+        if(addIds.length == 0 && removeIds.length == 0) {
+            return;
+        }
         if(isDialog) {
             // add all actions from all tables
 
