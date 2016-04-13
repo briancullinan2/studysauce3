@@ -390,7 +390,7 @@ $(document).ready(function () {
         var cards = [];
         cardRows.each(function () {
             var rowId = (/card-id-([0-9]+)(\s|$)/i).exec($(this).attr('class'));
-            if($(this).is('.removed')) {
+            if($(this).is('.removed') || $(this).is('.empty')) {
                 cards[cards.length] = {
                     id: rowId != null ? rowId[1] : null,
                     remove: true
