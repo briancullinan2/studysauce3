@@ -318,7 +318,7 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'card-id' => 0, 'expandable' => ['card' => ['preview']]]);
+        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack' => ['id' => ['created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]], 'pack-count' => 0, 'classes' => ['tiles']]);
     }
 
     /**

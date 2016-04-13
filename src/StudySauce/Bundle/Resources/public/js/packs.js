@@ -323,6 +323,7 @@ $(document).ready(function () {
     body.on('click', '[id^="packs"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('.pack-row');
+        var tab = row.parents('.results');
         var rowId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'))[1];
         body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
             row.addClass('removed');
@@ -333,15 +334,10 @@ $(document).ready(function () {
                 data: {
                     id: rowId
                 },
-                success: function (data) {
-                    var packs = $('#packs');
+                success: function () {
                     // reload packs if the tab is already loaded and switch to it
+                    tab.trigger('resulted');
                     window.activateMenu(Routing.generate('packs'));
-                    if(packs.length > 0) {
-                        body.one('show', '#packs', function () {
-                            loadContent.apply(packs.find('.results'), [data]);
-                        });
-                    }
                 }
             });
         });
