@@ -393,6 +393,7 @@ $(document).ready(function () {
 
         if (dialog.find('.plupload').is('.init'))
             return;
+        defaultImage = dialog.find('.plupload img.default').attr('src');
         var upload = new plupload.Uploader({
             chunk_size: '5MB',
             runtimes: 'html5,flash,silverlight,html4',
@@ -454,8 +455,8 @@ $(document).ready(function () {
                     dialog.find('input[type="hidden"]').val(data.fid);
                     dialog.find('.plup-filelist .squiggle').stop().remove();
                     dialog.find('#' + file.id).find('.squiggle').stop().remove();
-                    dialog.find('.plupload img').attr('src', data.src).load(function () {
-                        centerize.apply($(this))
+                    dialog.find('.plupload img').attr('src', data.src).removeClass('default').load(function () {
+                        centerize.apply($(this));
                     });
                 },
                 Error: function (up, err) {
@@ -468,10 +469,14 @@ $(document).ready(function () {
         }, 200);
 
     });
+    var defaultImage;
 
     body.on('hidden.bs.modal', '#upload-file', function () {
         setTimeout(function () {
             body.off('click.upload');
+            dialog.find('.plupload img').attr('src', defaultImage).removeClass('add').load(function () {
+                centerize.apply($(this));
+            });
         }, 100);
     });
 

@@ -5,7 +5,7 @@ $view['slots']->start('modal-body') ?>
 <div class="plupload">
     <div class="plup-filelist">
         <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/upload_all.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
-            <img width="300" height="100" src="<?php echo $view->escape($url) ?>" alt="Upload" class="centerized" />
+            <img width="300" height="100" src="<?php echo $view->escape($url) ?>" alt="Upload" class="centerized default" />
         <?php endforeach; ?>
         <a href="#file-select" class="plup-select" id="file-upload-select">Drag image here or click to select (1GB max)</a>
     </div>
