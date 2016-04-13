@@ -215,7 +215,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var row = $(this).parents('[class*="-row"]');
         if($(this).is('[href^="#remove-confirm-"]')) {
-            row.addClass('removed');
+            row.removeClass('selected').addClass('removed');
         }
         else {
             row.addClass('remove-confirm');
