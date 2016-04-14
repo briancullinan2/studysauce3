@@ -189,6 +189,7 @@ EOF
                     return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
+                $groupInvite = null;
                 $child = array_values(array_filter($notify, function ($n) {
                     /** @var User $child */
                     $child = $n[1];
