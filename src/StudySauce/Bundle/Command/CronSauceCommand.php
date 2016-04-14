@@ -189,20 +189,23 @@ EOF
                     return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
-                /** @var User[] $child */
-                $child = array_values(array_filter($notify, function ($n) use ($u) {
+                $child = array_values(array_filter($notify, function ($n) {
                     /** @var User $child */
                     $child = $n[1];
                     /** @var Pack $pack */
                     $pack = $n[0];
-                    return $child != $u && $child->getInvites()->filter(function (Invite $i) use ($pack) {
+                    return $child->getInvites()->filter(function (Invite $i) use ($pack) {
                         return in_array($i->getGroup(), $pack->getGroups()->toArray());})->count() > 0;
                 }));
 
+                /** @var Invite $groupInvite */
                 if(!empty($child)) {
-                    /** @var Invite $groupInvite */
-                    $groupInvite = $child[0]->getInvites()->filter(function (Invite $i) use ($child) {
-                        return in_array($i->getGroup(), $child[0]->getGroups()->toArray());})->first();
+                    /** @var User $childUser */
+                    $childUser = $child[0][1];
+                    /** @var Pack $childPack */
+                    $childPack = $child[0][0];
+                    $groupInvite = $childUser->getInvites()->filter(function (Invite $i) use ($childPack) {
+                        return in_array($i->getGroup(), $childPack->getGroups()->toArray());})->first();
                 }
 
                 /** @var Pack[] $alerting */
