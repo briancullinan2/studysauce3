@@ -238,16 +238,16 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // set the timeout to 4 and a half minutes
-        $empty = !$input->getOptions()['emails'] && !$input->getOptions()['sync'] && !$input->getOptions()['notify'];
-        set_time_limit(60*6);
         $options = $input->getOptions();
-        if($empty || !empty($input->getOptions()['sync'])) {
+        $empty = !$options['emails'] && !$options['sync'] && !$options['notify'];
+        set_time_limit(60*6);
+        if($empty || !empty($options['sync'])) {
 
         }
-        if($empty || !empty($input->getOptions()['notify'])) {
+        if($empty || !empty($options['notify'])) {
             $this->sendNotifications();
         }
-        if($empty || !empty($input->getOptions()['emails'])) {
+        if($empty || !empty($options['emails'])) {
             try {
                 $this->sendReminders();
                 //$this->send3DayMarketing();

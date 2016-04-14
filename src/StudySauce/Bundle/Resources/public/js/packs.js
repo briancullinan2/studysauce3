@@ -485,7 +485,7 @@ $(document).ready(function () {
         });
     });
 
-    function getFields(fields) {
+    function collectFields(fields) {
         var context = $(this);
         var result = {};
         for(var f in fields) {
@@ -524,7 +524,7 @@ $(document).ready(function () {
         }
     }
 
-    body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', function () {
+    function showPublishDialog() {
         var dialog = $('#pack-publish');
         var row = $(this).parents('.pack-row');
 
@@ -548,7 +548,7 @@ $(document).ready(function () {
                 }
             }
 
-            var publish = getFields.apply(dialog, [['schedule', 'email', 'alert']]);
+            var publish = collectFields.apply(dialog, [['schedule', 'email', 'alert']]);
 
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})
@@ -561,7 +561,16 @@ $(document).ready(function () {
                 packsFunc.apply(row);
             });
         });
+    }
+
+    body.on('change', '[id^="packs-"] .status select', function () {
+        if($(this).val() == 'GROUP') {
+            $('#pack-publish').modal({show: true});
+            showPublishDialog.apply(this);
+        }
     });
+
+    body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', showPublishDialog);
 
     body.on('click', '[id^="packs-"] *:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
         var row = $(this).parents('.pack-row');

@@ -482,7 +482,7 @@ $(document).ready(function () {
                 type: 'POST',
                 dataType: 'text',
                 success: function (data) {
-
+                    that.parents('.results').trigger('resulted');
                 }
             });
         });
