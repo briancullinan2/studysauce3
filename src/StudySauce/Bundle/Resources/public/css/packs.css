@@ -622,7 +622,7 @@
     position:relative;
 }
 
-[id^="packs-"] .pack-row.edit .highlighted-link > a[href^="/packs/remove"]
+[id^="packs-"] .pack-row.edit .highlighted-link > .remove-icon
 {
     display:inline-block !important;
 }

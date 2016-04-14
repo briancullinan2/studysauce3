@@ -28,12 +28,6 @@ $(document).ready(function () {
 
     }
 
-    body.on('hidden.bs.modal', '#confirm-remove', function () {
-        setTimeout(function () {
-            body.off('click.remove');
-        }, 100);
-    });
-
     body.on('click', '[id^="groups"] a[href="#add-new-ss_group"]', function (evt) {
         evt.preventDefault();
         if($(this).parents('.panel-pane').is('[id^="groups-"]')) {

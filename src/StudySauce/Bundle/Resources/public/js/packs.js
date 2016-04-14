@@ -333,12 +333,6 @@ $(document).ready(function () {
 
     body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
 
-    body.on('hidden.bs.modal', '#confirm-remove', function () {
-        setTimeout(function () {
-            body.off('click.remove');
-        }, 100);
-    });
-
     body.on('click', '[id^="packs-"] a[href="#save-pack"], [id^="packs-"] [value="#save-pack"]', function (evt) {
         evt.preventDefault();
 

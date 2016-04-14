@@ -114,12 +114,14 @@ $(document).ready(function () {
         var routes = Routing.match(path),
             subKey = routes[0].name.split('_')[0],
             subPath = Routing.generate(subKey),
-            key = subKey;
+            key = subKey,
+            requirements = routes[0].route.requirements;
+
         // add route parameter to tab id if loading a specific page like /packs/2 or /adviser/1
-        for (var r in routes[0].route.requirements) {
-            if (routes[0].route.requirements.hasOwnProperty(r) && r != '_format') {
-                if (typeof routes[0].params[r] == 'undefined' && !isNaN(parseInt(routes[0].route.requirements[r]))) {
-                    key += '-' + r + routes[0].route.requirements[r];
+        for (var r in requirements) {
+            if (requirements.hasOwnProperty(r) && r != '_format') {
+                if (typeof routes[0].params[r] == 'undefined' && !isNaN(parseInt(requirements[r]))) {
+                    key += '-' + r + requirements[r];
                 }
                 else {
                     key += '-' + r + routes[0].params[r];
@@ -470,6 +472,27 @@ $(document).ready(function () {
 
     });
     var defaultImage;
+
+    body.on('click', 'a[data-target="#confirm-remove"][data-url]', function (evt) {
+        evt.preventDefault();
+        var that = $(this);
+        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
+            $.ajax({
+                url: that.data('url'),
+                type: 'POST',
+                dataType: 'text',
+                success: function (data) {
+
+                }
+            });
+        });
+    });
+
+    body.on('hidden.bs.modal', '#confirm-remove', function () {
+        setTimeout(function () {
+            body.off('click.remove');
+        }, 100);
+    });
 
     body.on('hidden.bs.modal', '#upload-file', function () {
         var dialog = $('#upload-file');
