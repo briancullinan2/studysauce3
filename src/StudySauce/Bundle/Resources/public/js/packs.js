@@ -288,7 +288,7 @@ $(document).ready(function () {
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
-                autoSave.apply(packRows.add(cardRows), [false] /* do not close and return to /packs from edits */);
+                autoSave.apply(tab, [false] /* do not close and return to /packs from edits */);
             }, 2000);
         }
     }
@@ -347,15 +347,15 @@ $(document).ready(function () {
                 that.add(that.next('.expandable')).addClass('removed');
             }
         });
-        autoSave.apply(tab.find('.pack-row,.card-row'), [false]);
+        autoSave.apply(tab, [false]);
     });
 
     var isLoading = false;
     function autoSave(close) {
         autoSaveTimeout = null;
-        var tab = $(this).parents('.results:visible');
+        var tab = $(this).closest('.results:visible');
         var packRows = tab.find('.pack-row.edit:not(.template)');
-        var cardRows = $(this).closest('').filter('.card-row.changed:not(.template),.card-row.removed:not(.template)');
+        var cardRows = tab.find('.card-row.changed:not(.template),.card-row.removed:not(.template)');
         if (packRows.length == 0) {
             return;
         }
