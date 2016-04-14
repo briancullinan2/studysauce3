@@ -220,7 +220,7 @@ EOF
                 $child = array_values(array_filter($notify, function ($n) use ($u) { return $n[1] != $u; }));
 
                 if(count($emailing) > 0) {
-                    $emails->sendNewPacksNotification($u, $emailing, !empty($child) ? $child[0]->getFirst() : '');
+                    $emails->sendNewPacksNotification($u, $emailing, !empty($child) ? $child[0][1]->getFirst() : '');
                 }
             }
         }

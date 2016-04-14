@@ -244,7 +244,10 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     public function getChildInvite() {
-        $groupInvite = $this->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->filter(function (Group $g) {return !$g->getDeleted();})->count() > 0;})->first();
+        $groupInvite = $this->getInvites()->filter(function (Invite $i) {
+            return !empty($i->getInvitee())
+            && $i->getInvitee()->getGroups()->filter(function (Group $g) {
+                return !$g->getDeleted();})->count() > 0;})->first();
         return $groupInvite;
     }
 
@@ -252,7 +255,8 @@ class User extends BaseUser implements EncoderAwareInterface
         $groupInvite = $this->getChildInvite();
         /** @var Group $group */
         if (!empty($groupInvite)) {
-            $group = $groupInvite->getInvitee()->getGroups()->filter(function (Group $g) {return !$g->getDeleted();})->first();
+            $group = $groupInvite->getInvitee()->getGroups()->filter(function (Group $g) {
+                return !$g->getDeleted();})->first();
             return $group;
         }
         return null;
