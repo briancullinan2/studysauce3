@@ -133,7 +133,7 @@ class EmailsController extends Controller
                 'greeting' => 'Hello ' . $user->getFirst() . ',',
                 'child' => !empty($childInvite) && $childInvite->getUser() != $user ? $childInvite->getFirst() : '',
                 'group' => !empty($childInvite) ? $childInvite->getGroup()->getName() : '',
-                'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : '',
+                'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : (!empty($notify[0]->getLogo()) ? $notify[0]->getLogo() : ''),
                 'packName' => $notify[0]->getTitle(),
                 'packCount' => $notify[0]->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(),
                 'link' => false,

@@ -77,7 +77,7 @@ $view['slots']->start('body'); ?>
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],
                         'footers' => ['ss_group' => 'new']]));
-                } else {
+                } else if (!empty($entity->getId())) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'parent-ss_group-id' => $entity->getId(),
                         'count-ss_group' => 0,
