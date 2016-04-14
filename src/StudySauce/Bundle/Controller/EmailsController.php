@@ -131,7 +131,7 @@ class EmailsController extends Controller
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
                 'greeting' => 'Hello ' . $user->getFirst() . ',',
-                'child' => !empty($childInvite) ? $childInvite->getFirst() : '',
+                'child' => !empty($childInvite) && $childInvite->getUser() != $user ? $childInvite->getFirst() : '',
                 'group' => !empty($childInvite) ? $childInvite->getGroup()->getName() : '',
                 'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : '',
                 'packName' => $notify[0]->getTitle(),

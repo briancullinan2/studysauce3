@@ -227,14 +227,15 @@ $(document).ready(function () {
             if(row.find('.content input').val().trim() == '' && (
                     row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() == ''
                 ) && row.find('.correct input').val().trim() == '') {
-                row.removeClass('invalid').addClass('empty valid');
+                row.removeClass('invalid').addClass('empty valid changed');
             }
             else if (row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() != '') {
-                row.removeClass('invalid empty').addClass('valid');
+                row.removeClass('invalid empty').addClass('valid changed');
             }
             else {
                 row.removeClass('valid empty').addClass('invalid');
             }
+
             var type = row.find('.type select').val();
             if(!row.is('.type-' + type)) {
                 row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
@@ -263,7 +264,7 @@ $(document).ready(function () {
         packRows.each(function () {
             var row = $(this);
             if(row.find('.name input').val().trim() != '') {
-                row.removeClass('invalid empty').addClass('valid');
+                row.removeClass('invalid empty').addClass('valid changed');
             }
             else {
                 row.removeClass('valid empty').addClass('invalid');
@@ -287,7 +288,7 @@ $(document).ready(function () {
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
-                autoSave.apply(packRows.add(cardRows).add(tab.find('.card-row.removed')), [false] /* do not close and return to /packs from edits */);
+                autoSave.apply(packRows.add(cardRows), [false] /* do not close and return to /packs from edits */);
             }, 2000);
         }
     }
@@ -335,31 +336,35 @@ $(document).ready(function () {
 
     body.on('click', '[id^="packs-"] a[href="#save-pack"], [id^="packs-"] [value="#save-pack"]', function (evt) {
         evt.preventDefault();
-
+        var tab = $(this).parents('.results:visible');
         if (autoSaveTimeout != null) {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        autoSave.apply($(this).parents('.results:visible').find('.pack-row,.card-row'), [false]);
+        tab.find('.card-row.empty:not(.template)').each(function () {
+            var that = jQuery(this);
+            if(that.find('.content input').val().trim() == '') {
+                that.add(that.next('.expandable')).addClass('removed');
+            }
+        });
+        autoSave.apply(tab.find('.pack-row,.card-row'), [false]);
     });
 
+    var isLoading = false;
     function autoSave(close) {
         autoSaveTimeout = null;
         var tab = $(this).parents('.results:visible');
-        var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
-        var cardRows = $(this).closest('.card-row').filter(':not(.template)');
-        if (packRows.length == 0) {
-            packRows = tab.find('.pack-row.edit:not(.template)');
-        }
+        var packRows = tab.find('.pack-row.edit:not(.template)');
+        var cardRows = $(this).closest('').filter('.card-row.changed:not(.template),.card-row.removed:not(.template)');
         if (packRows.length == 0) {
             return;
         }
-        if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]')) {
+        if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]') || isLoading) {
             // TODO: select incorrect row
             return;
         }
 
-        tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
+        isLoading = true;
         loadingAnimation(tab.find('a[href="#save-pack"]'));
 
         // get the parsed list of cards
@@ -372,6 +377,9 @@ $(document).ready(function () {
                     id: rowId != null ? rowId[1] : null,
                     remove: true
                 };
+            }
+            else if($(this).is('.invalid')) {
+                return true;
             }
             else {
                 cards[cards.length] = {
@@ -400,6 +408,7 @@ $(document).ready(function () {
                 publish: packRows.find('.status select').data('publish')
             },
             success: function (data) {
+                isLoading = false;
                 tab.find('.squiggle').stop().remove();
 
                 // rename tab if working with a new pack
@@ -432,6 +441,7 @@ $(document).ready(function () {
                 // if done in the background, don't refresh the tab with loadContent
             },
             error: function () {
+                isLoading = false;
                 tab.find('.squiggle').stop().remove();
             }
         });
