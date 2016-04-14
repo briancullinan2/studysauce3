@@ -189,8 +189,21 @@ EOF
                     return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
-                /** @var Group $group */
-                $group = $u->getChildInviteGroup();
+                /** @var User[] $child */
+                $child = array_values(array_filter($notify, function ($n) use ($u) {
+                    /** @var User $child */
+                    $child = $n[1];
+                    /** @var Pack $pack */
+                    $pack = $n[0];
+                    return $child != $u && $child->getInvites()->filter(function (Invite $i) use ($pack) {
+                        return in_array($i->getGroup(), $pack->getGroups()->toArray());})->count() > 0;
+                }));
+
+                if(!empty($child)) {
+                    /** @var Invite $groupInvite */
+                    $groupInvite = $child[0]->getInvites()->filter(function (Invite $i) use ($child) {
+                        return in_array($i->getGroup(), $child[0]->getGroups()->toArray());})->first();
+                }
 
                 /** @var Pack[] $alerting */
                 $alerting = array_values(array_filter($difference, function (Pack $p) {
@@ -200,8 +213,8 @@ EOF
                 // TODO: uncomment this when notifications are working
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
-                        if (!empty($group)) {
-                            $controller->sendNotification($group->getName() . ' added a new pack, "'
+                        if (!empty($groupInvite)) {
+                            $controller->sendNotification($groupInvite->getGroup()->getName() . ' added a new pack, "'
                                 . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
@@ -216,11 +229,8 @@ EOF
                     return $p->getProperty('email') == true;
                 }));
 
-                /** @var User[] $child */
-                $child = array_values(array_filter($notify, function ($n) use ($u) { return $n[1] != $u; }));
-
                 if(count($emailing) > 0) {
-                    $emails->sendNewPacksNotification($u, $emailing, !empty($child) ? $child[0][1]->getFirst() : '');
+                    $emails->sendNewPacksNotification($u, $emailing, isset($groupInvite) ? $groupInvite : null);
                 }
             }
         }

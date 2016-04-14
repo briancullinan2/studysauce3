@@ -56,21 +56,14 @@ class EmailsController extends Controller
 
     /**
      * @param User $user
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param Invite $childInvite
+     * @return Response
      */
-    public function welcomeParentAction(User $user = null)
+    public function welcomeParentAction(User $user = null, Invite $childInvite = null)
     {
         /** @var $user User */
         if(empty($user))
             $user = $this->getUser();
-
-        /** @var Invite $groupInvite */
-        $groupInvite = $user->getChildInvite();
-
-        /** @var Group $group */
-        if (!empty($groupInvite)) {
-            $group = $groupInvite->getInvitee()->getGroups()->first();
-        }
 
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
@@ -79,8 +72,8 @@ class EmailsController extends Controller
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-parent.html.php', [
                 'link' => false,
-                'group' => !empty($group) ? $group->getName() : '',
-                'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
+                'group' => !empty($childInvite) ? $childInvite->getGroup()->getName() : '',
+                'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : '',
                 'child' => !empty($groupInvite) ? $groupInvite->getInvitee()->getFirst() : '',
                 'greeting' => (empty($user->getFirst()) ? 'Howdy partner' : ('Hello ' . $user->getFirst())) . ','
             ]), 'text/html');
@@ -122,16 +115,14 @@ class EmailsController extends Controller
     /**
      * @param User $user
      * @param Pack[] $notify
+     * @param Invite $childInvite
      * @return Response
      */
-    public function sendNewPacksNotification(User $user = null, $notify, $child)
+    public function sendNewPacksNotification(User $user = null, $notify, Invite $childInvite)
     {
         /** @var $user User */
         if(empty($user))
             $user = $this->getUser();
-
-        /** @var Group $group */
-        $group = $user->getChildInviteGroup();
 
         /** @var \Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
@@ -140,9 +131,9 @@ class EmailsController extends Controller
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
                 'greeting' => 'Hello ' . $user->getFirst() . ',',
-                'child' => $child,
-                'group' => !empty($group) ? $group->getName() : '',
-                'groupLogo' => !empty($group->getLogo()) ? $group->getLogo()->getUrl() : '',
+                'child' => $childInvite->getFirst(),
+                'group' => !empty($childInvite) ? $childInvite->getGroup()->getName() : '',
+                'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : '',
                 'packName' => $notify[0]->getTitle(),
                 'packCount' => $notify[0]->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(),
                 'link' => false,

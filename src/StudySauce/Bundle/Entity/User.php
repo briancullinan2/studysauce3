@@ -243,25 +243,6 @@ class User extends BaseUser implements EncoderAwareInterface
         return new ArrayCollection($packs);
     }
 
-    public function getChildInvite() {
-        $groupInvite = $this->getInvites()->filter(function (Invite $i) {
-            return !empty($i->getInvitee())
-            && $i->getInvitee()->getGroups()->filter(function (Group $g) {
-                return !$g->getDeleted();})->count() > 0;})->first();
-        return $groupInvite;
-    }
-
-    public function getChildInviteGroup() {
-        $groupInvite = $this->getChildInvite();
-        /** @var Group $group */
-        if (!empty($groupInvite)) {
-            $group = $groupInvite->getInvitee()->getGroups()->filter(function (Group $g) {
-                return !$g->getDeleted();})->first();
-            return $group;
-        }
-        return null;
-    }
-
     /**
      * Constructor
      */

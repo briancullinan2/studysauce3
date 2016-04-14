@@ -396,6 +396,7 @@ class AccountController extends Controller
         }
 
         $userManager->updateUser($child);
+        return $invite;
     }
 
     /**
@@ -450,7 +451,7 @@ class AccountController extends Controller
         }
 
         if(!empty($request->get('childFirst')) && !empty($request->get('childLast'))) {
-            $this->setChildAccount($user, $request, $userManager, $orm);
+            $childInvite = $this->setChildAccount($user, $request, $userManager, $orm);
         }
 
         // get the path the user should go to after logging in
@@ -474,7 +475,7 @@ class AccountController extends Controller
             $emails = new EmailsController();
             $emails->setContainer($this->container);
             if ($user->hasRole('ROLE_PARENT')) {
-                $emails->welcomeParentAction($user);
+                $emails->welcomeParentAction($user, isset($childInvite) ? $childInvite : null);
             } elseif ($user->hasRole('ROLE_PARTNER')) {
                 $emails->welcomePartnerAction($user);
             } else {
