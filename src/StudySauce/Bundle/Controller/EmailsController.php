@@ -65,7 +65,7 @@ class EmailsController extends Controller
             $user = $this->getUser();
 
         /** @var Invite $groupInvite */
-        $groupInvite = $user->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
+        $groupInvite = $user->getChildInvite();
 
         /** @var Group $group */
         if (!empty($groupInvite)) {
@@ -130,13 +130,8 @@ class EmailsController extends Controller
         if(empty($user))
             $user = $this->getUser();
 
-        /** @var Invite $groupInvite */
-        $groupInvite = $user->getInvites()->filter(function (Invite $i) {return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
-
         /** @var Group $group */
-        if (!empty($groupInvite)) {
-            $group = $groupInvite->getInvitee()->getGroups()->first();
-        }
+        $group = $user->getChildInviteGroup();
 
         /** @var \Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()

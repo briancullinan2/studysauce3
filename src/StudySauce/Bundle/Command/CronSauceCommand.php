@@ -189,14 +189,8 @@ EOF
                     return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
-                /** @var Invite $groupInvite */
-                $groupInvite = $u->getInvites()->filter(function (Invite $i) {
-                    return !empty($i->getInvitee()) && $i->getInvitee()->getGroups()->count() > 0;})->first();
-
                 /** @var Group $group */
-                if (!empty($groupInvite)) {
-                    $group = $groupInvite->getInvitee()->getGroups()->first();
-                }
+                $group = $u->getChildInviteGroup();
 
                 /** @var Pack[] $alerting */
                 $alerting = array_values(array_filter($difference, function (Pack $p) {
