@@ -118,7 +118,7 @@ class EmailsController extends Controller
      * @param Invite $childInvite
      * @return Response
      */
-    public function sendNewPacksNotification(User $user = null, $notify, Invite $childInvite)
+    public function sendNewPacksNotification(User $user = null, $notify, Invite $childInvite = null)
     {
         /** @var $user User */
         if(empty($user))
