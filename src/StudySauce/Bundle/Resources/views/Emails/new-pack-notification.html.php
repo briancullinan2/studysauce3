@@ -11,11 +11,12 @@ $view['slots']->start('message'); ?>
 </p>
 <?php if (!empty($groupLogo)) { ?>
     <p style="text-align:right; font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; padding:20px; margin: 0 auto; max-width:400px; border-top:1px solid #BBB; border-bottom:1px solid #BBB;">
+        <br />
         <img width="150" height="150" src="<?php echo $groupLogo; ?>" alt="LOGO" style="float:left;vertical-align: middle;" />
         <br />
         <br />
         <br />
-        <strong><?php print $packName; ?></strong> (<?php print $packCount; ?> cards)
+        <strong><?php print $packName; ?></strong><br />(<?php print $packCount; ?> cards)
         <br />
         <br />
         <br />
