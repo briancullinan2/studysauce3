@@ -50,13 +50,6 @@
     top:-20px;
 }
 
-#packs .pack-row .id {
-    vertical-align: middle;
-    margin-right: -4px;
-    margin-left: 0;
-    padding: 20px 4px 20px 0;
-}
-
 #packs .pack-row .pack-icon,
 [id^="packs-"] .pack-row .pack-icon {
     position: absolute;
@@ -164,7 +157,7 @@
     display:block;
 }
 
-[id^="packs-"] .pack-row .actions
+[id^="packs-"] .pack-row [class*="actions"]
 {
     width:5%;
 }
@@ -593,7 +586,7 @@
     left:90%;
 }
 
-[id^="packs-"] .results .pack-row .actions
+[id^="packs-"] .results .pack-row [class*="actions"]
 {
     position: absolute;
     width: 40px;
@@ -604,13 +597,13 @@
     margin-top: -9px;
 }
 
-[id^="packs-"] .results .card-row.read-only .actions,
-[id^="packs-"] .results .pack-row.read-only .actions
+[id^="packs-"] .results .card-row.read-only [class*="actions"],
+[id^="packs-"] .results .pack-row.read-only [class*="actions"]
 {
     display:none;
 }
 
-[id^="packs-"] .results .card-row .actions
+[id^="packs-"] .results .card-row [class*="actions"]
 {
     padding-right: 2px;
     margin-right: -2px;
@@ -629,7 +622,7 @@
     position:relative;
 }
 
-[id^="packs-"] .pack-row.edit .highlighted-link > a[href="#remove-confirm-pack"]
+[id^="packs-"] .pack-row.edit .highlighted-link > a[href^="/packs/remove"]
 {
     display:inline-block !important;
 }

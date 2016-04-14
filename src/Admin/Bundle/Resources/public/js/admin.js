@@ -95,22 +95,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#command a[href="#remove-confirm-group"]', function (evt) {
-        evt.preventDefault();
-        var row = $(this).parents('.group-row');
-        var groupId = ((/group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
-        $.ajax({
-            url: Routing.generate('save_group'),
-            type: 'POST',
-            dataType: 'text',
-            data: {
-                groupId: groupId,
-                remove: 1
-            },
-            success: loadContent
-        });
-    });
-
     body.on('click', '#command [value="#save-group"]', function (evt) {
         evt.preventDefault();
         var that = $(this);
@@ -428,19 +412,6 @@ $(document).ready(function () {
             userId = (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
         $('#reset-user-name').text(row.find('input[name="first-name"]').first().val());
         $('#confirm-password-reset').data('userId', userId);
-    });
-
-    body.on('click', 'a[href="#remove-confirm-user"]', function (evt) {
-        evt.preventDefault();
-        var data = getDataRequest.apply($(this).parents('.results'));
-        data.userId = $('#confirm-remove-user').data('userId');
-        $.ajax({
-            url: Routing.generate('remove_user'),
-            type: 'POST',
-            dataType: 'text',
-            data: data,
-            success: loadContent
-        });
     });
 
     body.on('click', '#confirm-cancel-user a[href="#cancel-user"]', function () {

@@ -1,6 +1,4 @@
 <div class="highlighted-link">
-    <a href="#cancel-edit">Cancel</a>
-    <button type="submit" value="#save-group" class="more">Save</button>
-    <a title="Edit group" href="#edit-group">&nbsp;</a>
-    <a href="#remove-confirm-group" data-target="#confirm-remove" data-toggle="modal">&nbsp;</a>
+    <a title="Edit group" href="<?php print $view['router']->generate('groups_edit', ['group' => $ss_group->getId()]); ?>" class="edit-icon">&nbsp;</a>
+    <a href="<?php print $view['router']->generate('save_group', ['remove' => true, 'groupId' => $ss_group->getId()]); ?>" data-target="#confirm-remove" data-toggle="modal">&nbsp;</a>
 </div>

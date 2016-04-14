@@ -616,12 +616,7 @@ class AdminController extends Controller
             //    $userManager->updateUser($u, false);
             //}
             $orm->flush();
-            return $this->forward('AdminBundle:Admin:results', [
-                'tables' => [
-                    'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description', 'userCountStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]],
-                'parent-ss_group-id' => 'NULL',
-                'count-ss_group' => 0,
-                'classes' => ['tiles']]);
+            return $this->redirect($this->generateUrl('groups'));
         }
         else
             $orm->merge($g);

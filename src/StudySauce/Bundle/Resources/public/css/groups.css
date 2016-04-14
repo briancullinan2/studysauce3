@@ -93,14 +93,14 @@
     display:none;
 }
 
-.group-edit .results .pack-row .actions
+.group-edit .results .pack-row [class*="actions"]
 {
     width:5%;
     padding-right:2px;
     margin-right: -2px;
 }
 
-.group-edit .results .ss_group-row .actions
+.group-edit .results .ss_group-row [class*="actions"]
 {
     position:absolute;
     width:40px;
@@ -111,7 +111,7 @@
     margin-top:-9px;
 }
 
-.group-edit .results .ss_group-row.read-only .actions {
+.group-edit .results .ss_group-row.read-only [class*="actions"] {
     display:none;
 }
 
@@ -359,7 +359,7 @@
     display:none;
 }
 
-.group-edit .ss_group-row.edit .highlighted-link > a[href="#remove-confirm-group"]
+.group-edit .ss_group-row.edit .highlighted-link > a[href^="/command/save/group?remove"]
 {
     display:inline-block !important;
 }
@@ -370,7 +370,7 @@
     display:none !important;
 }
 
-.group-edit .pack-row.edit .highlighted-link > a[href="#remove-confirm-pack"]
+.group-edit .pack-row.edit .highlighted-link > .remove-icon
 {
     display:inline-block !important;
 }

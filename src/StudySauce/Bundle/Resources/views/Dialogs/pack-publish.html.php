@@ -2,27 +2,26 @@
 
 $view['slots']->start('modal-body') ?>
 <label class="radio">
-    <input type="radio" name="publish-schedule" value="now" />
+    <input type="radio" name="date" value="now" />
     <i></i>
     <span>Publish now</span>
 </label><br/>
 <label class="radio">
-    <input type="radio" name="publish-schedule" value="later" checked="checked" />
+    <input type="radio" name="date" value="later" checked="checked" />
     <i></i>
     <span>Publish later</span>
 </label>
 <label class="input">
-    <input type="text" name="publish-date" placeholder="Date/time" />
+    <input type="text" name="schedule" placeholder="Date/time" />
 </label>
-<div id="publish-date"></div>
 <h3>Notifications:</h3>
 <label class="checkbox">
-    <input type="checkbox" name="publish-email" value="now" checked="checked" />
+    <input type="checkbox" name="email" value="true" checked="checked" />
     <i></i>
     <span>Email sent to user when pack publishes</span>
 </label><br/>
 <label class="checkbox">
-    <input type="checkbox" name="publish-alert" value="later" checked="checked" />
+    <input type="checkbox" name="alert" value="true" checked="checked" />
     <i></i>
     <span>In-app alert sent when pack publishes</span>
 </label>

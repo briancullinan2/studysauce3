@@ -28,64 +28,6 @@ $(document).ready(function () {
 
     }
 
-    body.on('click', '[id^="groups-"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
-        evt.preventDefault();
-        var tab = $(this).parents('.results');
-        var row = $(this).parents('.pack-row');
-        var group = tab.find('.ss_group-row.edit:not(.template)');
-        var id = ((/pack-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
-        var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(group.attr('class')) || [])[1];
-        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
-            row.addClass('removed');
-            $.ajax({
-                url: Routing.generate('save_group'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    groupId: groupId,
-                    packId: id != null ? id : null,
-                    groups: [{id: groupId, remove: true}]
-                },
-                success: function (data) {
-                    // copy rows and select
-                    var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                    loadContent.apply(tab, [data, ['pack']]);
-                    if (selected) {
-                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
-                    }
-                }
-            });
-        });
-        row.removeClass('removed');
-    });
-
-    body.on('click', '[id^="groups"] .ss_group-row [href="#remove-confirm-group"]', function (evt) {
-        evt.preventDefault();
-        var row = $(this).parents('.ss_group-row');
-        var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
-        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
-            row.addClass('removed');
-            $.ajax({
-                url: Routing.generate('save_group'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    groupId: groupId,
-                    remove: true
-                },
-                success: function (data) {
-                    // copy rows and redirect
-                    var groups;
-                    if ((groups = $('#groups')).length > 0) {
-                        loadContent.apply(groups.find('.results'), [data, ['ss_group']]);
-                    }
-                    activateMenu(Routing.generate('groups'));
-                }
-            });
-        });
-        row.removeClass('removed');
-    });
-
     body.on('hidden.bs.modal', '#confirm-remove', function () {
         setTimeout(function () {
             body.off('click.remove');
@@ -218,8 +160,7 @@ $(document).ready(function () {
     body.on('change keyup keydown', '[id^="groups-"] .ss_group-row input, [id^="groups-"] .ss_group-row select, [id^="groups-"] .ss_group-row textarea', groupsFunc);
 
     body.on('click', '.group-list .ss_group-row', function (evt) {
-        if($(evt.target).is('a[href="#edit-group"]') || !$(evt.target).is('a, .ss_group-row > .packList')
-            && $(evt.target).parents('.ss_group-row > .packList').length == 0 && !$(evt.target).is('a[href^="#remove-"]'))
+        if(!$(evt.target).is('a, .ss_group-row > .packList') && $(evt.target).parents('.ss_group-row > .packList').length == 0)
         {
             var results = $(this).parents('.results');
             var row = $(this).closest('.ss_group-row');
@@ -260,18 +201,18 @@ $(document).ready(function () {
         this.selectize.renderCache = {};
 
 
-        dialog.find('input[name="publish-date"]').datetimepicker({
+        dialog.find('input[name="schedule"]').datetimepicker({
             format: 'd.m.Y H:i',
             inline: true,
             minDate: 0
-        });
+        }).addClass('dateTimePicker');
 
         dialog.one('click.publish', 'a[href="#submit-publish"]', function () {
 
             var publish = {
-                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? new Date() : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
-                email: dialog.find('input[name="publish-email"]:checked').val() != null,
-                alert: dialog.find('input[name="publish-alert"]:checked').val() != null
+                schedule: dialog.find('input[name="date"]:checked').val() == 'now' ? new Date() : dialog.find('input[name="schedule"]').datetimepicker('getValue'),
+                email: dialog.find('input[name="email"]:checked').val() != null,
+                alert: dialog.find('input[name="alert"]:checked').val() != null
             };
 
             // show confirmation dialog
@@ -318,27 +259,6 @@ $(document).ready(function () {
         autoSaveTimeout = 0;
         groupsFunc.apply(tab.find('.ss_group-row.edit'));
         autoSaveTimeout = null;
-    });
-
-    body.on('click', '[id^="groups-"] a[href="#edit-pack"]', function () {
-        var results = $(this).parents('.results');
-        var row = $(this).parents('.pack-row');
-        var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-        window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
-        row.removeClass('edit read-only');
-    });
-
-    body.on('hidden.bs.modal', '#general-dialog', function () {
-        setTimeout(function () {
-            body.off('click.modify_entities_confirm');
-            body.off('click.publish_confirm');
-        }, 100);
-    });
-
-    body.on('hidden.bs.modal', '#pack-publish', function () {
-        setTimeout(function () {
-            $(this).off('click.publish');
-        }, 100);
     });
 
     body.on('click', '[id^="groups-"] *:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {

@@ -836,6 +836,7 @@ $(document).ready(function () {
     body.on('hidden.bs.modal', '#general-dialog', function () {
         setTimeout(function () {
             body.off('click.modify_entities_confirm');
+            body.off('click.publish_confirm');
         }, 100);
     });
 
@@ -881,5 +882,13 @@ $(document).ready(function () {
     }
 
     window.createEntityRow = createEntityRow;
+
+    // TODO: insert publish dialog here
+
+    body.on('hidden.bs.modal', '#pack-publish', function () {
+        setTimeout(function () {
+            body.off('click.publish');
+        }, 100);
+    });
 
 });

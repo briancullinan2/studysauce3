@@ -21,6 +21,7 @@ $view['slots']->start('message'); ?>
         <br />
         <br />
         <br />
+        <br />
     </p>
 <?php } ?>
 <p style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">

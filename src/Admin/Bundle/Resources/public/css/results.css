@@ -430,8 +430,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     width: 10%;
 }
 
-.results header > .actions,
-[class*="-row"] > .actions:nth-last-child(2)
+.results header > [class*="actions"],
+[class*="-row"] > [class*="actions"]:nth-last-child(2)
 {
     width:15%;
     text-align: right;
@@ -439,7 +439,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin-right: -32px;
 }
 
-[class*="-row"] > .actions:nth-last-child(2)
+[class*="-row"] > [class*="actions"]:nth-last-child(2)
 {
     padding-top:0;
     padding-bottom:0;
@@ -546,7 +546,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     line-height: 140%;
 }
 
-.tiles [class*="-row"] .actions {
+.tiles [class*="-row"] [class*="actions"] {
     position:absolute;
     right:10px;
     top:10px;

@@ -305,8 +305,7 @@ $(document).ready(function () {
     });
 
     body.on('click', '#packs .pack-row', function (evt) {
-        if($(evt.target).is('a[href="#edit-pack"]') || !$(evt.target).is('a, .pack-row > .packList')
-            && $(evt.target).parents('.pack-row > .packList').length == 0 && !$(evt.target).is('a[href^="#remove-"]'))
+        if(!$(evt.target).is('a, .pack-row > .packList') && $(evt.target).parents('.pack-row > .packList').length == 0)
         {
             var results = $(this).parents('.results');
             var row = $(this).closest('.pack-row');
@@ -334,30 +333,6 @@ $(document).ready(function () {
 
     body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
 
-    body.on('click', '[id^="packs"] .pack-row [href="#remove-confirm-pack"]', function (evt) {
-        evt.preventDefault();
-        var row = $(this).parents('.pack-row');
-        var tab = row.parents('.results');
-        var rowId = (/pack-id-([0-9]+)(\s|$)/i).exec(row.attr('class'))[1];
-        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
-            row.addClass('removed');
-            $.ajax({
-                url: Routing.generate('packs_remove'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    id: rowId
-                },
-                success: function () {
-                    // reload packs if the tab is already loaded and switch to it
-                    tab.trigger('resulted');
-                    window.activateMenu(Routing.generate('packs'));
-                }
-            });
-        });
-        row.removeClass('removed');
-    });
-
     body.on('hidden.bs.modal', '#confirm-remove', function () {
         setTimeout(function () {
             body.off('click.remove');
@@ -371,7 +346,7 @@ $(document).ready(function () {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        autoSave.apply($(this).parents('.results:visible').find('.pack-row,.card-row'), [true]);
+        autoSave.apply($(this).parents('.results:visible').find('.pack-row,.card-row'), [false]);
     });
 
     function autoSave(close) {
@@ -442,12 +417,7 @@ $(document).ready(function () {
                 }
 
                 if (close) {
-                    loadContent.apply(tab, [data]);
-                    packsFunc.apply(packRows.add(cardRows));
-                    //var newId = (/pack-id-([0-9]*)(\s|$)/i).exec(tab.find('.pack-row:visible').first().attr('class'))[1];
-                    //tab.find('.results .search input[name="search"]').val('pack-id:' + newId); // we dont need to trigger a change because this should be what we got back from create request
-                    //tab.find('.search .input').removeClass('read-only');
-                    window.activateMenu(Routing.generate('packs'));
+
                 }
                 else {
                     // copy new ids to new rows
@@ -521,44 +491,57 @@ $(document).ready(function () {
         });
     });
 
+    function getFields(fields) {
+        var context = $(this);
+        var result = {};
+        for(var f in fields) {
+            if (fields.hasOwnProperty(f)) {
+                var inputField = context.find('[name="' + fields[f] + '"]');
+                if (inputField.is('[type="checkbox"],[type="radio"]')) {
+                    result[fields[f]] = inputField.filter(':checked').val();
+                }
+                else if (inputField.is('.dateTimePicker')) {
+                    result[fields[f]] = inputField.datetimepicker('getValue');
+                }
+                else {
+                    result[fields[f]] = null;
+                }
+            }
+        }
+        return result;
+    }
+
+    function applyFields(fields) {
+        var context = $(this);
+        for(var f in fields) {
+            if (fields.hasOwnProperty(f)) {
+                var inputField = context.find('[name="' + fields[f] + '"]');
+                if (inputField.is('[type="checkbox"],[type="radio"]')) {
+                    inputField.each(function () {
+                        if($(this).val() == fields[f]) {
+                            $(this).prop('checked', true);
+                        }
+                    });
+                }
+                else if (inputField.is('.dateTimePicker')) {
+                    inputField.datetimepicker('setOptions', {value: new Date(inputField.val())});
+                }
+            }
+        }
+    }
+
     body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', function () {
         var dialog = $('#pack-publish');
         var row = $(this).parents('.pack-row');
 
-        dialog.find('input[name="publish-date"]').datetimepicker({
+        dialog.find('input[name="schedule"]').datetimepicker({
             format: 'd.m.Y H:i',
             inline: true,
             minDate: 0
-        });
+        }).addClass('dateTimePicker');
 
         // set up previous publish settings
-        var publish = row.find('.status select').data('publish');
-        if (typeof publish.schedule != 'undefined') {
-            if(new Date(publish.schedule) < new Date()) {
-                dialog.find('input[name="publish-schedule"][value="now"]').prop('checked', true);
-            }
-            else {
-                dialog.find('input[name="publish-schedule"][value="later"]').prop('checked', true);
-                dialog.find('input[name="publish-date"]').datetimepicker('setOptions', {value: new Date(publish.schedule)});
-            }
-        }
-        else {
-            dialog.find('input[name="publish-schedule"][value="now"]').prop('checked', true);
-        }
-
-        if (typeof publish.email != 'undefined') {
-            dialog.find('input[name="publish-email"][value="' + publish.email + '"]').prop('checked', true);
-        }
-        else {
-            dialog.find('input[name="publish-email"][value="true"]').prop('checked', true);
-        }
-
-        if (typeof publish.alert != 'undefined') {
-            dialog.find('input[name="publish-alert"][value="' + publish.alert + '"]').prop('checked', true);
-        }
-        else {
-            dialog.find('input[name="publish-alert"][value="true"]').prop('checked', true);
-        }
+        applyFields.apply(dialog, [row.find('.status select').data('publish')]);
 
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
             var entityField = row.find('.groups input.selectized');
@@ -571,11 +554,7 @@ $(document).ready(function () {
                 }
             }
 
-            var publish = {
-                schedule: dialog.find('input[name="publish-schedule"]:checked').val() == 'now' ? new Date() : dialog.find('input[name="publish-date"]').datetimepicker('getValue'),
-                email: dialog.find('input[name="publish-email"]:checked').val() != null,
-                alert: dialog.find('input[name="publish-alert"]:checked').val() != null
-            };
+            var publish = getFields.apply(dialog, [['schedule', 'email', 'alert']]);
 
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})
@@ -590,13 +569,6 @@ $(document).ready(function () {
         });
     });
 
-    body.on('hidden.bs.modal', '#general-dialog', function () {
-        setTimeout(function () {
-            body.off('click.modify_entities_confirm');
-            body.off('click.publish_confirm');
-        }, 100);
-    });
-
     body.on('click', '[id^="packs-"] *:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
         var row = $(this).parents('.pack-row');
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
@@ -604,12 +576,6 @@ $(document).ready(function () {
                 packsFunc.apply(row);
             }, 100);
         });
-    });
-
-    body.on('hidden.bs.modal', '#pack-publish', function () {
-        setTimeout(function () {
-            body.off('click.publish');
-        }, 100);
     });
 
 });
