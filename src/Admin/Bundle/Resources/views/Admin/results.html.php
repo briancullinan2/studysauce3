@@ -42,7 +42,8 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
         // show header template
         $tableTotal = $table . '_total';
         if (count($$table) > 0 || $isNew) {
-            if(!isset($searchRequest['headers'])) {
+            if(!isset($searchRequest['headers']) || is_array($headers = $searchRequest['headers'])
+                && isset($headers[$table]) && $headers[$table] === true) {
                 print $view->render('AdminBundle:Admin:header.html.php', $subVars + ['table' => $table]);
             }
             else if (is_array($headers = $searchRequest['headers'])
@@ -71,13 +72,14 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
         print $view->render('AdminBundle:Admin:row.html.php', $subVars + ['classes' => $classes, 'entity' => $entity, 'table' => $table]);
 
         // show footer at the end of each result list
-        if(!isset($searchRequest['footers'])) {
+        if(!isset($searchRequest['footers']) || is_array($footers = $searchRequest['footers'])
+            && isset($footers[$table]) && $footers[$table] === true) {
             print $view->render('AdminBundle:Admin:footer.html.php', $subVars + ['table' => $table, $table => $$table]);
         }
-        else if (is_array($headers = $searchRequest['footers'])
-            && isset($headers[$table])
-            && $view->exists('AdminBundle:Admin:footer-' . $headers[$table] . '.html.php')) {
-            print $view->render('AdminBundle:Admin:footer-' . $headers[$table] . '.html.php', $subVars + ['table' => $table, $table => $$table]);
+        else if (is_array($footers = $searchRequest['footers'])
+            && isset($footers[$table])
+            && $view->exists('AdminBundle:Admin:footer-' . $footers[$table] . '.html.php')) {
+            print $view->render('AdminBundle:Admin:footer-' . $footers[$table] . '.html.php', $subVars + ['table' => $table, $table => $$table]);
         }
     } ?>
 </div>

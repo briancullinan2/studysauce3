@@ -97,7 +97,7 @@ $(document).ready(function () {
         tab.find('.card-row.empty:not(.template)').each(function () {
             var that = jQuery(this);
             if(that.find('.content input').val().trim() == '') {
-                that.add(that.next('.expandable')).addClass('removed');
+                that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
             }
         });
 
@@ -350,7 +350,7 @@ $(document).ready(function () {
         tab.find('.card-row.empty:not(.template)').each(function () {
             var that = jQuery(this);
             if(that.find('.content input').val().trim() == '') {
-                that.add(that.next('.expandable')).addClass('removed');
+                that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
             }
         });
         autoSave.apply(tab, [false]);

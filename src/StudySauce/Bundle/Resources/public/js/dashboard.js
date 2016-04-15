@@ -478,7 +478,7 @@ $(document).ready(function () {
         var that = $(this);
         body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
             $.ajax({
-                url: that.data('url'),
+                url: that.data('action'),
                 type: 'POST',
                 dataType: 'text',
                 success: function (data) {
