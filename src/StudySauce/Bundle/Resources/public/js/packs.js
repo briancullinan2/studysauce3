@@ -222,8 +222,8 @@ $(document).ready(function () {
         var tab = $(this).parents('.results:visible');
         var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
         var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
-        cardRows.each(function () {
-            var row = $(this);
+        for(var c  = 0; c < cardRows.length; c++) {
+            var row = $(cardRows[c]);
             if(row.find('.content input').val().trim() == '' && (
                     row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() == ''
                 ) && row.find('.correct input').val().trim() == '') {
@@ -257,19 +257,16 @@ $(document).ready(function () {
             if(previewTimeout != null) {
                 clearTimeout(previewTimeout);
             }
-            previewTimeout = setTimeout(function () {
-                updatePreview.apply(row);
-            }, 100);
-        });
-        packRows.each(function () {
-            var row = $(this);
-            if(row.find('.name input').val().trim() != '') {
-                row.removeClass('invalid empty').addClass('valid changed');
+        }
+        for(var p = 0; p < packRows.length; p++) {
+            var row2 = $(packRows[p]);
+            if(row2.find('.name input').val().trim() != '') {
+                row2.removeClass('invalid empty').addClass('valid changed');
             }
             else {
-                row.removeClass('valid empty').addClass('invalid');
+                row2.removeClass('valid empty').addClass('invalid');
             }
-        });
+        }
 
         if(tab.find('.pack-row.read-only').length > 0 || tab.find('.card-row.invalid:not(.removed)').length == 0 && (
             tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0) &&
@@ -284,6 +281,10 @@ $(document).ready(function () {
         if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input').length > 0) {
             return;
         }
+
+        previewTimeout = setTimeout(function () {
+            updatePreview.apply(cardRows);
+        }, 100);
 
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
@@ -408,9 +409,6 @@ $(document).ready(function () {
                 publish: packRows.find('.status select').data('publish')
             },
             success: function (data) {
-                isLoading = false;
-                tab.find('.squiggle').stop().remove();
-
                 // rename tab if working with a new pack
                 if (tab.closest('.panel-pane').is('#packs-pack0')) {
                     tab.closest('.panel-pane').attr('id', 'packs-pack' + data.pack[0].id);
@@ -439,6 +437,8 @@ $(document).ready(function () {
                 }
 
                 // if done in the background, don't refresh the tab with loadContent
+                isLoading = false;
+                tab.find('.squiggle').stop().remove();
             },
             error: function () {
                 isLoading = false;
