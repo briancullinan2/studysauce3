@@ -224,6 +224,7 @@ table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
 }
 
 .results [class*="-row"] ~ .highlighted-link a[href^="#save-"],
+.results [class*="-row"] ~ .highlighted-link .cancel-edit,
 .results [class*="-row"] ~ .highlighted-link a[href^="#cancel-"]
 {
     visibility:hidden;

@@ -14,14 +14,14 @@
     min-height: 600px;
 }
 
-.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href="#cancel-edit"],
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group .cancel-edit,
 .group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href="#save-ss_group"],
 .group-edit .highlighted-link a[href="#edit-ss_group"] {
     display:inline-block;
 }
 
 
-.group-edit .highlighted-link.ss_group a[href="#cancel-edit"],
+.group-edit .highlighted-link.ss_group .cancel-edit,
 .group-edit .highlighted-link.ss_group a[href="#save-ss_group"],
 .group-edit .highlighted-link.ss_group a[href="#add-ss_group"],
 .group-edit .ss_group-row.edit ~ .highlighted-link a[href="#edit-ss_group"] {
@@ -39,7 +39,7 @@
     visibility: hidden;
 }
 
-.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href^="#cancel-"],
+.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group .cancel-edit,
 .group-edit .ss_group-row.edit ~ .highlighted-link.ss_group a[href^="#save-"]
 {
     visibility: visible;

@@ -5,7 +5,7 @@
 }
 
 [id^="packs-"] .highlighted-link.pack a[href="#add-pack"],
-[id^="packs-"] .highlighted-link.pack a[href="#cancel-edit"],
+[id^="packs-"] .highlighted-link.pack .cancel-edit,
 [id^="packs-"] .highlighted-link.pack a[href="#save-ss_group"],
 [id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
 [id^="packs-"] .card-row > label.checkbox:nth-last-child(1),
@@ -17,7 +17,7 @@
     display: none;
 }
 
-[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href="#cancel-edit"],
+[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack .cancel-edit,
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href="#save-ss_group"],
 [id^="packs-"] .card-row.edit.selected .highlighted-link > *:not(.more),
 [id^="packs-"] .card-row.edit:hover .highlighted-link > *:not(.more)
@@ -25,7 +25,7 @@
     display: inline-block;
 }
 
-[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#cancel-"],
+[id^="packs-"] .pack-row.edit ~ .highlighted-link.pack .cancel-edit,
 [id^="packs-"] .pack-row.edit ~ .highlighted-link.pack a[href^="#save-"]
 {
     visibility: visible;

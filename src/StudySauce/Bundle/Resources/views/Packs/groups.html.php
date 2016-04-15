@@ -57,7 +57,8 @@ $view['slots']->start('body'); ?>
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks'],
-                        'footers' => ['ss_group' => 'groupGroups']]));
+                        'footers' => ['ss_group' => 'groupGroups']
+                    ]));
                     if ($entity->getGroupPacks()->count() > 0) {
                         ?>
                         <div class="empty-members">
@@ -76,7 +77,8 @@ $view['slots']->start('body'); ?>
                         'classes' => ['tiles'],
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],
-                        'footers' => ['ss_group' => 'new']]));
+                        'footers' => ['ss_group' => 'new']
+                    ]));
                 } else if (!empty($entity->getId())) {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'parent-ss_group-id' => $entity->getId(),
@@ -84,7 +86,8 @@ $view['slots']->start('body'); ?>
                         'classes' => ['tiles'],
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'new'],
-                        'footers' => ['ss_group' => 'new']]));
+                        'footers' => ['ss_group' => 'new']
+                    ]));
                 }
                 ?>
             </div>

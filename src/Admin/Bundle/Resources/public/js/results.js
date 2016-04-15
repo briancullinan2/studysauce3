@@ -228,9 +228,21 @@ $(document).ready(function () {
         row.removeClass('read-only').addClass('edit');
     });
 
+    body.on('click', '.form-actions a[href^="#edit-"]', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('.results').find('.read-only');
+        row.removeClass('read-only').addClass('edit');
+    });
+
     body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
         var row = $(this).parents('[class*="-row"]');
+        row.removeClass('edit remove-confirm').addClass('read-only');
+    });
+
+    body.on('click', '.form-actions a[href^="#cancel-edit"], .form-actions .cancel-edit', function (evt) {
+        evt.preventDefault();
+        var row = $(this).parents('.results').find('.edit');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 

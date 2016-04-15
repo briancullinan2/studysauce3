@@ -47,6 +47,7 @@ $view['slots']->start('body'); ?>
                 $tables['edit'] = $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC';
                 $tables['count-pack'] = 1;
                 $tables['count-card'] = empty($entity->getId()) ? 5 : 0;
+                $tables['footers'] = ['pack' => 'packPacks'];
             }
             else {
                 $tables['count-pack'] = 0;

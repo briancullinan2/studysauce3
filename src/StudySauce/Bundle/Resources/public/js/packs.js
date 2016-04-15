@@ -101,7 +101,7 @@ $(document).ready(function () {
             }
         });
 
-        packsFunc.apply(tab.find('.card-row'));
+        packsFunc.apply(tab.find('.card-row').addClass('changed'));
     }
 
     body.on('focus mousedown keydown change keyup blur', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
@@ -332,16 +332,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '[id^="packs-"] a[href="#edit-pack"]', function (evt) {
-        evt.preventDefault();
-        var tab = $(this).parents('.results');
-        tab.find('.pack-row,.card-row').removeClass('read-only').addClass('edit');
-        window.setupFields();
-        autoSaveTimeout = 0;
-        packsFunc.apply(tab.find('.pack-row').add(tab.find('.card-row')));
-        autoSaveTimeout = null;
-    });
-
     body.on('click', '[id^="packs-"] .pack-row.edit a[href^="#cancel-"], [id^="packs-"] .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
         $(this).parents('.results').find('.pack-row,.card-row').removeClass('edit').addClass('read-only');
@@ -367,6 +357,7 @@ $(document).ready(function () {
     });
 
     var isLoading = false;
+
     function autoSave(close) {
         autoSaveTimeout = null;
         var tab = $(this).closest('.results:visible');
@@ -499,7 +490,7 @@ $(document).ready(function () {
         var row = $(this).parents('.card-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
             row.find('input[name="url"]').val($('#upload-file').find('img').attr('src'));
-            packsFunc.apply(row);
+            packsFunc.apply(row.addClass('changed'));
         });
     });
 
@@ -507,7 +498,7 @@ $(document).ready(function () {
         var row = $(this).parents('.pack-row');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
             row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('default');
-            packsFunc.apply(row);
+            packsFunc.apply(row.addClass('changed'));
         });
     });
 
@@ -584,7 +575,7 @@ $(document).ready(function () {
                 row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
                 row.find('.status select').data('publish', publish).val('GROUP');
                 row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-                packsFunc.apply(row);
+                packsFunc.apply(row.addClass('changed'));
             });
         });
     }
@@ -602,7 +593,7 @@ $(document).ready(function () {
         var row = $(this).parents('.pack-row');
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
             setTimeout(function () {
-                packsFunc.apply(row);
+                packsFunc.apply(row.addClass('changed'));
             }, 100);
         });
     });

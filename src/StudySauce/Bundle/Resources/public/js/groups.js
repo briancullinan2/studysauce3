@@ -245,16 +245,6 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '[id^="groups-"] a[href="#edit-ss_group"]', function (evt) {
-        evt.preventDefault();
-        var tab = $(this).parents('.results');
-        tab.find('.ss_group-row').removeClass('read-only').addClass('edit');
-        window.setupFields();
-        autoSaveTimeout = 0;
-        groupsFunc.apply(tab.find('.ss_group-row.edit'));
-        autoSaveTimeout = null;
-    });
-
     body.on('click', '[id^="groups-"] *:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
         var tab = $(this).parents('.results'),
             row = $(this).parents('.pack-row'),
