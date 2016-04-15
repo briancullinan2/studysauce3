@@ -219,18 +219,42 @@ $(document).ready(function () {
     });
 
     function packsFunc (evt) {
-        var tab = $(this).parents('.results:visible');
+        var tab = $(this).closest('.results:visible');
         var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
         var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
+
+        // do not autosave from selectize because the input underneath will change
+        if(typeof evt != 'undefined') {
+            if($(evt.target).parents('.selectize-input').length > 0) {
+                return;
+            }
+            packRows.not('.changed').addClass('changed');
+            cardRows.not('.changed').addClass('changed');
+        }
+
+        if(validationTimeout != null) {
+            clearTimeout(validationTimeout);
+        }
+        validationTimeout = setTimeout(function () {
+            validateChanged.apply(tab);
+        }, 100);
+    }
+
+    function validateChanged() {
+
+        var tab = $(this).closest('.results:visible');
+        var packRows = tab.find('.pack-row.changed,.pack-row:not(.valid)');
+        var cardRows = tab.find('.card-row.changed');
+
         for(var c  = 0; c < cardRows.length; c++) {
             var row = $(cardRows[c]);
             if(row.find('.content input').val().trim() == '' && (
                     row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() == ''
                 ) && row.find('.correct input').val().trim() == '') {
-                row.removeClass('invalid').addClass('empty valid changed');
+                row.removeClass('invalid').addClass('empty valid');
             }
             else if (row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() != '') {
-                row.removeClass('invalid empty').addClass('valid changed');
+                row.removeClass('invalid empty').addClass('valid');
             }
             else {
                 row.removeClass('valid empty').addClass('invalid');
@@ -254,14 +278,11 @@ $(document).ready(function () {
                 row.find('.input.type > span').text(rowIndex);
             }
 
-            if(previewTimeout != null) {
-                clearTimeout(previewTimeout);
-            }
         }
         for(var p = 0; p < packRows.length; p++) {
             var row2 = $(packRows[p]);
             if(row2.find('.name input').val().trim() != '') {
-                row2.removeClass('invalid empty').addClass('valid changed');
+                row2.removeClass('invalid empty').addClass('valid');
             }
             else {
                 row2.removeClass('valid empty').addClass('invalid');
@@ -277,15 +298,9 @@ $(document).ready(function () {
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
         }
 
-        // do not autosave from selectize because the input underneath will change
-        if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input').length > 0) {
-            return;
-        }
-
-        previewTimeout = setTimeout(function () {
+        if(cardRows.length > 0) {
             updatePreview.apply(cardRows);
-        }, 100);
-
+        }
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
@@ -294,8 +309,8 @@ $(document).ready(function () {
         }
     }
 
-    var autoSaveTimeout = 0,
-    previewTimeout = null;
+    var autoSaveTimeout = 0;
+    var validationTimeout = null;
 
     body.on('selected', '[id^="packs-"] .card-row', function () {
         updatePreview.apply($(this));
@@ -392,6 +407,7 @@ $(document).ready(function () {
                 };
             }
         });
+        cardRows.removeClass('changed');
 
         $.ajax({
             url: Routing.generate('packs_create'),
