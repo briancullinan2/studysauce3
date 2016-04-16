@@ -584,6 +584,7 @@
     font-size: 50px;
     vertical-align: middle;
     left:90%;
+    overflow:hidden;
 }
 
 [id^="packs-"] .results .pack-row [class*="actions"]

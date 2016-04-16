@@ -497,6 +497,12 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:inline-block;
 }
 
+.results [class*="-row"].invalid .invalid textarea,
+.results [class*="-row"].invalid .invalid input,
+.results [class*="-row"].invalid .invalid select {
+    border-bottom-color:#CC2211;
+}
+
 .tiles {
     margin-left:-1%;
     padding-right:4px;
@@ -547,6 +553,11 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     line-height: 140%;
 }
 
+.tiles [class*="-row"] .packList label {
+    color: #BBB;
+    font-weight: normal;
+}
+
 .tiles [class*="-row"] [class*="actions"] {
     position:absolute;
     right:10px;
@@ -554,6 +565,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     padding:0;
     margin:0;
     width:auto;
+    display:none;
 }
 
 .tiles [class*="-row"] .id .pack-icon {

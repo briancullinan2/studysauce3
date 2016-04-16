@@ -26,8 +26,7 @@ $(document).ready(function () {
 
     function rowImport(clipText) {
         var tab = $(this),
-            last = tab.find('.card-row.empty').first();
-        last = last.add(last.find('+ .expandable'));
+            last = null;
 
         // split into rows
         var clipRows = CSVToArray(clipText, "\t");
@@ -38,9 +37,19 @@ $(document).ready(function () {
             if(clipRows[i].length < 2)
                 continue;
 
-            tab.find('[href="#add-card"]').first().trigger('click');
-            var newRow = tab.find('.card-row.empty').first();
-            last = newRow.add(newRow.find('+ .expandable')).detach().insertAfter(last.last());
+            var newRow = tab.find('.card-row.empty:not(.template):not(.removed):not(.changed)').first();
+            if(newRow.length == 0) {
+                tab.find('[href="#add-card"]').first().trigger('click');
+                newRow = tab.find('.card-row.empty:not(.template):not(.removed):not(.changed)').first();
+            }
+
+            // list under currently focused row
+            if(last != null) {
+                last = newRow.addClass('changed').add(newRow.find('+ .expandable')).detach().insertAfter(last.last());
+            }
+            else {
+                last = newRow.addClass('changed').add(newRow.find('+ .expandable'));
+            }
 
             // set card type
             if(clipRows[i].length > 2) {
@@ -86,25 +95,17 @@ $(document).ready(function () {
                 (function (i) {
                     newRow.find('.correct.type-mc .radios input').filter(function () {
                         return $(this).val() == clipRows[i][2];
-                    }).prop('checked', true).trigger('blur');
+                    }).prop('checked', true).trigger('change');
                 })(i);
                 newRow.find('.correct.type-sa input, .input.correct:not([class*="type-"]) input').val(clipRows[i][2].replace("\n", '\\n'));
                 newRow.find('.content input').val(clipRows[i][1]);
             }
         }
 
-        // remove empties
-        tab.find('.card-row.empty:not(.template)').each(function () {
-            var that = jQuery(this);
-            if(that.find('.content input').val().trim() == '') {
-                that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
-            }
-        });
-
-        packsFunc.apply(tab.find('.card-row').addClass('changed'));
+        packsFunc.apply(tab.find('.card-row:not(.template):not(.removed)'));
     }
 
-    body.on('focus mousedown keydown change keyup blur', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
+    body.on('change keyup', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
         var row = $(this).parents('.card-row');
         var that = row.find('.correct textarea');
         that.css('height', '');
@@ -243,28 +244,45 @@ $(document).ready(function () {
     function validateChanged() {
 
         var tab = $(this).closest('.results:visible');
-        var packRows = tab.find('.pack-row.changed,.pack-row:not(.valid)');
-        var cardRows = tab.find('.card-row.changed');
+        var packRows = tab.find('.pack-row.changed:not(.template),.pack-row:not(.valid):not(.template)'); // <-- this is critical for autosave to work
+        var cardRows = tab.find('.card-row.changed:not(.removed):not(.template)');
 
         for(var c  = 0; c < cardRows.length; c++) {
             var row = $(cardRows[c]);
-            if(row.find('.content input').val().trim() == '' && (
-                    row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() == ''
-                ) && row.find('.correct input').val().trim() == '') {
+            var data = gatherFields.apply(row, [['type', 'content', 'answers', 'correct']]);
+
+            if(data.content == '' && data.correct == '' && (typeof data.answers == 'undefined' || data.answers == '')) {
                 row.removeClass('invalid').addClass('empty valid');
             }
-            else if (row.find('.type select').val() != 'mc' || row.find('.correct.type-mc textarea').val().trim() != '') {
-                row.removeClass('invalid empty').addClass('valid');
+            else if (data.content == '' || data.correct == '' || data.answers == '') {
+                row.removeClass('valid empty').addClass('invalid');
+                if (data.content == '') {
+                    row.find('.content').addClass('invalid');
+                }
+                else {
+                    row.find('.content').removeClass('invalid');
+                }
+                if (data.answers == '') {
+                    row.find('.answers').addClass('invalid');
+                }
+                else {
+                    row.find('.answers').removeClass('invalid');
+                }
+                if (data.correct == '') {
+                    row.find('.correct').addClass('invalid');
+                }
+                else {
+                    row.find('.correct').removeClass('invalid');
+                }
             }
             else {
-                row.removeClass('valid empty').addClass('invalid');
+                row.removeClass('invalid empty').addClass('valid');
             }
 
-            var type = row.find('.type select').val();
-            if(!row.is('.type-' + type)) {
+            if(!row.is('.type-' + data.type)) {
                 row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
-                if (type != '' && type != null) {
-                    row.addClass('type-' + type);
+                if (data.type != '' && data.type != null) {
+                    row.addClass('type-' + data.type);
                 }
             }
 
@@ -273,7 +291,7 @@ $(document).ready(function () {
             }
 
             // update line number
-            var rowIndex = '' + (tab.find('.card-row:not(.template):not(.removed)').index(row) + 1);
+            var rowIndex = '' + (cardRows.index(row) + 1);
             if(row.find('.input.type > span').text() != rowIndex) {
                 row.find('.input.type > span').text(rowIndex);
             }
@@ -282,16 +300,14 @@ $(document).ready(function () {
         for(var p = 0; p < packRows.length; p++) {
             var row2 = $(packRows[p]);
             if(row2.find('.name input').val().trim() != '') {
-                row2.removeClass('invalid empty').addClass('valid');
+                row2.removeClass('invalid empty').addClass('valid').find('.name').removeClass('invalid');
             }
             else {
-                row2.removeClass('valid empty').addClass('invalid');
+                row2.removeClass('valid empty').addClass('invalid').find('.name').addClass('invalid');
             }
         }
 
-        if(tab.find('.pack-row.read-only').length > 0 || tab.find('.card-row.invalid:not(.removed)').length == 0 && (
-            tab.find('.card-row.valid:not(.empty)').length > 0 || tab.find('.card-row.removed').length > 0) &&
-            tab.find('.pack-row.valid:not(.empty)').length > 0) {
+        if(tab.find('.pack-row.valid:not(.empty)').length > 0) {
             tab.find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
         }
         else {
@@ -362,7 +378,7 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         var tab = $(this).closest('.results:visible');
         var packRows = tab.find('.pack-row.edit:not(.template)');
-        var cardRows = tab.find('.card-row.changed:not(.template),.card-row.removed:not(.template)');
+        var cardRows = tab.find('.card-row.valid.changed:not(.template),.card-row.removed:not(.template)');
         if (packRows.length == 0) {
             return;
         }
@@ -471,8 +487,8 @@ $(document).ready(function () {
         }
     });
 
-    body.on('change keyup keydown', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
-    body.on('change keyup keydown', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
+    body.on('change keyup', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
+    body.on('change keyup', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
 
     body.on('change', '[id^="packs-"] .pack-row .status select', function () {
         var row = $(this).parents('.pack-row');
@@ -502,12 +518,12 @@ $(document).ready(function () {
         });
     });
 
-    function collectFields(fields) {
+    function gatherFields(fields) {
         var context = $(this);
         var result = {};
         for(var f in fields) {
             if (fields.hasOwnProperty(f)) {
-                var inputField = context.find('[name="' + fields[f] + '"]');
+                var inputField = context.find('[name="' + fields[f] + '"]:visible');
                 if (inputField.is('[type="checkbox"],[type="radio"]')) {
                     result[fields[f]] = inputField.filter(':checked').val();
                 }
@@ -515,7 +531,7 @@ $(document).ready(function () {
                     result[fields[f]] = inputField.datetimepicker('getValue');
                 }
                 else {
-                    result[fields[f]] = null;
+                    result[fields[f]] = inputField.val();
                 }
             }
         }
@@ -526,7 +542,7 @@ $(document).ready(function () {
         var context = $(this);
         for(var f in fields) {
             if (fields.hasOwnProperty(f)) {
-                var inputField = context.find('[name="' + fields[f] + '"]');
+                var inputField = context.find('[name="' + fields[f] + '"]:visible');
                 if (inputField.is('[type="checkbox"],[type="radio"]')) {
                     inputField.each(function () {
                         if($(this).val() == fields[f]) {
@@ -535,7 +551,10 @@ $(document).ready(function () {
                     });
                 }
                 else if (inputField.is('.dateTimePicker')) {
-                    inputField.datetimepicker('setOptions', {value: new Date(inputField.val())});
+                    inputField.datetimepicker('setOptions', {value: new Date(fields[f])});
+                }
+                else {
+                    inputField.val(fields[f])
                 }
             }
         }
@@ -565,7 +584,7 @@ $(document).ready(function () {
                 }
             }
 
-            var publish = collectFields.apply(dialog, [['schedule', 'email', 'alert']]);
+            var publish = gatherFields.apply(dialog, [['schedule', 'email', 'alert']]);
 
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})

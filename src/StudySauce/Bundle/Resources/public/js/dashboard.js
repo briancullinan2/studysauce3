@@ -473,13 +473,13 @@ $(document).ready(function () {
     });
     var defaultImage;
 
-    body.on('click', 'a[data-target="#confirm-remove"][data-url]', function (evt) {
+    body.on('click', 'a[data-target="#confirm-remove"][data-action]', function (evt) {
         evt.preventDefault();
         var that = $(this);
         body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
             $.ajax({
                 url: that.data('action'),
-                type: 'POST',
+                type: 'GET',
                 dataType: 'text',
                 success: function (data) {
                     that.parents('.results').trigger('resulted');
