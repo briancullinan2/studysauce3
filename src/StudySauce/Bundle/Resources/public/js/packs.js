@@ -449,6 +449,7 @@ $(document).ready(function () {
                 publish: packRows.find('.status select').data('publish')
             },
             success: function (data) {
+                tab.find('.squiggle').stop().remove();
                 // rename tab if working with a new pack
                 if (tab.closest('.panel-pane').is('#packs-pack0')) {
                     tab.closest('.panel-pane').attr('id', 'packs-pack' + data.pack[0].id);
@@ -457,28 +458,10 @@ $(document).ready(function () {
                     }
                 }
 
-                if (close) {
-
-                }
-                else {
-                    // copy new ids to new rows
-                    for(var i = 0; i < data.pack.length; i++) {
-                        if(packRows.filter('.pack-id-' + data.pack[i].id).length == 0) {
-                            packRows.filter('.edit.pack-id-:not(.template)').first().removeClass('pack-id-').addClass('pack-id-' + data.pack[i].id);
-                            // set pack id on panel
-                        }
-                    }
-                    for(var j = 0; j < data.card.length; j++) {
-                        if(cardRows.filter('.card-id-' + data.card[j].id).length == 0) {
-                            cardRows.filter('.edit.card-id-:not(.template)').first().removeClass('card-id-').addClass('card-id-' + data.card[j].id);
-                        }
-                    }
-                    tab.trigger('resulted');
-                }
+                loadContent.apply(tab, [data]);
 
                 // if done in the background, don't refresh the tab with loadContent
                 isLoading = false;
-                tab.find('.squiggle').stop().remove();
             },
             error: function () {
                 isLoading = false;

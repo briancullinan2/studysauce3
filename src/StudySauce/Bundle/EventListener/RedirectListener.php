@@ -197,7 +197,12 @@ class RedirectListener implements EventSubscriberInterface
             /** @var Router $router */
             $router = $this->container->get('router');
             $parts = parse_url($response->headers->get('Location'));
-            $options = ['redirect' => (!empty($parts['path']) ? $parts['path'] : '') . '?' . (!empty($parts['query']) ? $parts['query'] : '') . '#' . (!empty($parts['hash']) ? $parts['hash'] : ''), 'code' => $response->getStatusCode()];
+            $options = [
+                'redirect' => (!empty($parts['path'])
+                    ? $parts['path'] : '')
+                . (!empty($parts['query']) ? ('?' . $parts['query']) : '')
+                . (!empty($parts['hash']) ? ('#' . $parts['hash']) : ''),
+                'code' => $response->getStatusCode()];
             if(!empty($error = AccountController::getErrorForRequest($request))) {
                 $options['exception'] = $error->getMessage();
             }

@@ -103,19 +103,7 @@ $(document).ready(function () {
                 }
 
                 //tab.find('.ss_group-row .invites input').data('entities', data.ss_group[0].invites[0].code);
-
-                if (close) {
-
-                }
-                else {
-                    // copy new ids to new rows
-                    for(var i = 0; i < data.ss_group.length; i++) {
-                        if(row.filter('.ss_group-id-' + data.ss_group[i].id).length == 0) {
-                            row.filter('.edit.ss_group-id-:not(.template)').first().removeClass('ss_group-id-').addClass('ss_group-id-' + data.ss_group[i].id);
-                        }
-                    }
-                    tab.trigger('resulted');
-                }
+                loadContent.apply(tab, [data]);
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
@@ -123,21 +111,24 @@ $(document).ready(function () {
         });
     }
 
+    // TODO: refresh all intermediate group panels also
     var shouldRefresh = false;
     body.on('resulted', '[id^="groups-"] .results', function () {
         shouldRefresh = true;
+        var loaded = body.find('#groups');
+        var id = $(this).find('.ss_group-row .parent select').val();
+        if($(this).parents('.panel-pane').attr('id') != 'groups-group' + id) {
+            loaded = loaded.add(body.find('#' + 'groups-group' + id));
+        }
+        loaded.off('show.resulted').on('show.resulted', function () {
+            loadResults.apply($(this).find('.results'));
+        });
     });
 
     body.on('show', '.panel-pane[id^="groups-"]', function () {
         autoSaveTimeout = 0;
         groupsFunc.apply($(this).find('.ss_group-row.edit'));
         autoSaveTimeout = null;
-    });
-
-    body.on('show', '#groups', function () {
-        if (shouldRefresh) {
-            loadResults.apply($(this).find('.results'));
-        }
     });
 
     body.on('click', '[id^="groups-"] a[href="#save-ss_group"], [id^="groups-"] [value="#save-ss_group"]', function (evt) {
@@ -249,7 +240,7 @@ $(document).ready(function () {
         var tab = $(this).parents('.results'),
             row = $(this).parents('.pack-row'),
             rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
-            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row').first().attr('class'))[1],
+            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row:not(.template)').first().attr('class'))[1],
             field = $(this).siblings('*:has(input[data-ss_user])').find('input[data-ss_user]');
 
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {

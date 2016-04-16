@@ -247,25 +247,40 @@ $(document).ready(function () {
     });
 
     function loadContent (data, tables) {
-        var admin = $(this).closest('.results'),
-            content = $(data).filter('.results');
+        var admin = $(this).closest('.results');
         if(!tables) {
             tables = $.unique(admin.find('[class*="-row"].template').map(function () {
                 return (/(.*)-row/i).exec($(this).attr('class'))[1];
             }).toArray());
         }
-        for(var t = 0; t < tables.length; t++) {
-            var table = tables[t];
-            (function (table) {
-                // leave edit rows alone
-                admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable').remove();
-                var keepRows = admin.find('> .' + table + '-row').map(function () {
-                    var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
-                    return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
-                }).toArray().join(',');
-                content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows).insertBefore(admin.find('.' + table + '-row.template').first());
-                admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
-            })(table);
+        if(typeof data == 'object') {
+            for(var t2 = 0; t < tables.length; t++) {
+                var table2 = tables[t2];
+                (function (table) {
+                    for (var i = 0; i < data[table].length; i++) {
+                        if (admin.find('> .' + table + '-row.' + table + '-id-' + data[table][i].id).length == 0) {
+                            admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first().removeClass(table + '-id-').addClass(table + '-id-' + data[table][i].id);
+                            // set pack id on panel
+                        }
+                    }
+                })(table2);
+            }
+        }
+        else {
+            var content = $(data).filter('.results');
+            for(var t = 0; t < tables.length; t++) {
+                var table = tables[t];
+                (function (table) {
+                    // leave edit rows alone
+                    admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable').remove();
+                    var keepRows = admin.find('> .' + table + '-row').map(function () {
+                        var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
+                        return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
+                    }).toArray().join(',');
+                    content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows).insertBefore(admin.find('.' + table + '-row.template').first());
+                    admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
+                })(table);
+            }
         }
         resetHeader();
         admin.trigger('resulted');
@@ -279,19 +294,20 @@ $(document).ready(function () {
             searchRequest.abort();
         if(searchTimeout != null)
             clearTimeout(searchTimeout);
-        var that = $(this);
-
-        searchTimeout = setTimeout(function () {
-            searchRequest = $.ajax({
-                url: Routing.generate('command_callback'),
-                type: 'GET',
-                dataType: 'text',
-                data: getDataRequest.apply(that),
-                success: function (data) {
-                    loadContent.apply(that, [data]);
-                }
-            });
-        }, 100);
+        $(this).filter('.results:visible').each(function () {
+            var that = $(this);
+            searchTimeout = setTimeout(function () {
+                searchRequest = $.ajax({
+                    url: Routing.generate('command_callback'),
+                    type: 'GET',
+                    dataType: 'text',
+                    data: getDataRequest.apply(that),
+                    success: function (data) {
+                        loadContent.apply(that, [data]);
+                    }
+                });
+            }, 100);
+        });
     }
     window.loadResults = loadResults;
 

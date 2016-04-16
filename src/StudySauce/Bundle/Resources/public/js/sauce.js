@@ -888,6 +888,7 @@ $(document).ready(function () {
                     panel.css('position', '');
                     body.css('overflow', '');
                 } });
+                centerize.apply(panel.find('.centerized:visible'));
                 // poll for panel visibility and fire events
                 var triggerHide = setInterval(function () {
                     if (panels.is(':visible'))
@@ -968,9 +969,8 @@ if(typeof window.jqAjax == 'undefined') {
             if (data != null && typeof data.redirect != 'undefined') {
                 var a = document.createElement('a');
                 a.href = data.redirect;
-                if (window.location.pathname != a.pathname) {
+                if (typeof window.handleLink == 'undefined' || window.handleLink.apply(a, [jQuery.Event('click')])) {
                     window.location = data.redirect;
-                    return;
                 }
             }
             if (typeof success != 'undefined')

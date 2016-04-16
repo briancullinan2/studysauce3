@@ -111,7 +111,7 @@ $(document).ready(function () {
 
     function activateMenu(path, noPush) {
         var that = $(this);
-        var routes = Routing.match(path),
+        var routes = Routing.match(path) || Routing.match(this.pathname),
             subKey = routes[0].name.split('_')[0],
             subPath = Routing.generate(subKey),
             key = subKey,
@@ -285,10 +285,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('show', '.panel-pane', function () {
-        centerize.apply(body.find('.centerized:visible'));
-    });
-
     // remove it so it never comes up more than once
     body.on('hidden.bs.modal', '#bookmark', function () {
         $(this).remove();
@@ -301,13 +297,13 @@ $(document).ready(function () {
         var that = $(this),
             el = that[0],
             path = $(this).attr('href'),
-            routes = Routing.match(path);
+            routes = Routing.match(path) || Routing.match(this.pathname);
         if (!expandMenu.apply(this, [evt]))
-            return;
+            return false;
         if ($(this).is('.invalid a.more')) {
             evt.preventDefault();
             evt.stopPropagation();
-            return;
+            return false;
         }
 
         // the path is not a callback so just return normally
@@ -317,6 +313,7 @@ $(document).ready(function () {
             || routes[0].route.requirements['_format'].indexOf('tab') == -1) {
             visits[visits.length] = {path: el.pathname, query: el.search, hash: el.hash, time: (new Date()).toJSON()};
             collapseMenu.apply(this, [evt]);
+            return true;
         }
         // if the path clicked is a callback, use callback to load the new tab
         else {
@@ -325,8 +322,10 @@ $(document).ready(function () {
                 path = Routing.generate(routes[0].name);
             }
             activateMenu.apply(this, [path]);
+            return false;
         }
     }
+    window.handleLink = handleLink;
 
     // capture all callback links
     body.filter('.dashboard-home').on('click', 'button[value]', function () {

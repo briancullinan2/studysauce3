@@ -198,8 +198,9 @@ class AdminController extends Controller
     private static function getWhereValue($search, $searchField, $field, $tableName) {
         if (substr($search, 0, 1) == '!') {
             $search = substr($search, 1);
-            if (is_bool($search)) {
-                return [$tableName . '.' . $field . ' != :' . $searchField . '_bool_not', $searchField . '_bool_not', boolval($search)];
+            if (is_bool($search) || $search === 'false' || $search === 'true') {
+                $boolval = ( is_string($search) ? filter_var($search, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : boolval($search) );
+                return [$tableName . '.' . $field . ' != :' . $searchField . '_bool_not', $searchField . '_bool_not', $boolval];
             }
             else if (is_numeric($search)) {
                 return [$tableName . '.' . $field . ' != :' . $searchField . '_int_not', $searchField . '_int_not', intval($search)];
@@ -211,17 +212,20 @@ class AdminController extends Controller
                 return [$tableName . '.' . $field . ' NOT LIKE :' . $searchField . '_string_not', $searchField . '_string_not', '%' . $search . '%'];
             }
         }
-        else if (is_bool($search)) {
-            return [$tableName . '.' . $field . ' = :' . $searchField . '_bool', $searchField . '_bool', boolval($search)];
-        }
-        else if (is_numeric($search)) {
-            return [$tableName . '.' . $field . ' = :' . $searchField . '_int', $searchField . '_int', intval($search)];
-        }
-        else if ($search == 'NULL') {
-            return [$tableName . '.' . $field . ' IS NULL', null, null];
-        }
         else {
-            return [$tableName . '.' . $field . ' LIKE :' . $searchField . '_string', $searchField . '_string', '%' . $search . '%'];
+            if (is_bool($search) || $search === 'false' || $search === 'true') {
+                $boolval = ( is_string($search) ? filter_var($search, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : boolval($search) );
+                return [$tableName . '.' . $field . ' = :' . $searchField . '_bool', $searchField . '_bool', $boolval];
+            }
+            else if (is_numeric($search)) {
+                return [$tableName . '.' . $field . ' = :' . $searchField . '_int', $searchField . '_int', intval($search)];
+            }
+            else if ($search == 'NULL') {
+                return [$tableName . '.' . $field . ' IS NULL', null, null];
+            }
+            else {
+                return [$tableName . '.' . $field . ' LIKE :' . $searchField . '_string', $searchField . '_string', '%' . $search . '%'];
+            }
         }
     }
 
