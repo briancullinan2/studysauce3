@@ -480,8 +480,8 @@ $(document).ready(function () {
             $.ajax({
                 url: that.data('action'),
                 type: 'GET',
-                dataType: 'text',
-                success: function (data) {
+                dataType: 'json',
+                success: function () {
                     that.parents('.results').trigger('resulted');
                 }
             });

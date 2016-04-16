@@ -280,26 +280,20 @@ class PacksController extends Controller
         return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'pack-id' => $newPack->getId(), 'headers' => false, 'edit' => true, 'expandable' => ['card' => ['preview']]]);
     }
 
-    public function removeAction(Request $request)
+    public function removeAction(Pack $pack = null)
     {
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        /** @var Pack $newPack */
-        $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
-            ->where('p.id = :id')
-            ->setParameter('id', intval($request->get('id')))
-            ->getQuery()
-            ->getOneOrNullResult();
-        if (!empty($newPack)) {
+        if (!empty($pack)) {
             // TODO: set deleted flag if there are existing responses, we don't delete here
-            foreach ($newPack->getUserPacks()->toArray() as $up) {
+            foreach ($pack->getUserPacks()->toArray() as $up) {
                 /** @var UserPack $up */
-                $newPack->removeUserPack($up);
+                $pack->removeUserPack($up);
                 $up->getUser()->removeUserPack($up);
                 $orm->remove($up);
             }
-            foreach ($newPack->getCards()->toArray() as $c) {
+            foreach ($pack->getCards()->toArray() as $c) {
                 /** @var Card $c */
                 foreach ($c->getAnswers()->toArray() as $a) {
                     $c->removeAnswer($a);
@@ -314,9 +308,9 @@ class PacksController extends Controller
                 $c->getPack()->removeCard($c);
                 $orm->remove($c);
             }
-            $orm->remove($newPack);
+            $orm->remove($pack);
+            $orm->flush();
         }
-        $orm->flush();
 
         return $this->redirect($this->generateUrl('packs'));
     }

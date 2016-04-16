@@ -337,8 +337,9 @@ $collection->add(
 $collection->add(
     'packs_remove',
     new Route(
-        '/packs/remove',
-        ['_controller' => 'StudySauceBundle:Packs:remove']
+        '/packs/remove/{pack}',
+        ['_controller' => 'StudySauceBundle:Packs:remove', 'pack' => 0],
+        ['pack' => '[0-9]*']
     )
 );
 $collection->add(
