@@ -11,6 +11,7 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
 ?>
 <style>
     <?php foreach($tables as $table => $t) { ?>
+    .results.has-<?php print $table; ?>-error .<?php print $table; ?>-error,
     .showing-<?php print $table; ?> header > .<?php print $table; ?> {
         display: inline-block;
         opacity: 1;

@@ -473,27 +473,6 @@ $(document).ready(function () {
     });
     var defaultImage;
 
-    body.on('click', 'a[data-target="#confirm-remove"][data-action]', function (evt) {
-        evt.preventDefault();
-        var that = $(this);
-        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
-            $.ajax({
-                url: that.data('action'),
-                type: 'GET',
-                dataType: 'json',
-                success: function () {
-                    that.parents('.results').trigger('resulted');
-                }
-            });
-        });
-    });
-
-    body.on('hidden.bs.modal', '#confirm-remove', function () {
-        setTimeout(function () {
-            body.off('click.remove');
-        }, 100);
-    });
-
     body.on('hidden.bs.modal', '#upload-file', function () {
         var dialog = $('#upload-file');
         setTimeout(function () {

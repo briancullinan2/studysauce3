@@ -307,11 +307,28 @@ $(document).ready(function () {
             }
         }
 
-        if(tab.find('.pack-row.valid:not(.empty)').length > 0) {
-            tab.find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
+        var hasError = false;
+        if(tab.find('.card-row.invalid:not(.empty):not(.removed):not(.template)').length > 0) {
+            tab.addClass('has-card-error');
+            hasError = true;
         }
         else {
-            tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
+            tab.removeClass('has-card-error')
+        }
+
+        if(tab.find('.pack-row.valid:not(.empty):not(.removed):not(.template)').length > 0) {
+            tab.removeClass('has-pack-error').find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
+        }
+        else {
+            hasError = true;
+            tab.addClass('has-pack-error').find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
+        }
+
+        if(hasError) {
+            tab.addClass('has-error');
+        }
+        else {
+            tab.removeClass('has-error');
         }
 
         if(cardRows.length > 0) {
@@ -383,7 +400,7 @@ $(document).ready(function () {
             return;
         }
         if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]') || isLoading) {
-            // TODO: select incorrect row
+            // select incorrect row handled by #goto-error
             return;
         }
 

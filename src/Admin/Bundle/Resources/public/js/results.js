@@ -395,4 +395,32 @@ $(document).ready(function () {
         loadResults.apply(admin);
     });
 
+    body.on('click', 'a[data-target="#confirm-remove"][data-action]', function (evt) {
+        evt.preventDefault();
+        var that = $(this);
+        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
+            $.ajax({
+                url: that.data('action'),
+                type: 'GET',
+                dataType: 'json',
+                success: function () {
+                    that.parents('.results').trigger('resulted');
+                }
+            });
+        });
+    });
+
+    body.on('hidden.bs.modal', '#confirm-remove', function () {
+        setTimeout(function () {
+            body.off('click.remove');
+        }, 100);
+    });
+
+    body.on('click', 'a[href="#goto-error"]', function (evt) {
+        evt.preventDefault();
+        var invalid = $(this).parents('.results').find('.invalid .invalid:has(input, select, textarea)').first();
+        invalid.scrollintoview(DASHBOARD_MARGINS).addClass('pulsate');
+        invalid.find('input, select, textarea').focus().one('change', function () {$(this).parents('.pulsate').removeClass('pulsate');});
+    });
+
 });
