@@ -6,10 +6,31 @@ use StudySauce\Bundle\Entity\User;
 
 /** @var User|Group $ss_group */
 $entityIds = [];
+
+$packs = $ss_group->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
+$users = $ss_group->getUsers()->toArray();
+foreach($ss_group->getSubgroups()->toArray() as $g) {
+    /** @var Group $g */
+    if($g->getDeleted()) {
+        continue;
+    }
+    foreach($g->getGroupPacks()->toArray() as $p) {
+        if(!in_array($p, $packs)) {
+            $packs[] = $p;
+        }
+    }
+    foreach($g->getUsers()->toArray() as $u) {
+        if(!in_array($u, $users)) {
+            $users[] = $u;
+        }
+    }
+}
+
+
 ?>
 
 <div>
-    <label><?php print $ss_group->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->count(); ?> packs / <?php print $ss_group->getUsers()->count(); ?> users</label>
+    <label><?php print count($packs); ?> packs / <?php print count($users); ?> users</label>
     <?php
     foreach ($ss_group->getSubgroups()->toArray() as $g) {
         /** @var Group $g */
@@ -21,6 +42,10 @@ $entityIds = [];
             <span><?php print $g->getSubgroups()->filter(function (Group $p) {
                     return !$p->getDeleted();
                 })->count() + 1; // for self ?></span></a>
+    <?php }
+
+    if(count($ss_group->getSubgroups()->toArray()) == 0) { ?>
+        <span>No subgroups</span>
     <?php } ?>
 
 </div>

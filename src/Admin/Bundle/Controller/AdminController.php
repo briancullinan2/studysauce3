@@ -635,10 +635,12 @@ class AdminController extends Controller
             else {
                 $newInvite = $invites[0];
             }
+            $newInvite->setUser($user);
             $newInvite->setFirst('');
             $newInvite->setLast('');
             $newInvite->setEmail('');
             $newInvite->setGroup($g);
+            $newInvite->setActivated(true);
             $g->addInvite($newInvite);
             if (count($invites) == 0) {
                 $orm->persist($newInvite);

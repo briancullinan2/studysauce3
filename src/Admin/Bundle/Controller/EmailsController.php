@@ -220,6 +220,12 @@ class EmailsController extends \StudySauce\Bundle\Controller\EmailsController
      */
     public function buildEmail($_email, $variables = [], &$params = [], &$objects = [])
     {
+        /** @var $user User */
+        $user = $this->getUser();
+        if(!$user->hasRole('ROLE_ADMIN')) {
+            throw new AccessDeniedHttpException();
+        }
+
         /** @var EntityManager $orm */
         $orm = $this->getDoctrine()->getManager();
         $fullName = 'StudySauceBundle:Emails:' . $_email . '.html.php';

@@ -81,7 +81,7 @@ EOF
         // send reminders
 
         $groupInvites = $orm->getRepository('StudySauceBundle:Invite')->createQueryBuilder('g')
-            ->where('g.activated=0 AND g.invitee IS NULL')
+            ->where('g.activated=0 AND g.invitee IS NULL AND g.user IS NOT NULL')
             ->andWhere('g.reminder IS NULL OR g.reminder < :reminder')
             ->andWhere('(g.created < :d1 AND g.created > :d2) OR (g.created < :d3 AND g.created > :d4)' .
                 ' OR (g.created < :d5 AND g.created > :d6) OR (g.created < :d7 AND g.created > :d8)')

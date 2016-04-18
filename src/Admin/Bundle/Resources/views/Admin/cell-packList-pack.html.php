@@ -24,7 +24,7 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 ?>
 
 <div>
-    <label><?php print $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(); ?> cards</label>
+    <label><?php print $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(); ?> cards / <?php print $pack->getUsers()->count(); ?> users</label>
     <?php
     foreach ($groups as $p) {
         /** @var Group $p */

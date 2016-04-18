@@ -244,12 +244,15 @@ class PacksController extends Controller
                     if (strtolower(trim($a)) == strtolower(trim($c['correct']))) {
                         $newAnswer->setCorrect(true);
                     }
-                    if (strpos($c['type'], 'contains') > -1) {
+                    else if (strpos($c['type'], 'contains') > -1) {
                         $newAnswer->setCorrect(true);
                     }
-                    if (strpos($c['type'], 'exactly') > -1) {
+                    else if (strpos($c['type'], 'exactly') > -1) {
                         $newAnswer->setCorrect(true);
                         $newAnswer->setValue('^' . trim($a) . '$');
+                    }
+                    else {
+                        $newAnswer->setCorrect(false);
                     }
                 }
                 if (empty($newAnswer->getId())) {

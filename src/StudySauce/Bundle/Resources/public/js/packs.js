@@ -100,12 +100,18 @@ $(document).ready(function () {
                 newRow.find('.correct.type-sa input, .input.correct:not([class*="type-"]) input').val(clipRows[i][2].replace("\n", '\\n'));
                 newRow.find('.content input').val(clipRows[i][1]);
             }
+
+            var isUrl, content;
+            if((isUrl = (/https:\/\/.*?(\s|\\n|$)/i).exec(content = newRow.find('.content input').val())) !== null) {
+                newRow.find('.content input').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim());
+                newRow.find('input[name="url"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
+            }
         }
 
         packsFunc.apply(tab.find('.card-row:not(.template):not(.removed)'));
     }
 
-    body.on('change keyup', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
+    body.on('focus blur', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
         var row = $(this).parents('.card-row');
         var that = row.find('.correct textarea');
         that.css('height', '');
@@ -116,9 +122,14 @@ $(document).ready(function () {
         else {
             row.find('.correct').removeClass('editing');
             if (row.find('.correct .radios :checked').length > 0) {
-                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 24 - 2);
+                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
             }
         }
+    });
+
+    body.on('change keyup', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
+        var row = $(this).parents('.card-row');
+        var that = row.find('.correct textarea');
 
         // get current line
         var origName = $(evt.target).is('.correct .radios input') ? $(evt.target).attr('name') : row.find('.correct .radios input').attr('name');
@@ -284,10 +295,6 @@ $(document).ready(function () {
                 if (data.type != '' && data.type != null) {
                     row.addClass('type-' + data.type);
                 }
-            }
-
-            if (row.find('.correct .radios :checked').length > 0) {
-                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 24 - 2);
             }
 
             // update line number
@@ -475,11 +482,26 @@ $(document).ready(function () {
         shouldRefresh = true;
     });
 
-    body.on('show', '.panel-pane[id^="packs-"]', function () {
+    function setupPackEditor() {
         autoSaveTimeout = 0;
-        packsFunc.apply($(this).find('.pack-row').add($(this).find('.card-row')));
+        var tab = $(this).closest('.results');
+        packsFunc.apply(tab.find('.pack-row'));
+        var cardRows = tab.find('.card-row:not(.removed):not(.template)');
+
+        setTimeout(function () {
+            for(var i = 0; i < cardRows.length; i++) {
+                var row = $(cardRows[i]);
+                if (row.find('.correct .radios :checked').length > 0) {
+                    row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
+                }
+            }
+        }, 50);
+
         autoSaveTimeout = null;
-    });
+    }
+
+    body.on('click', '.panel-pane[id^="packs-"] a[href="#edit-pack"]', setupPackEditor);
+    body.on('show', '.panel-pane[id^="packs-"]', setupPackEditor);
 
     body.on('show', '#packs', function () {
         if (shouldRefresh) {
@@ -518,12 +540,15 @@ $(document).ready(function () {
         });
     });
 
-    function gatherFields(fields) {
+    function gatherFields(fields, visibleOnly) {
         var context = $(this);
         var result = {};
         for(var f in fields) {
             if (fields.hasOwnProperty(f)) {
-                var inputField = context.find('[name="' + fields[f] + '"]:visible');
+                var inputField = context.find('[name="' + fields[f] + '"]');
+                if(visibleOnly !== false) {
+                    inputField = inputField.filter(':visible');
+                }
                 if (inputField.is('[type="checkbox"],[type="radio"]')) {
                     result[fields[f]] = inputField.filter(':checked').val();
                 }
@@ -584,7 +609,7 @@ $(document).ready(function () {
                 }
             }
 
-            var publish = gatherFields.apply(dialog, [['schedule', 'email', 'alert']]);
+            var publish = gatherFields.apply(dialog, [['schedule', 'email', 'alert'], false]);
 
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})

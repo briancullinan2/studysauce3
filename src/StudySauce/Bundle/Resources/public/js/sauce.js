@@ -775,7 +775,7 @@ $(document).ready(function () {
         var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
 
         var appDialog = $('#gettheapp').modal({show: true});
-        if (appDialog.length > 0) {
+        if (appDialog.length > 0 && (window.location.pathname == '/login' || window.location.pathname == '/register' || window.location.pathname == '/reset')) {
             appUrl += (window.location.search.indexOf('?') > -1 ? '&' : '?') + $('input').map(function () {
                     return $(this).attr('name') + '=' + $(this).attr('value');
                 }).toArray().join("&");
