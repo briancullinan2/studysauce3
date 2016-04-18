@@ -41,12 +41,19 @@ $view['slots']->start('body'); ?>
             <?php
             $tables = ['tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']]];
             if($entity !== null) {
+                $isNew = false;
+                if(empty($entity->getId())) {
+                    $isNew = ['pack'];
+                }
+                if($entity->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0) {
+                    $isNew[] = 'card';
+                }
                 $tables['pack-id'] = $entity->getId();
                 $tables['headers'] = ['pack' => 'packPacks'];
-                $tables['new'] = empty($entity->getId());
+                $tables['new'] = $isNew;
                 $tables['edit'] = $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC';
                 $tables['count-pack'] = 1;
-                $tables['count-card'] = empty($entity->getId()) ? 5 : 0;
+                $tables['count-card'] = $isNew ? 5 : 0;
                 $tables['footers'] = ['pack' => 'packPacks', 'card' => true];
             }
             else {
