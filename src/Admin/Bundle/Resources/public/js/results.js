@@ -254,7 +254,7 @@ $(document).ready(function () {
             }).toArray());
         }
         if(typeof data == 'object') {
-            for(var t2 = 0; t < tables.length; t++) {
+            for(var t2 = 0; t2 < tables.length; t2++) {
                 var table2 = tables[t2];
                 (function (table) {
                     for (var i = 0; i < data[table].length; i++) {
