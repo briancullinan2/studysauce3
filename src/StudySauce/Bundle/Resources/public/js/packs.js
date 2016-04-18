@@ -302,7 +302,6 @@ $(document).ready(function () {
             if(row.find('.input.type > span').text() != rowIndex) {
                 row.find('.input.type > span').text(rowIndex);
             }
-
         }
         for(var p = 0; p < packRows.length; p++) {
             var row2 = $(packRows[p]);
@@ -484,7 +483,7 @@ $(document).ready(function () {
 
     function setupPackEditor() {
         autoSaveTimeout = 0;
-        var tab = $(this).closest('.results');
+        var tab = $(this).closest('.panel-pane');
         packsFunc.apply(tab.find('.pack-row'));
         var cardRows = tab.find('.card-row:not(.removed):not(.template)');
 
@@ -493,6 +492,12 @@ $(document).ready(function () {
                 var row = $(cardRows[i]);
                 if (row.find('.correct .radios :checked').length > 0) {
                     row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
+                }
+
+                // update line number
+                var rowIndex = '' + (i + 1);
+                if(row.find('.input.type > span').text() != rowIndex) {
+                    row.find('.input.type > span').text(rowIndex);
                 }
             }
         }, 50);
