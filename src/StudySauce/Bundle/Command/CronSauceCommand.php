@@ -234,7 +234,7 @@ EOF
                 }));
 
                 if(count($emailing) > 0) {
-                    $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null);
+                    $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($child) ? $child[0][1] : null);
                 }
             }
         }
