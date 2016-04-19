@@ -28,7 +28,7 @@ $view['slots']->start('body'); ?>
 <div class="panel-pane" id="reset">
     <div class="pane-content">
         <h2><?php if(!empty($token)) { ?>Set a new password<?php } else { ?>Reset your password<?php } ?></h2>
-        <form action="<?php print $view['router']->generate('password_reset'); ?>" method="post">
+        <form action="<?php print $view['router']->generate('reset'); ?>" method="post">
         <div class="email <?php print (!empty($token) ? 'read-only' : ''); ?>">
             <label class="input"><input type="text" name="email" placeholder="Email" value="<?php print $email; ?>"></label>
         </div>

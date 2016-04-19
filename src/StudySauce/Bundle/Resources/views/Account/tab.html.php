@@ -77,7 +77,7 @@ $view['slots']->start('body'); ?>
                     <div class="edit-icons">
                         <a href="#edit-account">Edit information</a>
                         <a href="#edit-password">Change password</a>
-                        <a href="<?php print $view['router']->generate('password_reset'); ?>">Forgot password</a>
+                        <a href="<?php print $view['router']->generate('reset'); ?>">Forgot password</a>
                     </div>
                     <div class="form-actions">
                         <div class="invalid-only">You must complete all fields before moving on.</div>

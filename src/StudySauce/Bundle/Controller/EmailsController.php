@@ -568,7 +568,7 @@ class EmailsController extends Controller
         if(empty($user))
             $user = $this->getUser();
 
-        $codeUrl = $this->generateUrl('password_reset', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $codeUrl = $this->generateUrl('reset', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()

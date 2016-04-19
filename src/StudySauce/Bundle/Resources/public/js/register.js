@@ -139,7 +139,7 @@ jQuery(document).ready(function() {
         account.find('.form-actions').removeClass('valid').addClass('invalid');
         loadingAnimation($(this).find('[value="#reset-password"]'));
         jQuery.ajax({
-            url: Routing.generate('password_reset'),
+            url: Routing.generate('reset'),
             type: 'POST',
             dataType: 'json',
             data: {
