@@ -242,7 +242,7 @@ $(document).ready(function () {
 
     body.on('click', '.form-actions a[href^="#cancel-edit"], .form-actions .cancel-edit', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.results').find('.edit');
+        var row = $(this).parents('.results').find('[class*="-row"].edit');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 

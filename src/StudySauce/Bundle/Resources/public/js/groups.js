@@ -89,17 +89,24 @@ $(document).ready(function () {
                 invite: row.find('.invite input').val().trim(),
                 roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
                 groupId: groupId,
-                parent: row.find('select[name="parent"]').val()
+                parent: row.find('select[name="parent"]').val(),
+                requestKey: getDataRequest.apply(tab).requestKey
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
 
                 // rename tab if working with a new group
+                // TODO: generalize this with some sort of data attribute or class, same as in packs
                 if (tab.closest('.panel-pane').is('#groups-group0')) {
-                    tab.closest('.panel-pane').attr('id', 'groups-group' + data.ss_group[0].id);
-                    if (!close) {
-                        window.activateMenu(Routing.generate('groups_edit', {group: data.ss_group[0].id}));
-                    }
+                    var id = close
+                        ? (/ss_group-id-([0-9]+)(\s|$)/i).exec($(data).find('.ss_group-row:not(.template)').first().attr('class'))[1]
+                        : data.ss_group[0].id;
+                    tab.closest('.panel-pane').attr('id', 'groups-group' + id);
+                    window.activateMenu(Routing.generate('groups_edit', {group: id}));
+                }
+
+                if(close) {
+                    tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
                 }
 
                 //tab.find('.ss_group-row .invites input').data('entities', data.ss_group[0].invites[0].code);
@@ -138,7 +145,7 @@ $(document).ready(function () {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        autoSave.apply($(this).parents('.results:visible'), [false]);
+        autoSave.apply($(this).parents('.results:visible'), [true]);
 
     });
 

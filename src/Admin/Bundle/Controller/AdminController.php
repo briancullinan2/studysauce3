@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Acl\Dbal\AclProvider;
 use Symfony\Component\Security\Acl\Dbal\MutableAclProvider;
 use Symfony\Component\Security\Acl\Domain\Acl;
@@ -274,6 +275,9 @@ class AdminController extends Controller
         self::$allTableMetadata = array_map(function ($table) use ($orm) {return $orm->getMetadataFactory()->getMetadataFor($table);}, self::$allTableClasses);
 
         self::$allTables = array_combine(array_map(function (ClassMetadata $md) {return $md->getTableName();}, self::$allTableMetadata), self::$allTableMetadata);
+
+        // pull out field searches
+        $allFields = self::getAllFieldNames(self::$defaultTables);
         //$times = array_map(function($e) {
         /** @var User|Group $e */
         //    return $e->getCreated()->getTimestamp();
@@ -281,33 +285,37 @@ class AdminController extends Controller
         //array_multisort($times, SORT_NUMERIC, SORT_DESC, $entities);
 
         // default entities to show
-
-        $searchRequest = array_merge($request->attributes->all(), $request->query->all());
-
-        // setup the tables we are searching
-        if (!isset($searchRequest['tables'])) {
-            $searchRequest['tables'] = [];
-        }
-        // convert table list to table => field list format
-        $tblList = [];
-        foreach($searchRequest['tables'] as $table => $t) {
-            if(!is_array($t)) {
-                $table = $t;
-                $t = self::$defaultTables[$t];
+        if(!empty($key = $request->get('requestKey'))) {
+            $searchRequest = $request->getSession()->get($key);
+            if(empty($request)) {
+                throw new NotFoundHttpException('Could not find request key');
             }
-            $tblList[$table] = $t;
         }
-        $searchRequest['tables'] = $tblList;
+        else {
+            $searchRequest = array_merge($request->attributes->all(), $request->query->all());
 
-        // pull out field searches
-        $allFields = self::getAllFieldNames(self::$defaultTables);
+            // setup the tables we are searching
+            if (!isset($searchRequest['tables'])) {
+                $searchRequest['tables'] = [];
+            }
+            // convert table list to table => field list format
+            $tblList = [];
+            foreach($searchRequest['tables'] as $table => $t) {
+                if(!is_array($t)) {
+                    $table = $t;
+                    $t = self::$defaultTables[$t];
+                }
+                $tblList[$table] = $t;
+            }
+            $searchRequest['tables'] = $tblList;
 
-        // TODO: fix this to do all occurrences and table names and other formats of searches specified above
-        $regex = '/\s(' . implode('|', $allFields) . '):(.*)\s/i';
-        if (isset($searchRequest['search']) && preg_match_all($regex, ' ' . $searchRequest['search'] . ' ', $matches)) {
-            foreach($matches[0] as $i => $m) {
-                $searchRequest['search'] = str_replace(trim($m), '', $searchRequest['search']);
-                $searchRequest[$matches[1][$i]] = $matches[2][$i];
+            // TODO: fix this to do all occurrences and table names and other formats of searches specified above
+            $regex = '/\s(' . implode('|', $allFields) . '):(.*)\s/i';
+            if (isset($searchRequest['search']) && preg_match_all($regex, ' ' . $searchRequest['search'] . ' ', $matches)) {
+                foreach($matches[0] as $i => $m) {
+                    $searchRequest['search'] = str_replace(trim($m), '', $searchRequest['search']);
+                    $searchRequest[$matches[1][$i]] = $matches[2][$i];
+                }
             }
         }
 
@@ -335,9 +343,9 @@ class AdminController extends Controller
                 $qb = $qb->andWhere($defaultWhere);
             }
 
-            $totalQuery = $qb->select('COUNT(DISTINCT ' . $table . '.id)')
-                ->getQuery();
-            $total = $totalQuery->getSingleScalarResult();
+            $totalQuery = clone $qb;
+            $total = $totalQuery->select('COUNT(DISTINCT ' . $table . '.id)')
+                ->getQuery()->getSingleScalarResult();
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count
@@ -369,16 +377,6 @@ class AdminController extends Controller
                 $users = $users->orderBy('u.lastVisit', 'DESC');
             }
             */
-            $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
-            $joins = [];
-            $where = self::searchBuilder($qb, $table, $table, $searchRequest, $joins);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest) + ['tables' => [$table => self::$defaultTables[$table]]], $joins);
-            if(!empty($where)) {
-                $qb = $qb->where($where);
-            }
-            if(!empty($defaultWhere)) {
-                $qb = $qb->andWhere($defaultWhere);
-            }
 
             $qb = $qb
                 ->select($table)
@@ -395,10 +393,11 @@ class AdminController extends Controller
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        $vars['searchRequest'] = $searchRequest;
+        $request->getSession()->set($key = md5(serialize($searchRequest)), $searchRequest);
+        $vars['searchRequest'] = $searchRequest + ['requestKey' => $key];
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
-        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+        if(in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
             // convert db entity to flat object
             foreach(array_merge(array_keys($searchRequest['tables']), ['allGroups']) as $table) {
                 if (!isset($vars[$table])) {
@@ -652,14 +651,8 @@ class AdminController extends Controller
         }
 
         return $this->forward('AdminBundle:Admin:results', [
-            'tables' => [
-                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'packs' => ['groupPacks'], 'actions' => ['deleted']],
-                'pack' => ['title', 'counts', 'members' => ['groups'], 'actions' => ['status'] /* search field but don't display a template */]],
-            'ss_group-id' => $g->getId(),
-            'edit' => ['ss_group'],
-            'read-only' => [],
-            'count-group' => 1,
-            'count-pack' => 0]);
+            'requestKey' => $request->get('requestKey'),
+            'dataType' => in_array('application/json', $request->getAcceptableContentTypes()) ? 'json' : 'text']);
     }
 
     /**

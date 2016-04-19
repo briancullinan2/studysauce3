@@ -280,7 +280,9 @@ class PacksController extends Controller
             }
         }
         $orm->flush();
-        return $this->forward('AdminBundle:Admin:results', ['tables' => ['pack', 'card'], 'pack-id' => $newPack->getId(), 'headers' => false, 'edit' => true, 'expandable' => ['card' => ['preview']]]);
+        return $this->forward('AdminBundle:Admin:results', [
+            'requestKey' => $request->get('requestKey'),
+            'dataType' => in_array('application/json', $request->getAcceptableContentTypes()) ? 'json' : 'text']);
     }
 
     public function removeAction(Pack $pack = null)

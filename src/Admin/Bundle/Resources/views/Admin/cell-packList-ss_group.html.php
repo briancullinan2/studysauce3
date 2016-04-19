@@ -30,7 +30,11 @@ foreach($ss_group->getSubgroups()->toArray() as $g) {
 ?>
 
 <div>
-    <label><?php print count($packs); ?> packs / <?php print count($users); ?> users</label>
+    <label><?php print count($packs); ?> packs / <?php print count($users); ?> users<?php
+        if(count($ss_group->getSubgroups()->toArray()) == 0) { ?>
+            <span>No subgroups</span>
+        <?php }
+        ?></label>
     <?php
     foreach ($ss_group->getSubgroups()->toArray() as $g) {
         /** @var Group $g */
@@ -42,10 +46,6 @@ foreach($ss_group->getSubgroups()->toArray() as $g) {
             <span><?php print $g->getSubgroups()->filter(function (Group $p) {
                     return !$p->getDeleted();
                 })->count() + 1; // for self ?></span></a>
-    <?php }
-
-    if(count($ss_group->getSubgroups()->toArray()) == 0) { ?>
-        <span>No subgroups</span>
     <?php } ?>
 
 </div>

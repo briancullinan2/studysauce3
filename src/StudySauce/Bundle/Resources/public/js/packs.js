@@ -392,7 +392,7 @@ $(document).ready(function () {
                 that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
             }
         });
-        autoSave.apply(tab, [false]);
+        autoSave.apply(tab, [true]);
     });
 
     var isLoading = false;
@@ -452,16 +452,25 @@ $(document).ready(function () {
                 status: packRows.find('.status select').val(),
                 title: packRows.find('.name input').val(),
                 keyboard: packRows.find('select[name="keyboard"]').val(),
-                publish: packRows.find('.status select').data('publish')
+                publish: packRows.find('.status select').data('publish'),
+                requestKey: getDataRequest.apply(tab).requestKey
             },
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
+
                 // rename tab if working with a new pack
+                // TODO: generalize this with some sort of data attribute or class, same as in groups
                 if (tab.closest('.panel-pane').is('#packs-pack0')) {
-                    tab.closest('.panel-pane').attr('id', 'packs-pack' + data.pack[0].id);
-                    if (!close) {
-                        window.activateMenu(Routing.generate('packs_edit', {pack: data.pack[0].id}));
-                    }
+                    var id = close
+                        ? (/pack-id-([0-9]+)(\s|$)/i).exec($(data).find('.pack-row:not(.template)').first().attr('class'))[1]
+                        : data.pack[0].id;
+                    tab.closest('.panel-pane').attr('id', 'packs-pack' + id);
+                    window.activateMenu(Routing.generate('packs_edit', {pack: id}));
+                }
+
+                // make fields read-only
+                if(close) {
+                    tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
                 }
 
                 loadContent.apply(tab, [data]);

@@ -36,7 +36,7 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
 </style>
 <div
     class="results <?php print (isset($searchRequest['classes']) && is_array($searchRequest['classes']) ? implode(' ', $searchRequest['classes']) : ''); ?>"
-    data-request="<?php print $view->escape(json_encode($searchRequest)); ?>">
+    data-request="<?php print $view->escape(json_encode(['requestKey' => $searchRequest['requestKey']])); ?>">
     <?php if (!isset($searchRequest['headers'])) {
         print $view->render('AdminBundle:Admin:header-search.html.php', $subVars);
     }
