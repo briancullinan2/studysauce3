@@ -190,13 +190,13 @@ EOF
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
                 $groupInvite = null;
-                $child = array_values(array_filter($notify, function ($n) {
+                $child = array_values(array_filter($notify, function ($u, $n) {
                     /** @var User $child */
                     $child = $n[1];
                     /** @var Pack $pack */
                     $pack = $n[0];
-                    return $child->getInvites()->filter(function (Invite $i) use ($pack) {
-                        return in_array($i->getGroup(), $pack->getGroups()->toArray());})->count() > 0;
+                    return $child != $u && $pack->getGroups()->filter(function (Group $i) use ($child) {
+                        return $child->hasGroup($i->getName());})->count() > 0;
                 }));
 
                 /** @var Invite $groupInvite */
@@ -205,8 +205,8 @@ EOF
                     $childUser = $child[0][1];
                     /** @var Pack $childPack */
                     $childPack = $child[0][0];
-                    $groupInvite = $childUser->getInvites()->filter(function (Invite $i) use ($childPack) {
-                        return in_array($i->getGroup(), $childPack->getGroups()->toArray());})->first();
+                    $groupInvite = $childPack->getGroups()->filter(function (Group $i) use ($childUser) {
+                        return $childUser->hasGroup($i->getName());})->first();
                 }
 
                 /** @var Pack[] $alerting */
@@ -234,7 +234,7 @@ EOF
                 }));
 
                 if(count($emailing) > 0) {
-                    $emails->sendNewPacksNotification($u, $emailing, isset($groupInvite) ? $groupInvite : null);
+                    $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null);
                 }
             }
         }

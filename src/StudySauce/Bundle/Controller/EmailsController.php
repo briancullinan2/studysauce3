@@ -115,10 +115,11 @@ class EmailsController extends Controller
     /**
      * @param User $user
      * @param Pack[] $notify
-     * @param Invite $childInvite
+     * @param Group $inviteGroup
+     * @param User $inviteChild
      * @return Response
      */
-    public function sendNewPacksNotification(User $user = null, $notify, Invite $childInvite = null)
+    public function sendNewPacksNotification(User $user = null, $notify, Group $inviteGroup = null, User $inviteChild = null)
     {
         /** @var $user User */
         if(empty($user))
@@ -131,9 +132,9 @@ class EmailsController extends Controller
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:new-pack-notification.html.php', [
                 'greeting' => 'Hello ' . $user->getFirst() . ',',
-                'child' => !empty($childInvite) && $childInvite->getUser() != $user ? $childInvite->getFirst() : '',
-                'group' => !empty($childInvite) ? $childInvite->getGroup()->getName() : '',
-                'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : (!empty($notify[0]->getLogo()) ? $notify[0]->getLogo() : ''),
+                'child' => !empty($inviteChild) ? $inviteChild->getFirst() : '',
+                'group' => !empty($inviteGroup) ? $inviteGroup->getName() : '',
+                'groupLogo' => !empty($inviteGroup) && !empty($inviteGroup->getLogo()) ? $inviteGroup->getLogo()->getUrl() : (!empty($notify[0]->getLogo()) ? $notify[0]->getLogo() : ''),
                 'packName' => $notify[0]->getTitle(),
                 'packCount' => $notify[0]->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(),
                 'link' => false,
