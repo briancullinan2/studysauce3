@@ -145,7 +145,7 @@ $collection->add(
     )
 );
 $collection->add(
-    'password_reset',
+    'reset',
     new Route(
         '/reset/{_format}',
         ['_controller' => 'StudySauceBundle:Account:reset', '_format' => 'funnel'],
