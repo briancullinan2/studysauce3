@@ -654,6 +654,7 @@ $(document).ready(function () {
     body.on('click', '[class*="-row"] a[href^="#edit-"]', setupFields);
     body.on('shown.bs.modal', setupFields);
     body.on('show', '.panel-pane', setupFields);
+    body.on('resulted', '.results', setupFields);
 
     // collection control for entity search
     body.on('change', 'input.selectized[data-tables]', function () {

@@ -39,7 +39,6 @@ $view['slots']->start('body'); ?>
     <div class="panel-pane" id="packs<?php print ($entity !== null ? ('-pack' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php
-            $tables = ['tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']]];
             if($entity !== null) {
                 $isNew = false;
                 if(empty($entity->getId())) {
@@ -48,13 +47,16 @@ $view['slots']->start('body'); ?>
                 if($entity->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0) {
                     $isNew[] = 'card';
                 }
-                $tables['pack-id'] = $entity->getId();
-                $tables['headers'] = ['pack' => 'packPacks'];
-                $tables['new'] = $isNew;
-                $tables['edit'] = $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC';
-                $tables['count-pack'] = 1;
-                $tables['count-card'] = $isNew ? 5 : 0;
-                $tables['footers'] = ['pack' => 'packPacks', 'card' => true];
+                $tables = [
+                    'tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']],
+                    'pack-id' => $entity->getId(),
+                    'headers' => ['pack' => 'packPacks'],
+                    'new' => $isNew,
+                    'edit' => $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC',
+                    'count-pack' => 1,
+                    'count-card' => $isNew ? 5 : 0,
+                    'footers' => ['pack' => 'packPacks', 'card' => true]
+                ];
             }
             else {
                 $tables['count-pack'] = 0;

@@ -47,13 +47,14 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']]];
                     $tables['pack'] = ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'count-pack' => empty($entity->getId()) ? -1 : 0,
+                        'count-pack' => $isNew ? -1 : 0,
                         'count-ss_group' => 1,
                         'ss_group-deleted' => $entity->getDeleted(),
-                        'edit' => !empty($entity->getId()) ? false : ['ss_group'],
-                        'read-only' => empty($entity->getId()) ? false : ['ss_group'],
-                        'new' => empty($entity->getId()),
+                        'edit' => !$isNew ? false : ['ss_group'],
+                        'read-only' => $isNew ? false : ['ss_group'],
+                        'new' => $isNew,
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks'],

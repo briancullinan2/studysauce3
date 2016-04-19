@@ -280,9 +280,19 @@ class PacksController extends Controller
             }
         }
         $orm->flush();
+
+        $shouldNewCards = $newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0;
         return $this->forward('AdminBundle:Admin:results', [
-            'requestKey' => $request->get('requestKey'),
-            'dataType' => in_array('application/json', $request->getAcceptableContentTypes()) ? 'json' : 'text']);
+            'tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']],
+            'pack-id' => $newPack->getId(),
+            'headers' => ['pack' => 'packPacks'],
+            'new' => $shouldNewCards ? ['card'] : false,
+            'edit' => false,
+            'count-pack' => 1,
+            'count-card' => $shouldNewCards ? 5 : 0,
+            'footers' => ['pack' => 'packPacks', 'card' => true],
+            'requestKey' => null
+        ]);
     }
 
     public function removeAction(Pack $pack = null)

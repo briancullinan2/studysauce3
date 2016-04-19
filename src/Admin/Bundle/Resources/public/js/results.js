@@ -254,6 +254,7 @@ $(document).ready(function () {
             }).toArray());
         }
         if(typeof data == 'object') {
+            admin.data('request', {requestKey: data.searchRequest.requestKey});
             for(var t2 = 0; t2 < tables.length; t2++) {
                 var table2 = tables[t2];
                 (function (table) {
@@ -268,6 +269,7 @@ $(document).ready(function () {
         }
         else {
             var content = $(data).filter('.results');
+            admin.data('request', content.data('request'));
             for(var t = 0; t < tables.length; t++) {
                 var table = tables[t];
                 (function (table) {

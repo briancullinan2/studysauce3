@@ -393,8 +393,9 @@ class AdminController extends Controller
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        $request->getSession()->set($key = md5(serialize($searchRequest)), $searchRequest);
-        $vars['searchRequest'] = $searchRequest + ['requestKey' => $key];
+        $searchRequest['requestKey'] = md5(serialize($searchRequest));
+        $request->getSession()->set($searchRequest['requestKey'], $searchRequest);
+        $vars['searchRequest'] = $searchRequest;
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
         if(in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
@@ -651,8 +652,20 @@ class AdminController extends Controller
         }
 
         return $this->forward('AdminBundle:Admin:results', [
-            'requestKey' => $request->get('requestKey'),
-            'dataType' => in_array('application/json', $request->getAcceptableContentTypes()) ? 'json' : 'text']);
+            'count-pack' => 0,
+            'count-ss_group' => 1,
+            'ss_group-deleted' => $g->getDeleted(),
+            'edit' => false,
+            'read-only' => ['ss_group'],
+            'new' => false,
+            'ss_group-id' => $g->getId(),
+            'tables' => [
+                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']],
+                'pack' => ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */]],
+            'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks'],
+            'footers' => ['ss_group' => 'groupGroups'],
+            'requestKey' => null
+        ]);
     }
 
     /**
