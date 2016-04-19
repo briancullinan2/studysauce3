@@ -190,11 +190,10 @@ EOF
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
                 $groupInvite = null;
-                $child = array_values(array_filter($notify, function ($u, $n) {
+                $child = array_values(array_filter($notify, function ($n) use ($u) {
                     /** @var User $child */
-                    $child = $n[1];
                     /** @var Pack $pack */
-                    $pack = $n[0];
+                    list($pack, $child) = $n;
                     return $child != $u && $pack->getGroups()->filter(function (Group $i) use ($child) {
                         return $child->hasGroup($i->getName());})->count() > 0;
                 }));
@@ -202,9 +201,8 @@ EOF
                 /** @var Invite $groupInvite */
                 if(!empty($child)) {
                     /** @var User $childUser */
-                    $childUser = $child[0][1];
                     /** @var Pack $childPack */
-                    $childPack = $child[0][0];
+                    list($childPack, $childUser) = $child[0];
                     $groupInvite = $childPack->getGroups()->filter(function (Group $i) use ($childUser) {
                         return $childUser->hasGroup($i->getName());})->first();
                 }

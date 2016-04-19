@@ -134,7 +134,7 @@ $(document).ready(function () {
 
     body.on('resulted', '[id^="packs-"] .results', function () {
         var groups = $(this).find('.pack-row .groups input[data-entities]').data('entities');
-        var loaded = $([]);
+        var loaded = body.find('#groups');
         for(var g in groups) {
             if(groups.hasOwnProperty(g) && groups[g].substr(0, 9) == 'ss_group-') {
                 loaded = loaded.add(body.find('#' + 'groups-group' + groups[g].substr(9)));

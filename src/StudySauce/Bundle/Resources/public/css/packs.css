@@ -328,6 +328,7 @@
     white-space: normal;
     margin:0 5px;
     display:none;
+    word-wrap: break-word;
 }
 
 [id^="packs-"] .preview-play .play {
@@ -398,6 +399,7 @@
     width:100%;
     left:0;
     top:0;
+    z-index: 10;
 }
 
 [id^="packs-"] .card-row + .expandable .type-mc .preview-response {
@@ -493,6 +495,8 @@
 
 [id^="packs-"] .card-row + .expandable .preview-content {
     height: 100%;
+    overflow: auto;
+    overflow-x:hidden;
 }
 
 [id^="packs-"] .card-row + .expandable .preview-answer .preview-inner .preview-content,

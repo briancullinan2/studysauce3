@@ -606,11 +606,14 @@ $(document).ready(function () {
         dialog.find('input[name="schedule"]').datetimepicker({
             format: 'd.m.Y H:i',
             inline: true,
-            minDate: 0
+            minDate: 0,
+            roundTime: 'ceil'
+            //allowTimes: (function () {var result = [];for(var xh=0;xh<=23;xh++){for(var xm=0;xm<60;xm+=30){result[result.length] = ("0"+xh).slice(-2)+':'+("0"+xm).slice(-2);}}return result;})()
         }).addClass('dateTimePicker');
 
         // set up previous publish settings
         applyFields.apply(dialog, [row.find('.status select').data('publish')]);
+        dialog.find('input[name="schedule"]').trigger('change');
 
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
             var entityField = row.find('.groups input.selectized');
@@ -637,6 +640,24 @@ $(document).ready(function () {
             });
         });
     }
+
+    body.on('change', '#pack-publish input[name="schedule"]', function () {
+        var dialog = $('#pack-publish');
+        if(dialog.find('input[name="schedule"]').datetimepicker('getValue') <= new Date()) {
+            dialog.find('input[value="now"]').prop('checked', true);
+        }
+        else {
+            dialog.find('input[value="later"]').prop('checked', true);
+        }
+    });
+
+    body.on('change', '#pack-publish input[name="date"]', function () {
+        var dialog = $('#pack-publish'),
+            input = dialog.find('input[name="schedule"]');
+        if(dialog.find('input[value="now"]').is(':checked')) {
+            input.datetimepicker('setOptions', {value: new Date()})
+        }
+    });
 
     body.on('change', '[id^="packs-"] .status select', function () {
         if($(this).val() == 'GROUP') {

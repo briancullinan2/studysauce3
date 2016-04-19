@@ -676,6 +676,9 @@ $(document).ready(function () {
         if(addIds.length == 0 && removeIds.length == 0) {
             return;
         }
+        if(isTemplate) {
+            removeIds = newValue.filter(function (v) {return existing.indexOf(v) > -1;})
+        }
         if(isDialog) {
             // add all actions from all tables
 
@@ -685,7 +688,7 @@ $(document).ready(function () {
         var addItemsStr = addItems.map(function (e) {return e.text;}).join(', ');
         var removeItemsStr = removeItems.map(function (e) {return e.text;}).join(', ');
 
-        var assignValues = function (toField) {
+        var confirmAssignValues = function (toField) {
             // show confirmation dialog
             $('#general-dialog').modal({show: true, backdrop: true})
                 .find('.modal-body').html('<p>Are you sure you want to <br />'
@@ -697,48 +700,53 @@ $(document).ready(function () {
                     : '') + '?');
 
             body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-                for (var tableName in tables) {
-                    if (tables.hasOwnProperty(tableName)) {
-                        (function(tableName) {
-                            var existingEntities = toField.data(tableName) || [];
-                            var obj = $.merge(
-                                addItems.filter(function (i) {return i.value.split('-')[0] == tableName}).map(function (item) {return $.extend({remove: false}, item);}),
-                                removeItems.filter(function (i) {return i.value.split('-')[0] == tableName}).map(function (item) {return $.extend({remove: true}, item);}));
-                            for (var i = 0; i < obj.length; i++) {
-                                (function (obj) {
-                                    var entity;
-                                    if((entity = existingEntities.filter(function (e) {return e.value == obj.value})).length > 0) {
-                                        entity[0].remove = obj.remove;
-                                    }
-                                    else {
-                                        existingEntities[existingEntities.length] = obj;
-                                    }
-                                    if(isTemplate) {
-                                        createEntityRow.apply(toField.parents('label'), [obj, obj.remove]);
-                                    }
-                                })(obj[i]);
-                            }
-                            toField.data(tableName, existingEntities);
-                        })(tableName);
-                    }
-                }
-                toField.data('entities', existing);
-                // set field
-                toField.val(existing.join(' '));
-                if(entityField != toField && toField.is('.selectized')) {
-                    toField[0].selectize.setValue(existing);
-                    toField[0].selectize.addOption(addItems);
-                }
+                updateRows(toField);
             });
         };
 
-        var updateRows = function (entityField) {
+        var updateRows = function (toField) {
             for (var tableName in tables) {
-                if (tables.hasOwnProperty(tableName) && entities.hasOwnProperty(tableName)) {
-                    for (var i = 0; i < entities[tableName].length; i++) {
-                        createEntityRow.apply(entityField.parents('label'), [entities[tableName][i], entities[tableName][i].remove]);
-                    }
+                if (tables.hasOwnProperty(tableName)) {
+                    (function(tableName) {
+                        var existingEntities = toField.data(tableName) || [];
+                        var obj = $.merge(
+                            addItems.filter(function (i) {return i.value.split('-')[0] == tableName}).map(function (item) {return $.extend({remove: false}, item);}),
+                            removeItems.filter(function (i) {return i.value.split('-')[0] == tableName}).map(function (item) {return $.extend({remove: true}, item);}));
+                        for (var i = 0; i < obj.length; i++) {
+                            (function (obj) {
+                                var entity;
+                                if((entity = existingEntities.filter(function (e) {return e.value == obj.value})).length > 0) {
+                                    entity[0].remove = obj.remove;
+                                }
+                                else {
+                                    existingEntities[existingEntities.length] = obj;
+                                }
+                                if (remove) {
+                                    var ei;
+                                    if((ei = existing.indexOf(obj.value)) > -1) {
+                                        existing = existing.splice(ei, 1);
+                                    }
+                                }
+                                else {
+                                    if(existing.indexOf(obj.value) == -1) {
+                                        existing[existing.length] = obj.value;
+                                    }
+                                }
+                                if(isTemplate) {
+                                    createEntityRow.apply(toField.parents('label'), [obj, obj.remove]);
+                                }
+                            })(obj[i]);
+                        }
+                        toField.data(tableName, existingEntities);
+                    })(tableName);
                 }
+            }
+            toField.data('entities', existing);
+            // set field
+            toField.val(existing.join(' '));
+            if(entityField != toField && toField.is('.selectized')) {
+                toField[0].selectize.setValue(existing);
+                toField[0].selectize.addOption(addItems);
             }
         };
 
@@ -758,11 +766,11 @@ $(document).ready(function () {
             // update rows
             updateRows(entityField);
             body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
-                assignValues($(this).prop('field'));
+                confirmAssignValues($(this).prop('field'));
             });
         }
         else {
-            assignValues(entityField);
+            confirmAssignValues(entityField);
         }
     });
 
@@ -871,19 +879,15 @@ $(document).ready(function () {
             newRow.addClass('buttons-1');
             newRow.find('[href="#subtract-entity"]').remove();
             $('<input type="hidden" name="' + newRow.find('input').attr('name').replace('[id]', '[remove]') + '" value="true" />').insertAfter(newRow.find('input'));
-            input.data('entities', input.data('entities').filter(function (e) {return e != option.value;}));
         }
         else {
             // add entity
             newRow.addClass('buttons-1');
             newRow.find('[href="#insert-entity"]').remove();
-            input.data('entities', $.merge(input.data('entities'), [option.value]));
         }
         newRow.removeClass('template');
         return newRow;
     }
-
-    window.createEntityRow = createEntityRow;
 
     // TODO: insert publish dialog here
 

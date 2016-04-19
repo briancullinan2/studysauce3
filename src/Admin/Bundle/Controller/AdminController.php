@@ -587,14 +587,14 @@ class AdminController extends Controller
             }
         }
 
-        if(!empty($request->get('packId'))) {
+        // do pack add/remove, not group remove
+        if(!empty($request->get('packId')) && !empty($g->getId())) {
             $this->forward('StudySauceBundle:Packs:create', ['id' => $request->get('packId'), 'groups' => $request->get('groups'), 'users' => $request->get('users'), 'publish' => $request->get('publish')]);
         }
-
-        if(empty($g->getId())) {
+        else if(empty($g->getId())) {
             $orm->persist($g);
         }
-        elseif($request->get('remove') == 'true') {
+        else if($request->get('remove') == 'true') {
             // remove group from users
             $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
             foreach($invites as $i => $in) {
@@ -622,8 +622,9 @@ class AdminController extends Controller
             $orm->flush();
             return $this->redirect($this->generateUrl('groups'));
         }
-        else
+        else {
             $orm->merge($g);
+        }
         $orm->flush();
 
         if(!empty($request->get('invite'))) {
