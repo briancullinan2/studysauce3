@@ -673,9 +673,9 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .tiles [class*="-row"] .name {
     display:block;
     width:auto;
-    padding-right: 50px;
+    padding-right:10px;
     position:relative;
-    padding-left:10px;
+    padding-left: 10px;
 }
 
 .tiles [class*="-row"].read-only .name input
@@ -683,21 +683,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     cursor: pointer;
 }
 
-.tiles [class*="-row"].read-only:hover .name span.count,
 .tiles [class*="-row"].read-only:hover .name input {
     color:#09B;
-}
-
-.tiles [class*="-row"] .name span.count {
-    position:absolute;
-    right:10px;
-    top:50%;
-    margin-top:-8px;
-}
-
-.results:not(.tiles) [class*="-row"] .name span.count,
-.results [class*="-row"].edit .name span.count {
-    display:none;
 }
 
 .tiles [class*="-row"] .id img {

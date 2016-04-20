@@ -236,7 +236,8 @@ $(document).ready(function () {
                         groupId: groupId,
                         packId: id != null ? id.substr(5) : null,
                         groups: [{id: groupId, remove: false}],
-                        publish: publish
+                        publish: publish,
+                        requestKey: getDataRequest.apply(tab).requestKey
                     },
                     success: function (data) {
                         tab.find('.squiggle').stop().remove();
@@ -255,40 +256,39 @@ $(document).ready(function () {
         });
     });
 
-    body.on('click', '[id^="groups-"] *:has(input[data-ss_user]) ~ a[href="#add-entity"]', function () {
-        var tab = $(this).parents('.results'),
-            row = $(this).parents('.pack-row'),
+    body.on('change', '[id^="groups-"] .pack-row .members input.selectized', function () {
+        var field = $(this),
+            tab = field.parents('.results'),
+            row = field.parents('.pack-row'),
             rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
-            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row:not(.template)').first().attr('class'))[1],
-            field = $(this).siblings('*:has(input[data-ss_user])').find('input[data-ss_user]');
+            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row:not(.template)').first().attr('class'))[1];
 
-        body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
-            body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-                // TODO: confirmation dialog
-                $.ajax({
-                    url: Routing.generate('save_group'),
-                    type: 'POST',
-                    dataType: 'text',
-                    data: {
-                        groupId: groupId,
-                        packId: rowId != null ? rowId : null,
-                        users: field.data('ss_user').map(function (g) {
-                            return {id: g['value'].substr(8), remove: g['remove']};
-                        })
-                    },
-                    success: function (data) {
-                        tab.find('.squiggle').stop().remove();
-                        // copy rows and select
-                        var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                        loadContent.apply(tab, [data, ['pack']]);
-                        if (selected) {
-                            tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
-                        }
-                    },
-                    error: function () {
-                        tab.find('.squiggle').stop().remove();
+        body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+            // TODO: confirmation dialog
+            $.ajax({
+                url: Routing.generate('save_group'),
+                type: 'POST',
+                dataType: 'text',
+                data: {
+                    groupId: groupId,
+                    packId: rowId != null ? rowId : null,
+                    users: field.data('ss_user').map(function (g) {
+                        return {id: g.value.substr(8), remove: g['remove']};
+                    }),
+                    requestKey: getDataRequest.apply(tab).requestKey
+                },
+                success: function (data) {
+                    tab.find('.squiggle').stop().remove();
+                    // copy rows and select
+                    var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                    loadContent.apply(tab, [data, ['pack']]);
+                    if (selected) {
+                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
                     }
-                });
+                },
+                error: function () {
+                    tab.find('.squiggle').stop().remove();
+                }
             });
         });
     });

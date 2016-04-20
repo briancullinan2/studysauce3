@@ -20,4 +20,3 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 
 ?>
 <label class="input"><input type="text" name="title" placeholder="Give your pack a title" value="<?php print $view->escape($pack->getTitle()); ?>" /></label>
-<span class="count"><?php print array_sum(array_map(function (Group $g) {return $g->getUsers()->count();}, $groups)) + count($diffUsers); ?></span>
