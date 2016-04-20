@@ -586,11 +586,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', function () {
-        var row = $(this).parents('.pack-row');
-        showPublishDialog.apply(this, [row.find('.name input').val(), row.find('.status select').data('publish')])(savePublish);
-    });
-
     body.on('click', '[id^="packs-"] *:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
         var row = $(this).parents('.pack-row');
         body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {

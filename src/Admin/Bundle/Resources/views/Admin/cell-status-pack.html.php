@@ -35,5 +35,4 @@ use StudySauce\Bundle\Entity\Pack;
             ?>
         </select>
     </label>
-    <a href="#pack-publish" data-target="#pack-publish" data-toggle="modal">&nbsp;</a>
 </div>

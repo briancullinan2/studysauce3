@@ -127,13 +127,6 @@
     position:relative;
 }
 
-[id^="packs-"] .pack-row > .status label {
-    margin-right:-30px;
-    padding-right:30px;
-    width:100%;
-    display:inline-block;
-}
-
 [id^="packs-"] .pack-row.read-only .pack-icon
 {
     z-index: -1;
@@ -155,7 +148,6 @@
     width: 45%;
     padding-left:150px;
     margin-left:-4px;
-    padding-right: 30px;
 }
 
 [id^="packs-"] .highlighted-link.card {
