@@ -4,29 +4,10 @@ use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
-/** @var User|Group $ss_group */
+/** @var Group $ss_group */
 $entityIds = [];
 
-$packs = $ss_group->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
-$users = $ss_group->getUsers()->toArray();
-foreach($ss_group->getSubgroups()->toArray() as $g) {
-    /** @var Group $g */
-    if($g->getDeleted()) {
-        continue;
-    }
-    foreach($g->getGroupPacks()->toArray() as $p) {
-        if(!in_array($p, $packs)) {
-            $packs[] = $p;
-        }
-    }
-    foreach($g->getUsers()->toArray() as $u) {
-        if(!in_array($u, $users)) {
-            $users[] = $u;
-        }
-    }
-}
-
-
+list($users, $packs) = $ss_group->getUserPacksRecursively();
 ?>
 
 <div>

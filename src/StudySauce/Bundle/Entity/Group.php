@@ -88,6 +88,30 @@ class Group extends BaseGroup implements GroupInterface
         $this->created = new \DateTime();
     }
 
+    public function getUserPacksRecursively()
+    {
+        $packs = $this->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
+        $users = $this->getUsers()->toArray();
+        foreach($this->getSubgroups()->toArray() as $g) {
+            /** @var Group $g */
+            if($g->getDeleted()) {
+                continue;
+            }
+            list($subUsers, $subPacks) = $g->getUserPacksRecursively();
+            foreach($subPacks as $p) {
+                if(!in_array($p, $packs)) {
+                    $packs[] = $p;
+                }
+            }
+            foreach($subUsers as $u) {
+                if(!in_array($u, $users)) {
+                    $users[] = $u;
+                }
+            }
+        }
+        return [$users, $packs];
+    }
+
     /**
      * Get id
      *
@@ -438,4 +462,5 @@ class Group extends BaseGroup implements GroupInterface
     {
         return $this->subgroups;
     }
+
 }
