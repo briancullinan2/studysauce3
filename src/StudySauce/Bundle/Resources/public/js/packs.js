@@ -392,6 +392,7 @@ $(document).ready(function () {
                 that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
             }
         });
+        tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
         autoSave.apply(tab, [true]);
     });
 
@@ -400,7 +401,7 @@ $(document).ready(function () {
     function autoSave(close) {
         autoSaveTimeout = null;
         var tab = $(this).closest('.results:visible');
-        var packRows = tab.find('.pack-row.edit:not(.template)');
+        var packRows = tab.find('.pack-row.valid:not(.template)');
         var cardRows = tab.find('.card-row.valid.changed:not(.template),.card-row.removed:not(.template)');
         if (packRows.length == 0) {
             return;
@@ -470,7 +471,6 @@ $(document).ready(function () {
 
                 // make fields read-only
                 if(close) {
-                    tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
                 }
 
                 loadContent.apply(tab, [data]);
@@ -493,7 +493,7 @@ $(document).ready(function () {
     function setupPackEditor() {
         autoSaveTimeout = 0;
         var tab = $(this).closest('.panel-pane');
-        packsFunc.apply(tab.find('.pack-row'));
+        validateChanged.apply(tab.find('.pack-row'));
         var cardRows = tab.find('.card-row:not(.removed):not(.template)');
 
         setTimeout(function () {
@@ -636,7 +636,7 @@ $(document).ready(function () {
                 row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
                 row.find('.status select').data('publish', publish).val('GROUP');
                 row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-                packsFunc.apply(row.addClass('changed'));
+                row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
             });
         });
     }

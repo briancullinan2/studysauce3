@@ -80,14 +80,14 @@ $view['slots']->start('body'); ?>
                         'headers' => ['ss_group' => 'new'],
                         'footers' => ['ss_group' => 'new']
                     ]));
-                } else if (!empty($entity->getId())) {
+                } else {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'parent-ss_group-id' => $entity->getId(),
+                        'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
                         'count-ss_group' => 0,
                         'classes' => ['tiles'],
                         'tables' => $tables,
-                        'headers' => ['ss_group' => 'new'],
-                        'footers' => ['ss_group' => 'new']
+                        'headers' => ['ss_group' => 'subnew'],
+                        'footers' => ['ss_group' => 'subnew']
                     ]));
                 }
                 ?>

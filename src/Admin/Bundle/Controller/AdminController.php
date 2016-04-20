@@ -286,9 +286,12 @@ class AdminController extends Controller
 
         // default entities to show
         if(!empty($key = $request->get('requestKey'))) {
-            $searchRequest = $request->getSession()->get($key);
-            if(empty($request)) {
+            $cacheRequest = $this->get('cache')->fetch($key);
+            if(empty($cacheRequest)) {
                 throw new NotFoundHttpException('Could not find request key');
+            }
+            else {
+                $searchRequest = unserialize($cacheRequest);
             }
         }
         else {
@@ -393,8 +396,9 @@ class AdminController extends Controller
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
-        $searchRequest['requestKey'] = md5(serialize($searchRequest));
-        $request->getSession()->set($searchRequest['requestKey'], $searchRequest);
+        $serialized = serialize($searchRequest);
+        $searchRequest['requestKey'] = md5($serialized);
+        $this->get('cache')->save($searchRequest['requestKey'], $serialized);
         $vars['searchRequest'] = $searchRequest;
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to

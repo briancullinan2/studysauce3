@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     function groupsFunc(evt) {
         var tab = $(this).parents('.results:visible');
-        var groupRow = tab.find('.ss_group-row.edit');
+        var groupRow = tab.find('.ss_group-row');
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
         }
@@ -72,7 +72,7 @@ $(document).ready(function () {
     function autoSave(close) {
         autoSaveTimeout = null;
         var tab = $(this);
-        var row = tab.find('.ss_group-row.edit:not(.template)');
+        var row = tab.find('.ss_group-row.valid:not(.template)');
         var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
         if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]'))
             return;
@@ -106,7 +106,6 @@ $(document).ready(function () {
                 }
 
                 if(close) {
-                    tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
                 }
 
                 //tab.find('.ss_group-row .invites input').data('entities', data.ss_group[0].invites[0].code);
@@ -147,19 +146,19 @@ $(document).ready(function () {
 
     body.on('show', '.panel-pane[id^="groups-"]', function () {
         autoSaveTimeout = 0;
-        groupsFunc.apply($(this).find('.ss_group-row.edit'));
+        groupsFunc.apply($(this).find('.ss_group-row:not(.template)'));
         autoSaveTimeout = null;
     });
 
     body.on('click', '[id^="groups-"] a[href="#save-ss_group"], [id^="groups-"] [value="#save-ss_group"]', function (evt) {
         evt.preventDefault();
-
+        var tab = $(this).parents('.results:visible');
         if (autoSaveTimeout != null) {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        autoSave.apply($(this).parents('.results:visible'), [true]);
-
+        tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
+        autoSave.apply(tab, [true]);
     });
 
     body.on('change keyup keydown', '[id^="groups-"] .ss_group-row input, [id^="groups-"] .ss_group-row select, [id^="groups-"] .ss_group-row textarea', groupsFunc);

@@ -198,7 +198,7 @@ EOF
                         return $child->hasGroup($i->getName());})->count() > 0;
                 }));
 
-                /** @var Invite $groupInvite */
+                /** @var Group $groupInvite */
                 if(!empty($child)) {
                     /** @var User $childUser */
                     /** @var Pack $childPack */
@@ -216,7 +216,7 @@ EOF
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
-                            $controller->sendNotification($groupInvite->getGroup()->getName() . ' added a new pack, "'
+                            $controller->sendNotification($groupInvite->getName() . ' added a new pack, "'
                                 . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {

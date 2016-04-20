@@ -15,6 +15,8 @@ services:
             - ~
         calls:
             - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
+    cache:
+        class: Doctrine\Common\Cache\ApcCache
 
     security.authentication.rememberme.services.persistent.main:
         alias: security.authentication.rememberme.services.simplehash.main
