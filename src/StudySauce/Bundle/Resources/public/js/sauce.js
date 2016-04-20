@@ -762,6 +762,51 @@ function ssMergeScripts(content)
 
 centerize.apply($('body').find('.centerized:visible'));
 
+function gatherFields(fields, visibleOnly) {
+    var context = $(this);
+    var result = {};
+    for(var f in fields) {
+        if (fields.hasOwnProperty(f)) {
+            var inputField = context.find('[name="' + fields[f] + '"]');
+            if(visibleOnly !== false) {
+                inputField = inputField.filter(':visible');
+            }
+            if (inputField.is('[type="checkbox"],[type="radio"]')) {
+                result[fields[f]] = inputField.filter(':checked').val();
+            }
+            else if (inputField.is('.dateTimePicker')) {
+                result[fields[f]] = inputField.datetimepicker('getValue');
+            }
+            else {
+                result[fields[f]] = inputField.val();
+            }
+        }
+    }
+    return result;
+}
+
+function applyFields(fields) {
+    var context = $(this);
+    for(var f in fields) {
+        if (fields.hasOwnProperty(f)) {
+            var inputField = context.find('[name="' + fields[f] + '"]:visible');
+            if (inputField.is('[type="checkbox"],[type="radio"]')) {
+                inputField.each(function () {
+                    if($(this).val() == fields[f]) {
+                        $(this).prop('checked', true);
+                    }
+                });
+            }
+            else if (inputField.is('.dateTimePicker')) {
+                inputField.datetimepicker('setOptions', {value: new Date(fields[f])});
+            }
+            else {
+                inputField.val(fields[f])
+            }
+        }
+    }
+}
+
 $(document).ready(function () {
     var body = $('body');
 

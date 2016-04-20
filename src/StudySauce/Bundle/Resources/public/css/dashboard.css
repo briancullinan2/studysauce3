@@ -332,7 +332,6 @@ a[href="#insert-entity"],
 a[href="#subtract-entity"] {
     width: 30px;
     vertical-align: middle;
-    background-color: #ddd;
     position: relative;
     height: 30px;
     display: inline-block;
@@ -405,22 +404,22 @@ a[href="#insert-entity"]:before {
     content: "+";
 }
 
-a[href="#insert-entity"] {
-    background-color: #dfd;
+a[href="#insert-entity"]:before {
+    color: #EEE;
 }
 
-.entity-search .title:hover + a[href="#insert-entity"],
-a[href="#insert-entity"]:hover {
-    background-color: #afa;
+.entity-search .entity-title:hover + a[href="#insert-entity"]:before,
+a[href="#insert-entity"]:hover:before {
+    color: #555;
 }
 
-a[href="#subtract-entity"] {
-    background-color: #fdd;
+a[href="#subtract-entity"]:before {
+    color: #EEE;
 }
 
-.entity-search .title:hover + a[href="#subtract-entity"],
-a[href="#subtract-entity"]:hover {
-    background-color: #faa;
+.entity-search .entity-title:hover + a[href="#subtract-entity"]:before,
+a[href="#subtract-entity"]:hover:before {
+    color: #555;
 }
 
 .entity-search .entity-name {

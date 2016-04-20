@@ -665,11 +665,14 @@ $(document).ready(function () {
     var isSettingSelectize = false;
 
     function handleSelectize (value, item, remove) {
+        var entityField = $(this);
+        if(entityField.data('confirm') === false) {
+            return;
+        }
         if(isSettingSelectize) {
             return;
         }
         isSettingSelectize = true;
-        var entityField = $(this);
         var existing = (entityField.data('entities') || []);
         var isDialog = entityField.parents('#add-entity').length > 0;
         var isTemplate = entityField.is('label:has(~ .checkbox.template) input.selectized[data-tables][data-entities]');
@@ -809,6 +812,45 @@ $(document).ready(function () {
     body.on('hidden.bs.modal', '#general-dialog', function () {
         $(this).find('.modal-body').html('<p>put message here</p>');
     });
+
+    function showPublishDialog(packName, publish) {
+        var dialog = $('#pack-publish').modal({show: true, backdrop: true});
+
+        dialog.find('input[name="schedule"]').datetimepicker({
+            format: 'd.m.Y H:i',
+            inline: true,
+            minDate: 0,
+            roundTime: 'ceil'
+            //allowTimes: (function () {var result = [];for(var xh=0;xh<=23;xh++){for(var xm=0;xm<60;xm+=30){result[result.length] = ("0"+xh).slice(-2)+':'+("0"+xm).slice(-2);}}return result;})()
+        }).addClass('dateTimePicker');
+
+        // set up previous publish settings
+        if(publish) {
+            applyFields.apply(dialog, [publish]);
+        }
+        dialog.find('input[name="schedule"]').trigger('change');
+
+        var publishConfirm = function (publish) {};
+        body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
+
+            var publish = gatherFields.apply(dialog, [['schedule', 'email', 'alert'], false]);
+
+            // show confirmation dialog
+            $('#general-dialog').modal({show: true, backdrop: true})
+                .find('.modal-body').html('<p>Are you sure you want to publish ' + packName + '?');
+
+            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
+                publishConfirm(publish);
+            });
+        });
+
+        return function (setPublish) {
+            if(typeof publishConfirm == 'function') {
+                publishConfirm = setPublish;
+            }
+        }
+    }
+    window.showPublishDialog = showPublishDialog;
 
     body.on('hidden.bs.modal', '#general-dialog', function () {
         setTimeout(function () {

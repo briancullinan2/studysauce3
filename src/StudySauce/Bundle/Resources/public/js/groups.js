@@ -188,70 +188,48 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '[id^="groups-"] .highlighted-link .packs input.selectized', function (evt) {
-        var dialog = $('#pack-publish').modal({show: true, backdrop: true});
-        var tab = $(this).parents('.results'),
-            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row:not(.template)').attr('class'))[1],
-            label = $(this).parents('label');
-
-
-        if ($(this).val().trim() == '') {
+    var isSettingSelectize = false;
+    body.on('change', '[id^="groups-"] .highlighted-link .packs input.selectized', function () {
+        if(isSettingSelectize) {
             return;
         }
-        var id = $(this).val(),
-            packName = this.selectize.options[id].text;
-        $(this).val('');
-        this.selectize.setValue('');
-        this.selectize.renderCache = {};
+        isSettingSelectize = true;
+        var that = $(this),
+            tab = that.parents('.results'),
+            groupId = (/ss_group-id-([0-9]+)(\s|$)/ig).exec(tab.find('.ss_group-row:not(.template)').attr('class'))[1],
+            id = that.val(),
+            packName = that[0].selectize.options[id].text;
 
+        showPublishDialog(packName, null)(function (publish) {
+            that[0].selectize.setValue('', true);
+            isSettingSelectize = false;
 
-        dialog.find('input[name="schedule"]').datetimepicker({
-            format: 'd.m.Y H:i',
-            inline: true,
-            minDate: 0
-        }).addClass('dateTimePicker');
+            // save packs
+            loadingAnimation(tab.find('a[href="#save-pack"]'));
 
-        dialog.one('click.publish', 'a[href="#submit-publish"]', function () {
-
-            var publish = {
-                schedule: dialog.find('input[name="date"]:checked').val() == 'now' ? new Date() : dialog.find('input[name="schedule"]').datetimepicker('getValue'),
-                email: dialog.find('input[name="email"]:checked').val() != null,
-                alert: dialog.find('input[name="alert"]:checked').val() != null
-            };
-
-            // show confirmation dialog
-            $('#general-dialog').modal({show: true, backdrop: true})
-                .find('.modal-body').html('<p>Are you sure you want to publish ' + packName + '?');
-
-            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
-
-                // save packs
-                loadingAnimation(tab.find('a[href="#save-pack"]'));
-
-                $.ajax({
-                    url: Routing.generate('save_group'),
-                    type: 'POST',
-                    dataType: 'text',
-                    data: {
-                        groupId: groupId,
-                        packId: id != null ? id.substr(5) : null,
-                        groups: [{id: groupId, remove: false}],
-                        publish: publish,
-                        requestKey: getDataRequest.apply(tab).requestKey
-                    },
-                    success: function (data) {
-                        tab.find('.squiggle').stop().remove();
-                        // copy rows and select
-                        var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
-                        loadContent.apply(tab, [data, ['pack']]);
-                        if (selected) {
-                            tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
-                        }
-                    },
-                    error: function () {
-                        tab.find('.squiggle').stop().remove();
+            $.ajax({
+                url: Routing.generate('save_group'),
+                type: 'POST',
+                dataType: 'text',
+                data: {
+                    groupId: groupId,
+                    packId: id != null ? id.substr(5) : null,
+                    groups: [{id: groupId, remove: false}],
+                    publish: publish,
+                    requestKey: getDataRequest.apply(tab).requestKey
+                },
+                success: function (data) {
+                    tab.find('.squiggle').stop().remove();
+                    // copy rows and select
+                    var selected = (/pack-id-([0-9]+)(\s|$)/ig).exec(tab.find('> .pack-row.selected').attr('class') || '');
+                    loadContent.apply(tab, [data, ['pack']]);
+                    if (selected) {
+                        tab.find('> .pack-row.pack-id-' + selected[1]).addClass('selected');
                     }
-                });
+                },
+                error: function () {
+                    tab.find('.squiggle').stop().remove();
+                }
             });
         });
     });

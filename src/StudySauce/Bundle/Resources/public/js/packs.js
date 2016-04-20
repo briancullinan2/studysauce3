@@ -554,93 +554,6 @@ $(document).ready(function () {
         });
     });
 
-    function gatherFields(fields, visibleOnly) {
-        var context = $(this);
-        var result = {};
-        for(var f in fields) {
-            if (fields.hasOwnProperty(f)) {
-                var inputField = context.find('[name="' + fields[f] + '"]');
-                if(visibleOnly !== false) {
-                    inputField = inputField.filter(':visible');
-                }
-                if (inputField.is('[type="checkbox"],[type="radio"]')) {
-                    result[fields[f]] = inputField.filter(':checked').val();
-                }
-                else if (inputField.is('.dateTimePicker')) {
-                    result[fields[f]] = inputField.datetimepicker('getValue');
-                }
-                else {
-                    result[fields[f]] = inputField.val();
-                }
-            }
-        }
-        return result;
-    }
-
-    function applyFields(fields) {
-        var context = $(this);
-        for(var f in fields) {
-            if (fields.hasOwnProperty(f)) {
-                var inputField = context.find('[name="' + fields[f] + '"]:visible');
-                if (inputField.is('[type="checkbox"],[type="radio"]')) {
-                    inputField.each(function () {
-                        if($(this).val() == fields[f]) {
-                            $(this).prop('checked', true);
-                        }
-                    });
-                }
-                else if (inputField.is('.dateTimePicker')) {
-                    inputField.datetimepicker('setOptions', {value: new Date(fields[f])});
-                }
-                else {
-                    inputField.val(fields[f])
-                }
-            }
-        }
-    }
-
-    function showPublishDialog() {
-        var dialog = $('#pack-publish');
-        var row = $(this).parents('.pack-row');
-
-        dialog.find('input[name="schedule"]').datetimepicker({
-            format: 'd.m.Y H:i',
-            inline: true,
-            minDate: 0,
-            roundTime: 'ceil'
-            //allowTimes: (function () {var result = [];for(var xh=0;xh<=23;xh++){for(var xm=0;xm<60;xm+=30){result[result.length] = ("0"+xh).slice(-2)+':'+("0"+xm).slice(-2);}}return result;})()
-        }).addClass('dateTimePicker');
-
-        // set up previous publish settings
-        applyFields.apply(dialog, [row.find('.status select').data('publish')]);
-        dialog.find('input[name="schedule"]').trigger('change');
-
-        body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
-            var entityField = row.find('.groups input.selectized');
-            var newValue = entityField.val().split(' ');
-            var groupStr = '';
-            for(var v in newValue) {
-                if (newValue.hasOwnProperty(v) && typeof entityField[0].selectize.options[newValue[v]] != 'undefined') {
-                    var obj = entityField[0].selectize.options[newValue[v]];
-                    groupStr += (groupStr != '' ? ', ' : '') + obj.text;
-                }
-            }
-
-            var publish = gatherFields.apply(dialog, [['schedule', 'email', 'alert'], false]);
-
-            // show confirmation dialog
-            $('#general-dialog').modal({show: true, backdrop: true})
-                .find('.modal-body').html('<p>Are you sure you want to publish to ' + groupStr + '?');
-
-            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
-                row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
-                row.find('.status select').data('publish', publish).val('GROUP');
-                row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-                row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
-            });
-        });
-    }
-
     body.on('change', '#pack-publish input[name="schedule"]', function () {
         var dialog = $('#pack-publish');
         if(dialog.find('input[name="schedule"]').datetimepicker('getValue') <= new Date()) {
@@ -659,14 +572,24 @@ $(document).ready(function () {
         }
     });
 
+    function savePublish(publish) {
+        row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
+        row.find('.status select').data('publish', publish).val('GROUP');
+        row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
+        row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
+    }
+
     body.on('change', '[id^="packs-"] .status select', function () {
         if($(this).val() == 'GROUP') {
-            $('#pack-publish').modal({show: true});
-            showPublishDialog.apply(this);
+            var row = $(this).parents('.pack-row');
+            showPublishDialog.apply(this, [row.find('.name input').val(), row.find('.status select').data('publish')])(savePublish);
         }
     });
 
-    body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', showPublishDialog);
+    body.on('click', '[id^="packs-"] a[data-target="#pack-publish"], [id^="packs-"] a[href="#pack-publish"]', function () {
+        var row = $(this).parents('.pack-row');
+        showPublishDialog.apply(this, [row.find('.name input').val(), row.find('.status select').data('publish')])(savePublish);
+    });
 
     body.on('click', '[id^="packs-"] *:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
         var row = $(this).parents('.pack-row');

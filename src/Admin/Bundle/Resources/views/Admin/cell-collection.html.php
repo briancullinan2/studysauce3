@@ -52,7 +52,8 @@ if (isset($entities)) {
                 print ' data-' . $table . '="' . $view->escape(json_encode(isset($dataTypes[$table]) ? $dataTypes[$table] : [])) . '"';
             } ?>
                 data-entities="<?php print $view->escape(json_encode($entityIds)); ?>"
-                data-tables="<?php print $view->escape(json_encode($tables)); ?>"/></label>
+                data-tables="<?php print $view->escape(json_encode($tables)); ?>"
+                data-confirm="<?php print (!isset($dataConfirm) || $dataConfirm ? 'true' : 'false'); ?>" /></label>
     <?php
     if (isset($entities) && (!isset($inline) || $inline !== true)) {
         $i = 0;
