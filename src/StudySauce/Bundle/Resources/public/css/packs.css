@@ -34,6 +34,15 @@
 
 [id^="packs-"] .highlighted-link.pack {
     margin: 50px 0;
+    clear:both;
+}
+
+[id^="packs-"] .pack-row:before {
+    content: " ";
+    display: inline-block;
+    padding-bottom: 10%;
+    position: static;
+    float: left;
 }
 
 #packs .pack-row .id {
