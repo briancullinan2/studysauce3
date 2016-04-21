@@ -50,12 +50,12 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
             if (!isset($searchRequest['headers']) || is_array($headers = $searchRequest['headers'])
                 && isset($headers[$table]) && $headers[$table] === true
             ) {
-                print $view->render('AdminBundle:Admin:header.html.php', $subVars + ['table' => $table]);
+                print $view->render('AdminBundle:Admin:header.html.php', $subVars + ['table' => $table, $table => $$table]);
             } else if (is_array($headers = $searchRequest['headers'])
                 && isset($headers[$table])
                 && $view->exists('AdminBundle:Admin:header-' . $headers[$table] . '.html.php')
             ) {
-                print $view->render('AdminBundle:Admin:header-' . $headers[$table] . '.html.php', $subVars + ['table' => $table]);
+                print $view->render('AdminBundle:Admin:header-' . $headers[$table] . '.html.php', $subVars + ['table' => $table, $table => $$table]);
             }
         }
 

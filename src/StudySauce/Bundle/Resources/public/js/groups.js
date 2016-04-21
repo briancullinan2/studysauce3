@@ -5,12 +5,14 @@ $(document).ready(function () {
         autoSaveTimeout = 0;
 
     function groupsFunc(evt) {
-        var tab = $(this).parents('.results:visible');
+        var tab = $(this).closest('.results:visible');
         var groupRow = tab.find('.ss_group-row');
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
+            groupRow.removeClass('valid empty').addClass('invalid');
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
         }
         else {
+            groupRow.removeClass('invalid empty').addClass('valid');
             tab.find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
         }
 
@@ -162,6 +164,7 @@ $(document).ready(function () {
             autoSaveTimeout = null;
         }
         tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
+        groupsFunc.apply(tab);
         autoSave.apply(tab, [true]);
     });
 

@@ -393,7 +393,10 @@ $(document).ready(function () {
             }
         });
         tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
+        autoSaveTimeout = 0;
+        validateChanged.apply(tab);
         autoSave.apply(tab, [true]);
+        autoSaveTimeout = null;
     });
 
     var isLoading = false;
