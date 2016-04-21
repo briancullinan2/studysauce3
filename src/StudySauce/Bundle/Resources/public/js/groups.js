@@ -31,7 +31,7 @@ $(document).ready(function () {
     body.on('click', '[id^="groups"] a[href="#add-new-ss_group"]', function (evt) {
         evt.preventDefault();
         if($(this).parents('.panel-pane').is('[id^="groups-"]')) {
-            var row = $(this).parents('.results').find('.ss_group-row:not(.template)');
+            var row = $(this).parents('.panel-pane').find('.group-edit .ss_group-row:not(.template)');
             var groupId = ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1];
             body.one('show', '#groups-group0', function () {
                 $(this).find('.ss_group-row:not(.template) .parent select').val(groupId);
@@ -60,8 +60,12 @@ $(document).ready(function () {
                     text: row.find('.name input').val(),
                     0: '(' + userCount + ' users)'
                 };
-                $(this).find('.pack-row .groups label > input.selectized')[0].selectize.addOption(option);
-                $(this).find('.pack-row .groups label > input.selectized').data('entities', ['ss_group-' + groupId]).data('ss_group', [option])[0].selectize.setValue('ss_group-' + groupId);
+                var groupsField = $(this).find('.pack-row .groups label > input.selectized');
+                groupsField.data('confirm', false);
+                groupsField[0].selectize.addOption(option);
+                groupsField.data('entities', ['ss_group-' + groupId]).data('ss_group', [option]);
+                groupsField[0].selectize.setValue('ss_group-' + groupId)
+                groupsField.data('confirm', true);
             }
             if(row.find('.id img:not(.default)').length > 0) {
                 $(this).find('.pack-row:not(.template) .id img').attr('src', row.find('.id img').attr('src')).removeClass('default');

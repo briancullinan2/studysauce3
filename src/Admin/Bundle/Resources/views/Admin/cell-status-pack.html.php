@@ -12,8 +12,11 @@ use StudySauce\Bundle\Entity\Pack;
             if ($pack->getProperty('schedule') > new \DateTime()) { ?>
                 <option value="GROUP" <?php print (!empty($pack->getId()) && $pack->getStatus() == 'GROUP' ? 'selected="selected"' : ''); ?>>Pending (<?php print $pack->getProperty('schedule')->format('m/d/Y'); ?>)</option>
             <?php }
-            else { ?>
+            else if (!empty($pack->getProperty('schedule'))) { ?>
                 <option value="GROUP" <?php print (!empty($pack->getId()) && $pack->getStatus() == 'GROUP' ? 'selected="selected"' : ''); ?>>Published</option>
+            <?php }
+            else { ?>
+                <option value="GROUP" <?php print (!empty($pack->getId()) && $pack->getStatus() == 'GROUP' ? 'selected="selected"' : ''); ?>>Publish</option>
             <?php }
 
             if ($app->getUser()->hasRole('ROLE_ADMIN') && $app->getUser()->getEmail() == 'brian@studysauce.com') {

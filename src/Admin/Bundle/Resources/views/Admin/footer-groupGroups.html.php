@@ -8,7 +8,7 @@ use StudySauce\Bundle\Entity\Pack;
     <a href="#save-<?php print $table; ?>" class="more">Save</a>
     <div class="packs">
         <a href="<?php print $view['router']->generate('packs_new'); ?>" class="big-add">Create
-            <span>+</span> new pack</a><br/>
+            <span>+</span> new pack</a><br/><br/>
         <?php
         /** @var Group[] $ss_group */
         if (isset($searchRequest['ss_group-id']) && isset($ss_group[0])) {

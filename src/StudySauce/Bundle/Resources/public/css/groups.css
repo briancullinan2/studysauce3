@@ -116,6 +116,7 @@
     margin-top:-9px;
 }
 
+.group-edit .results .ss_group-row.read-only .subgroup,
 .group-edit .results .ss_group-row.read-only [class*="actions"] {
     display:none;
 }
@@ -139,7 +140,7 @@
     width: 40%;
     padding-left:150px;
     margin-left:10%;
-    margin-right:-2px;
+    margin-right:5%;
     padding-right:2px;
 }
 
@@ -345,12 +346,6 @@
 .group-edit .ss_group-row.edit ~ .highlighted-link.ss_group
 {
     visibility: visible;
-}
-
-.group-edit .pack-row .members .big-add,
-.group-edit .ss_group-row .big-add
-{
-    float:none;
 }
 
 .group-edit .ss_group-row.read-only .pack-icon

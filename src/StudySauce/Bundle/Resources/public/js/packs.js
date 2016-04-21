@@ -493,7 +493,7 @@ $(document).ready(function () {
     function setupPackEditor() {
         autoSaveTimeout = 0;
         var tab = $(this).closest('.panel-pane');
-        validateChanged.apply(tab.find('.pack-row'));
+        validateChanged.apply(tab.find('.pack-row:not(.template)'));
         var cardRows = tab.find('.card-row:not(.removed):not(.template)');
 
         setTimeout(function () {
@@ -512,6 +512,8 @@ $(document).ready(function () {
         }, 50);
 
         autoSaveTimeout = null;
+        var select = tab.find('.pack-row:not(.template) .status select');
+        select.data('oldValue', select.val());
     }
 
     body.on('click', '.panel-pane[id^="packs-"] a[href="#edit-pack"]', setupPackEditor);
@@ -572,17 +574,26 @@ $(document).ready(function () {
         }
     });
 
-    function savePublish(publish) {
-        row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
-        row.find('.status select').data('publish', publish).val('GROUP');
-        row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-        row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
-    }
-
     body.on('change', '[id^="packs-"] .status select', function () {
+        var that = $(this);
         if($(this).val() == 'GROUP') {
-            var row = $(this).parents('.pack-row');
-            showPublishDialog.apply(this, [row.find('.name input').val(), row.find('.status select').data('publish')])(savePublish);
+            var row = that.parents('.pack-row');
+
+            body.one('hidden.bs.modal', '#pack-publish', function () {
+                that.val(that.data('oldValue'));
+                if(that.val() != 'GROUP') {
+                    that.trigger('change');
+                }
+            });
+            showPublishDialog.apply(this, [row.find('.name input').val(), that.data('publish')])(function (publish) {
+                row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
+                row.find('.status select').data('publish', publish).val('GROUP');
+                row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
+                row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
+            });
+        }
+        else {
+            that.data('oldValue', that.val());
         }
     });
 

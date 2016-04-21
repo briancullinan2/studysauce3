@@ -665,7 +665,7 @@ class AdminController extends Controller
             'new' => false,
             'ss_group-id' => $g->getId(),
             'tables' => [
-                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']],
+                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'subgroup' => [], 'actions' => ['deleted']],
                 'pack' => ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */]],
             'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks'],
             'footers' => ['ss_group' => 'groupGroups'],
