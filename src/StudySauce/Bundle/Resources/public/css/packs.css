@@ -601,6 +601,7 @@
     margin-right: -2px;
     left: 50%;
     margin-top: -9px;
+    margin-left:2px;
 }
 
 [id^="packs-"] .results .card-row.read-only [class*="actions"],

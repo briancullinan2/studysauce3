@@ -109,6 +109,11 @@ $(document).ready(function () {
                         : data.ss_group[0].id;
                     tab.closest('.panel-pane').attr('id', 'groups-group' + id);
                     window.activateMenu(Routing.generate('groups_edit', {group: id}));
+                    // TODO: make this a part of some sort of WPF style property updating notification
+                    // update id in results
+                    var results = tab.closest('.panel-pane').find('.group-list .results').data('request');
+                    results['parent-ss_group-id'] = id;
+                    results['requestKey'] = null;
                 }
 
                 if(close) {
