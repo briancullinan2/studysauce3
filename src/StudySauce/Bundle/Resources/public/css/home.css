@@ -41,6 +41,26 @@
     float: left;
 }
 
+.user-shuffle .pack-row .titleNew {
+    width:80%;
+}
+
+.user-shuffle .pack-row .titleNew strong {
+    color:#CC2211;
+}
+
+.user-shuffle .pack-row .retention {
+    width:20%;
+}
+
+.user-shuffle .pack-row .retention label {
+    text-align: right;
+}
+
+.user-shuffle .results .pack-row > label.checkbox {
+    display:none;
+}
+
 .study-mastery {
     position:relative;
 }

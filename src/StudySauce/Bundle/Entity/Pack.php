@@ -182,6 +182,15 @@ class Pack
         return '(' . $this->getCards()->count() . ' cards)';
     }
 
+    public function isNewForChild(User $c)
+    {
+        return $this->getUserPacks()->filter(function (UserPack $up) use ($c) {
+            return $up->getUser() == $c && !empty($up->getDownloaded()) && !$up->getRemoved();})->count() == 0
+        || $c->getResponses()->filter(function (Response $r) {
+            return $r->getCard()->getPack() == $this && $r->getCreated() <= new \DateTime();
+        })->count() == 0;
+    }
+
     /**
      * Constructor
      */
@@ -696,4 +705,5 @@ class Pack
     {
         return $this->getStatus() == 'DELETED';
     }
+
 }

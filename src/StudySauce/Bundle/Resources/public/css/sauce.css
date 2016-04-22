@@ -806,7 +806,7 @@ label
     text-align: left;
     display:block;
     margin:5px 0;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .selectize-input,

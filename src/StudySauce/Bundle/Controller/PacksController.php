@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use StudySauce\Bundle\Command\CronSauceCommand;
@@ -663,24 +664,23 @@ class PacksController extends Controller
      * @param User $user
      * @return mixed
      */
-    function getRetention(Pack $pack, User $user) {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
+    public static function getRetention(Pack $pack, User $user) {
         $intervals = [1, 2, 4, 7, 14, 28, 28 * 3, 28 * 6, 7 * 52];
         // if a card hasn't been answered, return the next card
         $cards = $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->toArray();
+        $responses = $user->getResponsesForPack($pack);
         $result = [];
         foreach($cards as $c) {
             /** @var Card $c */
-            /** @var Response[] $responses */
-            $responses = $orm->getRepository('StudySauceBundle:Response')->findBy(['card' => $c, 'user' => $user], ['created' => 'ASC']);
+            /** @var Response[] $cardResponses */
+            $cardResponses = $responses->matching(Criteria::create()->where(Criteria::expr()->eq('card', $c)))->toArray();
+            usort($cardResponses, function (Response $r1, Response $r2) {return $r1->getCreated()->getTimestamp() - $r2->getCreated()->getTimestamp();});
             /** @var \DateTime $last */
             $last = null;
             $i = 0;
             $correctAfter = false;
             $max = null;
-            foreach($responses as $r) {
+            foreach($cardResponses as $r) {
                 if ($r->getCorrect()) {
                     // If it is in between time intervals ignore the response
                     while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {

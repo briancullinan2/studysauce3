@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use FOS\UserBundle\Model\GroupInterface;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
@@ -227,6 +228,13 @@ class User extends BaseUser implements EncoderAwareInterface
             $users[] = $u->getUser();
         }
         return $users;
+    }
+
+    public function getResponsesForPack(Pack $pack)
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->in('card', $pack->getCards()->toArray()));
+        return $this->responses->matching($criteria) ?: new ArrayCollection();
     }
 
     /**

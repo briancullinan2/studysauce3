@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -65,7 +66,7 @@ class Card
     protected $recurrence = ''; // default is 1 day, 2 day 4 day, 1 week, 2 week, 4 week
 
     /**
-     * @ORM\OneToMany(targetEntity="Response", mappedBy="card", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Response", mappedBy="card", fetch="EXTRA_LAZY", indexBy="user")
      * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $responses;
@@ -81,15 +82,11 @@ class Card
      */
     protected $deleted = false;
 
-    /**
-     * @param User $user
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getResponsesForUser($user)
+    public function getResponsesForUser(User $user)
     {
-        return $this->getResponses()->filter(function (Response $r) use ($user) {
-            return $r->getUser() == $user;
-        });
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('user', $user));
+        return $this->responses->matching($criteria) ?: new ArrayCollection();
     }
 
     public function getIndex() {

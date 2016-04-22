@@ -12,7 +12,7 @@ list($users, $packs) = $ss_group->getUserPacksRecursively();
 
 <div>
     <label><?php if(count($ss_group->getSubgroups()->toArray()) == 0) {
-            print 'No subgroups';
+            print '0 subgroups';
         }
         else {
             print $ss_group->getSubgroups()->map(function (Group $g) {
@@ -31,5 +31,4 @@ list($users, $packs) = $ss_group->getUserPacksRecursively();
                     return !$p->getDeleted();
                 })->count(); // for self ?></span></a>
     <?php } ?>
-
 </div>

@@ -121,9 +121,10 @@ class AdminController extends Controller
      * @param $tableName
      * @param array $request
      * @param array $joins
+     * @param bool $isDefault
      * @return string
      */
-    private static function searchBuilder(QueryBuilder $qb, $table, $tableName, $request, &$joins = [])
+    private static function searchBuilder(QueryBuilder $qb, $table, $tableName, $request, &$joins = [], $isDefault = false)
     {
         /** @var QueryBuilder $qb $f */
         /** @var string $op */
@@ -148,7 +149,7 @@ class AdminController extends Controller
 
                 // by default, columns searching on the same term are ORed together
                 list($searchField, $search) = self::getSearchValue($field, $k, $f, $table, $request);
-                if ($request == self::$defaultSearch) {
+                if ($isDefault) {
                     $searchField .= '_default';
                 }
                 else {
@@ -338,7 +339,7 @@ class AdminController extends Controller
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
             $joins = [];
             $where = self::searchBuilder($qb, $table, $table, $searchRequest, $joins);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest) + ['tables' => [$table => self::$defaultTables[$table]]], $joins);
+            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest) + ['tables' => [$table => self::$defaultTables[$table]]], $joins, true);
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }
