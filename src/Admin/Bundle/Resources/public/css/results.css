@@ -583,7 +583,6 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .tiles [class*="-row"] .packList label {
     color: #BBB;
     font-weight: normal;
-    font-size: 14px;
 }
 
 .tiles [class*="-row"] [class*="actions"] {
