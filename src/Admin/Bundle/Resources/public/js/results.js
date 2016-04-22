@@ -420,8 +420,11 @@ $(document).ready(function () {
             $.ajax({
                 url: that.data('action'),
                 type: 'GET',
-                dataType: 'json',
-                success: function () {
+                dataType: that.data('type') || 'json',
+                success: function (data) {
+                    if(that.data('type') == 'text') {
+                        loadContent.apply(that.parents('.results'), [data]);
+                    }
                     that.parents('.results').trigger('resulted');
                 }
             });

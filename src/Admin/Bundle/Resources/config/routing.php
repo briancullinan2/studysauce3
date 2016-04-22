@@ -33,31 +33,6 @@ $collection->add(
 );
 
 $collection->add(
-    'results',
-    new Route(
-        '/results/{_format}',
-        ['_controller' => 'AdminBundle:Results:index', '_format' => 'index'],
-        ['_format' => DASHBOARD_VIEWS]
-    )
-);
-
-$collection->add(
-    'results_callback',
-    new Route(
-        '/results/list',
-        ['_controller' => 'AdminBundle:Results:index', '_format' => 'tab']
-    )
-);
-
-$collection->add(
-    'results_user',
-    new Route(
-        '/results/user',
-        ['_controller' => 'AdminBundle:Results:user', '_format' => 'tab']
-    )
-);
-
-$collection->add(
     'remove_user',
     new Route(
         '/command/remove/user',

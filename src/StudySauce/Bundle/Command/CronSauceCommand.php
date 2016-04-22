@@ -175,7 +175,11 @@ EOF
 
             /** @var Pack[] $difference */
             $difference = [];
+            $unique = [];
             foreach($notify as list($p, $c)) {
+                if(!in_array($p->getId(), $unique)) {
+                    $unique[] = $p->getId();
+                }
                 if (!in_array($p->getId(), $u->getProperty('notified') ?: [])) {
                     $difference[] = $p;
                 }
@@ -217,11 +221,11 @@ EOF
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
                             $controller->sendNotification($groupInvite->getName() . ' added a new pack, "'
-                                . $alerting[0]->getTitle() . '"!', count($notify), str_replace([' ', '<', '>'], '', $d));
+                                . $alerting[0]->getTitle() . '"!', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
                             $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
-                                . '" on Study Sauce!', count($notify), str_replace([' ', '<', '>'], '', $d));
+                                . '" on Study Sauce!', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                     }
                 }

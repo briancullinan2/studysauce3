@@ -376,7 +376,7 @@ a[href="#subtract-entity"] {
 }
 
 a[href="#insert-entity"]:before {
-    font-size:50px;
+    font-size:40px;
     line-height: 30px;
     vertical-align: middle;
     transition: background-color ease-in-out .15s;
@@ -404,21 +404,25 @@ a[href="#insert-entity"]:before {
 }
 
 a[href="#insert-entity"]:before {
-    color: #EEE;
+    color: #FFF;
 }
 
+.entity-search .checkbox:hover a[href="#insert-entity"]:before,
 .entity-search .entity-title:hover + a[href="#insert-entity"]:before,
 a[href="#insert-entity"]:hover:before {
     color: #555;
 }
 
 a[href="#subtract-entity"]:before {
-    color: #EEE;
+    color: #FFF;
+    opacity: 0;
 }
 
+.entity-search .checkbox:hover a[href="#subtract-entity"]:before,
 .entity-search .entity-title:hover + a[href="#subtract-entity"]:before,
 a[href="#subtract-entity"]:hover:before {
     color: #555;
+    opacity: 1;
 }
 
 .entity-search .entity-name {

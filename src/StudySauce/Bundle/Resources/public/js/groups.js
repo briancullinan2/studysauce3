@@ -212,10 +212,9 @@ $(document).ready(function () {
             id = that.val(),
             packName = that[0].selectize.options[id].text;
 
-        showPublishDialog(packName, null)(function (publish) {
-            that[0].selectize.setValue('', true);
-            isSettingSelectize = false;
+        that[0].selectize.setValue('', true);
 
+        showPublishDialog(packName, null)(function (publish) {
             // save packs
             loadingAnimation(tab.find('a[href="#save-pack"]'));
 
@@ -244,6 +243,8 @@ $(document).ready(function () {
                 }
             });
         });
+
+        isSettingSelectize = false;
     });
 
     body.on('change', '[id^="groups-"] .pack-row .members input.selectized', function () {

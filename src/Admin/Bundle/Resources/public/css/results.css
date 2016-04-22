@@ -165,57 +165,6 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     cursor: default;
 }
 
-.results > [class*="-row"].expandable > *:first-child,
-table.results.expandable > tbody > tr:nth-child(odd) > td:first-child
-{
-    position:relative;
-    padding-left: 30px;
-}
-
-.results > [class*="-row"].expandable > *:first-child:before,
-table.results.expandable > tbody > tr:nth-child(odd) > td:first-child:before
-{
-    transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=-3);
-    transform-origin: center center;
-    -webkit-transform-origin: center center;
-    -moz-transform-origin: center center;
-    -ms-transform-origin: center center;
-    -o-transform-origin: center center;
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 50%;
-    margin-top: -10px;
-    left: 5px;
-    background: url(../../studysauce/images/menu_new_half.png) no-repeat -4px -3px transparent;
-    height: 18px;
-    width: 18px;
-    cursor: pointer;
-    transition: transform ease-in-out .15s, -webkit-transform ease-in-out .15s, -moz-transform ease-in-out .15s, -ms-transform ease-in-out .15s, -o-transform ease-in-out .15s, filter ease-in-out .15s;
-}
-
-.results > [class*="-row"].expandable.invalid > *:first-child:before
-{
-    background: #CC2211;
-    color:white;
-    content: "!";
-    transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -moz-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
-    text-align: center;
-    border-radius: 100%;
-    padding: 2px;
-    font-weight: bold;
-}
-
 .results [class*="-row"].read-only .highlighted-link > *
 {
     margin: -3px 0;

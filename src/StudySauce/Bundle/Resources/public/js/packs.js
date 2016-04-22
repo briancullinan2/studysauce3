@@ -559,24 +559,6 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '#pack-publish input[name="schedule"]', function () {
-        var dialog = $('#pack-publish');
-        if(dialog.find('input[name="schedule"]').datetimepicker('getValue') <= new Date()) {
-            dialog.find('input[value="now"]').prop('checked', true);
-        }
-        else {
-            dialog.find('input[value="later"]').prop('checked', true);
-        }
-    });
-
-    body.on('change', '#pack-publish input[name="date"]', function () {
-        var dialog = $('#pack-publish'),
-            input = dialog.find('input[name="schedule"]');
-        if(dialog.find('input[value="now"]').is(':checked')) {
-            input.datetimepicker('setOptions', {value: new Date()})
-        }
-    });
-
     body.on('change', '[id^="packs-"] .status select', function () {
         var that = $(this);
         if($(this).val() == 'GROUP') {

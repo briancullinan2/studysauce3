@@ -48,7 +48,8 @@ $view['slots']->start('body'); ?>
                     $isNew[] = 'card';
                 }
                 $tables = [
-                    'tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']],
+                    'tables' => ['pack', 'card'],
+                    'expandable' => ['card' => ['preview']],
                     'pack-id' => $entity->getId(),
                     'headers' => ['pack' => 'packPacks'],
                     'new' => $isNew,
