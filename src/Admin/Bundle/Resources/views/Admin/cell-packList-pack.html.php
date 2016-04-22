@@ -24,8 +24,7 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
 ?>
 
 <div>
-    <label><?php print count($groups); ?> groups / <?php print array_sum(array_map(function (Group $g) {return $g->getUsers()->count();}, $groups)) + count($diffUsers); ?> users
-    <span><?php print $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(); ?> cards</span></label>
+    <label><?php print count($groups); ?> groups / <?php print array_sum(array_map(function (Group $g) {return $g->getUsers()->count();}, $groups)) + count($diffUsers); ?> users / <?php print $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(); ?> cards</label>
     <?php
     foreach ($groups as $p) {
         /** @var Group $p */

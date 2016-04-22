@@ -11,7 +11,7 @@ if(empty($answers)) {
 
 ?>
 <label class="input correct">
-    <input type="text" name="correct" placeholder="for display only" value="<?php print $view->escape(!empty($card->getCorrect()) ? $view->escape($card->getCorrect()->getValue()) : trim($card->getResponseContent())); ?>" />
+    <input type="text" name="correct" placeholder="Answer" value="<?php print $view->escape(!empty($card->getCorrect()) ? $view->escape($card->getCorrect()->getValue()) : trim($card->getResponseContent())); ?>" />
 </label>
 <div class="correct type-mc">
     <div class="radios">
@@ -20,7 +20,7 @@ if(empty($answers)) {
         <?php } ?>
     </div>
     <label class="input">
-        <textarea name="answers" placeholder="one per line"><?php print implode("\n", $answers); ?></textarea>
+        <textarea name="answers" placeholder="Answers"><?php print implode("\n", $answers); ?></textarea>
     </label>
 </div>
 <label class="radio correct type-tf">
@@ -34,5 +34,5 @@ if(empty($answers)) {
     <span>False</span>
 </label>
 <label class="input correct type-sa">
-    <input type="text" name="correct" placeholder="fill in the blank" value="<?php print $view->escape(!empty($card->getCorrect()) ? trim($card->getCorrect()->getValue(), '$^') : ''); ?>" />
+    <input type="text" name="correct" placeholder="Answer" value="<?php print $view->escape(!empty($card->getCorrect()) ? trim($card->getCorrect()->getValue(), '$^') : ''); ?>" />
 </label>
