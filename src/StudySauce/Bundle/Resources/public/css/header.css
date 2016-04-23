@@ -28,6 +28,21 @@
     margin:0;
 }
 
+.header .selectize-dropdown {
+    position: fixed;
+    right: 0;
+    top: 40px !important;
+    bottom: 0;
+    left: auto !important;
+    width: 500px !important;
+    border: none;
+    margin-top: 0;
+}
+
+.header .selectize-dropdown .selectize-dropdown-content {
+    max-height: 100%;
+}
+
 #site-name
 {
     font-family: 'Ubuntu',Arial,sans-serif;

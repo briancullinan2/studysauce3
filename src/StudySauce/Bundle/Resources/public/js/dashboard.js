@@ -725,10 +725,10 @@ $(document).ready(function () {
             window.activateMenu(Routing.generate('home_user', {user: id}));
         }
         else if(table == 'ss_group') {
-            window.activateMenu(Routing.generate('group_edit', {group: id}));
+            window.activateMenu(Routing.generate('groups_edit', {group: id}));
         }
         else if(table == 'pack') {
-            window.activateMenu(Routing.generate('pack_edit', {pack: id}));
+            window.activateMenu(Routing.generate('packs_edit', {pack: id}));
         }
     });
 

@@ -32,7 +32,7 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <div class="study-top">
             <div class="user-shuffle">
-                <h2>Today's goal</h2>
+                <h2>Today's goal <?php print ($user->getId() != $id ? ('(' . $first . ' ' . $last . ')') : ''); ?></h2>
                 <a href="#shuffle-card" class="centerized">&nbsp;</a>
             <?php
             $tables = [
