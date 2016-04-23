@@ -70,6 +70,7 @@
     position: relative;
     vertical-align: middle;
     height:30px;
+    width:5%;
 }
 
 .study-mastery .pack-row > label.checkbox:nth-last-child(1),
@@ -91,6 +92,14 @@
     width:auto;
     max-height: 100%;
     max-width: 100%;
+}
+
+.study-mastery .pack-row .title {
+    width:20%;
+}
+
+.study-mastery .pack-row .packMastery label {
+    background-color:#09B;
 }
 
 .study-mastery .pack-row .cardMastery {

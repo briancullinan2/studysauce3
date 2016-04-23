@@ -26,4 +26,4 @@ else {
 }
 
 ?>
-<label style="padding-left:<?php print $mastery; ?>%">&nbsp;<?php print $mastery; ?></label>
+<label style="padding-left:<?php print $mastery; ?>%;width:<?php print $mastery; ?>%;">&nbsp;<?php print $mastery; ?></label>
