@@ -199,6 +199,16 @@ class Pack
                 ->count() == 0;
     }
 
+    public function getUserById($id)
+    {
+        /** @var UserPack $up */
+        $up = $this->userPacks->filter(function (UserPack $up) use ($id) {return $up->getUser()->getId() == $id;})->first();
+        if(empty($up)) {
+            return null;
+        }
+        return $up->getUser();
+    }
+
     /**
      * Constructor
      */
