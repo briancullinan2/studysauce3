@@ -28,7 +28,7 @@ $view['slots']->start('javascripts'); ?>
 <?php $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="home<?php print (!empty($id) ? ('-user' . $id) : ''); ?>">
+    <div class="panel-pane" id="home<?php print (!empty($id) && $user->getId() != $id ? ('-user' . $id) : ''); ?>">
         <div class="pane-content">
             <div class="study-top">
             <div class="user-shuffle">
