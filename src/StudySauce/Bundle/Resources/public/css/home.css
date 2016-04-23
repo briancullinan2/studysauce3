@@ -93,10 +93,6 @@
     max-width: 100%;
 }
 
-.study-mastery .pack-row .title {
-    margin-left:10%;
-}
-
 .study-mastery .pack-row .cardMastery {
     top: 0;
     right: 0;
@@ -128,7 +124,7 @@
 
 a[href="#shuffle-card"] {
     position:absolute;
-    padding-top:30%;
+    padding-bottom:30%;
     width:30%;
     display:block;
     background: url(../images/shuffle_btn.png) no-repeat 0 0 transparent;

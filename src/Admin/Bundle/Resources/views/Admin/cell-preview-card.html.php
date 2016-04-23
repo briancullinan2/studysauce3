@@ -23,7 +23,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
             <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><?php print $view->escape($content); ?></div>
+                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
             <?php } ?>
         </div>
         <div class="preview-tap">Tap to see answer</div>
@@ -33,12 +33,12 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
             <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><?php print $view->escape($content); ?></div>
+                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
             <?php } ?>
         </div>
         <div class="preview-inner">
             <div class="preview-correct">Correct answer:</div>
-            <div class="preview-content"><?php print $view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getContent() : ''); ?></div>
+            <div class="preview-content"><div><?php print $view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getContent() : ''); ?></div></div>
         </div>
         <div class="preview-wrong">✘</div>
         <div class="preview-guess">Did you guess correctly?</div>
@@ -51,13 +51,13 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
             <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><?php print $view->escape($content); ?></div>
+                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
             <?php } ?>
         </div>
-        <div class="preview-response"><?php print (count($answers) > 0 ? $view->escape($answers[0]->getContent()) : ''); ?></div>
-        <div class="preview-response"><?php print (count($answers) > 1 ? $view->escape($answers[1]->getContent()) : ''); ?></div>
-        <div class="preview-response"><?php print (count($answers) > 2 ? $view->escape($answers[2]->getContent()) : ''); ?></div>
-        <div class="preview-response"><?php print (count($answers) > 3 ? $view->escape($answers[3]->getContent()) : ''); ?></div>
+        <div class="preview-response"><div><?php print (count($answers) > 0 ? $view->escape($answers[0]->getContent()) : ''); ?></div></div>
+        <div class="preview-response"><div><?php print (count($answers) > 1 ? $view->escape($answers[1]->getContent()) : ''); ?></div></div>
+        <div class="preview-response"><div><?php print (count($answers) > 2 ? $view->escape($answers[2]->getContent()) : ''); ?></div></div>
+        <div class="preview-response"><div><?php print (count($answers) > 3 ? $view->escape($answers[3]->getContent()) : ''); ?></div></div>
     </div>
 <?php } ?>
 <?php if ($card->getResponseType() == 'tf' || empty($card->getId())) { ?>
@@ -66,7 +66,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
             <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><?php print $view->escape($content); ?></div>
+                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
             <?php } ?>
         </div>
         <div class="preview-false">False</div>
@@ -80,7 +80,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
             <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><?php print $view->escape($content); ?></div>
+                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
             <?php } ?>
         </div>
         <label class="input"><input type="text" value="<?php print (!empty($isImage) || !empty($isAudio) ? $view->escape($content) : 'Type your answer'); ?>"/></label>
@@ -92,12 +92,12 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
             <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
             <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
             <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><?php print $view->escape($content); ?></div>
+                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
             <?php } ?>
         </div>
         <div class="preview-inner">
             <div class="preview-correct">Correct answer:</div>
-            <div class="preview-content"><?php print $view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getContent() : ''); ?></div>
+            <div class="preview-content"><div><?php print $view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getContent() : ''); ?></div></div>
         </div>
     </div>
 <?php } ?>

@@ -28,17 +28,17 @@ $view['slots']->start('javascripts'); ?>
 <?php $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="home">
+    <div class="panel-pane" id="home<?php print (!empty($id) ? ('-user' . $id) : ''); ?>">
         <div class="pane-content">
             <div class="study-top">
             <div class="user-shuffle">
                 <h2>Today's goal</h2>
-                <a href="#shuffle-card" class="centerize">&nbsp;</a>
+                <a href="#shuffle-card" class="centerized">&nbsp;</a>
             <?php
             $tables = [
                 'tables' => ['pack' => ['titleNew' => ['title'], 'retention', ['user', 'userPacks.user']], 'ss_user' => ['id']],
                 //'user-ss_user-id' => 'NULL',
-                'ss_user-id' => $user->getId(),
+                'ss_user-id' => $id,
                 'headers' => false,
                 'count-pack' => 0,
                 'count-ss_user' => -1,
@@ -53,7 +53,7 @@ $view['slots']->start('body'); ?>
                 $tables = [
                     'tables' => ['ss_user' => ['mastery' => 'id']],
                     //'user-ss_user-id' => 'NULL',
-                    'ss_user-id' => $user->getId(),
+                    'ss_user-id' => $id,
                     'headers' => false,
                     'count-pack' => 0,
                     'count-ss_user' => -1,
@@ -67,9 +67,9 @@ $view['slots']->start('body'); ?>
                 <h2>Study mastery report</h2>
                 <?php
                 $tables = [
-                    'tables' => ['pack' => ['id', 'title', 'retention', ['user', 'userPacks.user'], 'cardMastery'], 'ss_user' => ['id']],
+                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['user', 'userPacks.user'], 'cardMastery'], 'ss_user' => ['id']],
                     //'user-ss_user-id' => 'NULL',
-                    'ss_user-id' => $user->getId(),
+                    'ss_user-id' => $id,
                     'headers' => false,
                     'count-pack' => 0,
                     'count-ss_user' => -1,

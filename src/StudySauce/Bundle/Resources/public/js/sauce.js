@@ -539,38 +539,16 @@ $.datepicker._updateDatepicker = function( inst ) {
 };
 
 function centerize() {
-    var text = $('<textarea></textarea>')
-        .css('padding', 0)
-        .css('margin', 0)
-        .css('position', 'fixed')
-        .css('top', 0)
-        .css('left', -10000)
-        .css('opacity', '0')
-        .css('height', 1)
-        .css('border', 0)
-        .css('width', 1).appendTo('body');
-
     $(this).each(function () {
         if(!($(this).is('.centerized'))) {
             $(this).addClass('centerized');
         }
-        $(this).css('padding-top', '');
-        text.val($(this).text());
-        text.width($(this).outerWidth() + 18);
-        text.css('font-size', $(this).css('font-size'));
-        if ($(this).is('img')) {
-            if ($(this).parent().height() > $(this).height()) {
-                $(this).css('padding-top', (($(this).parent().height() - $(this).height()) / 2) + 'px')
-            }
-        }
-        else {
-            if (text[0].scrollHeight < $(this).height()) {
-                $(this).css('padding-top', (($(this).height() - text[0].scrollHeight) / 2) + 'px')
-            }
+        $(this).css('margin-top', '');
+        var myheight = $(this).outerHeight(false);
+        if ($(this).parent().height() > myheight) {
+            $(this).css('margin-top', (($(this).parent().height() - myheight) / 2) + 'px')
         }
     });
-
-    text.remove();
 }
 
 function loadingAnimation(that)

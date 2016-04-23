@@ -5,6 +5,8 @@ use StudySauce\Bundle\Entity\User;
 
 /** @var Pack $pack */
 /** @var User $user */
-$user = $app->getUser(); ?>
+$user = $app->getUser();
+$isNew = $pack->isNewForChild($user);
+?>
 
-<label><?php print ($pack->isNewForChild($user) ? '<strong>New </strong>' : ''); ?><span><?php print $view->escape($pack->getTitle()); ?></span></label>
+<label><?php print ($isNew ? '<strong>New </strong>' : ''); ?><span><?php print $view->escape($pack->getTitle()); ?></span></label>

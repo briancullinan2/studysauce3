@@ -88,6 +88,14 @@ $collection->add(
     )
 );
 $collection->add(
+    'home_user',
+    new Route(
+        '/home/{user}/{_format}',
+        ['_controller' => 'StudySauceBundle:Home:index', '_format' => 'index', 'user' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'user' => '[0-9]*']
+    )
+);
+$collection->add(
     'app_links',
     new Route(
         '/apple-app-site-association',

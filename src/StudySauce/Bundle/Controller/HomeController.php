@@ -18,12 +18,15 @@ class HomeController extends Controller
 {
     /**
      * @param Request $request
+     * @param User $user
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, User $user = null)
     {
         /** @var User $user */
-        $user = $this->getUser();
+        if(empty($user)) {
+            $user = $this->getUser();
+        }
 
         $templateVars = ['_format' => $request->get('_format')];
 

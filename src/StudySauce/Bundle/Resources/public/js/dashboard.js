@@ -714,6 +714,24 @@ $(document).ready(function () {
         isSettingSelectize = false;
     }
 
+    body.on('change', '.header input[name="search"]', function () {
+        var that = $(this);
+        var value = that.val();
+        var table = value.split('-')[0];
+        var id = parseInt(value.split('-')[1]);
+        that[0].selectize.setValue('');
+        that.blur();
+        if(table == 'ss_user') {
+            window.activateMenu(Routing.generate('home_user', {user: id}));
+        }
+        else if(table == 'ss_group') {
+            window.activateMenu(Routing.generate('group_edit', {group: id}));
+        }
+        else if(table == 'pack') {
+            window.activateMenu(Routing.generate('pack_edit', {pack: id}));
+        }
+    });
+
     function updateRows (toField, value, item) {
         isSettingSelectize = true;
         var tableName = value.split('-')[0];

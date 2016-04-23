@@ -37,10 +37,10 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         if($app->getRequest()->get('_format') != 'funnel') { ?>
             <nav>
                 <ul class="main-menu">
+                    <li><a href="<?php print $view['router']->generate('home'); ?>"><span>&nbsp;</span>Home</a></li>
                     <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
                     <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
                     <?php /*
-                    <li><a href="<?php print $view['router']->generate('home'); ?>"><span>&nbsp;</span>Home</a></li>
                     <li><a href="<?php print $view['router']->generate('command'); ?>"><span>&nbsp;</span>Users</a></li>
                     <li><a href="<?php print $view['router']->generate('import'); ?>"><span>&nbsp;</span>Import</a></li>
                     <li><a href="<?php print $view['router']->generate('emails'); ?>"><span>&nbsp;</span>Emails</a></li>
@@ -59,7 +59,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
                     </ul>
                 <?php } ?>
-                <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode([
+                <label class="input"><input type="text" name="search" data-confirm="false" data-tables="<?php print $view->escape(json_encode([
                         'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
                         'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
                         'ss_group' => ['name', 'userCountStr', 'description', 'id', 'deleted']])); ?>" placeholder="Search" /></label>

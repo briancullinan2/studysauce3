@@ -207,19 +207,19 @@ $(document).ready(function () {
         }
 
         // insert content and multiple choice answers
-        template.find('.preview-content').text(row.find('.content input:visible').val());
+        template.find('.preview-content span').text(row.find('.content input:visible').val());
         var answers = row.find('.correct.type-mc:visible textarea').val();
         if (answers != null) {
             answers = answers.split("\n");
-            template.find('.preview-response').each(function () {
+            template.find('.preview-response div').each(function () {
                 $(this).text(answers[$(this).parent().find('.preview-response').index($(this))]);
             });
         }
-        template.filter('.preview-answer').find('.preview-inner .preview-content').text(row.find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
+        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
 
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         // center some preview fields
-        centerize.apply(row.find(' + .expandable .preview-content, + .expandable .preview-response, + .expandable img, .pack-icon img'));
+        centerize.apply(row.find(' + .expandable .preview-content div, + .expandable .preview-response div, + .expandable img, .pack-icon img'));
     }
 
     body.on('click', '[id^="packs-"] .preview-play .play', function () {

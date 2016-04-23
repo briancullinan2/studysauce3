@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\GroupInterface;
 use StudySauce\Bundle\Entity\UserPack;
@@ -184,11 +185,18 @@ class Pack
 
     public function isNewForChild(User $c)
     {
-        return $this->getUserPacks()->filter(function (UserPack $up) use ($c) {
-            return $up->getUser() == $c && !empty($up->getDownloaded()) && !$up->getRemoved();})->count() == 0
-        || $c->getResponses()->filter(function (Response $r) {
-            return $r->getCard()->getPack() == $this && $r->getCreated() <= new \DateTime();
-        })->count() == 0;
+        return $this->userPacks->matching(Criteria::create()
+            ->where(Criteria::expr()
+                ->eq('user', $c))
+            ->andWhere(Criteria::expr()
+                ->neq('downloaded', null))
+            ->andWhere(Criteria::expr()
+                ->neq('removed', true)))
+            ->count() == 0 ||
+            $c->getResponsesForPack($this)->matching(Criteria::create()
+                ->where(Criteria::expr()
+                    ->lte('created', new \DateTime())))
+                ->count() == 0;
     }
 
     /**
