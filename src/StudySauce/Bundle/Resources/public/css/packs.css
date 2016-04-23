@@ -177,6 +177,7 @@
     width: 20%;
 }
 
+[id^="packs-"] header.card label:nth-child(1),
 [id^="packs-"] .card-row .id {
     width: 25%;
 }
@@ -211,8 +212,13 @@
     width:5%;
 }
 
+[id^="packs-"] header.card label:nth-child(2),
 [id^="packs-"] .card-row > *:nth-child(2) {
     width: 35%;
+}
+
+[id^="packs-"] .results .card-row > * {
+    vertical-align: top;
 }
 
 [id^="packs-"] .card-row .correct.type-tf {
@@ -238,6 +244,7 @@
     display:none;
 }
 
+[id^="packs-"] header.card label:nth-child(3),
 [id^="packs-"] .card-row > .correct,
 [id^="packs-"] .card-row[class*="type"].type-tf .correct
 {

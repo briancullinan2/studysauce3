@@ -111,21 +111,24 @@ $(document).ready(function () {
         packsFunc.apply(tab.find('.card-row:not(.template):not(.removed)'));
     }
 
-    body.on('focus blur', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
-        var row = $(this).parents('.card-row');
-        var that = row.find('.correct textarea');
-        that.css('height', '');
-        if (row.find('.correct :focus, .correct .radios :hover').length > 0) {
-            that.height(that[0].scrollHeight - 4);
-            row.find('.correct').addClass('editing');
-        }
-        else {
-            row.find('.correct').removeClass('editing');
-            if (row.find('.correct .radios :checked').length > 0) {
-                row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
+    function resizeTextAreas() {
+        var row = $(this).closest('.card-row:not(.template):not(.removed)');
+        row.each(function () {
+            var row = $(this);
+            var that = row.find('.correct textarea');
+            that.css('height', '');
+            if (row.is('.edit')) {
+                that.height(that[0].scrollHeight - 4);
+                row.find('.correct').addClass('editing');
             }
-        }
-    });
+            else {
+                row.find('.correct').removeClass('editing');
+                if (row.find('.correct .radios :checked').length > 0) {
+                    row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
+                }
+            }
+        });
+    }
 
     body.on('change keyup', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
         var row = $(this).parents('.card-row');
@@ -371,10 +374,8 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '[id^="packs-"] .pack-row.edit a[href^="#cancel-"], [id^="packs-"] .pack-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
-        evt.preventDefault();
-        $(this).parents('.results').find('.pack-row,.card-row').removeClass('edit').addClass('read-only');
-        window.activateMenu(Routing.generate('packs'));
+    body.on('click', '[id^="packs-"] .cancel-edit', function (evt) {
+        resizeTextAreas.apply($(this).parents('.results').find('.pack-row,.card-row'));
     });
 
     body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
@@ -393,6 +394,7 @@ $(document).ready(function () {
             }
         });
         tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
+        resizeTextAreas.apply($(this).parents('.results').find('.pack-row,.card-row'));
         autoSaveTimeout = 0;
         validateChanged.apply(tab);
         autoSave.apply(tab, [true]);
@@ -517,6 +519,7 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         var select = tab.find('.pack-row:not(.template) .status select');
         select.data('oldValue', select.val());
+        resizeTextAreas.apply($(this).parents('.results').find('.pack-row,.card-row'));
     }
 
     body.on('click', '.panel-pane[id^="packs-"] a[href="#edit-pack"]', setupPackEditor);

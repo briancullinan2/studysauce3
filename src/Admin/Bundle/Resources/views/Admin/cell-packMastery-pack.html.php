@@ -19,7 +19,7 @@ if(!empty($user)) {
     }));
 }
 if($total > 0) {
-    $mastery = ($total - $retentionCount) / $total;
+    $mastery = round(($total - $retentionCount) / $total * 100.0);
 }
 else {
     $mastery = 0;

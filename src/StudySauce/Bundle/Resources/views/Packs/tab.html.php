@@ -51,7 +51,7 @@ $view['slots']->start('body'); ?>
                     'tables' => ['pack', 'card'],
                     'expandable' => ['card' => ['preview']],
                     'pack-id' => $entity->getId(),
-                    'headers' => ['pack' => 'packPacks'],
+                    'headers' => ['pack' => 'packPacks', 'card' => 'packCards'],
                     'new' => $isNew,
                     'edit' => $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC',
                     'count-pack' => 1,
