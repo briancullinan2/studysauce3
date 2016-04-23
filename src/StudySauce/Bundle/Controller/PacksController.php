@@ -397,7 +397,7 @@ class PacksController extends Controller
         }));
     }
 
-    public function getChildUsersForPack(Pack $x, User $user) {
+    public static function getChildUsersForPack(Pack $x, User $user) {
         $packGroups = $x->getGroups()->map(function (Group $g) {
             return $g->getId();
         })->toArray();

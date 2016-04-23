@@ -36,7 +36,7 @@ $view['slots']->start('body'); ?>
                 <a href="#shuffle-card" class="centerized">&nbsp;</a>
             <?php
             $tables = [
-                'tables' => ['pack' => ['titleNew' => ['title'], 'retention', ['user', 'userPacks.user']], 'ss_user' => ['id']],
+                'tables' => ['pack' => ['titleNew' => ['title'], 'retention', ['userPacks.user']], 'ss_user' => ['id']],
                 //'user-ss_user-id' => 'NULL',
                 'ss_user-id' => $id,
                 'headers' => false,
@@ -67,7 +67,7 @@ $view['slots']->start('body'); ?>
                 <h2>Study mastery report</h2>
                 <?php
                 $tables = [
-                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['user', 'userPacks.user'], 'cardMastery'], 'ss_user' => ['id']],
+                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['userPacks.user'], 'cardMastery'], 'ss_user' => ['id']],
                     //'user-ss_user-id' => 'NULL',
                     'ss_user-id' => $id,
                     'headers' => false,

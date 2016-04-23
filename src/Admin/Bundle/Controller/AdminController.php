@@ -57,7 +57,7 @@ class AdminController extends Controller
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
 
-    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
+    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'userPacks.removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
 
     private static function getSearchValue($field, $k, $f, $table, $request) {
@@ -348,8 +348,9 @@ class AdminController extends Controller
             }
 
             $totalQuery = clone $qb;
-            $total = $totalQuery->select('COUNT(DISTINCT ' . $table . '.id)')
-                ->getQuery()->getSingleScalarResult();
+            $query = $totalQuery->select('COUNT(DISTINCT ' . $table . '.id)')
+                ->getQuery();
+            $total = $query->getSingleScalarResult();
             $vars[$table . '_total'] = $total;
 
             // max pagination to search count

@@ -705,7 +705,7 @@ $(document).ready(function () {
             body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
                 updateRows(entityField, value, obj);
                 var oldValue = entityField.data('oldValue').split(' ');
-                this.selectize.setValue(oldValue, true);
+                entityField[0].selectize.setValue(oldValue, true);
             });
 
             $('#general-dialog').modal({show: true, backdrop: true})
