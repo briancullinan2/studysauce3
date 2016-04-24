@@ -693,10 +693,49 @@ $(document).ready(function () {
         entityField.blur();
 
         if (isDialog) {
+            var dialog = $('#add-entity');
             updateRows(entityField, value, obj);
+            dialog.find('input[data-entities]').data('entities', entityField.data('entities')); // copy to other fields in dialog for syncronicity
             body.off('click.modify_entities').one('click.modify_entities', 'a[href="#submit-entities"]', function () {
-                debugger; //TODO: add up all changes
-                //confirmAssignValues($(this).prop('field'));
+                var toField = dialog.prop('field');
+                var oldEntities = toField.data('entities');
+                var newEntities = entityField.data('entities');
+                var tables = toField.data('tables');
+
+                // get entities differences
+                var addItems = newEntities.filter(function (e) {return oldEntities.indexOf(e) == -1});
+                var removeItems = oldEntities.filter(function (e) {return newEntities.indexOf(e) == -1});
+
+                // show confirmation dialog
+                var message = (addItems.length > 0 ? (' add ' + addItems.map(function (e) {
+                        return dialog.find('input[name="' + e.split('-')[0] + '"]')[0].selectize.options[e].text;}).join(', ')) : '')
+                    + (addItems.length > 0 && removeItems.length > 0 ? ' and ' : '')
+                    + (removeItems.length > 0 ? (' remove ' + removeItems.map(function (e) {
+                        return dialog.find('input[name="' + e.split('-')[0] + '"]')[0].selectize.options[e].text;}).join(', ')) : '');
+
+                // copy values from dialog back to field after confirmation
+                body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+                    isSettingSelectize = true;
+                    // filter out the removed and add the new to the field value
+                    var newValue = $.merge(toField.val().split(' ').filter(function (e) {return removeItems.indexOf(e) == -1;}), addItems);
+                    toField.data('entities', newEntities.slice(0));
+                    var allOptions = [];
+                    for(var tableName in tables) {
+                        if (tables.hasOwnProperty(tableName)) {
+                            var options = dialog.find('input[name="' + tableName + '"]').data(tableName);
+                            toField.data(tableName, options);
+                            allOptions = $.merge(allOptions, options);
+                        }
+                    }
+                    toField[0].selectize.clearOptions();
+                    toField[0].selectize.addOption(allOptions);
+                    toField[0].selectize.renderCache = {};
+                    toField[0].selectize.setValue(newValue, true);
+                    isSettingSelectize = false;
+                });
+
+                $('#general-dialog').modal({show: true, backdrop: true})
+                    .find('.modal-body').html('<p>Are you sure you want to ' + message + '?');
             });
         }
         else {
@@ -705,7 +744,9 @@ $(document).ready(function () {
             body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
                 updateRows(entityField, value, obj);
                 var oldValue = entityField.data('oldValue').split(' ');
+                isSettingSelectize = true;
                 entityField[0].selectize.setValue(oldValue, true);
+                isSettingSelectize = false;
             });
 
             $('#general-dialog').modal({show: true, backdrop: true})
@@ -809,7 +850,8 @@ $(document).ready(function () {
                     var tmpTables = {};
                     tmpTables[tableName] = tables[tableName];
                     entityField.data('tables', tmpTables);
-                    entityField.data('entities', field.data('entities'));
+                    entityField.data('oldValue', '');
+                    entityField.data('entities', field.data('entities').slice(0));
                     entityField.data(tableName, entities);
                     //entityField.
 
@@ -820,6 +862,8 @@ $(document).ready(function () {
                         entityField.val('');
                         entityField[0].selectize.setValue('');
                         entityField[0].selectize.renderCache = {};
+                        entityField[0].selectize.clearOptions();
+                        entityField[0].selectize.addOption(entities);
                     }
                 }
             }

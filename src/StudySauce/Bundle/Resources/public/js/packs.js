@@ -82,8 +82,8 @@ $(document).ready(function () {
             newRow.find('.correct textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
 
             if(clipRows[i].length == 2) {
-                newRow.find('.content input').val(clipRows[i][0]);
-                newRow.find('.correct input').val(clipRows[i][1]);
+                newRow.find('.content textarea').val(clipRows[i][0]);
+                newRow.find('.correct textarea').val(clipRows[i][1]);
             }
             else {
                 var tf = (clipRows[i][2].match(/true|false/i) || [''])[0].toLowerCase();
@@ -97,13 +97,13 @@ $(document).ready(function () {
                         return $(this).val() == clipRows[i][2];
                     }).prop('checked', true).trigger('change');
                 })(i);
-                newRow.find('.correct.type-sa input, .input.correct:not([class*="type-"]) input').val(clipRows[i][2].replace("\n", '\\n'));
-                newRow.find('.content input').val(clipRows[i][1]);
+                newRow.find('.correct textarea').val(clipRows[i][2].replace("\n", '\\n'));
+                newRow.find('.content textarea').val(clipRows[i][1]);
             }
 
             var isUrl, content;
-            if((isUrl = (/https:\/\/.*?(\s|\\n|$)/i).exec(content = newRow.find('.content input').val())) !== null) {
-                newRow.find('.content input').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim());
+            if((isUrl = (/https:\/\/.*?(\s|\\n|$)/i).exec(content = newRow.find('.content textarea').val())) !== null) {
+                newRow.find('.content textarea').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim());
                 newRow.find('input[name="url"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
             }
         }
@@ -115,24 +115,28 @@ $(document).ready(function () {
         var row = $(this).closest('.card-row:not(.template):not(.removed)');
         row.each(function () {
             var row = $(this);
-            var that = row.find('.correct textarea');
-            that.css('height', '');
-            if (row.is('.edit')) {
-                that.height(that[0].scrollHeight - 4);
-                row.find('.correct').addClass('editing');
-            }
-            else {
-                row.find('.correct').removeClass('editing');
-                if (row.find('.correct .radios :checked').length > 0) {
-                    row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
+            var that = row.find('textarea:visible');
+            that.each(function () {
+                var that = $(this);
+                that.css('height', '');
+                if (row.is('.edit')) {
+                    that.height(that[0].scrollHeight - 4);
+                    row.find('.correct').addClass('editing');
                 }
-            }
+                else {
+                    row.find('.correct').removeClass('editing');
+                    if (row.find('.correct .radios :checked').length > 0) {
+                        row.find('.correct textarea, .correct .radios').scrollTop(row.find('.correct .radios input').index(row.find('.correct .radios :checked')) * 22 - 2);
+                    }
+                }
+            });
         });
     }
+    body.on('change keyup keypress keydown focus blur', '[id^="packs-"] .card-row textarea', resizeTextAreas);
 
-    body.on('change keyup', '[id^="packs-"] .card-row .correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
+    body.on('change keyup', '[id^="packs-"] .card-row .type-mc.correct textarea, [id^="packs-"] .card-row .correct .radios input', function (evt) {
         var row = $(this).parents('.card-row');
-        var that = row.find('.correct textarea');
+        var that = row.find('.type-mc.correct textarea');
 
         // get current line
         var origName = $(evt.target).is('.correct .radios input') ? $(evt.target).attr('name') : row.find('.correct .radios input').attr('name');
@@ -198,8 +202,8 @@ $(document).ready(function () {
             template.filter('.preview-answer').find('.preview-prompt .preview-content').replaceWith($('<img src="' + url + '" />').load(function () {
                 centerize.apply($(this));
             }));
-            if(row.find('.content input').val().trim() != '') {
-                template.find('[type="text"]').val(row.find('.content input').val());
+            if(row.find('.content textarea').val().trim() != '') {
+                template.find('[type="text"]').val(row.find('.content textarea').val());
             }
             else {
                 template.find('[type="text"]').val('Type your answer');
@@ -210,7 +214,7 @@ $(document).ready(function () {
         }
 
         // insert content and multiple choice answers
-        template.find('.preview-content span').text(row.find('.content input:visible').val());
+        template.find('.preview-content div').text(row.find('.content textarea:visible').val());
         var answers = row.find('.correct.type-mc:visible textarea').val();
         if (answers != null) {
             answers = answers.split("\n");
@@ -218,7 +222,7 @@ $(document).ready(function () {
                 $(this).text(answers[$(this).parent().find('.preview-response').index($(this))]);
             });
         }
-        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
+        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
 
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         // center some preview fields
@@ -389,7 +393,7 @@ $(document).ready(function () {
         }
         tab.find('.card-row.empty:not(.template)').each(function () {
             var that = jQuery(this);
-            if(that.find('.content input').val().trim() == '') {
+            if(that.find('.content textarea').val().trim() == '') {
                 that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
             }
         });
@@ -437,9 +441,9 @@ $(document).ready(function () {
                 cards[cards.length] = {
                     id: rowId != null ? rowId[1] : null,
                     type:     $(this).find('.type select').val(),
-                    content:  ($(this).find('input[name="url"]').val() != '' ? ($(this).find('input[name="url"]').val() + "\\n") : '') + $(this).find('.input.content:visible input').val(),
+                    content:  ($(this).find('input[name="url"]').val() != '' ? ($(this).find('input[name="url"]').val() + "\\n") : '') + $(this).find('.input.content:visible textarea').val(),
                     answers:  $(this).find('.correct.type-mc:visible textarea').val(),
-                    correct:  $(this).find('.input.correct:visible input:not([type="radio"]), .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val()
+                    correct:  $(this).find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val()
                 };
             }
         });
@@ -574,7 +578,7 @@ $(document).ready(function () {
                 }
             });
             showPublishDialog.apply(this, [row.find('.name input').val(), that.data('publish')])(function (publish) {
-                row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ')');
+                row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' ' + publish.schedule.getHours() + ':' + publish.schedule.getMinutes() + ')');
                 row.find('.status select').data('publish', publish).val('GROUP');
                 row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
                 row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');

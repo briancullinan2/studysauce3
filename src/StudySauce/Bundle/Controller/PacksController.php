@@ -150,16 +150,18 @@ class PacksController extends Controller
         // TODO: secure user access using ACLs, which admins have access to which users?
         foreach ($request->get('users') ?: [] as $u) {
             /** @var UserPack $up */
-            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'] && !$up->getRemoved();})->first()) && isset($u['remove']) && $u['remove'] == 'true') {
-                $up->setRemoved(true);
+            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first())) {
+                $up->setRemoved(isset($u['remove']) && $u['remove'] == 'true');
+                $orm->merge($up);
             }
-            else if (empty($up) && (!isset($u['remove']) || $u['remove'] != 'true')) {
+            else {
                 $up = new UserPack();
                 /** @var User $upUser */
                 $upUser = $orm->getRepository('StudySauceBundle:User')->findOneBy(['id' => $u['id']]);
                 $up->setUser($upUser);
                 $upUser->addUserPack($up);
                 $up->setPack($newPack);
+                $up->setRemoved(isset($u['remove']) && $u['remove'] == 'true');
                 $newPack->addUserPack($up);
                 $orm->persist($up);
             }
@@ -397,33 +399,6 @@ class PacksController extends Controller
         }));
     }
 
-    public static function getChildUsersForPack(Pack $x, User $user) {
-        $packGroups = $x->getGroups()->map(function (Group $g) {
-            return $g->getId();
-        })->toArray();
-
-        return array_filter(
-            // also return current user and children
-            array_merge([$user], $user->getInvites()
-            ->filter(function (Invite $i) {
-                return !empty($i->getInvitee());
-            })
-            ->map(function (Invite $i) {
-                return $i->getInvitee();
-            })->toArray()),
-            function (User $u) use ($x, $packGroups) {
-                return ($x->getUser() == $u && !$x->getStatus() == 'UNLISTED' && !$x->getStatus() == 'DELETED')
-                || $u->getUserPacks()
-                    ->filter(function (UserPack $up) use ($x) {
-                        return !$up->getRemoved() && $up->getPack()->getId() == $x->getId();
-                    })->count() > 0
-                || count(array_intersect($packGroups, $u->getGroups()
-                    ->map(function (Group $g) {
-                        return $g->getId();
-                    })->toArray())) > 0;
-            });
-    }
-
     /**
      * @param User|null $user
      * @return JsonResponse
@@ -447,7 +422,7 @@ class PacksController extends Controller
         $packs = self::getPacksForUser($user);
         $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
 
-            $users = self::getChildUsersForPack($x, $user);
+            $users = $x->getChildUsers($user);
 
             if ($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || count($users) == 0 || $x->getProperty('schedule') > new \DateTime()) {
                 return [
@@ -627,7 +602,7 @@ class PacksController extends Controller
             $retention = self::getRetention($packs->first(), $user);
         }
         else {
-            $packs = $user->getPacks()->filter(function (Pack $p) use ($user, $currentUser) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && !empty($p->getStatus()) && in_array($user, self::getChildUsersForPack($p, $user));});
+            $packs = $user->getPacks()->filter(function (Pack $p) use ($user, $currentUser) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && !empty($p->getStatus()) && in_array($user, $p->getChildUsers($user));});
             $retention = array_values($packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray());
         }
 

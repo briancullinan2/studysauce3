@@ -58,13 +58,11 @@
 #packs .pack-row .id {
     text-align: center;
     position:relative;
-    vertical-align: top;
 }
 
 [id^="packs-"] .pack-row .id {
     text-align: center;
     position: absolute;
-    vertical-align: top;
     padding-bottom: 10%;
     top:-20px;
 }
@@ -217,10 +215,6 @@
     width: 35%;
 }
 
-[id^="packs-"] .results .card-row > * {
-    vertical-align: top;
-}
-
 [id^="packs-"] .card-row .correct.type-tf {
     text-align: right;
 }
@@ -259,6 +253,12 @@
     width:100%;
     position:relative;
     vertical-align: middle;
+}
+
+[id^="packs-"] .selectize-control.multi .selectize-input {
+    height:auto;
+    max-height:6em;
+    white-space: normal;
 }
 
 [id^="packs-"] .pack-row {

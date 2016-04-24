@@ -199,6 +199,29 @@ class Pack
                 ->count() == 0;
     }
 
+    public function getChildUsers(User $user)
+    {
+        return array_filter(
+        // also return current user and children
+            array_merge([$user], $user->getInvites()
+                ->filter(function (Invite $i) {
+                    return !empty($i->getInvitee());
+                })
+                ->map(function (Invite $i) {
+                    return $i->getInvitee();
+                })->toArray()),
+            function (User $u) {
+                return ($this->getUser() == $u && !$this->getStatus() == 'UNLISTED' && !$this->getStatus() == 'DELETED')
+                || $this->userPacks->matching(Criteria::create()
+                    ->where(Criteria::expr()
+                        ->neq('removed', true))->andWhere(Criteria::expr()
+                        ->eq('user', $u)))->count() > 0
+                || $this->groups->matching(Criteria::create()
+                    ->where(Criteria::expr()
+                        ->in('name', $u->getGroupNames())))->count() > 0;
+            });
+    }
+
     public function getUserById($id)
     {
         /** @var UserPack $up */
@@ -207,6 +230,11 @@ class Pack
             return null;
         }
         return $up->getUser();
+    }
+
+    public function getGroupForChild(User $childUser)
+    {
+        return $this->groups->matching(Criteria::create()->where(Criteria::expr()->in('name', $childUser->getGroupNames())))->first();
     }
 
     /**
@@ -723,5 +751,6 @@ class Pack
     {
         return $this->getStatus() == 'DELETED';
     }
+
 
 }

@@ -149,7 +149,7 @@ EOF
             // loop through packs and determine if they have already been downloaded by the user
             foreach($packs as $p) {
 
-                $children = $controller->getChildUsersForPack($p, $u);
+                $children = $p->getChildUsers($u);
 
                 // same conditions as on PackControllers listAction()
                 if($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus())
@@ -203,8 +203,7 @@ EOF
                     /** @var User $childUser */
                     /** @var Pack $childPack */
                     list($childPack, $childUser) = $child[0];
-                    $groupInvite = $childPack->getGroups()->filter(function (Group $i) use ($childUser) {
-                        return $childUser->hasGroup($i->getName());})->first();
+                    $groupInvite = $childPack->getGroupForChild($childUser);
                 }
 
                 /** @var Pack[] $alerting */

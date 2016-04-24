@@ -130,7 +130,7 @@ table.results > tbody > tr > td .checkbox {
 .results [class*="-row"] > *,
 table.results > tbody > tr > td > *
 {
-    vertical-align: middle;
+    vertical-align: top;
     line-height: 100%;
 }
 
