@@ -200,12 +200,21 @@ $(document).ready(function () {
             that.attr('class', that.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
             that.removeClass('template removed read-only historic').addClass('edit empty');
             that.find('select, textarea, input[type="text"]').val('').trigger('change');
-            that.find('> *').each(function () {
-                var radio = $(this).find('input[type="radio"]').first();
-                if (radio.length > 0) {
-                    $(this).find('input[type="radio"]').attr('name', radio.attr('name').split('-')[0] + '-' + radioCounter++).trigger('change');
-                }
-            });
+            var radio = that.find('input[type="radio"]');
+            if (radio.length > 0) {
+                radioCounter++;
+                var renamed = [];
+                radio.each(function () {
+                    var origName = $(this).attr('name');
+                    var name = origName.replace(/[0-9]*/, '') + radioCounter;
+                    // find radios with the same name as the one we are on
+                    if(renamed.indexOf(origName) == -1) {
+                        renamed[renamed.length] = origName;
+                        renamed[renamed.length] = name;
+                    }
+                    that.find('input[type="radio"][name="' + origName + '"]').attr('name', name).trigger('change');
+                });
+            }
             that.find('input[type="checkbox"]').prop('checked', false).trigger('change');
         });
         newRow.insertBefore(results.find('.' + table + '-row').first());

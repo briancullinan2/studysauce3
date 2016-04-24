@@ -1,8 +1,7 @@
 
 $(document).ready(function () {
 
-    var body = $('body'),
-        radioCounter = 5000;
+    var body = $('body');
 
     key('⌘+v, ctrl+v, command+v', function () {
         var tab = $('[id^="packs-"] .results:visible');
@@ -78,12 +77,11 @@ $(document).ready(function () {
             }
 
             // set correct answers
-            newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
             newRow.find('.correct.type-mc textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
 
             if(clipRows[i].length == 2) {
-                newRow.find('.content textarea').val(clipRows[i][0]);
-                newRow.find('.correct textarea').val(clipRows[i][1]);
+                newRow.find('.content textarea').val(clipRows[i][0]).trigger('change');
+                newRow.find('.correct textarea').val(clipRows[i][1]).trigger('change');
             }
             else {
                 var tf = (clipRows[i][2].match(/true|false/i) || [''])[0].toLowerCase();
@@ -98,12 +96,12 @@ $(document).ready(function () {
                     }).prop('checked', true).trigger('change');
                 })(i);
                 newRow.find('.correct .correct:not(.type-mc) textarea').val(clipRows[i][2]);
-                newRow.find('.content textarea').val(clipRows[i][1]);
+                newRow.find('.content textarea').val(clipRows[i][1]).trigger('change');
             }
 
             var isUrl, content;
             if((isUrl = (/https:\/\/.*?(\s|\\n|$)/i).exec(content = newRow.find('.content textarea').val())) !== null) {
-                newRow.find('.content textarea').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim());
+                newRow.find('.content textarea').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim()).trigger('change');
                 newRow.find('input[name="url"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
             }
         }
@@ -150,20 +148,19 @@ $(document).ready(function () {
             if(!answers.hasOwnProperty(i))
                 continue;
             var newItem;
-            (function (i) {
-                if ((newItem = $(existing.find('input').filter(function () {return $(this).val() == answers[i];})
-                        .map(function () {return $(this).parents('label')[0];})).not(newItems).first()).length == 0) {
-                    newItem = $('<label class="radio"><input type="radio" name="' + origName + '" value="' + answers[i] + '"><i></i><span>' + answers[i] + '</span></label>')
-                        .appendTo(row.find('.correct .radios'));
+            if ((newItem = $(existing.find('input').filter(function () {
+                    return $(this).val() == answers[i];}).map(function () {
+                    return $(this).parents('label')[0];})).not(newItems).first()).length == 0) {
+                newItem = $('<label class="radio"><input type="radio" name="' + origName + '" value="' + answers[i] + '"><i></i><span>' + answers[i] + '</span></label>')
+                    .appendTo(row.find('.correct .radios'));
+            }
+            else {
+                if (i != newItem.parent().index(newItem)) {
+                    orderChanged = true;
+                    newItem.detach().appendTo(row.find('.correct .radios'));
                 }
-                else {
-                    if (i != newItem.index()) {
-                        orderChanged = true;
-                        newItem.detach().appendTo(row.find('.correct .radios'));
-                    }
-                }
-                newItems = $.merge(newItems, [newItem[0]]);
-            })(i);
+            }
+            newItems = $.merge(newItems, [newItem[0]]);
         }
         if (existing.not(newItems).length > 0) {
             existing.not(newItems).remove();
@@ -173,7 +170,6 @@ $(document).ready(function () {
             newVal = row.find('.correct .radios input').eq(line);
         }
         newVal.prop('checked', true);
-        updatePreview.apply(row);
     });
 
     function updatePreview() {
@@ -219,7 +215,7 @@ $(document).ready(function () {
         if (answers != null) {
             answers = answers.split("\n");
             template.find('.preview-response div').each(function () {
-                $(this).text(answers[$(this).parent().find('.preview-response').index($(this))]);
+                $(this).text(answers[$(this).parent().parent().find('.preview-response').index($(this).parent())]);
             });
         }
         template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
