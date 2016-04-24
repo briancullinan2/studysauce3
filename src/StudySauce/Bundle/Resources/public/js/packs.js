@@ -79,7 +79,7 @@ $(document).ready(function () {
 
             // set correct answers
             newRow.find('.correct.radio input').attr('name', 'correct-' + radioCounter++);
-            newRow.find('.correct textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
+            newRow.find('.correct.type-mc textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
 
             if(clipRows[i].length == 2) {
                 newRow.find('.content textarea').val(clipRows[i][0]);
@@ -97,7 +97,7 @@ $(document).ready(function () {
                         return $(this).val() == clipRows[i][2];
                     }).prop('checked', true).trigger('change');
                 })(i);
-                newRow.find('.correct textarea').val(clipRows[i][2].replace("\n", '\\n'));
+                newRow.find('.correct .correct:not(.type-mc) textarea').val(clipRows[i][2]);
                 newRow.find('.content textarea').val(clipRows[i][1]);
             }
 
@@ -242,6 +242,19 @@ $(document).ready(function () {
         var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
         var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
 
+        for(var c  = 0; c < cardRows.length; c++) {
+            var row = $(cardRows[c]);
+            var data = gatherFields.apply(row, [['type']]);
+
+            if(!row.is('.type-' + data.type)) {
+                row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
+                if (data.type != '' && data.type != null) {
+                    row.addClass('type-' + data.type);
+                }
+            }
+
+        }
+
         // do not autosave from selectize because the input underneath will change
         if(typeof evt != 'undefined') {
             if($(evt.target).parents('.selectize-input').length > 0) {
@@ -295,13 +308,6 @@ $(document).ready(function () {
             }
             else {
                 row.removeClass('invalid empty').addClass('valid');
-            }
-
-            if(!row.is('.type-' + data.type)) {
-                row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
-                if (data.type != '' && data.type != null) {
-                    row.addClass('type-' + data.type);
-                }
             }
 
             // update line number

@@ -16,7 +16,9 @@ $view['slots']->start('message'); ?>
         <br />
         <br />
         <br />
-        <strong><?php print $packName; ?></strong><br />(<?php print $packCount; ?> cards)
+        <span style="text-align: left; display:inline-block;">
+            <strong><?php print $packName; ?></strong><br />(<?php print $packCount; ?> cards)
+        </span>
         <br />
         <br />
         <br />
