@@ -223,10 +223,10 @@ class PacksController extends Controller
                 $orm->merge($newCard);
             }
 
-            if (!isset($c['answers'])) {
+            if (!isset($c['answers']) && isset($c['correct'])) {
                 $c['answers'] = $c['correct'];
             }
-            $answers = explode("\n", $c['answers']);
+            $answers = explode("\n", isset($c['answers']) ? $c['answers'] : '');
             $answerValues = [];
             foreach ($answers as $a) {
                 if (trim($a) == '')
