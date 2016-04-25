@@ -7,7 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var User|Group $entity */
 
-$rowId = $table . '-id-' . $entity->getId();
+$rowId = $table . '-id-';
+if(method_exists($entity, 'getId')) {
+    $rowId .= $entity->getId();
+}
 
 $expandable = isset($searchRequest['expandable']) && is_array($searchRequest['expandable'])
     ? $searchRequest['expandable']

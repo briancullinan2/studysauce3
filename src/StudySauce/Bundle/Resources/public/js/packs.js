@@ -541,17 +541,6 @@ $(document).ready(function () {
     body.on('change keyup', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
     body.on('change keyup', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
 
-    body.on('change', '[id^="packs-"] .pack-row .status select', function () {
-        var row = $(this).parents('.pack-row');
-        var status = row.find('.status select').val().toLowerCase();
-        if(status == '') {
-            row.find('.status > div').attr('class', '');
-        }
-        else if(!row.find('.status > div').is('.' + status)) {
-            row.find('.status > div').attr('class', status);
-        }
-    });
-
     // TODO: generalize and move this to dashboard, just like users-groups dialog
     body.on('click', '[id^="packs-"] .card-row a[href="#upload-image"]', function () {
         var row = $(this).parents('.card-row');
@@ -570,25 +559,30 @@ $(document).ready(function () {
     });
 
     body.on('change', '[id^="packs-"] .status select', function () {
+        var row = $(this).parents('.pack-row');
+        var select = row.find('.status select');
+
         var that = $(this);
         if($(this).val() == 'GROUP') {
-            var row = that.parents('.pack-row');
+            that.val(that.data('oldValue'));
 
-            body.one('hidden.bs.modal', '#pack-publish', function () {
-                that.val(that.data('oldValue'));
-                if(that.val() != 'GROUP') {
-                    that.trigger('change');
-                }
-            });
             showPublishDialog.apply(this, [row.find('.name input').val(), that.data('publish')])(function (publish) {
-                row.find('.status select option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' ' + publish.schedule.getHours() + ':' + publish.schedule.getMinutes() + ')');
-                row.find('.status select').data('publish', publish).val('GROUP');
+                select.find('option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' ' + publish.schedule.getHours() + ':' + publish.schedule.getMinutes() + ')');
+                select.data('publish', publish).val('GROUP');
                 row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
                 row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
             });
         }
         else {
             that.data('oldValue', that.val());
+        }
+
+        var status = select.val().toLowerCase();
+        if(status == '') {
+            row.find('.status > div').attr('class', '');
+        }
+        else if(!row.find('.status > div').is('.' + status)) {
+            row.find('.status > div').attr('class', status);
         }
     });
 

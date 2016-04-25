@@ -36,12 +36,14 @@ $view['slots']->start('body'); ?>
                 <a href="#shuffle-card" class="centerized">&nbsp;</a>
             <?php
             $tables = [
-                'tables' => ['pack' => ['titleNew' => ['title'], 'retention', ['userPacks.user']], 'ss_user' => ['id']],
+                'tables' => ['pack' => ['titleNew' => ['title'], 'retention', ['userPacks.user']], 'ss_user' => ['id'], 'user_pack' => ['user', 'pack', 'removed']],
                 //'user-ss_user-id' => 'NULL',
+                'user_pack-removed' => false,
                 'ss_user-id' => $id,
                 'headers' => false,
                 'count-pack' => 0,
                 'count-ss_user' => -1,
+                'count-user_pack' => -1,
                 'footers' => false
             ];
             print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));

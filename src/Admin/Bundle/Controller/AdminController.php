@@ -52,12 +52,13 @@ class AdminController extends Controller
         'ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description','userCountStr'], 'parent', 'invites', 'packs' => ['packs','groupPacks'], 'actions' => ['deleted']],
         'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'status', 'groups' => ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
         'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
-        'invite' => ['id', 'name'=> ['code', 'email', 'created'], 'actions' => ['deleted']]
+        'invite' => ['id', 'name'=> ['code', 'email', 'created'], 'actions' => ['deleted']],
+        'user_pack' => ['user', 'pack', 'removed']
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
 
-    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'userPacks.removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
+    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
 
     private static function getSearchValue($field, $k, $f, $table, $request) {
@@ -83,6 +84,7 @@ class AdminController extends Controller
     private static function joinBuilder(QueryBuilder $qb, $joinTable, $joinName, $field, $request, &$joins = [])
     {
         // TODO: add userPacks-removed = false search field
+        $result = '';
         $joinFields = explode('.', $field);
         foreach($joinFields as $jf) {
             $associated = self::$allTables[$joinTable]->getAssociationMappings();
@@ -99,6 +101,9 @@ class AdminController extends Controller
                 if (!in_array($newName, $joins)) {
                     $joins[] = $newName;
                     $qb = $qb->leftJoin($joinName . '.' . $jf, $newName);
+                    if(in_array($joinTable, array_keys($request['tables']))) {
+                        $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $newName, $request, $joins);
+                    }
                 }
                 $joinName = $newName;
             }
@@ -110,9 +115,9 @@ class AdminController extends Controller
         }
         // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
         if (!empty($joinName) && isset($request['tables'][$joinTable])) {
-            return self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
+            $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
         }
-        return '';
+        return $result;
     }
 
     /**
@@ -348,7 +353,7 @@ class AdminController extends Controller
             }
 
             $totalQuery = clone $qb;
-            $query = $totalQuery->select('COUNT(DISTINCT ' . $table . '.id)')
+            $query = $totalQuery->select('COUNT(DISTINCT(' . $table . '.' . self::$allTables[$table]->identifier[0] . '))')
                 ->getQuery();
             $total = $query->getSingleScalarResult();
             $vars[$table . '_total'] = $total;
