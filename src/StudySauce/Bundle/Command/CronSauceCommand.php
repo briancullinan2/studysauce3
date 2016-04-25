@@ -211,16 +211,17 @@ EOF
                     return $p->getProperty('alert') == true;
                 }));
 
-                // TODO: uncomment this when notifications are working
+                // send notifcations to all users devices
+                // TODO: select child invite for packs with alerts, and separately packs with emails
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
                             $controller->sendNotification($groupInvite->getName() . ' added a new pack, "'
-                                . $alerting[0]->getTitle() . '"!', count($unique), str_replace([' ', '<', '>'], '', $d));
+                                . $alerting[0]->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
                             $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
-                                . '" on Study Sauce!', count($unique), str_replace([' ', '<', '>'], '', $d));
+                                . '" on Study Sauce', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                     }
                 }

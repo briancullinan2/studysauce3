@@ -11,6 +11,7 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/datetimepicker-master/build/jquery.datetimepicker.full.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery.scrollintoview.js',
                 '@StudySauceBundle/Resources/public/js/keymaster.js',
+                '@StudySauceBundle/Resources/public/js/papaparse.min.js',
                 '@StudySauceBundle/Resources/public/js/sauce.js',
                 '@StudySauceBundle/Resources/public/js/contact.js',
             ],

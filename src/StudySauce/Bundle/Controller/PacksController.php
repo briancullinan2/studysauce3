@@ -134,8 +134,8 @@ class PacksController extends Controller
         }
         if (!empty($publish = $request->get('publish'))) {
             $newPack->setProperty('schedule', new \DateTime($publish['schedule']));
-            $newPack->setProperty('email', $publish['email']);
-            $newPack->setProperty('alert', $publish['alert']);
+            $newPack->setProperty('email', isset($publish['email']) && $publish['email'] == 'true');
+            $newPack->setProperty('alert', isset($publish['alert']) && $publish['alert'] == 'true');
         }
         foreach ($request->get('groups') ?: [] as $group) {
             /** @var Group $g */
