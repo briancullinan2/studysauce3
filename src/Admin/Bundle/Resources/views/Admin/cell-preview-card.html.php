@@ -8,7 +8,7 @@ $cardCount = !empty($card->getPack()) ? ($card->getIndex() + 1 . ' of ' . $card-
 $content = $card->getContent();
 $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
 /** @var Answer[] $answers */
-$answers = $card->getAnswers()->filter(function (Answer $a) {return !$a->getDeleted();})->toArray();
+$answers = array_values($card->getAnswers()->filter(function (Answer $a) {return !$a->getDeleted();})->toArray());
 if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
     $url = trim($matches[0]);
     $isImage = substr($url, -4) == '.jpg' || substr($url, -4) == '.jpeg' || substr($url, -4) == '.gif' || substr($url, -4) == '.png';
