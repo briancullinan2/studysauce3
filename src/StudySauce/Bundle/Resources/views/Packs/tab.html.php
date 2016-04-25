@@ -52,6 +52,7 @@ $view['slots']->start('body'); ?>
                     'expandable' => ['card' => ['preview']],
                     'pack-id' => $entity->getId(),
                     'headers' => ['pack' => 'packPacks', 'card' => 'packCards'],
+                    'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
                     'new' => $isNew,
                     'edit' => $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC',
                     'count-pack' => 1,

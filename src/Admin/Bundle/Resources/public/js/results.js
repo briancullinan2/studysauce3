@@ -262,6 +262,7 @@ $(document).ready(function () {
                 return (/(.*)-row/i).exec($(this).attr('class'))[1];
             }).toArray());
         }
+
         if(typeof data == 'object') {
             admin.data('request', {requestKey: data.searchRequest.requestKey});
             for(var t2 = 0; t2 < tables.length; t2++) {
@@ -269,8 +270,9 @@ $(document).ready(function () {
                 (function (table) {
                     for (var i = 0; i < data[table].length; i++) {
                         if (admin.find('> .' + table + '-row.' + table + '-id-' + data[table][i].id).length == 0) {
-                            admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first().removeClass(table + '-id-').addClass(table + '-id-' + data[table][i].id);
                             // set pack id on panel
+                            admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first().removeClass(table + '-id-').addClass(table + '-id-' + data[table][i].id);
+                            // TODO: update data-action attributes with new ID
                         }
                     }
                 })(table2);

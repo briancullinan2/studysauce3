@@ -174,6 +174,9 @@ $(document).ready(function () {
 
     function updatePreview() {
         var row = $(this);
+        if(row.length == 0) {
+            return;
+        }
         var template = row.find('select[name="type"]').val() == ''
             ? row.find('+ .expandable .preview-card:not([class*="type-"])')
             : row.find('+ .expandable .preview-card.type-' + row.find('select[name="type"]').val().split(' ')[0]);
@@ -401,10 +404,7 @@ $(document).ready(function () {
         });
         tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
         resizeTextAreas.apply($(this).parents('.results').find('.pack-row,.card-row'));
-        autoSaveTimeout = 0;
         validateChanged.apply(tab);
-        autoSave.apply(tab, [true]);
-        autoSaveTimeout = null;
     });
 
     var isLoading = false;
@@ -526,7 +526,7 @@ $(document).ready(function () {
         var select = tab.find('.pack-row:not(.template) .status select');
         select.data('oldValue', select.val());
         resizeTextAreas.apply(tab.find('.card-row:not(.template):not(.removed)'));
-        tab.find('.card-row:not(.template):not(.removed)').first().trigger('mousedown');
+        tab.find('.card-row:not(.template):not(.removed)').first().filter(':not(.selected)').trigger('mousedown');
     }
 
     body.on('click', '.panel-pane[id^="packs-"] a[href="#edit-pack"]', setupPackEditor);
@@ -537,9 +537,6 @@ $(document).ready(function () {
             loadResults.apply($(this).find('.results'));
         }
     });
-
-    body.on('change keyup', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
-    body.on('change keyup', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
 
     // TODO: generalize and move this to dashboard, just like users-groups dialog
     body.on('click', '[id^="packs-"] .card-row a[href="#upload-image"]', function () {
@@ -558,7 +555,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('change', '[id^="packs-"] .status select', function () {
+    body.on('change', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');
         var select = row.find('.status select');
 
@@ -567,10 +564,14 @@ $(document).ready(function () {
             that.val(that.data('oldValue'));
 
             showPublishDialog.apply(this, [row.find('.name input').val(), that.data('publish')])(function (publish) {
-                select.find('option[value="GROUP"]').text(publish.schedule <= new Date() ? 'Published' : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' ' + publish.schedule.getHours() + ':' + publish.schedule.getMinutes() + ')');
+                select.find('option[value="GROUP"]').text(publish.schedule <= new Date()
+                    ? 'Published'
+                    : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' '
+                + publish.schedule.getHours() + ':00)');
                 select.data('publish', publish).val('GROUP');
                 row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-                row.parents('.results').find('a[href="#save-pack"]').first().trigger('click');
+                row.addClass('changed');
+                row.parents('.results').find('.form-actions a[href="#save-pack"]').first().trigger('click');
             });
         }
         else {
@@ -594,5 +595,8 @@ $(document).ready(function () {
             }, 100);
         });
     });
+
+    body.on('change keyup', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
+    body.on('change keyup', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
 
 });
