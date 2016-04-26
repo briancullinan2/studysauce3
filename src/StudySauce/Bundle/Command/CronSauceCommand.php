@@ -187,7 +187,7 @@ EOF
                 }
             }
 
-            if (count($difference) > 0) {
+            if (count($difference) > 0 && $u->hasRole('ROLE_ADMIN')) {
                 print "\n" . $u->getEmail();
 
                 $u->setProperty('notified', array_unique(array_merge(array_map(function ($n) {
