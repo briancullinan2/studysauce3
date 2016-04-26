@@ -410,12 +410,6 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin-right: -32px;
 }
 
-[class*="-row"] > [class*="actions"]:nth-last-child(2)
-{
-    padding-top:0;
-    padding-bottom:0;
-}
-
 .results header > label.checkbox:last-child,
 .results [class*="-row"] > label.checkbox:nth-last-child(1)
 {
