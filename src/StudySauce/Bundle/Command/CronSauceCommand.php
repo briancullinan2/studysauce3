@@ -143,6 +143,12 @@ EOF
 
         foreach($users as $u) {
             /** @var User $u */
+            // don't send to child accounts unless they have set their own email address
+            if($u->getInvitees()->filter(function (Invite $i) use ($u) {
+                    return $i->getUser()->getEmail() . '_' == substr($u->getEmail(), 0, strlen($i->getUser()->getEmail()) + 1);})->count() > 0) {
+                continue;
+            }
+
             $packs = $controller->getPacksForUser($u);
 
             $notify = [];
@@ -181,8 +187,8 @@ EOF
                 }
             }
 
-            print "\n" . $u->getEmail();
             if (count($difference) > 0) {
+                print "\n" . $u->getEmail();
 
                 $u->setProperty('notified', array_unique(array_merge(array_map(function ($n) {
                     /** @var Pack $p */
@@ -217,12 +223,12 @@ EOF
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
-                            print $groupInvite->getName() . ' added a new pack, "' . $alerting[0]->getTitle() . '"';
+                            print "\t" . $groupInvite->getName() . ' added a new pack, "' . $alerting[0]->getTitle() . '"';
                             //$controller->sendNotification($groupInvite->getName() . ' added a new pack, "'
                             //    . $alerting[0]->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
-                            print 'You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce';
+                            print "\t" . 'You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce';
                             //$controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
                             //    . '" on Study Sauce', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
@@ -235,7 +241,7 @@ EOF
                 }));
 
                 if(count($emailing) > 0) {
-                    print 'We have added ' . $emailing[0]->getTitle() . ' to Study Sauce';
+                    print "\t" . 'We have added ' . $emailing[0]->getTitle() . ' to Study Sauce';
                     //$emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($child) ? $child[0][1] : null);
                 }
             }
