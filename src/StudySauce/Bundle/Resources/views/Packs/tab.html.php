@@ -64,8 +64,8 @@ $view['slots']->start('body'); ?>
                 $tables['count-pack'] = 0;
                 $tables['tables'] = ['pack' => ['id' => ['created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
                 $tables['classes'] = ['tiles'];
-                $tables['headers'] = ['pack' => 'new'];
-                $tables['footers'] = ['pack' => 'new'];
+                $tables['headers'] = ['pack' => 'newPack'];
+                $tables['footers'] = ['pack' => 'newPack'];
             }
             print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)); ?>
         </div>
@@ -76,6 +76,5 @@ $view['slots']->start('body'); ?>
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']), ['strategy' => 'sinclude']);
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'confirm-remove']), ['strategy' => 'sinclude']);
 $view['slots']->stop();
 

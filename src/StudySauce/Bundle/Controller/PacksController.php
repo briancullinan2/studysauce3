@@ -145,12 +145,20 @@ class PacksController extends Controller
             }
             else if (!empty($g) && $newPack->hasGroup($g->getName()) && isset($group['remove']) && $group['remove'] == 'true') {
                 $newPack->removeGroup($g);
+                foreach($g->getUsers()->toArray() as $ug) {
+                    /** @var User $ug */
+                    $up = $ug->getUserPack($newPack);
+                    if(!empty($up)) {
+                        $up->setRemoved(true);
+                        $orm->merge($up);
+                    }
+                }
             }
         }
         // TODO: secure user access using ACLs, which admins have access to which users?
         foreach ($request->get('users') ?: [] as $u) {
             /** @var UserPack $up */
-            if (!empty($up = $newPack->getUserPacks()->filter(function (UserPack $up) use ($u) {return $up->getUser()->getId() == $u['id'];})->first())) {
+            if (!empty($up = $newPack->getUserPackById($u['id']))) {
                 $up->setRemoved(isset($u['remove']) && $u['remove'] == 'true');
                 $orm->merge($up);
             }
@@ -387,7 +395,7 @@ class PacksController extends Controller
             if ($p->getStatus() == 'UNLISTED' && $hasPack) {
                 return true;
             }
-            if ($p->getStatus() == 'GROUP' && ($hasGroups || $hasPack)) {
+            if ($p->getStatus() == 'GROUP' && $hasGroups) {
                 // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
                 //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
                 return true;
@@ -444,7 +452,7 @@ class PacksController extends Controller
                 })->count(),
                 'users' => array_values(array_map(function (User $u) use ($x) {
                     /** @var UserPack $up */
-                    $up = $u->getUserPacks()->filter(function (UserPack $up) use ($x) {return $up->getPack() == $x;})->first();
+                    $up = $u->getUserPack($x);
                     return [
                         'id' => $u->getId(),
                         'created' => empty($up) || empty($up->getCreated()) ? null : $up->getCreated()->format('r')
@@ -488,9 +496,7 @@ class PacksController extends Controller
             ->getQuery()
             ->getResult();
         /** @var UserPack $up */
-        $up = $user->getUserPacks()->filter(function (UserPack $up) use ($request) {
-            return $up->getPack()->getId() == intval($request->get('pack'));
-        })->first();
+        $up = $user->getUserPackById(intval($request->get('pack')));
         $isNew = false;
         if (empty($up)) {
             $up = new UserPack();

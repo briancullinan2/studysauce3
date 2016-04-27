@@ -429,7 +429,7 @@ window.onerror = function (errorMessage, url, lineNumber) {
     window.jsErrors.push(message);
     if(window.noError)
         return false;
-    var dialog = $('#error-dialog');
+    var dialog = $('#error');
     if(dialog.length > 0)
     {
         dialog.find('.modal-body').html(errorMessage);
@@ -658,7 +658,7 @@ function gatherFields(fields, visibleOnly) {
     var result = {};
     for(var f in fields) {
         if (fields.hasOwnProperty(f)) {
-            var inputField = context.find('[name="' + fields[f] + '"]');
+            var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"]');
             if(visibleOnly !== false) {
                 inputField = inputField.filter(':visible');
             }
@@ -926,7 +926,7 @@ if(typeof window.jqAjax == 'undefined') {
 $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
     if(window.noError)
         return false;
-    var dialog = $('#error-dialog');
+    var dialog = $('#error');
     if(dialog.length > 0 && thrownError !== "abort" && jqXHR.status !== 0)
     {
         var error = '';

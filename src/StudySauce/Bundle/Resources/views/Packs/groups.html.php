@@ -46,10 +46,8 @@ $view['slots']->start('body'); ?>
                 <div class="group-edit">
                     <?php
                     $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'subgroup' => [], 'actions' => ['deleted']]];
-                    $tables['pack'] = ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                     $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'count-pack' => $isNew ? -1 : 0,
                         'count-ss_group' => 1,
                         'ss_group-deleted' => $entity->getDeleted(),
                         'edit' => !$isNew ? false : ['ss_group'],
@@ -57,15 +55,10 @@ $view['slots']->start('body'); ?>
                         'new' => $isNew,
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
-                        'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks'],
+                        'headers' => ['ss_group' => 'groupGroups'],
                         'footers' => ['ss_group' => 'groupGroups']
                     ]));
-                    if ($entity->getGroupPacks()->count() > 0) {
-                        ?>
-                        <div class="empty-members">
-                            <div>Click pack name to see group members</div>
-                        </div><?php
-                    } ?>
+                    ?>
                 </div>
             <?php } ?>
             <div class="group-list">
@@ -77,8 +70,8 @@ $view['slots']->start('body'); ?>
                         'count-ss_group' => 0,
                         'classes' => ['tiles'],
                         'tables' => $tables,
-                        'headers' => ['ss_group' => 'new'],
-                        'footers' => ['ss_group' => 'new']
+                        'headers' => ['ss_group' => 'newGroup'],
+                        'footers' => ['ss_group' => 'newGroup']
                     ]));
                 } else {
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
@@ -92,6 +85,35 @@ $view['slots']->start('body'); ?>
                 }
                 ?>
             </div>
+            <?php if ($entity !== null) {
+                global $ss_group;
+                $ss_group = [$entity];
+                ?>
+                <div class="list-packs">
+                    <?php
+                    $tables = ['ss_group' => ['id', 'deleted']];
+                    $tables['pack'] = ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $isNew = empty($entity->getId());
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                        'count-pack' => $isNew ? -1 : 0,
+                        'count-ss_group' => -1,
+                        'ss_group-deleted' => $entity->getDeleted(),
+                        'edit' => !$isNew ? false : [],
+                        'read-only' => $isNew ? false : [],
+                        'new' => $isNew,
+                        'ss_group-id' => $entity->getId(),
+                        'tables' => $tables,
+                        'headers' => [],
+                        'footers' => ['ss_group' => 'groupPacks']
+                    ]));
+                    if ($entity->getGroupPacks()->count() > 0) {
+                        ?>
+                        <div class="empty-members">
+                            <div>Click pack name to see group members</div>
+                        </div><?php
+                    } ?>
+                </div>
+            <?php } ?>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>
@@ -100,6 +122,5 @@ $view['slots']->start('body'); ?>
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']), ['strategy' => 'sinclude']);
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'confirm-remove']), ['strategy' => 'sinclude']);
 $view['slots']->stop();
 

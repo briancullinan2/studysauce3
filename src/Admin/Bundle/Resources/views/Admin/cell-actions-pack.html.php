@@ -1,4 +1,4 @@
 <div class="highlighted-link">
     <a title="Edit pack" href="<?php print $view['router']->generate('packs_edit', ['pack' => $pack->getId()]); ?>" class="edit-icon">&nbsp;</a>
-    <a title="Remove pack" href="#confirm-remove" class="remove-icon" data-action="<?php print $view['router']->generate('packs_remove', ['pack' => $pack->getId()]); ?>" data-target="#confirm-remove" data-toggle="modal">&nbsp;</a>
+    <a title="Remove pack" href="#general-dialog" data-dialog="Are you sure you would like to delete the pack &ldquo;<?php print $pack->getTitle(); ?>&rdquo; permanently?" class="remove-icon" data-action="<?php print $view['router']->generate('packs_remove', ['pack' => $pack->getId()]); ?>" data-target="#general-dialog" data-toggle="modal">&nbsp;</a>
 </div>

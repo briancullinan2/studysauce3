@@ -886,7 +886,7 @@ input:-webkit-autofill {
 .selectize-dropdown.single,
 .selectize-dropdown.multi
 {
-    border-color: #555555;
+    border-color: #BBB;
     border-radius: 0 0 2px 2px;
 }
 

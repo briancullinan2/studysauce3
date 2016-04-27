@@ -52,6 +52,18 @@
     clear:both;
 }
 
+.list-packs .add-packs .entity-search
+{
+    margin-right:-50px;
+    display:inline-block;
+    width:100%;
+    padding-right:50px;
+}
+
+.list-packs .add-packs .entity-search + .big-add {
+    float:none;
+}
+
 .group-edit .ss_group-row:before {
     content: " ";
     display: inline-block;
@@ -60,7 +72,7 @@
     float: left;
 }
 
-.group-edit .pack-row {
+.list-packs .pack-row {
     margin-left:-10px;
     padding-left:10px;
 }
@@ -74,13 +86,14 @@
 }
 
 
-.group-edit .pack-row label {
+.list-packs .pack-row label {
     font-weight: normal;
 }
 
-.group-edit .highlighted-link > .packs
+.list-packs .add-packs
 {
     width: 45%;
+    margin: 20px 0;
 }
 
 .group-edit .results .ss_group-row.read-only:hover
@@ -89,16 +102,16 @@
     border-color:transparent;
 }
 
-.group-edit .results .pack-row > .title
+.list-packs .results .pack-row > .title
 {
     cursor: pointer;
 }
 
-.group-edit .results .pack-row:hover > .title {
+.list-packs .results .pack-row:hover > .title {
     color:#09B;
 }
 
-.group-edit .results .pack-row [class*="actions"]
+.list-packs .results .pack-row [class*="actions"]
 {
     width:5%;
     padding-right:2px;
@@ -192,6 +205,7 @@
     width:100%;
     z-index: 0;
     line-height:27px;
+    margin-top:1px;
 }
 
 .group-edit header.ss_group label:nth-child(1) {
@@ -212,23 +226,28 @@
     padding-left:10%;
 }
 
-.group-edit header.pack label:nth-child(1),
-.group-edit .pack-row .title {
+.list-packs header.pack label:nth-child(1),
+.list-packs .pack-row .title {
     width:25%;
 }
 
-.group-edit header.pack label:nth-child(2),
-.group-edit header.pack label:nth-child(3)
+.list-packs header.pack label:nth-child(2),
+.list-packs header.pack label:nth-child(3)
 {
     width:7.5%;
     text-align: center;
 }
 
-.group-edit .pack-row .counts {
+.list-packs {
+    position:relative;
+    min-height:300px;
+}
+
+.list-packs .pack-row .counts {
     width:15%;
 }
 
-.group-edit .pack-row .counts label {
+.list-packs .pack-row .counts label {
     width:50%;
     margin:0 -2px;
     padding:0 2px;
@@ -236,55 +255,51 @@
     text-align: center;
 }
 
-.group-edit .results .pack-row.selected {
+.list-packs .results .pack-row.selected {
     background: #E9E9E9;
 }
 
-.group-edit .pack-row .members
+.list-packs .pack-row .members
 {
     top: 0;
     right: 0;
     height: 100%;
     position:absolute;
     width:50%;
-    padding-bottom:385px;
-    margin-top:270px;
-    padding-left:20px;
     background: #E9E9E9;
     z-index: 110;
-    padding-right:20px;
+    padding: 60px 20px 70px;
     display:none;
     margin-left: 0;
     margin-right: 0;
 }
 
-.group-edit .pack-row .members > label:first-child {
-    position:relative;
-    top:40px;
+.list-packs .pack-row .members > label:first-child {
     color:#BBB;
+    position:relative;
+    top:-5px;
 }
 
-.group-edit .pack-row.selected .members,
-.group-edit .pack-row:hover .members {
+.list-packs .pack-row.selected .members,
+.list-packs .pack-row:hover .members {
     display: block;
 }
 
-.group-edit .pack-row:hover .members {
+.list-packs .pack-row:hover .members {
     z-index: 100;
 }
 
-.group-edit .empty-members {
+.list-packs .empty-members {
     position: absolute;
     top: 0;
-    margin-top: 325px;
     width: 50%;
-    padding-bottom: 405px;
+    padding-bottom: 70px;
     right: 0;
     height: 100%;
     z-index: -1;
 }
 
-.group-edit .empty-members div {
+.list-packs .empty-members div {
     border:1px dashed #bbb;
     background: #ddd;
     height:100%;
@@ -293,37 +308,33 @@
     padding-top:100px;
 }
 
-.group-edit .pack-row .members > div {
+.list-packs .pack-row .members > div {
     display:block;
     vertical-align: top;
     overflow: auto;
     height:100%;
-    margin-top:50px;
     overflow-y:scroll;
+    margin-bottom:10px;
 }
 
-.group-edit .pack-row .members > div label.input {
+.list-packs .pack-row .members > div label.input {
     position: absolute;
     width: 100%;
     left: 0;
-    top: 10px;
+    top: 20px;
     padding-left:20px;
     padding-right:20px;
 }
 
-.group-edit .pack-row .members > div label
+.list-packs .pack-row .members > div label
 {
     display:block;
     height:29px;
 }
 
-.group-edit .pack-row .members > div label a
+.list-packs .pack-row .members > div label a
 {
     display:inline-block !important;
-}
-
-.group-list .empty-members {
-    display:none;
 }
 
 .right-pad .group-list {
@@ -339,7 +350,7 @@
 }
 
 .group-edit .ss_group-row > label.checkbox:nth-last-child(1),
-.group-edit .pack-row > label.checkbox:nth-last-child(1) {
+.list-packs .pack-row > label.checkbox:nth-last-child(1) {
     display:none;
 }
 
@@ -370,13 +381,13 @@
     display:none !important;
 }
 
-.group-edit .pack-row.edit .highlighted-link > .remove-icon
+.list-packs .pack-row.edit .highlighted-link > .remove-icon
 {
     display:inline-block !important;
 }
 
-.group-edit .pack-row .highlighted-link > a[href="#cancel-edit"],
-.group-edit .pack-row .highlighted-link > [value^="#save-"]
+.list-packs .pack-row .highlighted-link > a[href="#cancel-edit"],
+.list-packs .pack-row .highlighted-link > [value^="#save-"]
 {
     display:none !important;
 }

@@ -211,14 +211,14 @@ class Pack
                     return $i->getInvitee();
                 })->toArray()),
             function (User $u) {
-                return ($this->getUser() == $u && !$this->getStatus() == 'UNLISTED' && !$this->getStatus() == 'DELETED')
+                return ($this->getUser() == $u && $this->getStatus() != 'DELETED' && $this->getStatus() != 'GROUP')
                 || $this->userPacks->matching(Criteria::create()
                     ->where(Criteria::expr()
                         ->neq('removed', true))->andWhere(Criteria::expr()
-                        ->eq('user', $u)))->count() > 0
+                        ->eq('user', $u)))->count() > 0 && $this->getStatus() != 'GROUP'
                 || $this->groups->matching(Criteria::create()
                     ->where(Criteria::expr()
-                        ->in('name', $u->getGroupNames())))->count() > 0;
+                        ->in('name', $u->getGroupNames())))->count() > 0 && $this->getStatus() == 'GROUP';
             });
     }
 
@@ -235,6 +235,22 @@ class Pack
     public function getGroupForChild(User $childUser)
     {
         return $this->groups->matching(Criteria::create()->where(Criteria::expr()->in('name', $childUser->getGroupNames())))->first();
+    }
+
+    /**
+     * @param User $u
+     * @return UserPack|null
+     */
+    public function getUserPack(User $u) {
+        return $this->userPacks->matching(Criteria::create()->where(Criteria::expr()->eq('user', $u)))->first();
+    }
+
+    /**
+     * @param int $uid
+     * @return UserPack|null
+     */
+    public function getUserPackById($uid) {
+        return $this->userPacks->filter(function (UserPack $up) use ($uid) {return $up->getUser()->getId() == $uid;})->first();
     }
 
     /**

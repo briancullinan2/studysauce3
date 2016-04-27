@@ -358,6 +358,12 @@ body.right-menu #bookmark
     text-align: center;
 }
 
+#add-entity .selectize-dropdown.multi {
+    position:relative;
+    display:block !important;
+    top: 0 !important;
+}
+
 /*
 #add-entity .template {
     display:none;

@@ -62,6 +62,16 @@ $(document).ready(function () {
         }
     });
 
+    body.on('click', '.tiles [class*="-row"]:has(a.edit-icon)', function (evt) {
+        if(!$(evt.target).is('a:not(.edit-icon), [class*="-row"] > .packList, [class*="-row"] > .packList *'))
+        {
+            var results = $(this).parents('.results');
+            var row = $(this).closest('[class*="-row"]');
+            window.activateMenu(row.find('.edit-icon').attr('href'));
+            row.removeClass('edit').addClass('read-only');
+        }
+    });
+
     body.on('click', '.results.expandable > [class*="-row"]:nth-of-type(odd), .results.expandable > tbody > tr:nth-child(odd)', function () {
         var row = $(this);
         if(row.is('.selected')) {
@@ -190,7 +200,7 @@ $(document).ready(function () {
 
     var radioCounter = 5000;
 
-    body.on('click', '.results a[href^="#add-"]:not([href^="#add-new-"])', function (evt) {
+    body.on('click', '.results a[href^="#add-"]', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);
@@ -255,6 +265,13 @@ $(document).ready(function () {
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
+    function getTabId() {
+        var row = $(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first();
+        var table = (/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class'))[2];
+        return ((new RegExp(table + '-id-([0-9]+)(\\s|$)', 'ig')).exec(row.attr('class')) || [])[1];
+    }
+    window.getTabId = getTabId;
+
     function loadContent (data, tables) {
         var admin = $(this).closest('.results');
         if(!tables) {
@@ -284,14 +301,19 @@ $(document).ready(function () {
             for(var t = 0; t < tables.length; t++) {
                 var table = tables[t];
                 (function (table) {
+                    var getTabIdReg = new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i');
                     // leave edit rows alone
+                    var selected = getTabIdReg.exec(admin.find('> .' + table + '-row.selected').attr('class') || '');
                     admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable').remove();
                     var keepRows = admin.find('> .' + table + '-row').map(function () {
-                        var rowId = (new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i')).exec($(this).attr('class'))[1];
+                        var rowId = getTabIdReg.exec($(this).attr('class'))[1];
                         return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
                     }).toArray().join(',');
                     content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows).insertBefore(admin.find('.' + table + '-row.template').first());
                     admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
+                    if (selected) {
+                        admin.find('> .' + table + '-id-' + selected[1]).addClass('selected');
+                    }
                 })(table);
             }
         }
@@ -338,7 +360,7 @@ $(document).ready(function () {
         var search = this.hash.substring(8);
         if (search.indexOf(':') > -1) {
             admin.find('header input, header select').each(function () {
-                var subSearch = (new RegExp($(this).attr('name') + ':(.*?)(\s|$)', 'i')).exec(search);
+                var subSearch = (new RegExp($(this).attr('name') + ':(.*?)(\\s|$)', 'i')).exec(search);
                 if (subSearch) {
                     search = search.replace(subSearch[0], '');
                     $(this).val(subSearch[1]).trigger('change');
@@ -424,10 +446,10 @@ $(document).ready(function () {
         loadResults.apply(admin);
     });
 
-    body.on('click', 'a[data-target="#confirm-remove"][data-action]', function (evt) {
+    body.on('click', 'a[data-target="#general-dialog"][data-action]', function (evt) {
         evt.preventDefault();
         var that = $(this);
-        body.one('click.remove', '#confirm-remove a[href="#remove-confirm"]', function () {
+        body.one('click.confirm-action', '#general-dialog a[href="#submit"]', function () {
             $.ajax({
                 url: that.data('action'),
                 type: 'GET',
@@ -440,12 +462,9 @@ $(document).ready(function () {
                 }
             });
         });
-    });
 
-    body.on('hidden.bs.modal', '#confirm-remove', function () {
-        setTimeout(function () {
-            body.off('click.remove');
-        }, 100);
+        $('#general-dialog').modal({show: true, backdrop: true})
+            .find('.modal-body').html(that.data('dialog'));
     });
 
     body.on('click', 'a[href="#goto-error"]', function (evt) {

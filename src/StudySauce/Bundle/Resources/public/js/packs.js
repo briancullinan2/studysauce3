@@ -367,26 +367,6 @@ $(document).ready(function () {
         updatePreview.apply($(this));
     });
 
-    body.on('click', '#packs a[href="#add-new-pack"]', function (evt) {
-        evt.preventDefault();
-        window.activateMenu(Routing.generate('packs_new'));
-    });
-
-    body.on('click', '#packs .pack-row', function (evt) {
-        if(!$(evt.target).is('a, .pack-row > .packList') && $(evt.target).parents('.pack-row > .packList').length == 0)
-        {
-            var results = $(this).parents('.results');
-            var row = $(this).closest('.pack-row');
-            var packId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1];
-            window.activateMenu(Routing.generate('packs_edit', {pack: packId}));
-            row.removeClass('edit').addClass('read-only');
-        }
-    });
-
-    body.on('click', '[id^="packs-"] .cancel-edit', function (evt) {
-        resizeTextAreas.apply($(this).parents('.results').find('.pack-row,.card-row'));
-    });
-
     body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
 
     body.on('click', '[id^="packs-"] a[href="#save-pack"], [id^="packs-"] [value="#save-pack"]', function (evt) {
@@ -426,7 +406,7 @@ $(document).ready(function () {
         loadingAnimation(tab.find('a[href="#save-pack"]'));
 
         // get the parsed list of cards
-        var packId = (/pack-id-([0-9]+)(\s|$)/i).exec(packRows.attr('class'));
+        var packId = getTabId.apply(this);
         var cards = [];
         cardRows.each(function () {
             var rowId = (/card-id-([0-9]+)(\s|$)/i).exec($(this).attr('class'));
@@ -440,13 +420,7 @@ $(document).ready(function () {
                 return true;
             }
             else {
-                cards[cards.length] = {
-                    id: rowId != null ? rowId[1] : null,
-                    type:     $(this).find('.type select').val(),
-                    content:  ($(this).find('input[name="url"]').val() != '' ? ($(this).find('input[name="url"]').val() + "\\n") : '') + $(this).find('.input.content:visible textarea').val(),
-                    answers:  $(this).find('.correct.type-mc:visible textarea').val(),
-                    correct:  $(this).find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val()
-                };
+                cards[cards.length] = $.extend({id: rowId != null ? rowId[1] : null}, gatherFields.apply($(this), [['type', 'url', 'content', 'answers', 'correct']]));
             }
         });
         cardRows.removeClass('changed');
@@ -470,21 +444,15 @@ $(document).ready(function () {
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
 
+                loadContent.apply(tab, [data]);
+
                 // rename tab if working with a new pack
                 // TODO: generalize this with some sort of data attribute or class, same as in groups
                 if (tab.closest('.panel-pane').is('#packs-pack0')) {
-                    var id = close
-                        ? (/pack-id-([0-9]+)(\s|$)/i).exec($(data).find('.pack-row:not(.template)').first().attr('class'))[1]
-                        : data.pack[0].id;
+                    var id = getTabId.apply(tab);
                     tab.closest('.panel-pane').attr('id', 'packs-pack' + id);
                     window.activateMenu(Routing.generate('packs_edit', {pack: id}));
                 }
-
-                // make fields read-only
-                if(close) {
-                }
-
-                loadContent.apply(tab, [data]);
 
                 // if done in the background, don't refresh the tab with loadContent
                 isLoading = false;

@@ -175,9 +175,7 @@ $(document).ready(function () {
                 }, 1000);
                 return;
             }
-            setTimeout(function () {
-                window.sincluding[window.sincluding.length] = path;
-            }, 15);
+            window.sincluding[window.sincluding.length] = path;
             $.ajax({
                 url: Routing.generate(routes[0].name, $.extend({_format: 'tab'}, routes[0].params)),
                 type: 'GET',
@@ -821,12 +819,8 @@ $(document).ready(function () {
 
         dialog.find('.tab-pane.active, li').removeClass('active');
         dialog.find('li').hide();
-        var first = null;
         for(var tableName in tables) {
             if(tables.hasOwnProperty(tableName)) {
-                if(first == null) {
-                    first = tableName;
-                }
 
                 var entityField = dialog.find('input[name="' + tableName + '"][type="text"]');
                 if(entityField.length == 0) {
@@ -843,8 +837,12 @@ $(document).ready(function () {
         }
 
         dialog.one('shown.bs.modal', function () {
+            var first = null;
             for(var tableName in tables) {
                 if (tables.hasOwnProperty(tableName)) {
+                    if(first == null) {
+                        first = tableName;
+                    }
                     var entityField = dialog.find('input[name="' + tableName + '"]');
                     var entities = field.data(tableName);
                     var tmpTables = {};
@@ -867,9 +865,15 @@ $(document).ready(function () {
                     }
                 }
             }
-        });
 
-        dialog.find('a[href="#add-entity-' + first + '"]').trigger('click');
+            setTimeout(function () {
+                dialog.find('a[href="#add-entity-' + first + '"]').trigger('click');
+            }, 100);
+        });
+    });
+
+    body.on('click', '#add-entity [href^="#add-entity-"]', function () {
+        $('#add-entity').find($(this).attr('href')).find('.selectize-input input').click();
     });
 
     body.on('hidden.bs.modal', '#general-dialog', function () {
@@ -945,6 +949,7 @@ $(document).ready(function () {
         setTimeout(function () {
             body.off('click.modify_entities_confirm');
             body.off('click.publish_confirm');
+            body.off('click.confirm-action');
         }, 100);
     });
 

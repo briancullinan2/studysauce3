@@ -252,6 +252,22 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
+     * @param Pack $p
+     * @return UserPack|null
+     */
+    public function getUserPack(Pack $p) {
+        return $this->userPacks->matching(Criteria::create()->where(Criteria::expr()->eq('pack', $p)))->first();
+    }
+
+    /**
+     * @param int $pid
+     * @return UserPack|null
+     */
+    public function getUserPackById($pid) {
+        return $this->userPacks->matching(Criteria::create()->where(Criteria::expr()->eq('pack.id', $pid)))->first();
+    }
+
+    /**
      * Constructor
      */
     public function __construct()
