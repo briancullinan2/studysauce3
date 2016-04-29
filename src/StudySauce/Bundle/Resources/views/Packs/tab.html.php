@@ -38,36 +38,89 @@ $view['slots']->stop();
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="packs<?php print ($entity !== null ? ('-pack' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
-            <?php
-            if($entity !== null) {
-                $isNew = false;
-                if(empty($entity->getId())) {
-                    $isNew = ['pack'];
-                }
-                if($entity->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0) {
-                    $isNew[] = 'card';
-                }
-                $tables = [
-                    'tables' => ['pack', 'card'],
-                    'expandable' => ['card' => ['preview']],
-                    'pack-id' => $entity->getId(),
-                    'headers' => ['pack' => 'packPacks', 'card' => 'packCards'],
-                    'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
-                    'new' => $isNew,
-                    'edit' => $entity->getStatus() != 'GROUP' && $entity->getStatus() != 'PUBLIC',
-                    'count-pack' => 1,
-                    'count-card' => $isNew ? 5 : 0,
-                    'footers' => ['pack' => 'packPacks', 'card' => true]
-                ];
+            <?php if ($entity !== null) { ?>
+                <div class="pack-edit">
+                    <?php
+                    $tables = [
+                        // view settings
+                        'tables' => ['pack', 'card'],
+                        'headers' => ['pack' => 'packPacks'],
+                        'footers' => ['pack' => 'packPacks'],
+                        'new' => empty($entity->getId()),
+                        'edit' => empty($entity->getId()),
+                        // search settings
+                        'pack-id' => $entity->getId(),
+                        'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
+                        // for new=true the template generates the -count number of empty rows, and no database query is performed
+                        'count-pack' => 1,
+                        'count-card' => -1,
+                    ];
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+                    ?>
+                </div>
+                <div class="group-list">
+                    <?php
+                    global $pack;
+                    $pack = [$entity];
+                    $newCards = $entity->getCards()->filter(function (Card $c) {
+                            return !$c->getDeleted();
+                        })->count() == 0;
+                    $tables = [
+                        // view settings
+                        'tables' => [
+                            'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */],
+                            'pack' => ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], ['status'] /* search field but don't display a template */]],
+                        'classes' => ['last-right-expand'],
+                        'headers' => ['ss_group' => 'subGroups'],
+                        'footers' => ['ss_group' => 'subGroups'],
+                        'edit' => false,
+                        'read-only' => false,
+                        // search settings
+                        'pack-id' => $entity->getId(),
+                        'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
+                        'ss_group-deleted' => false,
+                        'count-ss_group' => 0,
+                        'count-pack' => -1,
+                    ];
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+                    ?>
+                    <div class="empty-members">
+                        <div>Select name on the left to see group members</div>
+                    </div>
+                </div>
+                <div class="card-list">
+                    <?php
+                    $newCards = $entity->getCards()->filter(function (Card $c) {
+                            return !$c->getDeleted();
+                        })->count() == 0;
+                    $tables = [
+                        // view settings
+                        'tables' => ['pack', 'card'],
+                        'expandable' => ['card' => ['preview']],
+                        'headers' => ['card' => 'packCards'],
+                        'footers' => ['card' => true],
+                        'new' => $newCards,
+                        'edit' => $newCards,
+                        // search settings
+                        'pack-id' => $entity->getId(),
+                        'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
+                        // for new=true the template generates the -count number of empty rows, and no database query is performed
+                        'count-pack' => -1,
+                        'count-card' => $newCards ? 5 : 0,
+                    ];
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+                    ?>
+                </div>
+                <?php
             }
             else {
                 $tables['count-pack'] = 0;
-                $tables['tables'] = ['pack' => ['id' => ['created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
+                $tables['tables'] = ['pack' => ['id' => ['created', 'id'], 'name' => ['title', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
                 $tables['classes'] = ['tiles'];
                 $tables['headers'] = ['pack' => 'newPack'];
                 $tables['footers'] = ['pack' => 'newPack'];
-            }
-            print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)); ?>
+                print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+            } ?>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>

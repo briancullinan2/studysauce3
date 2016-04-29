@@ -88,16 +88,17 @@ class Group extends BaseGroup implements GroupInterface
         $this->created = new \DateTime();
     }
 
-    public function getUserPacksRecursively()
+    public function getUsersPacksGroupsRecursively()
     {
         $packs = $this->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
         $users = $this->getUsers()->toArray();
-        foreach($this->getSubgroups()->toArray() as $g) {
+        $groups = $this->getSubgroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();
+        foreach($groups as $g) {
             /** @var Group $g */
             if($g->getDeleted()) {
                 continue;
             }
-            list($subUsers, $subPacks) = $g->getUserPacksRecursively();
+            list($subUsers, $subPacks, $subGroups) = $g->getUsersPacksGroupsRecursively();
             foreach($subPacks as $p) {
                 if(!in_array($p, $packs)) {
                     $packs[] = $p;
@@ -108,8 +109,13 @@ class Group extends BaseGroup implements GroupInterface
                     $users[] = $u;
                 }
             }
+            foreach($subGroups as $sg) {
+                if(!in_array($sg, $groups)) {
+                    $groups[] = $sg;
+                }
+            }
         }
-        return [$users, $packs];
+        return [$users, $packs, $groups];
     }
 
     /**
@@ -169,7 +175,13 @@ class Group extends BaseGroup implements GroupInterface
     }
 
     public function getUserCountStr() {
-        return '(' . $this->getUsers()->count() . ' users)';
+        list($users, $packs) = $this->getUsersPacksGroupsRecursively();
+        return '(' . count($users) . ' users)';
+    }
+
+    public function getDescriptionStr() {
+        list($users, $packs, $groups) = $this->getUsersPacksGroupsRecursively();
+        return '(' . count($groups) . ' subgroups / ' . count($packs) . ' packs)';
     }
 
     /**

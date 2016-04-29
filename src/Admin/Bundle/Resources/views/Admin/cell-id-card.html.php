@@ -24,7 +24,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
         <option value="sa exactly" <?php print ($card->getResponseType() == 'sa' && !$isContains ? 'selected="selected"' : ''); ?>>Short answer (exact match)</option>
     </select>
 </label>
-<input name="url" value="<?php print (!empty($url) ? $url : ''); ?>" type="hidden" />
+<input name="upload" value="<?php print (!empty($url) ? $url : ''); ?>" type="hidden" />
 <a href="#upload-image" class="<?php print (!empty($isImage) ? 'active' : ''); ?>" data-target="#upload-file" data-toggle="modal"> </a>
 <a href="#upload-audio" class="<?php print (!empty($isAudio) ? 'active' : ''); ?>" data-target="#upload-file" data-toggle="modal"> </a>
 <a href="#upload-video" data-target="#upload-file" data-toggle="modal"> </a>

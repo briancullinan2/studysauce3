@@ -660,7 +660,7 @@ function gatherFields(fields, visibleOnly) {
         if (fields.hasOwnProperty(f)) {
             var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"]');
             if(visibleOnly !== false) {
-                inputField = inputField.filter(':visible');
+                inputField = inputField.filter('[type="hidden"],:visible');
             }
             if (inputField.is('[type="checkbox"],[type="radio"]')) {
                 result[fields[f]] = inputField.filter(':checked').val();
@@ -799,7 +799,7 @@ $(document).ready(function () {
         show: true
     });
 
-    body.on('show.bs.modal', '.modal', function () {
+    body.on('shown.bs.modal', '.modal', function () {
         var modals = $('.modal');
         //if(backdrops.length > 1)
         if(modals.length > 0)

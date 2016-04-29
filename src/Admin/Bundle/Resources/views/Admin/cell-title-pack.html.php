@@ -1,1 +1,1 @@
-<label><span><?php print $view->escape($pack->getTitle()); ?></span></label>
+<label><span><?php print (isset($searchRequest['pack-id']) && $pack->getId() == $searchRequest['pack-id'] ? 'All users in this pack' : $view->escape($pack->getTitle())); ?></span></label>

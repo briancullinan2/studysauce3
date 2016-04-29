@@ -2,11 +2,12 @@
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 
 /** @var Pack $pack */
 
 $entityIds = [];
-$users = $pack->getUsers();
+$users = $pack->getUserPacks()->map(function (UserPack $up) {return $up->getUser();});
 $ids = $users->map(function (User $u) {return 'ss_user-' . $u->getId();})->toArray();
 if(isset($searchRequest['ss_group-id']) && !empty($group = $searchRequest['ss_group-id'])) {
     $users = $users->filter(function (User $u) use ($group) {

@@ -38,14 +38,13 @@ $view['slots']->stop();
 $view['slots']->start('body'); ?>
     <div
         class="panel-pane <?php
-        print (!empty($entity) && $entity->getGroupPacks()->count() > 0 ? ' right-pad' : '');
         print (!empty($entity) && $entity->getSubgroups()->count() > 0 ? ' has-subgroups' : ''); ?>"
         id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
                 <div class="group-edit">
                     <?php
-                    $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'subgroup' => [], 'actions' => ['deleted']]];
+                    $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']]];
                     $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-ss_group' => 1,
@@ -61,59 +60,76 @@ $view['slots']->start('body'); ?>
                     ?>
                 </div>
             <?php } ?>
-            <div class="group-list">
-                <?php
-                $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name','description','userCountStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
-                if (empty($entity)) {
-                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'parent-ss_group-id' => 'NULL',
-                        'count-ss_group' => 0,
-                        'classes' => ['tiles'],
-                        'tables' => $tables,
-                        'headers' => ['ss_group' => 'newGroup'],
-                        'footers' => ['ss_group' => 'newGroup']
-                    ]));
-                } else {
-                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
-                        'count-ss_group' => 0,
-                        'classes' => ['tiles'],
-                        'tables' => $tables,
-                        'headers' => false,
-                        'footers' => false
-                    ]));
-                }
-                ?>
-            </div>
-            <?php if ($entity !== null) {
-                global $ss_group;
-                $ss_group = [$entity];
-                ?>
-                <div class="list-packs">
+            <div class="membership">
+                <div class="group-list">
                     <?php
-                    $tables = ['ss_group' => ['id', 'deleted']];
-                    $tables['pack'] = ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
-                    $isNew = empty($entity->getId());
-                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                        'count-pack' => $isNew ? -1 : 0,
-                        'count-ss_group' => -1,
-                        'ss_group-deleted' => $entity->getDeleted(),
-                        'edit' => !$isNew ? false : [],
-                        'read-only' => $isNew ? false : [],
-                        'new' => $isNew,
-                        'ss_group-id' => $entity->getId(),
-                        'tables' => $tables,
-                        'headers' => [],
-                        'footers' => ['ss_group' => 'groupPacks']
-                    ]));
-                    if ($entity->getGroupPacks()->count() > 0) {
-                        ?>
-                        <div class="empty-members">
-                            <div>Click pack name to see group members</div>
-                        </div><?php
-                    } ?>
+                    $tiles = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
+                    if (empty($entity)) {
+                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                            'tables' => $tiles,
+                            'parent-ss_group-id' => 'NULL',
+                            'count-ss_group' => 0,
+                            'classes' => ['tiles'],
+                            'headers' => ['ss_group' => 'newGroup'],
+                            'footers' => ['ss_group' => 'newGroup']
+                        ]));
+                    } else {
+                        global $subGroupParent;
+                        $subGroupParent = [$entity];
+                        // TODO: check view setting
+                        $tableViews = [
+                            'Tiles' => [
+                                'tables' => $tiles,
+                                'classes' => ['tiles']
+                            ],
+                            'Membership' => [
+                                'tables' => ['ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
+                                'classes' => ['last-right-expand']
+                            ]
+                        ];
+                        $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
+                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tableView + [
+                            'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
+                            'count-ss_group' => 0,
+                            'parent-ss_group-deleted' => $entity->getDeleted(),
+                            'edit' => false,
+                            'read-only' => false,
+                            'headers' => ['ss_group' => 'subGroups'],
+                            'footers' => ['ss_group' => 'subGroups']
+                        ]));
+                    }
+                    ?>
                 </div>
-            <?php } ?>
+                <?php if ($entity !== null) {
+                    global $subPacks;
+                    list($users, $subPacks, $groups) = $entity->getUsersPacksGroupsRecursively();
+                    ?>
+                    <div class="list-packs">
+                        <?php
+                        $tables = ['ss_group' => ['id', 'deleted']];
+                        $tables['pack'] = ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                        $isNew = empty($entity->getId());
+                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                            'count-pack' => $isNew || empty($subPacks) ? -1 : 0,
+                            'count-ss_group' => -1,
+                            'ss_group-deleted' => $entity->getDeleted(),
+                            'edit' => false,
+                            'new' => empty($subPacks),
+                            'classes' => ['last-right-expand'],
+                            'read-only' => false,
+                            'ss_group-id' => $entity->getId(),
+                            'tables' => $tables,
+                            'headers' => ['pack' => 'groupPacks'],
+                            'footers' => ['pack' => 'groupPacks']
+                        ]));
+                        ?>
+                    </div>
+                <?php } ?>
+
+                <div class="empty-members">
+                    <div>Select name on the left to see group members</div>
+                </div>
+            </div>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>

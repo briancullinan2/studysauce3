@@ -81,19 +81,14 @@ $(document).ready(function () {
         loadingAnimation(tab.find('a[href^="#save-"]'));
         tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
 
+        var groupData = $.extend({groupId: groupId, requestKey: getDataRequest.apply(tab).requestKey},
+            gatherFields.apply(row, [['upload', 'name', 'invite', 'parent']]));
+
         $.ajax({
             url: Routing.generate('save_group'),
             type: 'POST',
-            dataType: close ? 'text' : 'json',
-            data: {
-                logo: row.find('.id img:not(.default)').attr('src'),
-                groupName: row.find('input[name="name"]').val().trim(),
-                invite: row.find('.invite input').val().trim(),
-                roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                groupId: groupId,
-                parent: row.find('select[name="parent"]').val(),
-                requestKey: getDataRequest.apply(tab).requestKey
-            },
+            dataType: 'text',
+            data: groupData,
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
 
@@ -147,7 +142,7 @@ $(document).ready(function () {
 
     body.on('show', '.panel-pane[id^="groups-"]', function () {
         autoSaveTimeout = 0;
-        groupsFunc.apply($(this).find('.ss_group-row:not(.template)'));
+        groupsFunc.apply($(this).find('.group-edit .ss_group-row:not(.template)'));
         autoSaveTimeout = null;
     });
 
@@ -163,20 +158,12 @@ $(document).ready(function () {
         autoSave.apply(tab, [true]);
     });
 
-    body.on('change keyup keydown', '[id^="groups-"] .ss_group-row input, [id^="groups-"] .ss_group-row select, [id^="groups-"] .ss_group-row textarea', groupsFunc);
+    body.on('change keyup keydown', '.group-edit .ss_group-row input, .group-edit .ss_group-row select, .group-edit .ss_group-row textarea', groupsFunc);
 
     body.on('click', '[id^="groups-"] .ss_group-row.edit a[href^="#cancel-"], [id^="groups-"] .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
         evt.preventDefault();
         $(this).parents('.results').find('.ss_group-row').removeClass('edit').addClass('read-only');
         window.activateMenu(Routing.generate('groups'));
-    });
-
-    body.on('click', '[id^="groups-"] .ss_group-row a[href="#upload-image"]', function () {
-        var row = $(this).parents('.ss_group-row');
-        body.one('click.upload', 'a[href="#submit-upload"]', function () {
-            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('default');
-            groupsFunc.apply(row);
-        });
     });
 
     var isSettingSelectize = false;
@@ -224,14 +211,20 @@ $(document).ready(function () {
     });
 
     body.on('change', '[id^="groups-"] .pack-row .members input.selectized', function () {
+        if(isSettingSelectize) {
+            return;
+        }
+        isSettingSelectize = true;
         var field = $(this),
             tab = field.parents('.results'),
             row = field.parents('.pack-row'),
-            rowId = (/pack-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1],
+            rowId = getRowId.apply(row),
             groupId = getTabId.apply(row);
 
+        field[0].selectize.setValue('', true);
+
+        // confirmation dialog
         body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-            // TODO: confirmation dialog
             $.ajax({
                 url: Routing.generate('save_group'),
                 type: 'POST',
@@ -254,6 +247,8 @@ $(document).ready(function () {
                 }
             });
         });
+
+        isSettingSelectize = false;
     });
 
 });

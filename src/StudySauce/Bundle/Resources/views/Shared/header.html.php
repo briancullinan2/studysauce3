@@ -62,7 +62,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
                 <label class="input"><input type="text" name="search" data-confirm="false" data-tables="<?php print $view->escape(json_encode([
                         'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
                         'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
-                        'ss_group' => ['name', 'userCountStr', 'description', 'id', 'deleted']])); ?>" placeholder="Search" /></label>
+                        'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted']])); ?>" placeholder="Search" /></label>
                 <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>
                 <a href="<?php print $view['router']->generate('logout'); ?>" title="Log out">logout</a></div>
             <div id="jquery_jplayer" style="width: 0; height: 0;"></div>

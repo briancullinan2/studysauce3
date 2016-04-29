@@ -20,7 +20,7 @@ $expandable = isset($searchRequest['expandable']) && is_array($searchRequest['ex
 print $rowId; ?> <?php
 print (isset($searchRequest['edit']) && ($searchRequest['edit'] === true || is_array($searchRequest['edit']) && in_array($table, $searchRequest['edit']))
     ? 'edit'
-    : (isset($searchRequest['read-only']) && is_array($searchRequest['read-only']) && !in_array($table, $searchRequest['read-only'])
+    : (isset($searchRequest['read-only']) && ($searchRequest['read-only'] === false || is_array($searchRequest['read-only']) && !in_array($table, $searchRequest['read-only']))
         ? ''
         : 'read-only')); ?> <?php
 print (isset($expandable[$table]) ? 'expandable' : ''); ?> <?php

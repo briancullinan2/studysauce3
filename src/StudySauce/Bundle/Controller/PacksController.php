@@ -112,15 +112,15 @@ class PacksController extends Controller
             $newPack->setUser($user);
         }
         if ($user->hasRole('ROLE_ADMIN')) {
-            if(!empty($request->get('logo'))) {
-                $newPack->setProperty('logo', $request->get('logo'));
+            if(!empty($request->get('upload'))) {
+                $newPack->setProperty('logo', $request->get('upload'));
             }
             $groups = new ArrayCollection($orm->getRepository('StudySauceBundle:Group')->findAll());
         } else {
             /** @var File $logo */
-            if(!empty($request->get('logo'))) {
+            if(!empty($request->get('upload'))) {
                 $logo = $user->getFiles()->filter(function (File $f) use ($request) {
-                    return $f->getUrl() == $request->get('logo');
+                    return $f->getUrl() == $request->get('upload');
                 })->first();
                 $newPack->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
             }
@@ -145,6 +145,9 @@ class PacksController extends Controller
             }
             else if (!empty($g) && $newPack->hasGroup($g->getName()) && isset($group['remove']) && $group['remove'] == 'true') {
                 $newPack->removeGroup($g);
+                if($newPack->getGroup() == $g) {
+                    $newPack->setGroup(null);
+                }
                 foreach($g->getUsers()->toArray() as $ug) {
                     /** @var User $ug */
                     $up = $ug->getUserPack($newPack);

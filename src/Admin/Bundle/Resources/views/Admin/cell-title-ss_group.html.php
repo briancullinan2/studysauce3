@@ -1,0 +1,1 @@
+<label><span><?php print (isset($searchRequest['parent-ss_group-id']) && $ss_group->getId() == $searchRequest['parent-ss_group-id'] ? 'All users in this group' : $view->escape($ss_group->getName())); ?></span></label>

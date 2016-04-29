@@ -370,14 +370,14 @@ a[href="#subtract-entity"] {
     margin-left: 0;
 }
 
-.entity-search label.checkbox span:after {
+.entity-search label.checkbox.changed span:after {
     content: " will be added ";
     color: #bbb;
     display:inline-block;
     padding-left:10px;
 }
 
-.entity-search label.checkbox input[name*="remove"] ~ span:after {
+.entity-search label.checkbox.changed input[name*="remove"] ~ span:after {
     content: " will be removed ";
 }
 

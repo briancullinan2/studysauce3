@@ -60,21 +60,16 @@
     position:relative;
 }
 
-[id^="packs-"] .pack-row .id {
+.pack-edit .pack-row .id {
     text-align: center;
     position: absolute;
     padding-bottom: 10%;
+    width:10%;
     top:-20px;
 }
 
-#packs .pack-row .pack-icon,
-[id^="packs-"] .pack-row .pack-icon {
-    position: absolute;
+.pack-edit .pack-row .pack-icon {
     padding:0 20px 0 5px;
-    height:100%;
-    width:100%;
-    top:0;
-    left:0;
 }
 
 #packs .pack-row .pack-icon
@@ -119,20 +114,13 @@
     background-color: #FF4433;
 }
 
-[id^="packs-"] .pack-row > .groups,
-[id^="packs-"] .pack-row > .name {
+.pack-edit .pack-row > :nth-of-type(2),
+.pack-edit .pack-row > :nth-of-type(4) {
     width: 45%;
     margin-left:10%;
     padding-left:150px;
     margin-right:0;
     padding-right:5%;
-}
-
-[id^="packs-"] .pack-row > .status {
-    width: 45%;
-    padding-left:150px;
-    margin-left:-4px;
-    position:relative;
 }
 
 [id^="packs-"] .pack-row.read-only .pack-icon
@@ -146,12 +134,11 @@
     display:none;
 }
 
-[id^="packs-"] .pack-row > .properties,
 [id^="packs-"] .pack-row > .users {
     width: 25%;
 }
 
-[id^="packs-"] .pack-row > .properties
+[id^="packs-"] .pack-row > .status
 {
     width: 45%;
     padding-left:150px;
@@ -164,11 +151,7 @@
 
 [id^="packs-"] .card-row.edit ~ .highlighted-link.card {
     display:block;
-}
-
-[id^="packs-"] .pack-row [class*="actions"]
-{
-    width:5%;
+    margin:20px 0;
 }
 
 [id^="packs-"] .card-row > * {
@@ -178,6 +161,10 @@
 [id^="packs-"] header.card label:nth-child(1),
 [id^="packs-"] .card-row .id {
     width: 25%;
+}
+
+[id^="packs-"] header.card label:nth-child(1) {
+    padding-left:40px;
 }
 
 [id^="packs-"] .card-row .id a.active
@@ -223,6 +210,10 @@
     text-align: left;
 }
 
+.group-list {
+    position:relative;
+}
+
 #packs .packList label {
     color: #BBB;
     font-weight: normal;
@@ -261,7 +252,7 @@
     white-space: normal;
 }
 
-[id^="packs-"] .pack-row {
+.pack-edit .pack-row {
     position: relative;
 }
 
@@ -435,7 +426,7 @@
 [id^="packs-"] .preview-card:not(.preview-answer) .preview-inner,
 [id^="packs-"] .card-row + .expandable .preview-answer:not([class*="type-"]) .preview-inner
 {
-    padding-bottom: 2.6em;
+    padding-bottom: 3.0em;
     margin-bottom: -2.6em;
 }
 
@@ -450,7 +441,7 @@
 }
 
 [id^="packs-"] .card-row + .expandable .preview-answer .preview-inner {
-    padding-top:55%;
+    padding-top:64%;
     position:relative;
 }
 
@@ -595,21 +586,6 @@
     position:relative;
 }
 
-[id^="packs-"] a[href="#add-entity"] {
-    line-height: 20px;
-    border-radius: 100%;
-    display: inline-block;
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    right: auto;
-    margin-top: -12px;
-    font-size: 40px;
-    vertical-align: middle;
-    left:90%;
-    overflow:hidden;
-}
-
 [id^="packs-"] .results .pack-row [class*="actions"]
 {
     position: absolute;
@@ -637,14 +613,8 @@
 [id^="packs-"] .pack-row.read-only a[href="#pack-publish"],
 #packs .pack-row > label.checkbox:nth-last-child(1),
 #packs .highlighted-link.card,
-#packs a[href="#add-entity"],
-[id^="packs-"] .read-only a[href="#add-entity"],
 #packs a[href="#pack-publish"] {
     display:none;
-}
-
-[id^="packs-"] .pack-row .groups {
-    position:relative;
 }
 
 [id^="packs-"] .pack-row.edit .highlighted-link > .remove-icon

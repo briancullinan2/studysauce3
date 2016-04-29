@@ -24,7 +24,7 @@ use Codeception\Subscriber\Module;
 use Codeception\SuiteManager;
 use Codeception\TestCase;
 use Codeception\TestCase\Cest;
-use Codeception\TestLoader;
+use Codeception\Lib\TestLoader;
 use Codeception\Util\Locator;
 use Doctrine\ORM\Query;
 use PHP_Timer;

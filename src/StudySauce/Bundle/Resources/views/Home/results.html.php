@@ -69,8 +69,9 @@ $view['slots']->start('body'); ?>
                 <h2>Study mastery report</h2>
                 <?php
                 $tables = [
-                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['userPacks.user'], 'cardMastery'], 'ss_user' => ['id']],
+                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['userPacks.user'], 'expandMastery'], 'ss_user' => ['id']],
                     //'user-ss_user-id' => 'NULL',
+                    'classes' => ['last-right-expand'],
                     'ss_user-id' => $id,
                     'headers' => false,
                     'count-pack' => 0,

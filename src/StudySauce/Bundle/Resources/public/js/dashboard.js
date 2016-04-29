@@ -380,7 +380,13 @@ $(document).ready(function () {
 
     body.on('hidden.bs.modal', '#upload-file', function () {
         var dialog = $('#upload-file');
-        dialog.find('.file').remove();
+        setTimeout(function () {
+            body.off('click.upload');
+            dialog.find('.plupload img').attr('src', defaultImage).removeClass('add').load(function () {
+                centerize.apply($(this));
+            });
+            dialog.find('.file').remove();
+        }, 100);
     });
 
     body.on('dragover', '#upload-file', function () {
@@ -389,6 +395,18 @@ $(document).ready(function () {
 
     body.on('click', 'a[data-target="#upload-file"], a[href="#upload-file"]', function () {
         var dialog = $('#upload-file');
+
+        // update field next to upload link
+        var row = $(this).parents('[class*="-row"]');
+        body.one('click.upload', 'a[href="#submit-upload"]', function () {
+            var url = dialog.find('img').attr('src');
+            // TODO user some sort of data binding api to update this part
+            row.addClass('changed').find('input[name="upload"]').val(url).trigger('change').siblings('img').attr('src', url).removeClass('default').load(function () {
+                if($(this).is('.centerized')) {
+                    centerize.apply(this);
+                }
+            });
+        });
 
         if (dialog.find('.plupload').is('.init'))
             return;
@@ -469,17 +487,6 @@ $(document).ready(function () {
 
     });
     var defaultImage;
-
-    body.on('hidden.bs.modal', '#upload-file', function () {
-        var dialog = $('#upload-file');
-        setTimeout(function () {
-            body.off('click.upload');
-            dialog.find('.plupload img').attr('src', defaultImage).removeClass('add').load(function () {
-                centerize.apply($(this));
-            });
-            dialog.find('.file').remove();
-        }, 100);
-    });
 
     // hide any visible modals when panel changes
     body.on('hide', '.panel-pane', function () {
@@ -949,7 +956,7 @@ $(document).ready(function () {
         setTimeout(function () {
             body.off('click.modify_entities_confirm');
             body.off('click.publish_confirm');
-            body.off('click.confirm-action');
+            body.off('click.confirm_action');
         }, 100);
     });
 

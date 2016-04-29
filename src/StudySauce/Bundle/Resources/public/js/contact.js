@@ -34,7 +34,7 @@ $(document).ready(function () {
         }
     }
 
-    body.on('show.bs.modal', '#contact-support', validateContact);
+    body.on('shown.bs.modal', '#contact-support', validateContact);
     body.on('keyup', '#contact-support input, #contact-support textarea', validateContact);
     body.on('change', '#contact-support input, #contact-support textarea', validateContact);
 
@@ -118,7 +118,7 @@ $(document).ready(function () {
         }
     }
 
-    body.on('show.bs.modal', '#schedule-demo', validateDemo);
+    body.on('shown.bs.modal', '#schedule-demo', validateDemo);
     body.on('keyup', '#schedule-demo input, #schedule-demo textarea', validateDemo);
     body.on('change', '#schedule-demo input, #schedule-demo textarea', validateDemo);
 
@@ -274,7 +274,7 @@ $(document).ready(function () {
             invite.removeClass('invalid-only').find('.highlighted-link').removeClass('invalid').addClass('valid');
     }
 
-    body.on('show.bs.modal', '#student-invite, #bill-parents', validateInvite);
+    body.on('shown.bs.modal', '#student-invite, #bill-parents', validateInvite);
     body.on('keyup', '#student-invite input, #bill-parents input', validateInvite);
     body.on('change', '#student-invite input, #bill-parents input', validateInvite);
 

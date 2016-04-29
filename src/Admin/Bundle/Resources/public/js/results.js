@@ -22,13 +22,13 @@ $(document).ready(function () {
         }
 
         selectViable = false;
-        var results = $(this).parents('.results');
+        var results = $(this).closest('.results');
         var type = (/(.*)-row/i).exec($(this).attr('class'))[1];
         var state = !$(this).find('input[name="selected"]').prop('checked');
         // clear selection unless shift is pressed
         var range = $(this);
         if (!key.shift) {
-            results.find('.selected').not($(this)).removeClass('selected').find('> *:last-child input[name="selected"]')
+            results.parents('.panel-pane').find('.results').find('.selected').not($(this)).removeClass('selected').find('> *:last-child input[name="selected"]')
                 .prop('checked', false);
         }
         else {
@@ -249,7 +249,7 @@ $(document).ready(function () {
 
     body.on('click', '.form-actions a[href^="#edit-"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.results').find('.read-only');
+        var row = $(this).parents('.panel-pane').find('.results [class*="-row"].read-only');
         row.removeClass('read-only').addClass('edit');
     });
 
@@ -261,16 +261,21 @@ $(document).ready(function () {
 
     body.on('click', '.form-actions a[href^="#cancel-edit"], .form-actions .cancel-edit', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.results').find('[class*="-row"].edit');
+        var row = $(this).parents('.panel-pane').find('.results [class*="-row"].edit');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
     function getTabId() {
-        var row = $(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first();
-        var table = (/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class'))[2];
-        return ((new RegExp(table + '-id-([0-9]+)(\\s|$)', 'ig')).exec(row.attr('class')) || [])[1];
+        return getRowId.apply($(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first());
     }
     window.getTabId = getTabId;
+
+    function getRowId() {
+        var row = $(this).closest('[class*="-row"]').first();
+        var table = (/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class'))[2];
+        return ((new RegExp(table + '-id-([0-9]*)(\\s|$)', 'ig')).exec(row.attr('class')) || [])[1];
+    }
+    window.getRowId = getRowId;
 
     function loadContent (data, tables) {
         var admin = $(this).closest('.results');
@@ -279,43 +284,66 @@ $(document).ready(function () {
                 return (/(.*)-row/i).exec($(this).attr('class'))[1];
             }).toArray());
         }
-
+        var content;
         if(typeof data == 'object') {
+            if(typeof data.tables == 'undefined') {
+                throw 'Not a "results" request.';
+            }
             admin.data('request', {requestKey: data.searchRequest.requestKey});
-            for(var t2 = 0; t2 < tables.length; t2++) {
-                var table2 = tables[t2];
-                (function (table) {
+        }
+        else {
+            content = $(data).filter('.results');
+            if (content.find('.panel-pane').length > 0) {
+                throw 'Not a "results" request.';
+            }
+            admin.data('request', content.data('request'));
+        }
+
+        for(var t = 0; t < tables.length; t++) {
+            (function (table) {
+                if(typeof data == 'object') {
                     for (var i = 0; i < data[table].length; i++) {
                         if (admin.find('> .' + table + '-row.' + table + '-id-' + data[table][i].id).length == 0) {
                             // set pack id on panel
                             admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first().removeClass(table + '-id-').addClass(table + '-id-' + data[table][i].id);
                             // TODO: update data-action attributes with new ID
+
                         }
                     }
-                })(table2);
-            }
-        }
-        else {
-            var content = $(data).filter('.results');
-            admin.data('request', content.data('request'));
-            for(var t = 0; t < tables.length; t++) {
-                var table = tables[t];
-                (function (table) {
-                    var getTabIdReg = new RegExp(table + '-id-([0-9]*)(\\s|$)', 'i');
+                }
+                else {
                     // leave edit rows alone
-                    var selected = getTabIdReg.exec(admin.find('> .' + table + '-row.selected').attr('class') || '');
-                    admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable').remove();
-                    var keepRows = admin.find('> .' + table + '-row').map(function () {
-                        var rowId = getTabIdReg.exec($(this).attr('class'))[1];
+                    var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
+                    // TODO: update empty row ids
+
+                    // remove existing rows
+                    admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable')
+                        .remove();
+
+                    var keepRows = admin.find('> .' + table + '-row:not(.template)').map(function () {
+                        var rowId = getRowId.apply(this);
                         return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
-                    }).toArray().join(',');
-                    content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows).insertBefore(admin.find('.' + table + '-row.template').first());
+                    }).toArray();
+                    var newRows = content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows.join(','));
+                    for(var n = 0; n < newRows.length; n++) {
+                        var noId;
+                        if((noId = admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first()).length > 0) {
+                            noId.removeClass(table + '-id-').addClass(table + '-id-' + getRowId.apply(newRows[n]));
+                        }
+                        else {
+                            $(newRows[n]).insertBefore(admin.find('.' + table + '-row.template').first());
+                        }
+                    }
                     admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
+                    // TODO: even if we are keeping the existing rows, still update data-action attributes for each ID
+                    for(var r = 0; r < keepRows.length; r++) {
+                        admin.find(keepRows[r]).find('> [class*="actions"]').replaceWith(content.find(keepRows[r]).find('> [class*="actions"]'))
+                    }
                     if (selected) {
                         admin.find('> .' + table + '-id-' + selected[1]).addClass('selected');
                     }
-                })(table);
-            }
+                }
+            })(tables[t]);
         }
         resetHeader();
         admin.trigger('resulted');
@@ -449,7 +477,7 @@ $(document).ready(function () {
     body.on('click', 'a[data-target="#general-dialog"][data-action]', function (evt) {
         evt.preventDefault();
         var that = $(this);
-        body.one('click.confirm-action', '#general-dialog a[href="#submit"]', function () {
+        body.one('click.confirm_action', '#general-dialog a[href="#submit"]', function () {
             $.ajax({
                 url: that.data('action'),
                 type: 'GET',
@@ -463,8 +491,7 @@ $(document).ready(function () {
             });
         });
 
-        $('#general-dialog').modal({show: true, backdrop: true})
-            .find('.modal-body').html(that.data('dialog'));
+        $('#general-dialog').find('.modal-body').html(that.data('dialog'));
     });
 
     body.on('click', 'a[href="#goto-error"]', function (evt) {

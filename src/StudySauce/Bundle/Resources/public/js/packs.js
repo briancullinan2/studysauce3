@@ -3,6 +3,10 @@ $(document).ready(function () {
 
     var body = $('body');
 
+    function getTab() {
+        return $(this).closest('.panel-pane').find('.pack-edit .results, .card-list .results');
+    }
+
     key('⌘+v, ctrl+v, command+v', function () {
         var tab = $('[id^="packs-"] .results:visible');
         if(tab.is(':visible') && tab.find('input:focus, select:focus, textarea:focus').parents('.results [class*="-row"]').is('.empty')) {
@@ -102,7 +106,7 @@ $(document).ready(function () {
             var isUrl, content;
             if((isUrl = (/https:\/\/.*?(\s|\\n|$)/i).exec(content = newRow.find('.content textarea').val())) !== null) {
                 newRow.find('.content textarea').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim()).trigger('change');
-                newRow.find('input[name="url"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
+                newRow.find('input[name="upload"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
             }
         }
 
@@ -191,7 +195,7 @@ $(document).ready(function () {
 
         // replace with image
         var url;
-        if((url = row.find('input[name="url"]').val().trim()) != '') {
+        if((url = row.find('input[name="upload"]').val().trim()) != '') {
             template.find('img').attr('src', url).load(function () {
                 centerize.apply($(this));
             });
@@ -213,7 +217,7 @@ $(document).ready(function () {
         }
 
         // insert content and multiple choice answers
-        template.find('.preview-content div').text(row.find('.content textarea:visible').val());
+        template.find('.preview-content div').text(row.find('.content textarea:visible').val().replace(/\\n/ig, "\n"));
         var answers = row.find('.correct.type-mc:visible textarea').val();
         if (answers != null) {
             answers = answers.split("\n");
@@ -221,7 +225,7 @@ $(document).ready(function () {
                 $(this).text(answers[$(this).parent().parent().find('.preview-response').index($(this).parent())]);
             });
         }
-        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val());
+        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val().replace(/\\n/ig, "\n"));
 
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         // center some preview fields
@@ -237,7 +241,7 @@ $(document).ready(function () {
     });
 
     function packsFunc (evt) {
-        var tab = $(this).closest('.results:visible');
+        var tab = getTab.apply(this);
         var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
         var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
 
@@ -273,7 +277,7 @@ $(document).ready(function () {
 
     function validateChanged() {
 
-        var tab = $(this).closest('.results:visible');
+        var tab = getTab.apply(this);
         var packRows = tab.find('.pack-row.changed:not(.template),.pack-row:not(.valid):not(.template)'); // <-- this is critical for autosave to work
         var cardRows = tab.find('.card-row.changed:not(.removed):not(.template)');
 
@@ -371,7 +375,7 @@ $(document).ready(function () {
 
     body.on('click', '[id^="packs-"] a[href="#save-pack"], [id^="packs-"] [value="#save-pack"]', function (evt) {
         evt.preventDefault();
-        var tab = $(this).parents('.results:visible');
+        var tab = getTab.apply(this);
         if (autoSaveTimeout != null) {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
@@ -383,7 +387,7 @@ $(document).ready(function () {
             }
         });
         tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
-        resizeTextAreas.apply($(this).parents('.results').find('.pack-row,.card-row'));
+        resizeTextAreas.apply(getTab.apply(this).find('.pack-row,.card-row'));
         validateChanged.apply(tab);
     });
 
@@ -391,7 +395,7 @@ $(document).ready(function () {
 
     function autoSave(close) {
         autoSaveTimeout = null;
-        var tab = $(this).closest('.results:visible');
+        var tab = getTab.apply(this);
         var packRows = tab.find('.pack-row.valid:not(.template)');
         var cardRows = tab.find('.card-row.valid.changed:not(.template),.card-row.removed:not(.template)');
         if (packRows.length == 0) {
@@ -409,10 +413,10 @@ $(document).ready(function () {
         var packId = getTabId.apply(this);
         var cards = [];
         cardRows.each(function () {
-            var rowId = (/card-id-([0-9]+)(\s|$)/i).exec($(this).attr('class'));
+            var rowId = getRowId.apply($(this));
             if($(this).is('.removed') || $(this).is('.empty')) {
                 cards[cards.length] = {
-                    id: rowId != null ? rowId[1] : null,
+                    id: rowId,
                     remove: true
                 };
             }
@@ -420,27 +424,19 @@ $(document).ready(function () {
                 return true;
             }
             else {
-                cards[cards.length] = $.extend({id: rowId != null ? rowId[1] : null}, gatherFields.apply($(this), [['type', 'url', 'content', 'answers', 'correct']]));
+                cards[cards.length] = $.extend({id: rowId}, gatherFields.apply($(this), [['type', 'upload', 'content', 'answers', 'correct']]));
             }
         });
         cardRows.removeClass('changed');
 
+        var packData = $.extend({id: packId, cards: cards, publish: packRows.find('.status select').data('publish'), requestKey: getDataRequest.apply(tab).requestKey},
+            gatherFields.apply(packRows, [['upload', 'groups', 'users', 'status', 'title', 'keyboard']]));
+
         $.ajax({
             url: Routing.generate('packs_create'),
             type: 'POST',
-            dataType: close ? 'text' : 'json',
-            data: {
-                id: packId != null ? packId[1] : null,
-                logo: packRows.find('.id img:not(.default)').attr('src'),
-                cards: cards,
-                groups: packRows.find('.groups input').data('ss_group').map(function (g) {return {id: g['value'].substring(9), remove: g['remove']};}),
-                users: packRows.find('.groups input').data('ss_user').map(function (g) {return {id: g['value'].substring(8), remove: g['remove']};}),
-                status: packRows.find('.status select').val(),
-                title: packRows.find('.name input').val(),
-                keyboard: packRows.find('select[name="keyboard"]').val(),
-                publish: packRows.find('.status select').data('publish'),
-                requestKey: getDataRequest.apply(tab).requestKey
-            },
+            dataType: 'text',
+            data: packData,
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
 
@@ -506,22 +502,7 @@ $(document).ready(function () {
         }
     });
 
-    // TODO: generalize and move this to dashboard, just like users-groups dialog
-    body.on('click', '[id^="packs-"] .card-row a[href="#upload-image"]', function () {
-        var row = $(this).parents('.card-row');
-        body.one('click.upload', 'a[href="#submit-upload"]', function () {
-            row.find('input[name="url"]').val($('#upload-file').find('img').attr('src'));
-            packsFunc.apply(row.addClass('changed'));
-        });
-    });
-
-    body.on('click', '[id^="packs-"] .pack-row a[href="#upload-image"]', function () {
-        var row = $(this).parents('.pack-row');
-        body.one('click.upload', 'a[href="#submit-upload"]', function () {
-            row.find('.id img').attr('src', $('#upload-file').find('img').attr('src')).removeClass('default');
-            packsFunc.apply(row.addClass('changed'));
-        });
-    });
+    // TODO: generalize and move this to dashboard
 
     body.on('change', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');
@@ -536,10 +517,9 @@ $(document).ready(function () {
                     ? 'Published'
                     : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' '
                 + publish.schedule.getHours() + ':00)');
-                select.data('publish', publish).val('GROUP');
                 row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
                 row.addClass('changed');
-                row.parents('.results').find('.form-actions a[href="#save-pack"]').first().trigger('click');
+                select.data('publish', publish).val('GROUP').trigger('change');
             });
         }
         else {
@@ -553,15 +533,6 @@ $(document).ready(function () {
         else if(!row.find('.status > div').is('.' + status)) {
             row.find('.status > div').attr('class', status);
         }
-    });
-
-    body.on('click', '[id^="packs-"] *:has(input[data-ss_user][data-ss_group]) ~ a[href="#add-entity"]', function () {
-        var row = $(this).parents('.pack-row');
-        body.one('click.modify_entities', 'a[href="#submit-entities"]', function () {
-            setTimeout(function () {
-                packsFunc.apply(row.addClass('changed'));
-            }, 100);
-        });
     });
 
     body.on('change keyup', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);

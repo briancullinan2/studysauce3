@@ -38,7 +38,7 @@ class Pack
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="packs")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
      */
     protected $user;
 

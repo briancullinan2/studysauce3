@@ -7,18 +7,11 @@ use StudySauce\Bundle\Entity\User;
 /** @var Group $ss_group */
 $entityIds = [];
 
-list($users, $packs) = $ss_group->getUserPacksRecursively();
+list($users, $packs, $groups) = $ss_group->getUsersPacksGroupsRecursively();
 ?>
 
 <div>
-    <label><?php if(count($ss_group->getSubgroups()->toArray()) == 0) {
-            print '0 subgroups';
-        }
-        else {
-            print $ss_group->getSubgroups()->map(function (Group $g) {
-                    return $g->getDeleted() ? 0 : $g->getSubgroups()->count() + 1;
-                })->count() . ' subgroups';
-        } ?> / <?php print count($packs); ?> packs / <?php print count($users); ?> users</label>
+    <label><?php print count($groups) . ' subgroups'; ?> / <?php print count($packs); ?> packs / <?php print count($users); ?> users</label>
     <?php
     foreach ($ss_group->getSubgroups()->toArray() as $g) {
         /** @var Group $g */
