@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     function groupsFunc(evt) {
         var tab = $(this).closest('.results:visible');
-        var groupRow = tab.find('.ss_group-row');
+        var groupRow = tab.find('.ss_group-row').addClass('changed');
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
             groupRow.removeClass('valid empty').addClass('invalid');
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
@@ -208,6 +208,19 @@ $(document).ready(function () {
         });
 
         isSettingSelectize = false;
+    });
+
+    $(window).on('beforeunload', function (evt) {
+        //if($('.panel-pane[id^="packs-"] .pack-edit .pack-row.changed:not(.template)').length > 0)
+        if($('.panel-pane[id^="groups-"]:visible').find('.group-edit .ss_group-row.edit.changed:not(.template):not(.removed)').length > 0) {
+            evt.preventDefault();
+            return "You have unsaved changes!  Please don't go!";
+        }
+    });
+
+    body.on('hide', '.panel-pane[id^="groups-"]', function () {
+        var row = $(this).find('.results [class*="-row"].edit');
+        row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
     body.on('change', '[id^="groups-"] .pack-row .members input.selectized', function () {

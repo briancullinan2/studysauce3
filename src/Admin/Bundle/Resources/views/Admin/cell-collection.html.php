@@ -75,7 +75,7 @@ if (isset($entities)) {
     if (isset($entities) && (!isset($inline) || $inline !== true)) {
         $i = 0;
         ?>
-        <header><label>Included <?php print implode('/', array_map(function ($t) {
+        <header><label>Current <?php print implode('/', array_map(function ($t) {
                     return ucfirst(str_replace('ss_', '', $t)) . 's';
                 }, array_keys($tables))); ?></label></header>
         <?php

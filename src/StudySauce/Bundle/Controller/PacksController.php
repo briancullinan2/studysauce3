@@ -297,13 +297,13 @@ class PacksController extends Controller
 
         // TODO: $shouldNewCards = $newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0;
         $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: '');
-        return $this->forward('AdminBundle:Admin:results', $searchRequest + [
+        return $this->forward('AdminBundle:Admin:results', array_merge($searchRequest, [
             'edit' => false,
             'read-only' => ['pack'],
             'new' => false,
             'pack-id' => $newPack->getId(),
             'requestKey' => null,
-        ]);
+        ]));
     }
 
     public function removeAction(Pack $pack = null)

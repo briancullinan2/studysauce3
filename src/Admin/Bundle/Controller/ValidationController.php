@@ -108,7 +108,7 @@ class ValidationController extends Controller
             $ftime = filectime($fpath);
             if($file != $request->get('result'))
                 continue;
-            return new JsonResponse(unserialize(file_get_contents($fpath)) + ['created' => $ftime]);
+            return new JsonResponse(array_merge(unserialize(file_get_contents($fpath)), ['created' => $ftime]));
         }
         throw new NotFoundHttpException();
     }

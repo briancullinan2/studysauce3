@@ -60,16 +60,15 @@ $view['slots']->start('body'); ?>
                 </div>
                 <div class="group-list">
                     <?php
-                    global $pack;
-                    $pack = [$entity];
                     $newCards = $entity->getCards()->filter(function (Card $c) {
                             return !$c->getDeleted();
                         })->count() == 0;
                     $tables = [
                         // view settings
                         'tables' => [
-                            'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */],
-                            'pack' => ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], ['status'] /* search field but don't display a template */]],
+                            'pack' => ['id', 'title', 'counts', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
+                            'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
+                        ],
                         'classes' => ['last-right-expand'],
                         'headers' => ['ss_group' => 'subGroups'],
                         'footers' => ['ss_group' => 'subGroups'],
@@ -80,7 +79,7 @@ $view['slots']->start('body'); ?>
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
                         'ss_group-deleted' => false,
                         'count-ss_group' => 0,
-                        'count-pack' => -1,
+                        'count-pack' => 1,
                     ];
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
                     ?>

@@ -50,11 +50,6 @@
     float: left;
 }
 
-[id^="packs-"] .card-row {
-    margin-left: -10px;
-    padding-left: 10px;
-}
-
 #packs .pack-row .id {
     text-align: center;
     position:relative;
@@ -264,6 +259,7 @@
     left:0;
     top:50%;
     margin-top:-9px;
+    text-align: center;
 }
 
 [id^="packs-"] header.pack {

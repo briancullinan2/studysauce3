@@ -299,6 +299,9 @@ class AdminController extends Controller
             else {
                 $searchRequest = unserialize($cacheRequest);
             }
+            if(!empty($tableView = $request->get('view')) && isset($searchRequest['views'][$tableView])) {
+                $searchRequest = array_merge($searchRequest, $searchRequest['views'][$tableView]);
+            }
         }
         else {
             $searchRequest = array_merge($request->attributes->all(), $request->query->all());
@@ -312,7 +315,7 @@ class AdminController extends Controller
             foreach($searchRequest['tables'] as $table => $t) {
                 if(!is_array($t)) {
                     $table = $t;
-                    $t = self::$defaultTables[$t];
+                    $t = self::$defaultTables[explode('-', $t)[0]];
                 }
                 $tblList[$table] = $t;
             }
@@ -330,21 +333,36 @@ class AdminController extends Controller
 
         $vars['search'] = '';
         foreach($searchRequest['tables'] as $table => $t) {
-            $vars['tables'][$table] = $t;
+            $tableParts = explode('-', $table);
+            $ext = implode('-', array_splice($tableParts, 1));
+            $table = explode('-', $table)[0];
+            $aliasedRequest = [];
+            if(strlen($ext) > 0) {
+                $ext = '-' . $ext;
+                $aliasLen = strlen($table) + strlen($ext);
+                foreach ($searchRequest as $r => $s) {
+                    if (substr($r, 0, $aliasLen) == $table . $ext) {
+                        $aliasedRequest[substr($r, $aliasLen)] = $s;
+                    }
+                }
+                $aliasedRequest['tables'][$table] = $searchRequest['tables'][$table . $ext];
+            }
+            $aliasedRequest = array_merge($searchRequest, $aliasedRequest);
+            $vars['tables'][$table . $ext] = $aliasedRequest['tables'][$table];
 
-            $resultCount = isset($searchRequest['count-' . $table]) ? intval($searchRequest['count-' . $table]) : 25;
+            $resultCount = isset($aliasedRequest['count-' . $table]) ? intval($aliasedRequest['count-' . $table]) : 25;
             // for templating purposes only
-            if($resultCount == -1 || isset($searchRequest['new']) && ($searchRequest['new'] === true || is_array($searchRequest['new']) && in_array($table, $searchRequest['new']))) {
-                $vars[$table] = [];
-                $vars[$table . '_total'] = 0;
+            if($resultCount == -1 || isset($aliasedRequest['new']) && ($aliasedRequest['new'] === true || is_array($aliasedRequest['new']) && in_array($table, $aliasedRequest['new']))) {
+                $vars['results'][$table . $ext] = [];
+                $vars['results'][$table . $ext . '_total'] = 0;
                 continue;
             }
 
             /** @var QueryBuilder $qb */
             $qb = $orm->getRepository(self::$allTables[$table]->name)->createQueryBuilder($table);
             $joins = [];
-            $where = self::searchBuilder($qb, $table, $table, $searchRequest, $joins);
-            $defaultWhere = self::searchBuilder($qb, $table, $table, array_diff_key(self::$defaultSearch, $searchRequest) + ['tables' => [$table => self::$defaultTables[$table]]], $joins, true);
+            $where = self::searchBuilder($qb, $table, $table, $aliasedRequest, $joins);
+            $defaultWhere = self::searchBuilder($qb, $table, $table, array_merge(array_diff_key(self::$defaultSearch, $aliasedRequest), ['tables' => [$table => self::$defaultTables[$table]]]), $joins, true);
             if(!empty($where)) {
                 $qb = $qb->where($where);
             }
@@ -356,11 +374,11 @@ class AdminController extends Controller
             $query = $totalQuery->select('COUNT(DISTINCT(' . $table . '.' . self::$allTables[$table]->identifier[0] . '))')
                 ->getQuery();
             $total = $query->getSingleScalarResult();
-            $vars[$table . '_total'] = $total;
+            $vars['results'][$table . $ext . '_total'] = $total;
 
             // max pagination to search count
-            if(!empty($resultCount) && isset($searchRequest['page-' . $table])) {
-                $page = $searchRequest['page-' . $table];
+            if(!empty($resultCount) && isset($aliasedRequest['page-' . $table])) {
+                $page = $aliasedRequest['page-' . $table];
                 if($page == 'last') {
                     $page = $total / $resultCount;
                 }
@@ -373,7 +391,7 @@ class AdminController extends Controller
             // TODO: add sorting back in
             // figure out how to sort
             /*
-            if(!empty($order = $searchRequest->get('order'))) {
+            if(!empty($order = $aliasedRequest->get('order'))) {
                 $field = explode(' ', $order)[0];
                 $direction = explode(' ', $order)[1];
                 if($direction != 'ASC' && $direction != 'DESC')
@@ -399,7 +417,7 @@ class AdminController extends Controller
                 $query = $query->setMaxResults($resultCount);
             }
 
-            $vars[$table] = $query->getQuery()->getResult();
+            $vars['results'][$table . $ext] = $query->getQuery()->getResult();
         }
 
         $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
@@ -412,10 +430,10 @@ class AdminController extends Controller
         if(in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
             // convert db entity to flat object
             foreach(array_merge(array_keys($searchRequest['tables']), ['allGroups']) as $table) {
-                if (!isset($vars[$table])) {
+                if (!isset($vars['results'][$table])) {
                     continue;
                 }
-                $tableName = $table;
+                $tableName = explode('-', $table)[0];
                 if ($table == 'allGroups') {
                     $tableName = 'ss_group';
                 }
@@ -423,7 +441,7 @@ class AdminController extends Controller
                 $fields = array_intersect(self::getAllFieldNames([$tableName => $table == 'allGroups'
                     ? self::$defaultTables['ss_group']
                     : $searchRequest['tables'][$tableName]]), $allowedFields);
-                $vars[$table] = array_map(function ($e) use ($fields) {
+                $vars['results'][$table] = array_map(function ($e) use ($fields) {
                     $obj = [];
                     foreach($fields as $f) {
                         if (!method_exists($e, 'get' . ucfirst($f))) {
@@ -437,7 +455,7 @@ class AdminController extends Controller
                         }
                     }
                     return $obj;
-                }, $vars[$table]);
+                }, $vars['results'][$table]);
             }
             return new JsonResponse($vars);
         }
@@ -664,13 +682,13 @@ class AdminController extends Controller
         }
 
         $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: '');
-        return $this->forward('AdminBundle:Admin:results', $searchRequest + [
+        return $this->forward('AdminBundle:Admin:results', array_merge($searchRequest, [
             'edit' => false,
             'read-only' => ['ss_group'],
             'new' => false,
             'ss_group-id' => $g->getId(),
             'requestKey' => null
-        ]);
+        ]));
     }
 
     /**

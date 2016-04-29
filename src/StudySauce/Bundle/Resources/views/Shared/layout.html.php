@@ -19,6 +19,8 @@ $collection = $router->getRouteCollection();
         <meta property="al:ios:url" content="studysauce://studysauce.com"/>
         <meta property="al:ios:app_store_id" content="3MV67NZ3PZ"/>
         <meta property="al:ios:app_name" content="Study Sauce"/>
+        <meta name="theme-color" content="#424242">
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
         <link rel="icon" sizes="76x76"
               href="<?php print $view['assets']->getUrl('bundles/studysauce/images/studysauce-icon-76x76.png'); ?>">
@@ -93,123 +95,143 @@ $collection = $router->getRouteCollection();
         <style>
             <?php
             foreach($iconSets as $file => $icons) {
-            $existing = [];
-            foreach ($icons as $i => $paths) {
-                foreach($paths as $c => $p) {
-                    if(in_array($p, $existing)) {
-                        continue;
+                $existing = [];
+                foreach ($icons as $i => $paths) {
+                    foreach($paths as $c => $p) {
+                        if(in_array($p, $existing)) {
+                            continue;
+                        }
+                        print (empty($existing) ? '' : ',');
+                        if(substr($p, 0, 1) == '.') {
+                            print 'a' . $p . ', a ' . $p;
+                        }
+                        else {
+                            print 'a[href^="' . $p . '"]:not(.more):not(.btn):not(.cloak), a[href^="' . $p . '"].cloak:not(.btn):not(.more) .reveal';
+                        }
+                        $existing[] = $p;
                     }
-                    print (empty($existing) ? '' : ',');
-                    if(substr($p, 0, 1) == '.') {
-                        print 'a' . $p . ', a ' . $p;
-                    }
-                    else {
-                        print 'a[href^="' . $p . '"]:not(.more):not(.btn):not(.cloak), a[href^="' . $p . '"].cloak:not(.btn):not(.more) .reveal';
-                    }
-                    $existing[] = $p;
                 }
-            }
-            print <<<EOCSS
-            {
-                padding-left: 30px;
-                position: relative;
-            }
+                print <<<EOCSS
+                {
+                    padding-left: 30px;
+                    position: relative;
+                }
 EOCSS;
 
-            $existing = [];
-            foreach ($icons as $i => $paths) {
-                foreach($paths as $c => $p) {
-                    if(in_array($p, $existing)) {
-                        continue;
+                $existing = [];
+                foreach ($icons as $i => $paths) {
+                    foreach($paths as $c => $p) {
+                        if(in_array($p, $existing)) {
+                            continue;
+                        }
+                        print (empty($existing) ? '' : ',');
+                        if(substr($p, 0, 1) == '.') {
+                            print 'a' . $p . ':before, a ' . $p . ':before';
+                        }
+                        else {
+                            print 'a[href^="' . $p . '"]:not(.more):not(.btn):not(.cloak):before, a[href^="' . $p . '"].cloak:not(.btn):not(.more) .reveal:before';
+                        }
+                        $existing[] = $p;
                     }
-                    print (empty($existing) ? '' : ',');
-                    if(substr($p, 0, 1) == '.') {
-                        print 'a' . $p . ':before, a ' . $p . ':before';
+                }
+
+                print <<<EOCSS
+                {
+                    background: url($file) no-repeat left -2px transparent;
+                    content: " ";
+                    display: block;
+                    height: 24px;
+                    width: 24px;
+                    margin-top: -12px;
+                    position: absolute;
+                    left: 2px;
+                    top: 50%;
+                }
+EOCSS;
+
+                foreach ($icons as $i => $paths) {
+                    if ($i > 0) {
+                        $y = ($i - 1) * 50 + 2;
+                        foreach($paths as $c => $p) {
+                            if(substr($p, 0, 1) == '.') {
+                                print <<<EOCSS
+                                a$p:hover:before,
+                                a$p:focus:before,
+                                a$p:active:before,
+                                a$p.active:before,
+                                a:hover $p:before,
+                                a:focus $p:before,
+                                a:active $p:before,
+                                a.active $p:before
+EOCSS;
+                            }
+                            else {
+                                print <<<EOCSS
+                                a[href^="$p"]:not(.more):not(.btn):not(.cloak):hover:before,
+                                a[href^="$p"]:not(.more):not(.btn):not(.cloak):focus:before,
+                                a[href^="$p"]:not(.more):not(.btn):not(.cloak):active:before,
+                                a[href^="$p"].active:not(.more):not(.btn):not(.cloak):before,
+                                a[href^="$p"].cloak:not(.btn):not(.more):hover .reveal:before,
+                                a[href^="$p"].cloak:not(.btn):not(.more):focus .reveal:before,
+                                a[href^="$p"].cloak:not(.btn):not(.more):active .reveal:before,
+                                a[href^="$p"].cloak.active:not(.btn):not(.more) .reveal:before
+EOCSS;
+                            }
+                            print ($c == count($paths) -1 ? '' : ',');
+                        }
+                        print <<<EOCSS
+                        {
+                            background-position: left -${'y'}px;
+                        }
+EOCSS;
                     }
                     else {
-                        print 'a[href^="' . $p . '"]:not(.more):not(.btn):not(.cloak):before, a[href^="' . $p . '"].cloak:not(.btn):not(.more) .reveal:before';
+                        $y = ($i + 1) * 50 - 2;
+                        foreach($paths as $c => $p) {
+                            if(substr($p, 0, 1) == '.') {
+                                print <<<EOCSS
+                                a$p:before,
+                                a $p:before
+EOCSS;
+                            }
+                            else {
+                                print <<<EOCSS
+                                a[href^="$p"]:not(.more):not(.btn):not(.cloak):before,
+                                a[href^="$p"].cloak:not(.btn):not(.more) .reveal:before
+EOCSS;
+                            }
+                            print ($c == count($paths) -1 ? '' : ',');
+                        }
+                        print <<<EOCSS
+                        {
+                            background-position: left ${'y'}px;
+                        }
+EOCSS;
                     }
-                    $existing[] = $p;
                 }
+            } ?>
+
+            <?php foreach(array_keys(\Admin\Bundle\Controller\AdminController::$defaultTables) as $table => $t) { ?>
+            .results.has-<?php print $table; ?>-error .<?php print $table; ?>-error,
+            .showing-<?php print $table; ?> header > .<?php print $table; ?> {
+                display: inline-block;
+                opacity: 1;
+                visibility: visible;
             }
 
-            print <<<EOCSS
-            {
-                background: url($file) no-repeat left -2px transparent;
-                content: " ";
+            .showing-<?php print $table; ?> header > h2.<?php print $table; ?> {
                 display: block;
-                height: 24px;
-                width: 24px;
-                margin-top: -12px;
-                position: absolute;
-                left: 2px;
-                top: 50%;
+                opacity: 1;
+                visibility: visible;
             }
-EOCSS;
 
-            foreach ($icons as $i => $paths) {
-                if ($i > 0) {
-                    $y = ($i - 1) * 50 + 2;
-                    foreach($paths as $c => $p) {
-                        if(substr($p, 0, 1) == '.') {
-                            print <<<EOCSS
-                            a$p:hover:before,
-                            a$p:focus:before,
-                            a$p:active:before,
-                            a$p.active:before,
-                            a:hover $p:before,
-                            a:focus $p:before,
-                            a:active $p:before,
-                            a.active $p:before
-EOCSS;
-                        }
-                        else {
-                            print <<<EOCSS
-                            a[href^="$p"]:not(.more):not(.btn):not(.cloak):hover:before,
-                            a[href^="$p"]:not(.more):not(.btn):not(.cloak):focus:before,
-                            a[href^="$p"]:not(.more):not(.btn):not(.cloak):active:before,
-                            a[href^="$p"].active:not(.more):not(.btn):not(.cloak):before,
-                            a[href^="$p"].cloak:not(.btn):not(.more):hover .reveal:before,
-                            a[href^="$p"].cloak:not(.btn):not(.more):focus .reveal:before,
-                            a[href^="$p"].cloak:not(.btn):not(.more):active .reveal:before,
-                            a[href^="$p"].cloak.active:not(.btn):not(.more) .reveal:before
-EOCSS;
-                        }
-                        print ($c == count($paths) -1 ? '' : ',');
-                    }
-                    print <<<EOCSS
-                    {
-                        background-position: left -${'y'}px;
-                    }
-EOCSS;
-                }
-                else {
-                    $y = ($i + 1) * 50 - 2;
-                    foreach($paths as $c => $p) {
-                        if(substr($p, 0, 1) == '.') {
-                            print <<<EOCSS
-                            a$p:before,
-                            a $p:before
-EOCSS;
-                        }
-                        else {
-                            print <<<EOCSS
-                            a[href^="$p"]:not(.more):not(.btn):not(.cloak):before,
-                            a[href^="$p"].cloak:not(.btn):not(.more) .reveal:before
-EOCSS;
-                        }
-                        print ($c == count($paths) -1 ? '' : ',');
-                    }
-                    print <<<EOCSS
-                    {
-                        background-position: left ${'y'}px;
-                    }
-EOCSS;
-                }
+            .results .<?php print $table; ?>-row.edit ~ .highlighted-link.<?php print $table; ?> a[href^="#edit-"],
+            .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .highlighted-link.<?php print $table; ?>,
+            .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .<?php print $table; ?>-row {
+                display: none;
             }
-        } ?>
+            <?php } ?>
         </style>
-
 
         <?php $view['slots']->output('stylesheets'); ?>
     </head>

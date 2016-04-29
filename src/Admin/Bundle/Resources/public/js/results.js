@@ -243,34 +243,33 @@ $(document).ready(function () {
 
     body.on('click', '[class*="-row"] a[href^="#edit-"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('[class*="-row"]');
+        var row = $(this).closest('[class*="-row"]');
         row.removeClass('read-only').addClass('edit');
     });
 
     body.on('click', '.form-actions a[href^="#edit-"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.panel-pane').find('.results [class*="-row"].read-only');
+        var row = $(this).closest('.panel-pane').find('.results [class*="-row"].read-only');
         row.removeClass('read-only').addClass('edit');
     });
 
     body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('[class*="-row"]');
+        var row = $(this).closest('[class*="-row"]');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
     body.on('click', '.form-actions a[href^="#cancel-edit"], .form-actions .cancel-edit', function (evt) {
         evt.preventDefault();
-        var row = $(this).parents('.panel-pane').find('.results [class*="-row"].edit');
+        var row = $(this).closest('.panel-pane').find('.results [class*="-row"].edit');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
-    body.on('click', '.results a[data-extend]', function (evt) {
+    body.on('click', '.results a[href^="#switch-view-"]', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results').first();
         var request = results.data('request');
-        request = $.extend(request, $(this).data('extend'));
-        request['requestKey'] = null;
+        request['view'] = $(this).attr('href').substr(13);
         results.data('request', request);
         loadResults.apply(results);
     });
@@ -326,18 +325,18 @@ $(document).ready(function () {
                     .remove();
 
                 var existing,
-                    keepRows = (existing = admin.find('> .' + table + '-row:not(.template)')).map(function () {
+                    keepRows = (existing = admin.find('> .' + table + '-row')).map(function () {
                     var rowId = getRowId.apply(this);
-                    return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
+                    return '.' + table + '-id-' + rowId + ', .' + table + '-id-' + rowId + ' + .expandable';
                 }).toArray();
                 var last = existing.length == 0 ? admin.find(getRowQuery(tables[t-1])).last() : existing.last();
                 var newRows = content.find(rowQuery).not(keepRows.join(','));
-                var headerFooter = newRows.filter('header, .highlighted-link');
+                var headerFooter = newRows.filter('header, .highlighted-link, .' + table + '-row, .' + table + '-row + .expandable');
                 // put headers before and actions after
                 if(headerFooter.length > 0) {
                     if (existing.length > 0) {
                         headerFooter.filter('header').insertBefore(existing.first());
-                        headerFooter.filter('.highlighted-link').insertAfter(existing.last());
+                        headerFooter.filter('.highlighted-link, .' + table + '-row, .' + table + '-row + .expandable').insertAfter(existing.last());
                     }
                     else {
                         if (last.length == 0) {
@@ -352,18 +351,25 @@ $(document).ready(function () {
                 }
 
                 for(var n = 0; n < newRows.length; n++) {
-                    var noId;
+                    var noId, row = $(newRows[n]);
+                    if(!row.is('.' + table + '-row')) {
+                        continue;
+                    }
+                    else {
+                        row = row.add($(newRows[n]).next('.expandable'));
+                    }
                     // update empty row ids TODO: verify this doesn't mistakenly pick out the wrong blank row added in between saving
                     if((noId = admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first()).length > 0) {
                         noId.removeClass(table + '-id-').addClass(table + '-id-' + getRowId.apply(newRows[n]));
                     }
                     else {
                         if(last.length == 0) {
-                            $(newRows[n]).prependTo(admin);
+                            row.prependTo(admin);
                         }
                         else {
-                            $(newRows[n]).insertAfter(last);
+                            row.insertAfter(last);
                         }
+                        last = row.last();
                     }
                 }
                 admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());

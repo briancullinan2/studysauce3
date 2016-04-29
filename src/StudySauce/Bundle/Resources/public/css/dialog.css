@@ -364,6 +364,10 @@ body.right-menu #bookmark
     top: 0 !important;
 }
 
+#add-entity header {
+    display:none;
+}
+
 /*
 #add-entity .template {
     display:none;

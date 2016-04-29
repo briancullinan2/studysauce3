@@ -156,6 +156,7 @@ $(document).ready(function () {
                 parts[parts.length-1] = subPath.substr(1);
                 $(this).attr('href', parts.join('/'));
             });
+            var host;
             if(!(host = body.find('#welcome-message .main-menu a[href*="' + window.location.hostname +  '"]')).is('.active')) {
                 host.addClass('active');
             }
@@ -316,10 +317,25 @@ $(document).ready(function () {
         // if the path clicked is a callback, use callback to load the new tab
         else {
             evt.preventDefault();
-            if (routes[0].name == '_welcome') {
-                path = Routing.generate(routes[0].name);
-            }
-            activateMenu.apply(this, [path]);
+            // allow other click responders to finish processing before doing a page change
+            setTimeout(function () {
+                if (routes[0].name == '_welcome') {
+                    path = Routing.generate(routes[0].name);
+                }
+                var message = new $.Event('beforeunload');
+                $(window).trigger(message);
+                if(typeof message.result !== 'undefined') {
+                    body.off('click.confirm_navigation').one('click.confirm_navigation', '#general-dialog a[href="#submit"]', function () {
+                        activateMenu.apply(that[0], [path]);
+                    });
+
+                    $('#general-dialog').modal('hide').modal({show: true, backdrop: true})
+                        .find('.modal-body').html(message.result)
+                }
+                else {
+                    activateMenu.apply(that[0], [path]);
+                }
+            }, 50);
             return false;
         }
     }
@@ -836,6 +852,7 @@ $(document).ready(function () {
                     newTemplate.removeClass('template active');
                     var title = tableName.replace('ss_', '').substr(0, 1).toUpperCase() + tableName.replace('ss_', '').substr(1);
                     entityField = newTemplate.find('input').attr('name', tableName).attr('placeholder', 'Search for ' + title);
+                    newTemplate.find('header label').text('Current ' + title + 's');
                     dialog.find('li.template').clone().appendTo(dialog.find('ul')).removeClass('template active')
                         .find('a').attr('href', '#add-entity-' + tableName).data('target', '#add-entity-' + tableName).text(title);
                 }
@@ -957,6 +974,7 @@ $(document).ready(function () {
             body.off('click.modify_entities_confirm');
             body.off('click.publish_confirm');
             body.off('click.confirm_action');
+            body.off('click.confirm_navigation');
         }, 100);
     });
 

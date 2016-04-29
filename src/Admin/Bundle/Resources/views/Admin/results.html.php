@@ -6,34 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var GlobalVariables $app */
 
-$subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest] + compact(array_map(function ($t) {
+$subVars = array_merge(['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest, 'results' => $results], compact(array_map(function ($t) {
         return $t . '_total';
-    }, array_keys($tables)));
-
+    }, array_keys($tables))));
 ?>
-<style>
-    <?php foreach($tables as $table => $t) { ?>
-    .results.has-<?php print $table; ?>-error .<?php print $table; ?>-error,
-    .showing-<?php print $table; ?> header > .<?php print $table; ?> {
-        display: inline-block;
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .showing-<?php print $table; ?> header > h2.<?php print $table; ?> {
-        display: block;
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .results .<?php print $table; ?>-row.edit ~ .highlighted-link.<?php print $table; ?> a[href^="#edit-"],
-    .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .highlighted-link.<?php print $table; ?>,
-    .results.collapsible > h2.<?php print $table; ?>.collapsed ~ .<?php print $table; ?>-row {
-        display: none;
-    }
-
-    <?php } ?>
-</style>
 <div
     class="results <?php print (isset($searchRequest['classes']) && is_array($searchRequest['classes']) ? implode(' ', $searchRequest['classes']) : ''); ?>"
     data-request="<?php print $view->escape(json_encode($searchRequest)); ?>">
@@ -41,36 +17,58 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
         print $view->render('AdminBundle:Admin:header-search.html.php', $subVars);
     }
 
-    if(!empty($searchRequest['views'])) { ?><ul class="views"><?php
-        foreach($searchRequest['views'] as $v => $extend) {
-            ?><li><a href="#data-extend" data-extend="<?php print $view->escape(json_encode($extend)); ?>"><?php print $v; ?></a></li><?php
-        } ?></ul><?php
+    if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
+        if(!empty($searchRequest['views'])) { ?><ul class="views"><?php
+            foreach($searchRequest['views'] as $v => $extend) {
+                ?><li><a href="#switch-view-<?php print $v; ?>"><?php print $v; ?></a></li><?php
+            } ?></ul><?php
+        }
+        else { ?>
+            <ul class="views"><li><a href="#switch-view-" data-extend="{}">Refresh</a></li></ul>
+        <?php }
     }
 
     foreach ($tables as $table => $t) {
-        $isNew = isset($searchRequest['new']) && ($searchRequest['new'] === true || is_array($searchRequest['new']) && in_array($table, $searchRequest['new']));
+        $tableParts = explode('-', $table);
+        $ext = implode('-', array_splice($tableParts, 1));
+        $table = explode('-', $table)[0];
+        $aliasedRequest = [];
+        if(strlen($ext) > 0) {
+            $ext = '-' . $ext;
+            $aliasLen = strlen($table) + strlen($ext);
+            foreach ($searchRequest as $r => $s) {
+                if (substr($r, 0, $aliasLen) == $table . $ext) {
+                    $aliasedRequest[substr($r, $aliasLen)] = $s;
+                }
+            }
+            $aliasedRequest['tables'][$table] = $searchRequest['tables'][$table . $ext];
+        }
+        $aliasedRequest = array_merge($searchRequest, $aliasedRequest);
+        $subVars = array_merge($subVars, ['searchRequest' => $aliasedRequest]);
+
+        $isNew = isset($aliasedRequest['new']) && ($aliasedRequest['new'] === true || is_array($aliasedRequest['new']) && in_array($table, $aliasedRequest['new']));
 
         // show header template
         $tableTotal = $table . '_total';
-        if (count($$table) > 0 || $isNew) {
-            if (!isset($searchRequest['headers']) || is_array($headers = $searchRequest['headers'])
+        if (count($results[$table . $ext]) > 0 || $isNew) {
+            if (!isset($aliasedRequest['headers']) || is_array($headers = $aliasedRequest['headers'])
                 && isset($headers[$table]) && $headers[$table] === true
             ) {
-                print $view->render('AdminBundle:Admin:header.html.php', $subVars + ['table' => $table, $table => $$table]);
-            } else if (is_array($headers = $searchRequest['headers'])
+                print $view->render('AdminBundle:Admin:header.html.php',                          array_merge($subVars, ['table' => $table]));
+            } else if (is_array($headers = $aliasedRequest['headers'])
                 && isset($headers[$table])
                 && $view->exists('AdminBundle:Admin:header-' . $headers[$table] . '.html.php')
             ) {
-                print $view->render('AdminBundle:Admin:header-' . $headers[$table] . '.html.php', $subVars + ['table' => $table, $table => $$table]);
+                print $view->render('AdminBundle:Admin:header-' . $headers[$table] . '.html.php', array_merge($subVars, ['table' => $table]));
             }
         }
 
         // print out all result entities
-        foreach ($$table as $entity) {
+        foreach ($results[$table . $ext] as $entity) {
             if ($view->exists('AdminBundle:Admin:row-' . $table . '.html.php')) {
-                print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', $subVars + [$table => $entity, 'table' => $table]);
+                print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', array_merge($subVars, [$table => $entity, 'table' => $table]));
             } else {
-                print $view->render('AdminBundle:Admin:row.html.php', $subVars + ['entity' => $entity, 'table' => $table]);
+                print $view->render('AdminBundle:Admin:row.html.php',                array_merge($subVars, ['entity' => $entity, 'table' => $table]));
             }
         }
 
@@ -79,12 +77,12 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
         $entity = new $class();
         if ($isNew) {
             $classes = ' empty';
-            $newCount = $isNew && !empty(intval($searchRequest['count-' . $table])) ? intval($searchRequest['count-' . $table]) : 1;
+            $newCount = $isNew && !empty(intval($aliasedRequest['count-' . $table])) ? intval($aliasedRequest['count-' . $table]) : 1;
             for ($nc = 0; $nc < $newCount; $nc++) {
                 if ($view->exists('AdminBundle:Admin:row-' . $table . '.html.php')) {
-                    print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', $subVars + ['classes' => $classes, $table => $entity, 'table' => $table]);
+                    print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', array_merge($subVars, ['classes' => $classes, $table => $entity, 'table' => $table]));
                 } else {
-                    print $view->render('AdminBundle:Admin:row.html.php', $subVars + ['classes' => $classes, 'entity' => $entity, 'table' => $table]);
+                    print $view->render('AdminBundle:Admin:row.html.php',                array_merge($subVars, ['classes' => $classes, 'entity' => $entity, 'table' => $table]));
                 }
             }
         }
@@ -92,21 +90,21 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
         $templateSubVars = $subVars;
         $templateSubVars['searchRequest'] = array_merge($templateSubVars['searchRequest'], ['read-only' => false, 'edit' => false]);
         if ($view->exists('AdminBundle:Admin:row-' . $table . '.html.php')) {
-            print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', $templateSubVars + ['classes' => $classes, $table => $entity, 'table' => $table]);
+            print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', array_merge($templateSubVars, ['classes' => $classes, $table => $entity, 'table' => $table]));
         } else {
-            print $view->render('AdminBundle:Admin:row.html.php', $templateSubVars + ['classes' => $classes, 'entity' => $entity, 'table' => $table]);
+            print $view->render('AdminBundle:Admin:row.html.php',                array_merge($templateSubVars, ['classes' => $classes, 'entity' => $entity, 'table' => $table]));
         }
 
         // show footer at the end of each result list
-        if (!isset($searchRequest['footers']) || is_array($footers = $searchRequest['footers'])
+        if (!isset($aliasedRequest['footers']) || is_array($footers = $aliasedRequest['footers'])
             && isset($footers[$table]) && $footers[$table] === true
         ) {
-            print $view->render('AdminBundle:Admin:footer.html.php', $subVars + ['table' => $table, $table => $$table]);
-        } else if (is_array($footers = $searchRequest['footers'])
+            print $view->render('AdminBundle:Admin:footer.html.php',                          array_merge($subVars, ['table' => $table]));
+        } else if (is_array($footers = $aliasedRequest['footers'])
             && isset($footers[$table])
             && $view->exists('AdminBundle:Admin:footer-' . $footers[$table] . '.html.php')
         ) {
-            print $view->render('AdminBundle:Admin:footer-' . $footers[$table] . '.html.php', $subVars + ['table' => $table, $table => $$table]);
+            print $view->render('AdminBundle:Admin:footer-' . $footers[$table] . '.html.php', array_merge($subVars, ['table' => $table]));
         }
     } ?>
 </div>

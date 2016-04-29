@@ -217,7 +217,8 @@ $(document).ready(function () {
         }
 
         // insert content and multiple choice answers
-        template.find('.preview-content div').text(row.find('.content textarea:visible').val().replace(/\\n/ig, "\n"));
+        var content = row.find('.content textarea:visible').val() || '';
+        template.find('.preview-content div').text(content.replace(/\\n/ig, "\n"));
         var answers = row.find('.correct.type-mc:visible textarea').val();
         if (answers != null) {
             answers = answers.split("\n");
@@ -225,12 +226,25 @@ $(document).ready(function () {
                 $(this).text(answers[$(this).parent().parent().find('.preview-response').index($(this).parent())]);
             });
         }
-        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val().replace(/\\n/ig, "\n"));
+        var answer = row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val() || '';
+        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(answer.replace(/\\n/ig, "\n"));
 
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         // center some preview fields
         centerize.apply(row.find(' + .expandable .preview-content div, + .expandable .preview-response div, + .expandable img, .pack-icon img'));
     }
+
+    $(window).on('beforeunload', function (evt) {
+        if($('.panel-pane[id^="packs-"]:visible').find('.pack-edit .pack-row.edit.changed:not(.template):not(.removed), .card-list .card-row.edit.changed:not(.template):not(.removed)').length > 0) {
+            evt.preventDefault();
+            return "You have unsaved changes!  Please don't go!";
+        }
+    });
+
+    body.on('hide', '.panel-pane[id^="packs-"]', function () {
+        var row = $(this).find('.results [class*="-row"].edit');
+        row.removeClass('edit remove-confirm').addClass('read-only');
+    });
 
     body.on('click', '[id^="packs-"] .preview-play .play', function () {
         var player = $('#jquery_jplayer');

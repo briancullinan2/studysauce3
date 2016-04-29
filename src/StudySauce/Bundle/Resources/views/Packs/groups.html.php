@@ -73,8 +73,6 @@ $view['slots']->start('body'); ?>
                             'footers' => ['ss_group' => 'newGroup']
                         ]));
                     } else {
-                        global $subGroupParent;
-                        $subGroupParent = [$entity];
                         // TODO: check view setting
                         $tableViews = [
                             'Tiles' => [
@@ -83,40 +81,41 @@ $view['slots']->start('body'); ?>
                                  'headers' => false,
                            ],
                             'Membership' => [
-                                'tables' => ['ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
+                                'tables' => [
+                                    'ss_group-1' => ['id', 'title', 'counts', 'expandMembers' => [], 'actions' => ['deleted'] /* search field but don't display a template */],
+                                    'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
                                  'headers' => ['ss_group' => 'subGroups'],
                            ]
                         ];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
-                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tableView + [
+                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
+                                'ss_group-1headers' => false,
+                                'ss_group-1footers' => false,
+                                'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
                                 'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
                                 'count-ss_group' => 0,
-                                'parent-ss_group-deleted' => $entity->getDeleted(),
+                                'ss_group-deleted' => $entity->getDeleted(),
                                 'edit' => false,
                                 'read-only' => false,
                                 'headers' => ['ss_group' => 'subGroups'],
                                 'footers' => ['ss_group' => 'subGroups'],
-                                'views' => $app->getUser()->getEmailCanonical() == 'brian@studysauce.com' ? $tableViews : null
-                            ]));
+                                'views' => $tableViews
+                            ])));
                     }
                     ?>
                 </div>
-                <?php if ($entity !== null) {
-                    global $subPacks;
-                    list($users, $subPacks, $groups) = $entity->getUsersPacksGroupsRecursively();
-                    ?>
+                <?php if ($entity !== null) { ?>
                     <div class="list-packs">
                         <?php
                         $tables = ['ss_group' => ['id', 'deleted']];
                         $tables['pack'] = ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                         $isNew = empty($entity->getId());
                         print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                            'count-pack' => $isNew || empty($subPacks) ? -1 : 0,
+                            'count-pack' => $isNew ? -1 : 0,
                             'count-ss_group' => -1,
                             'ss_group-deleted' => $entity->getDeleted(),
                             'edit' => false,
-                            'new' => empty($subPacks),
                             'classes' => ['last-right-expand'],
                             'read-only' => false,
                             'ss_group-id' => $entity->getId(),
