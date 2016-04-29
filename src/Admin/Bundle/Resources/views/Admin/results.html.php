@@ -41,6 +41,12 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
         print $view->render('AdminBundle:Admin:header-search.html.php', $subVars);
     }
 
+    if(!empty($searchRequest['views'])) { ?><ul class="views"><?php
+        foreach($searchRequest['views'] as $v => $extend) {
+            ?><li><a href="#data-extend" data-extend="<?php print $view->escape(json_encode($extend)); ?>"><?php print $v; ?></a></li><?php
+        } ?></ul><?php
+    }
+
     foreach ($tables as $table => $t) {
         $isNew = isset($searchRequest['new']) && ($searchRequest['new'] === true || is_array($searchRequest['new']) && in_array($table, $searchRequest['new']));
 
@@ -83,10 +89,12 @@ $subVars = ['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $
             }
         }
         $classes = 'template empty';
+        $templateSubVars = $subVars;
+        $templateSubVars['searchRequest'] = array_merge($templateSubVars['searchRequest'], ['read-only' => false, 'edit' => false]);
         if ($view->exists('AdminBundle:Admin:row-' . $table . '.html.php')) {
-            print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', $subVars + ['classes' => $classes, $table => $entity, 'table' => $table]);
+            print $view->render('AdminBundle:Admin:row-' . $table . '.html.php', $templateSubVars + ['classes' => $classes, $table => $entity, 'table' => $table]);
         } else {
-            print $view->render('AdminBundle:Admin:row.html.php', $subVars + ['classes' => $classes, 'entity' => $entity, 'table' => $table]);
+            print $view->render('AdminBundle:Admin:row.html.php', $templateSubVars + ['classes' => $classes, 'entity' => $entity, 'table' => $table]);
         }
 
         // show footer at the end of each result list

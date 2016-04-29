@@ -663,19 +663,12 @@ class AdminController extends Controller
             $orm->flush();
         }
 
-        return $this->forward('AdminBundle:Admin:results', [
-            'count-pack' => 0,
-            'count-ss_group' => 1,
-            'ss_group-deleted' => $g->getDeleted(),
+        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: '');
+        return $this->forward('AdminBundle:Admin:results', $searchRequest + [
             'edit' => false,
             'read-only' => ['ss_group'],
             'new' => false,
             'ss_group-id' => $g->getId(),
-            'tables' => [
-                'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'subgroup' => [], 'actions' => ['deleted']],
-                'pack' => ['title', 'counts', 'members' => ['groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */]],
-            'headers' => ['ss_group' => 'groupGroups', 'pack' => 'groupPacks'],
-            'footers' => ['ss_group' => 'groupGroups'],
             'requestKey' => null
         ]);
     }

@@ -415,7 +415,7 @@ a[href="#insert-entity"]:before {
 }
 
 a[href="#insert-entity"]:before {
-    color: #FFF;
+    color: transparent;
 }
 
 .entity-search .checkbox:hover a[href="#insert-entity"]:before,

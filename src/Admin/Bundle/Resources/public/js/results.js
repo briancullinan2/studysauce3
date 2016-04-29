@@ -265,6 +265,16 @@ $(document).ready(function () {
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
+    body.on('click', '.results a[data-extend]', function (evt) {
+        evt.preventDefault();
+        var results = $(this).parents('.results').first();
+        var request = results.data('request');
+        request = $.extend(request, $(this).data('extend'));
+        request['requestKey'] = null;
+        results.data('request', request);
+        loadResults.apply(results);
+    });
+
     function getTabId() {
         return getRowId.apply($(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first());
     }
@@ -272,13 +282,13 @@ $(document).ready(function () {
 
     function getRowId() {
         var row = $(this).closest('[class*="-row"]').first();
-        var table = (/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class'))[2];
+        var table = ((/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class')) || [])[2];
         return ((new RegExp(table + '-id-([0-9]*)(\\s|$)', 'ig')).exec(row.attr('class')) || [])[1];
     }
     window.getRowId = getRowId;
 
     function loadContent (data, tables) {
-        var admin = $(this).closest('.results');
+        var admin = $(this).closest('.results').first();
         if(!tables) {
             tables = $.unique(admin.find('[class*="-row"].template').map(function () {
                 return (/(.*)-row/i).exec($(this).attr('class'))[1];
@@ -286,62 +296,83 @@ $(document).ready(function () {
         }
         var content;
         if(typeof data == 'object') {
+            throw 'Not allowed';
+            /*
             if(typeof data.tables == 'undefined') {
                 throw 'Not a "results" request.';
             }
             admin.data('request', {requestKey: data.searchRequest.requestKey});
+            */
         }
         else {
             content = $(data).filter('.results');
             if (content.find('.panel-pane').length > 0) {
                 throw 'Not a "results" request.';
             }
-            admin.data('request', content.data('request'));
+            admin.data('request', content.data('request')).attr('class', content.attr('class'));
         }
 
         for(var t = 0; t < tables.length; t++) {
             (function (table) {
-                if(typeof data == 'object') {
-                    for (var i = 0; i < data[table].length; i++) {
-                        if (admin.find('> .' + table + '-row.' + table + '-id-' + data[table][i].id).length == 0) {
-                            // set pack id on panel
-                            admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first().removeClass(table + '-id-').addClass(table + '-id-' + data[table][i].id);
-                            // TODO: update data-action attributes with new ID
+                var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
 
+                var getRowQuery,
+                    rowQuery = (getRowQuery = function (table) { return '> header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable' })(table);
+
+                admin.find(rowQuery)
+                    // leave edit rows alone
+                    .filter('.template, .header, .highlighted-link, :not(.edit), :not(.edit) + .expandable')
+                    // remove existing rows
+                    .remove();
+
+                var existing,
+                    keepRows = (existing = admin.find('> .' + table + '-row:not(.template)')).map(function () {
+                    var rowId = getRowId.apply(this);
+                    return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
+                }).toArray();
+                var last = existing.length == 0 ? admin.find(getRowQuery(tables[t-1])).last() : existing.last();
+                var newRows = content.find(rowQuery).not(keepRows.join(','));
+                var headerFooter = newRows.filter('header, .highlighted-link');
+                // put headers before and actions after
+                if(headerFooter.length > 0) {
+                    if (existing.length > 0) {
+                        headerFooter.filter('header').insertBefore(existing.first());
+                        headerFooter.filter('.highlighted-link').insertAfter(existing.last());
+                    }
+                    else {
+                        if (last.length == 0) {
+                            headerFooter.prependTo(admin);
+                        }
+                        else {
+                            headerFooter.insertAfter(last);
+                        }
+                        last = headerFooter.filter('header').last();
+                    }
+                    newRows = newRows.not(headerFooter);
+                }
+
+                for(var n = 0; n < newRows.length; n++) {
+                    var noId;
+                    // update empty row ids TODO: verify this doesn't mistakenly pick out the wrong blank row added in between saving
+                    if((noId = admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first()).length > 0) {
+                        noId.removeClass(table + '-id-').addClass(table + '-id-' + getRowId.apply(newRows[n]));
+                    }
+                    else {
+                        if(last.length == 0) {
+                            $(newRows[n]).prependTo(admin);
+                        }
+                        else {
+                            $(newRows[n]).insertAfter(last);
                         }
                     }
                 }
-                else {
-                    // leave edit rows alone
-                    var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
-                    // TODO: update empty row ids
-
-                    // remove existing rows
-                    admin.find('> .' + table + '-row:not(.edit):not(.template), > .' + table + '-row:not(.edit):not(.template) + .expandable')
-                        .remove();
-
-                    var keepRows = admin.find('> .' + table + '-row:not(.template)').map(function () {
-                        var rowId = getRowId.apply(this);
-                        return '.' + table + '-id-' + rowId + ',.' + table + '-id-' + rowId + ' + .expandable';
-                    }).toArray();
-                    var newRows = content.find('> .' + table + '-row:not(.template), > .' + table + '-row:not(.template) + .expandable').not(keepRows.join(','));
-                    for(var n = 0; n < newRows.length; n++) {
-                        var noId;
-                        if((noId = admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first()).length > 0) {
-                            noId.removeClass(table + '-id-').addClass(table + '-id-' + getRowId.apply(newRows[n]));
-                        }
-                        else {
-                            $(newRows[n]).insertBefore(admin.find('.' + table + '-row.template').first());
-                        }
-                    }
-                    admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
-                    // TODO: even if we are keeping the existing rows, still update data-action attributes for each ID
-                    for(var r = 0; r < keepRows.length; r++) {
-                        admin.find(keepRows[r]).find('> [class*="actions"]').replaceWith(content.find(keepRows[r]).find('> [class*="actions"]'))
-                    }
-                    if (selected) {
-                        admin.find('> .' + table + '-id-' + selected[1]).addClass('selected');
-                    }
+                admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
+                // TODO: even if we are keeping the existing rows, still update data-action attributes for each ID
+                for(var r = 0; r < keepRows.length; r++) {
+                    admin.find(keepRows[r]).find('> [class*="actions"]').replaceWith(content.find(keepRows[r]).find('> [class*="actions"]'))
+                }
+                if (selected) {
+                    admin.find('> .' + table + '-id-' + selected[1]).addClass('selected');
                 }
             })(tables[t]);
         }

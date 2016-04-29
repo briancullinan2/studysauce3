@@ -16,7 +16,7 @@ table.results > thead > tr > th
     vertical-align: bottom;
 }
 
-.results header > *
+.results header > *:not(.big-add)
 {
     display:inline-block;
     margin:0 -2px;
@@ -544,6 +544,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     padding: 0;
 }
 
+.tiles > header,
 .tiles > .highlighted-link {
     padding: 0 1%;
 }
@@ -652,6 +653,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 
 .last-right-expand {
     min-height:300px;
+    clear:both;
 }
 
 .last-right-expand header > *
@@ -800,6 +802,41 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     padding-right:50px;
 }
 
+.results > .views {
+    position:fixed;
+    top:40%;
+    left:0;
+    width:auto;
+    background-color:#bbb;
+    display:none;
+    opacity: .3;
+    z-index: 1000;
+    transition: ease-in-out 1s;
+}
+
+.results > .views:hover {
+    opacity: 1;
+}
+
+.results > .views li,
+.results:hover .views {
+    display:block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    transition: ease-in-out 1s;
+}
+
+.results > .views li a {
+    display:block;
+    padding:10px;
+    list-style: none;
+    margin: 0;
+}
+
+.results > .views li a:hover {
+    background-color:#fff;
+}
 
 @media (min-width: 1500px)
 {

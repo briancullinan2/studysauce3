@@ -295,17 +295,14 @@ class PacksController extends Controller
         }
         $orm->flush();
 
-        $shouldNewCards = $newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0;
-        return $this->forward('AdminBundle:Admin:results', [
-            'tables' => ['pack', 'card'], 'expandable' => ['card' => ['preview']],
-            'pack-id' => $newPack->getId(),
-            'headers' => ['pack' => 'packPacks'],
-            'new' => $shouldNewCards ? ['card'] : false,
+        // TODO: $shouldNewCards = $newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0;
+        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: '');
+        return $this->forward('AdminBundle:Admin:results', $searchRequest + [
             'edit' => false,
-            'count-pack' => 1,
-            'count-card' => $shouldNewCards ? 5 : 0,
-            'footers' => ['pack' => 'packPacks', 'card' => true],
-            'requestKey' => null
+            'read-only' => ['pack'],
+            'new' => false,
+            'pack-id' => $newPack->getId(),
+            'requestKey' => null,
         ]);
     }
 

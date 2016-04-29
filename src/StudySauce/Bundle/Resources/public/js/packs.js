@@ -8,8 +8,8 @@ $(document).ready(function () {
     }
 
     key('⌘+v, ctrl+v, command+v', function () {
-        var tab = $('[id^="packs-"] .results:visible');
-        if(tab.is(':visible') && tab.find('input:focus, select:focus, textarea:focus').parents('.results [class*="-row"]').is('.empty')) {
+        var tab = $('[id*="packs-"]:visible');
+        if(tab.find('input:focus, select:focus, textarea:focus').parents('.results [class*="-row"]').is('.empty')) {
             // get the clipboard text
             var text = $('<textarea></textarea>')
                 .css('position', 'fixed')
@@ -431,6 +431,7 @@ $(document).ready(function () {
 
         var packData = $.extend({id: packId, cards: cards, publish: packRows.find('.status select').data('publish'), requestKey: getDataRequest.apply(tab).requestKey},
             gatherFields.apply(packRows, [['upload', 'groups', 'users', 'status', 'title', 'keyboard']]));
+        packRows.removeClass('changed');
 
         $.ajax({
             url: Routing.generate('packs_create'),

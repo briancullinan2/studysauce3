@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /** @var GlobalVariables $app */
 /** @var $view TimedPhpEngine */
-/** @var $user User */
 /** @var Group $entity */
 
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
@@ -80,23 +79,26 @@ $view['slots']->start('body'); ?>
                         $tableViews = [
                             'Tiles' => [
                                 'tables' => $tiles,
-                                'classes' => ['tiles']
-                            ],
+                                'classes' => ['tiles'],
+                                 'headers' => false,
+                           ],
                             'Membership' => [
                                 'tables' => ['ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
-                                'classes' => ['last-right-expand']
-                            ]
+                                'classes' => ['last-right-expand'],
+                                 'headers' => ['ss_group' => 'subGroups'],
+                           ]
                         ];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
                         print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tableView + [
-                            'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
-                            'count-ss_group' => 0,
-                            'parent-ss_group-deleted' => $entity->getDeleted(),
-                            'edit' => false,
-                            'read-only' => false,
-                            'headers' => ['ss_group' => 'subGroups'],
-                            'footers' => ['ss_group' => 'subGroups']
-                        ]));
+                                'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
+                                'count-ss_group' => 0,
+                                'parent-ss_group-deleted' => $entity->getDeleted(),
+                                'edit' => false,
+                                'read-only' => false,
+                                'headers' => ['ss_group' => 'subGroups'],
+                                'footers' => ['ss_group' => 'subGroups'],
+                                'views' => $app->getUser()->getEmailCanonical() == 'brian@studysauce.com' ? $tableViews : null
+                            ]));
                     }
                     ?>
                 </div>
@@ -124,11 +126,10 @@ $view['slots']->start('body'); ?>
                         ]));
                         ?>
                     </div>
+                    <div class="empty-members">
+                        <div>Select name on the left to see group members</div>
+                    </div>
                 <?php } ?>
-
-                <div class="empty-members">
-                    <div>Select name on the left to see group members</div>
-                </div>
             </div>
         </div>
     </div>
