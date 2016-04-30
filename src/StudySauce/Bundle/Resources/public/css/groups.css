@@ -79,7 +79,7 @@
     margin-top:-9px;
 }
 
-.group-list .results .ss_group-row .actions .remove-icon {
+[id^="groups-"] .group-list .ss_group-row .actions .remove-icon {
     display:none;
 }
 
