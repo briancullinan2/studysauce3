@@ -82,7 +82,7 @@ $view['slots']->start('body'); ?>
                            ],
                             'Membership' => [
                                 'tables' => [
-                                    'ss_group-1' => ['id', 'title', 'counts', 'expandMembers' => [], 'actions' => ['deleted'] /* search field but don't display a template */],
+                                    'ss_group-1' => ['id', 'title', 'counts', 'expandMembers' => [], ['deleted'] /* search field but don't display a template */],
                                     'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
                                  'headers' => ['ss_group' => 'subGroups'],
@@ -90,7 +90,7 @@ $view['slots']->start('body'); ?>
                         ];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
                         print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
-                                'ss_group-1headers' => false,
+                                'ss_group-1headers' => ['ss_group' => 'subGroups'],
                                 'ss_group-1footers' => false,
                                 'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
                                 'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
@@ -98,8 +98,8 @@ $view['slots']->start('body'); ?>
                                 'ss_group-deleted' => $entity->getDeleted(),
                                 'edit' => false,
                                 'read-only' => false,
-                                'headers' => ['ss_group' => 'subGroups'],
-                                'footers' => ['ss_group' => 'subGroups'],
+                                'headers' => false,
+                                'footers' => false,
                                 'views' => $tableViews
                             ])));
                     }

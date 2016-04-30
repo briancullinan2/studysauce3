@@ -26,8 +26,6 @@ if (!empty($results['pack'])) {
 
 ?>
 <div class="highlighted-link form-actions <?php print $table; ?>">
-    <a href="<?php print $view['router']->generate('groups_new'); ?>" class="big-add">Add
-        <span>+</span> new subgroup</a><br/>
     <?php
     if (!empty($entityIds)) {
         print $this->render('AdminBundle:Admin:cell-collection.html.php', [

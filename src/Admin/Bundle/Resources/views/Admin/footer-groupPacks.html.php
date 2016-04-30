@@ -9,8 +9,6 @@ if(empty($results['pack'])) { ?>
 }
 ?>
 <div class="highlighted-link form-actions <?php print $table; ?>">
-    <a href="<?php print $view['router']->generate('packs_new'); ?>" class="big-add">Create
-        <span>+</span> new pack</a><br/>
     <?php
 
     print $this->render('AdminBundle:Admin:cell-collection.html.php', [

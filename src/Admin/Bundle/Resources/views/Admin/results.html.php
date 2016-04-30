@@ -18,13 +18,13 @@ $subVars = array_merge(['tables' => $tables, 'allGroups' => $allGroups, 'searchR
     }
 
     if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
-        if(!empty($searchRequest['views'])) { ?><ul class="views"><?php
+        if(!empty($searchRequest['views'])) { ?><div class="views"><ul><?php
             foreach($searchRequest['views'] as $v => $extend) {
                 ?><li><a href="#switch-view-<?php print $v; ?>"><?php print $v; ?></a></li><?php
-            } ?></ul><?php
+            } ?></ul></div><?php
         }
         else { ?>
-            <ul class="views"><li><a href="#switch-view-" data-extend="{}">Refresh</a></li></ul>
+            <div class="views"><ul><li><a href="#switch-view-" data-extend="{}">Refresh</a></li></div>
         <?php }
     }
 

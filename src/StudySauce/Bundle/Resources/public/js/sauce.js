@@ -561,9 +561,11 @@ function ssMergeStyles(content)
 
     var any = false;
     $(styles).each(function () {
-        var url = $(this).attr('href');
-        if (typeof url != 'undefined') {
-            if ($('link[href="' + url + '"]').length == 0) {
+        // remove version string
+        var url;
+        if (typeof (url = $(this).attr('href')) != 'undefined') {
+            url = url.replace(/\?.*/ig, '');
+            if ($('link[href*="' + url + '"]').length == 0) {
                 $('head').append('<link href="' + url + '" type="text/css" rel="stylesheet" />');
                 any = true;
             }
@@ -575,14 +577,16 @@ function ssMergeStyles(content)
                 imports = false;
             while (match = re.exec($(this).html())) {
                 imports = true;
-                if ($('link[href="' + match[1] + '"]').length == 0 &&
-                    $('style:contains("' + match[1] + '")').length == 0) {
+                // remove version string
+                url = match[1].replace(/\?.*/ig, '');
+                if ($('link[href="' + url + '"]').length == 0 &&
+                    $('style:contains("' + url + '")').length == 0) {
                     if (typeof media == 'undefined' || media == 'all') {
-                        $('head').append('<link href="' + match[1] + '" type="text/css" rel="stylesheet" />');
+                        $('head').append('<link href="' + url + '" type="text/css" rel="stylesheet" />');
                         any = true;
                     }
                     else {
-                        $('head').append('<style media="' + media + '">@import url("' + match[1] + '");');
+                        $('head').append('<style media="' + media + '">@import url("' + url + '");');
                         any = true;
                     }
                 }
@@ -630,7 +634,7 @@ function ssMergeScripts(content)
         var url = ($(this).attr('src') || '').replace(/\?.*/ig, '');
         if (url != '') {
             // only load script if it hasn't already been loaded
-            if ($('script[src^="' + url + '"]').length == 0 && alreadyLoadedScripts.indexOf(url) == -1) {
+            if ($('script[src*="' + url + '"]').length == 0 && alreadyLoadedScripts.indexOf(url) == -1) {
                 console.log(url);
                 window.sincluding.push(url);
                 $.getScript(url);

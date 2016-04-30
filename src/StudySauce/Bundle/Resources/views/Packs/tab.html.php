@@ -70,7 +70,7 @@ $view['slots']->start('body'); ?>
                             'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
                         ],
                         'classes' => ['last-right-expand'],
-                        'headers' => ['ss_group' => 'subGroups'],
+                        'headers' => ['pack' => 'subGroups'],
                         'footers' => ['ss_group' => 'subGroups'],
                         'edit' => false,
                         'read-only' => false,

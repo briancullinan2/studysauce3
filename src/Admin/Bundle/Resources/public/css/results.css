@@ -395,6 +395,11 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     width:100%;
 }
 
+.results header > .big-add {
+    padding-left:3%;
+    margin:20px 0;
+}
+
 .results header > *.id,
 .results [class*="-row"] > *:nth-child(1)
 {
@@ -451,7 +456,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     text-align: left;
     position: relative;
     vertical-align: middle;
-    width: 5%;
+    width: 3%;
 }
 
 .results .search {
@@ -573,6 +578,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:block;
     width:auto;
     height: 120px;
+    text-align: center;
 }
 
 .tiles [class*="-row"] .packList {
@@ -658,24 +664,24 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     clear:both;
 }
 
-.last-right-expand header > *
+.last-right-expand header
 {
-    border-bottom: 1px solid #bbb;
+    border-bottom: 2px solid #bbb;
 }
 
-.last-right-expand > header > label:nth-child(1),
+.last-right-expand > header > label:nth-of-type(1),
 .last-right-expand [class*="-row"] .title
 {
     width:25%;
 }
 
-.last-right-expand > header > label:nth-child(1)
+.last-right-expand > header > label:nth-of-type(1)
 {
-    margin-left:5%;
+    margin-left:3%;
 }
 
-.last-right-expand > header > label:nth-child(2),
-.last-right-expand > header > label:nth-child(3)
+.last-right-expand > header > label:nth-of-type(2),
+.last-right-expand > header > label:nth-of-type(3)
 {
     width:7.5%;
     text-align: center;
@@ -773,8 +779,9 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 
 .last-right-expand .form-actions
 {
-    width: 45%;
+    width: 50%;
     margin: 20px 0;
+    text-align:left;
 }
 
 .empty-members {
@@ -784,11 +791,10 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     padding-bottom: 70px;
     right: 0;
     height: 100%;
-    z-index: -1;
 }
 
 .empty-members div {
-    border:1px dashed #bbb;
+    border:2px dashed #bbb;
     background: #ddd;
     height:100%;
     text-align: center;
@@ -798,49 +804,67 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 
 .last-right-expand .form-actions > .entity-search
 {
-    margin-right:-40px;
     display:inline-block;
-    width:100%;
-    padding-right:50px;
+    width:92%;
+    padding-right:6%;
+    padding-left:6%;
 }
 
 .results > .views {
-    position:fixed;
-    padding-top:17% !important;
-    left:0;
-    width:100px;
+    position:absolute;
     background-color:#bbb;
     display:none;
     opacity: .3;
     z-index: 1000;
-    transition: ease-in-out 1s;
+    overflow: visible;
+    left:0;
+    right:100%;
+    min-height:42px;
+    padding:inherit;
+}
+
+.results > .views ul {
+    margin:0;
+    padding:0;
+    list-style: none;
+    position:fixed;
+    left:0;
+    padding-top:17% !important;
+    width:100px;
     height:100%;
     top:0;
     bottom:0;
+    background: #BBB;
     overflow: hidden;
 }
 
 .results > .views:hover {
     opacity: 1;
+}
+
+.results > .views:hover ul {
     overflow:visible;
 }
 
-.results > .views li,
-.results:hover .views {
-    display:inline-block;
-    list-style: none;
+.results > .views li {
     padding: 0;
     margin: 0;
-    transition: ease-in-out 1s;
+    list-style: none;
     min-width: 100px;
     background: #BBB;
 }
 
+.results:hover .views {
+    display:inline-block;
+}
+
 .results > .views li a {
-    display:block;
+    display:inline-block;
     padding:10px;
     list-style: none;
     margin: 0;
+    background: #BBB;
+    min-width:100%;
 }
 
 .results > .views li a:hover {
