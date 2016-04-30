@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var GlobalVariables $app */
 
-$subVars = array_merge(['tables' => $tables, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest, 'results' => $results], compact(array_map(function ($t) {
+$subVars = array_merge(['allGroups' => $allGroups, 'searchRequest' => $searchRequest, 'results' => $results], compact(array_map(function ($t) {
         return $t . '_total';
     }, array_keys($tables))));
 ?>
@@ -44,7 +44,7 @@ $subVars = array_merge(['tables' => $tables, 'allGroups' => $allGroups, 'searchR
             $aliasedRequest['tables'][$table] = $searchRequest['tables'][$table . $ext];
         }
         $aliasedRequest = array_merge($searchRequest, $aliasedRequest);
-        $subVars = array_merge($subVars, ['searchRequest' => $aliasedRequest]);
+        $subVars = array_merge($subVars, ['searchRequest' => $aliasedRequest, 'tables' => $aliasedRequest['tables']]);
 
         $isNew = isset($aliasedRequest['new']) && ($aliasedRequest['new'] === true || is_array($aliasedRequest['new']) && in_array($table, $aliasedRequest['new']));
 

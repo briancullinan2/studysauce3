@@ -654,9 +654,9 @@ $(document).ready(function () {
                                     continue;
                                 }
                                 var table = isNaN(parseInt(t)) ? t : tables[t];
-                                if (content.hasOwnProperty(table)) {
+                                if (typeof content.results[table] != 'undefined') {
                                     (function (table) {
-                                        results = $.merge(results, content[table].map(function (e) {
+                                        results = $.merge(results, content.results[table].map(function (e) {
                                             return {
                                                 table: table,
                                                 value: table + '-' + e.id,

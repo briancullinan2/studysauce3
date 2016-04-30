@@ -316,11 +316,11 @@ $(document).ready(function () {
                 var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
 
                 var getRowQuery,
-                    rowQuery = (getRowQuery = function (table) { return '> header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable' })(table);
+                    rowQuery = (getRowQuery = function (table) { return '> .views, > header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable' })(table);
 
                 admin.find(rowQuery)
                     // leave edit rows alone
-                    .filter('.template, .header, .highlighted-link, :not(.edit), :not(.edit) + .expandable')
+                    .filter('.views, .template, .header, .highlighted-link, :not(.edit), :not(.edit) + .expandable')
                     // remove existing rows
                     .remove();
 
@@ -331,11 +331,11 @@ $(document).ready(function () {
                 }).toArray();
                 var last = existing.length == 0 ? admin.find(getRowQuery(tables[t-1])).last() : existing.last();
                 var newRows = content.find(rowQuery).not(keepRows.join(','));
-                var headerFooter = newRows.filter('header, .highlighted-link, .' + table + '-row, .' + table + '-row + .expandable');
+                var headerFooter = newRows.filter('.views, header, .highlighted-link, .' + table + '-row, .' + table + '-row + .expandable');
                 // put headers before and actions after
                 if(headerFooter.length > 0) {
                     if (existing.length > 0) {
-                        headerFooter.filter('header').insertBefore(existing.first());
+                        headerFooter.filter('header, .views').insertBefore(existing.first());
                         headerFooter.filter('.highlighted-link, .' + table + '-row, .' + table + '-row + .expandable').insertAfter(existing.last());
                     }
                     else {
@@ -345,7 +345,7 @@ $(document).ready(function () {
                         else {
                             headerFooter.insertAfter(last);
                         }
-                        last = headerFooter.filter('header').last();
+                        last = headerFooter.filter('header, .views').last();
                     }
                     newRows = newRows.not(headerFooter);
                 }
