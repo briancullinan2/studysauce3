@@ -11,7 +11,7 @@ use StudySauce\Bundle\Entity\Pack;
     } ?>
     <form action="<?php print $view['router']->generate('save_group', [
         'groupId' => $results['ss_group'][0]->getId(),
-        'groups' => ['id' => $results['ss_group'][0]->getId(), 'remove' => false]]); ?>">
+        'ss_group' => [['id' => $results['ss_group'][0]->getId(), 'remove' => false]]]); ?>">
     <?php
     print $this->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['pack' => ['title','userCountStr','cardCountStr', 'id', 'status']],

@@ -449,6 +449,7 @@ $(document).ready(function () {
     var shouldRefresh = false;
     body.on('resulted', '[id^="packs-"] .results', function () {
         isLoading = false;
+        var tab = $(this);
         if (tab.closest('.panel-pane').is('#packs-pack0')) {
             var id = getTabId.apply(tab);
             tab.closest('.panel-pane').attr('id', 'packs-pack' + id);

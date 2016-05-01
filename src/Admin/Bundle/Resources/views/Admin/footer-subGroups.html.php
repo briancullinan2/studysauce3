@@ -19,9 +19,6 @@ if (!empty($results['pack'])) {
     foreach ($results['ss_group'] as $g) {
         $entityIds[] = 'ss_group-' . $g->getId();
     }
-
-
-
 }
 
 ?>
@@ -30,7 +27,7 @@ if (!empty($results['pack'])) {
     if (!empty($entityIds)) { ?>
     <form action="<?php print $view['router']->generate('packs_create', [
         'packId' => $results['pack'][0]->getId(),
-        'ss_group' => ['id' => $results['ss_group'][0]->getId(), 'remove' => false]]); ?>">
+        'ss_group' => [['id' => $results['ss_group'][0]->getId(), 'remove' => false]]]); ?>">
         <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
             'tables' => [
                 'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],

@@ -88,6 +88,8 @@ $(document).ready(function () {
     // TODO: refresh all intermediate group panels also
     var shouldRefresh = false;
     body.on('resulted', '[id^="groups-"] .results', function () {
+        var tab = $(this);
+
         if (tab.closest('.panel-pane').is('#groups-group0')) {
             var id = getTabId.apply(tab);
             tab.closest('.panel-pane').attr('id', 'groups-group' + id);
@@ -101,12 +103,12 @@ $(document).ready(function () {
 
         shouldRefresh = true;
         var loaded = body.find('#groups');
-        var parentId = $(this).find('.ss_group-row .parent select').val();
-        if($(this).parents('.panel-pane').attr('id') != 'groups-group' + parentId) {
+        var parentId = tab.find('.ss_group-row .parent select').val();
+        if(tab.parents('.panel-pane').attr('id') != 'groups-group' + parentId) {
             loaded = loaded.add(body.find('#' + 'groups-group' + parentId));
         }
         loaded.off('show.resulted').on('show.resulted', function () {
-            loadResults.apply($(this).find('.results'));
+            loadResults.apply(tab.find('.results'));
         });
     });
 
