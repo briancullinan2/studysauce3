@@ -425,7 +425,6 @@ $(document).ready(function () {
         loadingAnimation(tab.find('a[href="#save-pack"]'));
 
         // get the parsed list of cards
-        var packId = getTabId.apply(this);
         var cards = [];
         cardRows.each(function () {
             var rowId = getRowId.apply($(this));
@@ -441,40 +440,20 @@ $(document).ready(function () {
         });
         cardRows.removeClass('changed');
 
-        var packData = $.extend({id: packId, cards: cards, publish: packRows.find('.status select').data('publish'), requestKey: getDataRequest.apply(tab).requestKey},
+        var packData = $.extend({cards: cards},
             gatherFields.apply(packRows, [['upload', 'status', 'title', 'keyboard']]));
         packRows.removeClass('changed');
-
-        $.ajax({
-            url: Routing.generate('packs_create'),
-            type: 'POST',
-            dataType: 'text',
-            data: packData,
-            success: function (data) {
-                tab.find('.squiggle').stop().remove();
-
-                loadContent.apply(tab, [data]);
-
-                // rename tab if working with a new pack
-                // TODO: generalize this with some sort of data attribute or class, same as in groups
-                if (tab.closest('.panel-pane').is('#packs-pack0')) {
-                    var id = getTabId.apply(tab);
-                    tab.closest('.panel-pane').attr('id', 'packs-pack' + id);
-                    window.activateMenu(Routing.generate('packs_edit', {pack: id}));
-                }
-
-                // if done in the background, don't refresh the tab with loadContent
-                isLoading = false;
-            },
-            error: function () {
-                isLoading = false;
-                tab.find('.squiggle').stop().remove();
-            }
-        });
+        standardSave.apply(tab.find('a[href="#save-pack"]'), [packData]);
     }
 
     var shouldRefresh = false;
     body.on('resulted', '[id^="packs-"] .results', function () {
+        isLoading = false;
+        if (tab.closest('.panel-pane').is('#packs-pack0')) {
+            var id = getTabId.apply(tab);
+            tab.closest('.panel-pane').attr('id', 'packs-pack' + id);
+            window.activateMenu(Routing.generate('packs_edit', {pack: id}));
+        }
         shouldRefresh = true;
     });
 
@@ -499,11 +478,12 @@ $(document).ready(function () {
             }
         }, 50);
 
-        autoSaveTimeout = null;
         var select = tab.find('.pack-row:not(.template) .status select');
         select.data('oldValue', select.val());
         resizeTextAreas.apply(tab.find('.card-row:not(.template):not(.removed)'));
         tab.find('.card-row:not(.template):not(.removed)').first().filter(':not(.selected)').trigger('mousedown');
+
+        autoSaveTimeout = null;
     }
 
     body.on('click', '.panel-pane[id^="packs-"] a[href="#edit-pack"]', setupPackEditor);

@@ -815,7 +815,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 }
 
 .last-right-expand .empty-packs {
-    margin-left:3%;
+    margin-left:6%;
 }
 
 .results > .views {

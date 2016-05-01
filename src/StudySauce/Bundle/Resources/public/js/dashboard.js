@@ -700,12 +700,7 @@ $(document).ready(function () {
         var obj = $.extend({remove: remove}, item);
 
         if(isTemplate) {
-            if(existing.indexOf(value) > -1) {
-                obj.remove = true;
-            }
-            else {
-                obj.remove = false;
-            }
+            obj.remove = existing.indexOf(value) > -1;
             createEntityRow.apply(entityField.parents('label'), [obj, obj.remove]);
             this.selectize.setValue('', true);
         }
@@ -826,8 +821,8 @@ $(document).ready(function () {
                 tab.find('.squiggle').stop().remove();
             }
         });
-
     }
+    window.standardSave = standardSave;
 
     body.on('change', '.header input[name="search"]', function () {
         var that = $(this);
@@ -1011,7 +1006,7 @@ $(document).ready(function () {
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
                 field.data('publish', publish);
-                standardSave.apply(field, [$.extend({id: packId}, publish)]);
+                standardSave.apply(field, [{packId: packId.replace('pack-', ''), publish: publish}]);
             });
         });
     }

@@ -41,7 +41,7 @@ $view['slots']->start('body'); ?>
         id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
-                <div class="group-edit">
+                <form action="<?php print $view['router']->generate('groups_save', ['groupId' => $entity->getId()]); ?>" class="group-edit">
                     <?php
                     $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']]];
                     $isNew = empty($entity->getId());
@@ -57,7 +57,7 @@ $view['slots']->start('body'); ?>
                         'footers' => ['ss_group' => 'groupGroups']
                     ]));
                     ?>
-                </div>
+                </form>
             <?php } ?>
             <div class="membership">
                 <div class="group-list">

@@ -618,7 +618,7 @@ class AdminController extends Controller
 
         // do pack add/remove, not group remove
         if(!empty($request->get('packId')) && !empty($g->getId())) {
-            $this->forward('StudySauceBundle:Packs:create', ['id' => $request->get('packId'), 'groups' => $request->get('ss_group'), 'ss_user' => $request->get('ss_user'), 'publish' => $request->get('publish')]);
+            $this->forward('StudySauceBundle:Packs:create', ['packId' => $request->get('packId'), 'groups' => $request->get('ss_group'), 'ss_user' => $request->get('ss_user'), 'publish' => $request->get('publish')]);
         }
         else if(empty($g->getId())) {
             $orm->persist($g);

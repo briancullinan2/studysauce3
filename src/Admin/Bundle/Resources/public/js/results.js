@@ -311,6 +311,7 @@ $(document).ready(function () {
             admin.data('request', content.data('request')).attr('class', content.attr('class'));
         }
 
+        admin.find('> .views').remove();
         for(var t = 0; t < tables.length; t++) {
             (function (table) {
                 var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
@@ -320,7 +321,7 @@ $(document).ready(function () {
 
                 admin.find(rowQuery)
                     // leave edit rows alone
-                    .filter('.views, .template, .header, .highlighted-link, :not(.edit), :not(.edit) + .expandable')
+                    .filter('.template, .header, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable')
                     // remove existing rows
                     .remove();
 

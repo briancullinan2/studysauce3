@@ -81,46 +81,29 @@ $(document).ready(function () {
         loadingAnimation(tab.find('a[href^="#save-"]'));
         tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
 
-        var groupData = $.extend({groupId: groupId, requestKey: getDataRequest.apply(tab).requestKey},
-            gatherFields.apply(row, [['upload', 'name', 'invite', 'parent']]));
-
-        $.ajax({
-            url: Routing.generate('save_group'),
-            type: 'POST',
-            dataType: 'text',
-            data: groupData,
-            success: function (data) {
-                tab.find('.squiggle').stop().remove();
-
-                loadContent.apply(tab, [data]);
-
-                // rename tab if working with a new group
-                // TODO: generalize this with some sort of data attribute or class, same as in packs
-                if (tab.closest('.panel-pane').is('#groups-group0')) {
-                    var id = getTabId.apply(tab);
-                    tab.closest('.panel-pane').attr('id', 'groups-group' + id);
-                    window.activateMenu(Routing.generate('groups_edit', {group: id}));
-                    // TODO: make this a part of some sort of WPF style property updating notification
-                    // update id in results
-                    var results = tab.closest('.panel-pane').find('.group-list .results').data('request');
-                    results['parent-ss_group-id'] = id;
-                    results['requestKey'] = null;
-                }
-            },
-            error: function () {
-                tab.find('.squiggle').stop().remove();
-            }
-        });
+        var groupData = gatherFields.apply(row, [['upload', 'name', 'invite', 'parent']]);
+        standardSave.apply(tab.find('a[href^="#save-"]'), [groupData]);
     }
 
     // TODO: refresh all intermediate group panels also
     var shouldRefresh = false;
     body.on('resulted', '[id^="groups-"] .results', function () {
+        if (tab.closest('.panel-pane').is('#groups-group0')) {
+            var id = getTabId.apply(tab);
+            tab.closest('.panel-pane').attr('id', 'groups-group' + id);
+            window.activateMenu(Routing.generate('groups_edit', {group: id}));
+            // TODO: make this a part of some sort of WPF style property updating notification
+            // update id in results
+            var results = tab.closest('.panel-pane').find('.group-list .results').data('request');
+            results['parent-ss_group-id'] = id;
+            results['requestKey'] = null;
+        }
+
         shouldRefresh = true;
         var loaded = body.find('#groups');
-        var id = $(this).find('.ss_group-row .parent select').val();
-        if($(this).parents('.panel-pane').attr('id') != 'groups-group' + id) {
-            loaded = loaded.add(body.find('#' + 'groups-group' + id));
+        var parentId = $(this).find('.ss_group-row .parent select').val();
+        if($(this).parents('.panel-pane').attr('id') != 'groups-group' + parentId) {
+            loaded = loaded.add(body.find('#' + 'groups-group' + parentId));
         }
         loaded.off('show.resulted').on('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
@@ -162,7 +145,7 @@ $(document).ready(function () {
     body.on('change keyup keydown', '.group-edit .ss_group-row input, .group-edit .ss_group-row select, .group-edit .ss_group-row textarea', groupsFunc);
 
     var isSettingSelectize = false;
-    body.on('change', '[id^="groups-"] .highlighted-link .packs input.selectized', function () {
+    body.on('change', '.list-packs .highlighted-link.pack input.selectized', function () {
         if(isSettingSelectize) {
             return;
         }

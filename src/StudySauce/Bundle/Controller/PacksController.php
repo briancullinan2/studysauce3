@@ -104,7 +104,7 @@ class PacksController extends Controller
         // process pack settings
         $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
             ->where('p.id = :id')
-            ->setParameter('id', intval($request->get('id')))
+            ->setParameter('id', intval($request->get('packId')))
             ->getQuery()
             ->getOneOrNullResult();
         if (empty($newPack)) {

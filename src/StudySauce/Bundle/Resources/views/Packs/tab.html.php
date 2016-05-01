@@ -39,7 +39,7 @@ $view['slots']->start('body'); ?>
     <div class="panel-pane" id="packs<?php print ($entity !== null ? ('-pack' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
-                <div class="pack-edit">
+                <form action="<?php print $view['router']->generate('packs_create', ['packId' => $entity->getId()]); ?>" class="pack-edit">
                     <?php
                     $tables = [
                         // view settings
@@ -57,7 +57,7 @@ $view['slots']->start('body'); ?>
                     ];
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
                     ?>
-                </div>
+                </form>
                 <div class="group-list">
                     <?php
                     $newCards = $entity->getCards()->filter(function (Card $c) {
