@@ -321,7 +321,7 @@ $(document).ready(function () {
 
                 admin.find(rowQuery)
                     // leave edit rows alone
-                    .filter('.template, .header, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable')
+                    .filter('.template, header, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable')
                     // remove existing rows
                     .remove();
 

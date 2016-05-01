@@ -940,12 +940,16 @@ $(document).ready(function () {
 
             setTimeout(function () {
                 dialog.find('a[href="#add-entity-' + first + '"]').trigger('click');
-            }, 100);
+            }, 50);
         });
     });
 
     body.on('click', '#add-entity [href^="#add-entity-"]', function () {
-        $('#add-entity').find($(this).attr('href')).find('.selectize-input input').click();
+        var input = $('#add-entity').find($(this).attr('href')).find('.selectize-input input');
+        input.trigger('click');
+        setTimeout(function () {
+            input.focus();
+        }, 50);
     });
 
     body.on('hidden.bs.modal', '#general-dialog', function () {
