@@ -101,6 +101,10 @@
     margin-left:10%;
 }
 
+.list-packs .ss_group-row {
+    display:none !important;
+}
+
 .group-edit .ss_group-row .invite,
 .group-edit .ss_group-row .invites
 {

@@ -395,9 +395,13 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     width:100%;
 }
 
+.results .form-actions > .big-add,
 .results header > .big-add {
-    padding-left:3%;
     margin:20px 0;
+}
+
+.last-right-expand header > .big-add {
+    padding-left:3%;
 }
 
 .results header > *.id,
@@ -452,7 +456,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     display:none;
 }
 
-.results [class*="-row"] .id {
+.last-right-expand [class*="-row"] .id {
     text-align: left;
     position: relative;
     vertical-align: middle;
@@ -579,6 +583,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     width:auto;
     height: 120px;
     text-align: center;
+    position:relative;
 }
 
 .tiles [class*="-row"] .packList {
@@ -719,15 +724,19 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     z-index: 100;
 }
 
+.last-right-expand [class*="-row"] > [class*="Members"] > form {
+    display:block;
+    height: 100%;
+}
 
-.last-right-expand [class*="-row"] > [class*="Members"] > label:first-child {
+.last-right-expand [class*="-row"] > [class*="Members"] > form > label:first-child {
     color:#BBB;
     position:relative;
     top:-5px;
     font-weight: normal;
 }
 
-.last-right-expand [class*="-row"] > [class*="Members"] > div {
+.last-right-expand [class*="-row"] > [class*="Members"] > form > .entity-search {
     display:block;
     vertical-align: top;
     overflow: auto;
@@ -736,7 +745,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     margin-bottom:10px;
 }
 
-.last-right-expand [class*="-row"] > [class*="Members"] > div label.input {
+.last-right-expand [class*="-row"] > [class*="Members"] > form > .entity-search > label.input {
     position: absolute;
     width: 100%;
     left: 0;
@@ -745,13 +754,13 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     padding-right:20px;
 }
 
-.last-right-expand [class*="-row"] > [class*="Members"] > div label
+.last-right-expand [class*="-row"] > [class*="Members"] > form > .entity-search > label
 {
     display:block;
     height:29px;
 }
 
-.last-right-expand [class*="-row"] > [class*="Members"] > div label a
+.last-right-expand [class*="-row"] > [class*="Members"] > form > .entity-search > label a
 {
     display:inline-block !important;
 }
@@ -798,7 +807,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     padding-top:100px;
 }
 
-.last-right-expand .form-actions > .entity-search
+.last-right-expand .form-actions > form > .entity-search
 {
     display:inline-block;
     width:86%;

@@ -146,6 +146,7 @@ $(document).ready(function () {
         autoSaveTimeout = null;
     });
 
+    // TODO: generalize some of this and move to results?
     body.on('click', '[id^="groups-"] a[href="#save-ss_group"], [id^="groups-"] [value="#save-ss_group"]', function (evt) {
         evt.preventDefault();
         var tab = $(this).parents('.results:visible');
@@ -160,12 +161,6 @@ $(document).ready(function () {
 
     body.on('change keyup keydown', '.group-edit .ss_group-row input, .group-edit .ss_group-row select, .group-edit .ss_group-row textarea', groupsFunc);
 
-    body.on('click', '[id^="groups-"] .ss_group-row.edit a[href^="#cancel-"], [id^="groups-"] .ss_group-row ~ .highlighted-link a[href^="#cancel"]', function (evt) {
-        evt.preventDefault();
-        $(this).parents('.results').find('.ss_group-row').removeClass('edit').addClass('read-only');
-        window.activateMenu(Routing.generate('groups'));
-    });
-
     var isSettingSelectize = false;
     body.on('change', '[id^="groups-"] .highlighted-link .packs input.selectized', function () {
         if(isSettingSelectize) {
@@ -173,39 +168,12 @@ $(document).ready(function () {
         }
         isSettingSelectize = true;
         var that = $(this),
-            tab = that.parents('.results'),
-            groupId = getTabId.apply(tab),
             id = that.val(),
             packName = that[0].selectize.options[id].text;
 
         that[0].selectize.setValue('', true);
 
-        showPublishDialog(packName, null)(function (publish) {
-            // save packs
-            loadingAnimation(tab.find('a[href="#save-pack"]'));
-
-            $.ajax({
-                url: Routing.generate('save_group'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    groupId: groupId,
-                    packId: id != null ? id.substr(5) : null,
-                    groups: [{id: groupId, remove: false}],
-                    publish: publish,
-                    requestKey: getDataRequest.apply(tab).requestKey
-                },
-                success: function (data) {
-                    tab.find('.squiggle').stop().remove();
-                    // copy rows and select
-
-                    loadContent.apply(tab, [data, ['pack']]);
-                },
-                error: function () {
-                    tab.find('.squiggle').stop().remove();
-                }
-            });
-        });
+        showPublishDialog.apply(that, [id, packName, null]);
 
         isSettingSelectize = false;
     });
@@ -223,45 +191,5 @@ $(document).ready(function () {
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
-    body.on('change', '[id^="groups-"] .pack-row .members input.selectized', function () {
-        if(isSettingSelectize) {
-            return;
-        }
-        isSettingSelectize = true;
-        var field = $(this),
-            tab = field.parents('.results'),
-            row = field.parents('.pack-row'),
-            rowId = getRowId.apply(row),
-            groupId = getTabId.apply(row);
-
-        field[0].selectize.setValue('', true);
-
-        // confirmation dialog
-        body.one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-            $.ajax({
-                url: Routing.generate('save_group'),
-                type: 'POST',
-                dataType: 'text',
-                data: {
-                    groupId: groupId,
-                    packId: rowId != null ? rowId : null,
-                    users: field.data('ss_user').map(function (g) {
-                        return {id: g.value.substr(8), remove: g['remove']};
-                    }),
-                    requestKey: getDataRequest.apply(tab).requestKey
-                },
-                success: function (data) {
-                    tab.find('.squiggle').stop().remove();
-                    // copy rows and select
-                    loadContent.apply(tab, [data, ['pack']]);
-                },
-                error: function () {
-                    tab.find('.squiggle').stop().remove();
-                }
-            });
-        });
-
-        isSettingSelectize = false;
-    });
 
 });

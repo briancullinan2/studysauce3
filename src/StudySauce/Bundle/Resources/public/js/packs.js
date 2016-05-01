@@ -407,6 +407,7 @@ $(document).ready(function () {
 
     var isLoading = false;
 
+    // TODO: generalize this
     function autoSave(close) {
         autoSaveTimeout = null;
         var tab = getTab.apply(this);
@@ -434,9 +435,6 @@ $(document).ready(function () {
                     remove: true
                 };
             }
-            else if($(this).is('.invalid')) {
-                return true;
-            }
             else {
                 cards[cards.length] = $.extend({id: rowId}, gatherFields.apply($(this), [['type', 'upload', 'content', 'answers', 'correct']]));
             }
@@ -444,7 +442,7 @@ $(document).ready(function () {
         cardRows.removeClass('changed');
 
         var packData = $.extend({id: packId, cards: cards, publish: packRows.find('.status select').data('publish'), requestKey: getDataRequest.apply(tab).requestKey},
-            gatherFields.apply(packRows, [['upload', 'groups', 'users', 'status', 'title', 'keyboard']]));
+            gatherFields.apply(packRows, [['upload', 'status', 'title', 'keyboard']]));
         packRows.removeClass('changed');
 
         $.ajax({
@@ -517,28 +515,32 @@ $(document).ready(function () {
         }
     });
 
-    // TODO: generalize and move this to dashboard
+    // TODO: generalize and move this to dashboard using some sort of property binding API, data-target, data-toggle for selects toggles class of closest matching target?
 
     body.on('change', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');
-        var select = row.find('.status select');
+        var select = $(this);
 
-        var that = $(this);
         if($(this).val() == 'GROUP') {
-            that.val(that.data('oldValue'));
+            select.val(select.data('oldValue'));
 
-            showPublishDialog.apply(this, [row.find('.name input').val(), that.data('publish')])(function (publish) {
-                select.find('option[value="GROUP"]').text(publish.schedule <= new Date()
-                    ? 'Published'
-                    : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' '
-                + publish.schedule.getHours() + ':00)');
-                row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-                row.addClass('changed');
-                select.data('publish', publish).val('GROUP').trigger('change');
+            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
+                setTimeout(function () {
+                    var publish = select.data('publish');
+                    select.find('option[value="GROUP"]').text(publish.schedule <= new Date()
+                        ? 'Published'
+                        : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' '
+                    + publish.schedule.getHours() + ':00)');
+                    row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
+                    select.val('GROUP');
+                    // saves automatically
+                }, 50);
             });
+
+            showPublishDialog.apply(select, [getRowId.apply(row), row.find('.name input').val(), select.data('publish')]);
         }
         else {
-            that.data('oldValue', that.val());
+            select.data('oldValue', select.val());
         }
 
         var status = select.val().toLowerCase();

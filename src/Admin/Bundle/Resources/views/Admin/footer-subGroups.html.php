@@ -27,14 +27,18 @@ if (!empty($results['pack'])) {
 ?>
 <div class="highlighted-link form-actions <?php print $table; ?>">
     <?php
-    if (!empty($entityIds)) {
-        print $this->render('AdminBundle:Admin:cell-collection.html.php', [
+    if (!empty($entityIds)) { ?>
+    <form action="<?php print $view['router']->generate('packs_create', [
+        'id' => $results['pack'][0]->getId(),
+        'ss_group' => ['id' => $results['ss_group'][0]->getId(), 'remove' => false]]); ?>">
+        <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
             'tables' => [
                 'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
                 'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted']],
             'entityIds' => $entityIds]);
         ?>
         <a href="#add-entity" title="Manage users and groups" data-target="#add-entity" data-toggle="modal" class="big-add"><span>+</span>&nbsp;</a>
+    </form>
     <?php } ?>
 </div>
 

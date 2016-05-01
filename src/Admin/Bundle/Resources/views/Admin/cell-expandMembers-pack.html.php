@@ -14,11 +14,15 @@ if(isset($searchRequest['ss_group-id']) && !empty($group = $searchRequest['ss_gr
         return $u->getGroups()->filter(function (Group $g) use ($group) {return $g->getId() == $group;})->count() > 0;});
 }
 ?>
-<label><?php print $users->count(); ?> users</label>
-<?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
-    'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
-    'entities' => $users->toArray(),
-    'entityIds' => $ids]); ?>
+<form action="<?php print (!empty($group)
+    ? $view['router']->generate('save_group', ['groupId' => $searchRequest['ss_group-id'], 'packId' => $pack->getId()])
+    : $view['router']->generate('packs_create', ['id' => $pack->getId()])); ?>">
+    <label><?php print $users->count(); ?> users</label>
+    <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
+        'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
+        'entities' => $users->toArray(),
+        'entityIds' => $ids]); ?>
 
-<a href="#add-entity" class="big-add" data-toggle="modal" data-target="#add-entity">Add
-    <span>+</span> individual</a>
+    <a href="#add-entity" class="big-add" data-toggle="modal" data-target="#add-entity">Add
+        <span>+</span> individual</a>
+</form>

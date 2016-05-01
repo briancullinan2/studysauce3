@@ -734,9 +734,8 @@ $(document).ready(function () {
                     + (removeItems.length > 0 ? (' remove ' + removeItems.map(function (e) {
                         return dialog.find('input[name="' + e.split('-')[0] + '"]')[0].selectize.options[e].text;}).join(', ')) : '');
 
-                // copy values from dialog back to field after confirmation
+                // confirmation dialog
                 body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-                    isSettingSelectize = true;
                     // filter out the removed and add the new to the field value
                     var newValue = $.merge(toField.val().split(' ').filter(function (e) {return removeItems.indexOf(e) == -1;}), addItems);
                     toField.data('entities', newEntities.slice(0));
@@ -748,11 +747,11 @@ $(document).ready(function () {
                             allOptions = $.merge(allOptions, options);
                         }
                     }
+                    // copy values from dialog back to field after confirmation
                     toField[0].selectize.clearOptions();
                     toField[0].selectize.addOption(allOptions);
                     toField[0].selectize.renderCache = {};
-                    toField[0].selectize.setValue(newValue, true);
-                    isSettingSelectize = false;
+                    confirmEntitySelect.apply(toField, [newValue]);
                 });
 
                 $('#general-dialog').modal({show: true, backdrop: true})
@@ -762,18 +761,69 @@ $(document).ready(function () {
         else {
             var message = (obj.remove ? 'remove ' : 'add ') + obj.text;
 
+            // confirmation dialog
             body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
                 updateRows(entityField, value, obj);
+                // oldValue actually contains updates values
                 var oldValue = entityField.data('oldValue').split(' ');
-                isSettingSelectize = true;
-                entityField[0].selectize.setValue(oldValue, true);
-                isSettingSelectize = false;
+                confirmEntitySelect.apply(entityField, [oldValue]);
             });
 
             $('#general-dialog').modal({show: true, backdrop: true})
                 .find('.modal-body').html('<p>Are you sure you want to ' + message + '?');
         }
         isSettingSelectize = false;
+    }
+
+    function confirmEntitySelect(newValue) {
+        if(isSettingSelectize) {
+            return;
+        }
+        isSettingSelectize = true;
+        var field = $(this);
+        field[0].selectize.setValue(newValue, true);
+        var tables = field.data('tables');
+        var updates = {};
+        for(var table in tables) {
+            if(tables.hasOwnProperty(table)) {
+                updates[table] = field.data(table).map(function (g) {
+                    return {id: g.value.substr(8), remove: g['remove']};
+                });
+            }
+        }
+
+        standardSave.apply(field, [updates]);
+        isSettingSelectize = false;
+    }
+
+    function standardSave(data) {
+        var field = $(this);
+        var tab = field.closest('.results');
+        data = $.extend(data, {requestKey: getDataRequest.apply(tab).requestKey});
+        var actionItem = field.closest('[action], [data-action]');
+        var saveUrl = actionItem.data('action') || actionItem.attr('action');
+
+        if(typeof saveUrl == 'undefined') {
+            throw 'Save action not found!';
+        }
+
+        // TODO: loading animation from CTA or activating field?
+
+        $.ajax({
+            url: saveUrl,
+            type: 'POST',
+            dataType: 'text',
+            data: data,
+            success: function (data) {
+                tab.find('.squiggle').stop().remove();
+                // copy rows and select
+                loadContent.apply(tab, [data]);
+            },
+            error: function () {
+                tab.find('.squiggle').stop().remove();
+            }
+        });
+
     }
 
     body.on('change', '.header input[name="search"]', function () {
@@ -922,7 +972,8 @@ $(document).ready(function () {
         }
     });
 
-    function showPublishDialog(packName, publish) {
+    function showPublishDialog(packId, packName, publish) {
+        var field = $(this);
         var dialog = $('#pack-publish').modal({show: true, backdrop: true});
 
         var allowTimes = [];
@@ -947,7 +998,6 @@ $(document).ready(function () {
         dialog.find('input[name="schedule"]').datetimepicker('setOptions', {value: date});
         dialog.find('input[name="schedule"]').trigger('change');
 
-        var publishConfirm = function (publish) {};
         body.one('click.publish', '#pack-publish a[href="#submit-publish"]', function () {
 
             var publish = gatherFields.apply(dialog, [['schedule', 'email', 'alert'], false]);
@@ -957,15 +1007,10 @@ $(document).ready(function () {
                 .find('.modal-body').html('<p>Are you sure you want to publish ' + packName + '?');
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
-                publishConfirm(publish);
+                field.data('publish', publish);
+                standardSave.apply(field, [$.extend({id: packId}, publish)]);
             });
         });
-
-        return function (setPublish) {
-            if(typeof publishConfirm == 'function') {
-                publishConfirm = setPublish;
-            }
-        }
     }
     window.showPublishDialog = showPublishDialog;
 

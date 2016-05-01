@@ -78,14 +78,12 @@ $view['slots']->start('body'); ?>
                             'Tiles' => [
                                 'tables' => $tiles,
                                 'classes' => ['tiles'],
-                                 'headers' => false,
                            ],
                             'Membership' => [
                                 'tables' => [
                                     'ss_group-1' => ['id', 'title', 'counts', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
                                     'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
-                                 'headers' => ['ss_group' => 'subGroups'],
                            ]
                         ];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
@@ -102,10 +100,8 @@ $view['slots']->start('body'); ?>
                                 'footers' => false,
                                 'views' => $tableViews
                             ])));
-                    }
                     ?>
                 </div>
-                <?php if ($entity !== null) { ?>
                     <div class="list-packs">
                         <?php
                         $tables = ['ss_group' => ['id', 'deleted']];
@@ -113,7 +109,7 @@ $view['slots']->start('body'); ?>
                         $isNew = empty($entity->getId());
                         print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                             'count-pack' => $isNew ? -1 : 0,
-                            'count-ss_group' => -1,
+                            'count-ss_group' => 1,
                             'ss_group-deleted' => $entity->getDeleted(),
                             'edit' => false,
                             'classes' => ['last-right-expand'],

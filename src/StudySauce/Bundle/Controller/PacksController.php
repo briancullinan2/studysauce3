@@ -137,7 +137,7 @@ class PacksController extends Controller
             $newPack->setProperty('email', isset($publish['email']) && $publish['email'] == 'true');
             $newPack->setProperty('alert', isset($publish['alert']) && $publish['alert'] == 'true');
         }
-        foreach ($request->get('groups') ?: [] as $group) {
+        foreach ($request->get('ss_group') ?: [] as $group) {
             /** @var Group $g */
             if (!empty($g = $groups->filter(function (Group $g) use ($group) {
                     return $group['id'] == $g->getId();})->first()) && !$newPack->hasGroup($g->getName()) && (!isset($group['remove']) || $group['remove'] != 'true')) {
@@ -159,7 +159,7 @@ class PacksController extends Controller
             }
         }
         // TODO: secure user access using ACLs, which admins have access to which users?
-        foreach ($request->get('users') ?: [] as $u) {
+        foreach ($request->get('ss_user') ?: [] as $u) {
             /** @var UserPack $up */
             if (!empty($up = $newPack->getUserPackById($u['id']))) {
                 $up->setRemoved(isset($u['remove']) && $u['remove'] == 'true');
