@@ -19,7 +19,7 @@ list($users, $packs, $groups) = $ss_group->getUsersPacksGroupsRecursively();
             continue;
         }
         ?>
-        <a href="<?php print $view['router']->generate('groups_edit', ['group' => $g->getId()]); ?>" class="pack-list"><?php print $g->getName(); ?>
+        <a href="<?php print $view['router']->generate('groups_edit', ['group' => $g->getId()]); ?>" class="pack-list"><?php print $view->escape($g->getName()); ?>
             <span><?php print $g->getSubgroups()->filter(function (Group $p) {
                     return !$p->getDeleted();
                 })->count(); // for self ?></span></a>

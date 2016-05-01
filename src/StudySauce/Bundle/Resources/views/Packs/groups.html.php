@@ -78,52 +78,53 @@ $view['slots']->start('body'); ?>
                             'Tiles' => [
                                 'tables' => $tiles,
                                 'classes' => ['tiles'],
-                           ],
+                            ],
                             'Membership' => [
                                 'tables' => [
                                     'ss_group-1' => ['id', 'title', 'counts', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
                                     'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
-                           ]
+                            ]
                         ];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
                         print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
-                                'ss_group-1headers' => ['ss_group' => 'subGroups'],
-                                'ss_group-1footers' => false,
-                                'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
-                                'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
-                                'count-ss_group' => 0,
-                                'ss_group-deleted' => $entity->getDeleted(),
-                                'edit' => false,
-                                'read-only' => false,
-                                'headers' => false,
-                                'footers' => false,
-                                'views' => $tableViews
-                            ])));
-                    ?>
-                </div>
-                    <div class="list-packs">
-                        <?php
-                        $tables = ['ss_group' => ['id', 'deleted']];
-                        $tables['pack'] = ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
-                        $isNew = empty($entity->getId());
-                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
-                            'count-pack' => $isNew ? -1 : 0,
-                            'count-ss_group' => 1,
+                            'ss_group-1headers' => ['ss_group' => 'subGroups'],
+                            'ss_group-1footers' => false,
+                            'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
+                            'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
+                            'count-ss_group' => 0,
                             'ss_group-deleted' => $entity->getDeleted(),
                             'edit' => false,
-                            'classes' => ['last-right-expand'],
                             'read-only' => false,
-                            'ss_group-id' => $entity->getId(),
-                            'tables' => $tables,
-                            'headers' => ['pack' => 'groupPacks'],
-                            'footers' => ['pack' => 'groupPacks']
-                        ]));
-                        ?>
-                    </div>
-                    <div class="empty-members">
-                        <div>Select name on the left to see group members</div>
-                    </div>
+                            'headers' => false,
+                            'footers' => false,
+                            'views' => $tableViews
+                        ])));
+                    } ?>
+                </div>
+                <?php if (!empty($entity)) { ?>
+                <div class="list-packs">
+                    <?php
+                    $tables = ['ss_group' => ['id', 'deleted']];
+                    $tables['pack'] = ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $isNew = empty($entity->getId());
+                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                        'count-pack' => $isNew ? -1 : 0,
+                        'count-ss_group' => 1,
+                        'ss_group-deleted' => $entity->getDeleted(),
+                        'edit' => false,
+                        'classes' => ['last-right-expand'],
+                        'read-only' => false,
+                        'ss_group-id' => $entity->getId(),
+                        'tables' => $tables,
+                        'headers' => ['pack' => 'groupPacks'],
+                        'footers' => ['pack' => 'groupPacks']
+                    ]));
+                    ?>
+                </div>
+                <div class="empty-members">
+                    <div>Select name on the left to see group members</div>
+                </div>
                 <?php } ?>
             </div>
         </div>
