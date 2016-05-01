@@ -703,6 +703,9 @@ $(document).ready(function () {
             if(existing.indexOf(value) > -1) {
                 obj.remove = true;
             }
+            else {
+                obj.remove = false;
+            }
             createEntityRow.apply(entityField.parents('label'), [obj, obj.remove]);
             this.selectize.setValue('', true);
         }

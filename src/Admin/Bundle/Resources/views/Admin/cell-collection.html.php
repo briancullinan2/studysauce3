@@ -17,7 +17,7 @@ $getJoinTable = function ($u) {
 $entityIds = isset($entityIds) && is_array($entityIds) ? $entityIds : [];
 $listIds = [];
 $dataTypes = [];
-$removedEntities = [];
+$removedEntities = isset($removedEntities) && is_array($removedEntities) ? $removedEntities : [];
 if (isset($entities)) {
     foreach ($entities as $u) {
         if(empty($joinTable = $getJoinTable($u))) {
@@ -25,19 +25,17 @@ if (isset($entities)) {
         }
         $key = $joinTable . '-' . $u->getId();
         $listIds[] = $key;
-        if (!in_array($key, $entityIds)) {
+        $remove = in_array($u, $removedEntities);
+        $unsetId = array_search($key, $entityIds);
+        if (!$remove && $unsetId === false) {
             $entityIds[] = $key;
+        }
+        else if ($remove && $unsetId !== false) {
+            unset($entityIds[$unsetId]);
         }
         $first = $u->{'get' . ucfirst($tables[$joinTable][0])}();
         $second = $u->{'get' . ucfirst($tables[$joinTable][1])}();
         $third = $u->{'get' . ucfirst($tables[$joinTable][2])}();
-        $remove = false;
-        if(method_exists($u, 'getRemoved')) {
-            $remove = $u->getRemoved();
-            if($remove) {
-                $removedEntities[] = $u;
-            }
-        }
         if($first instanceof \DateTime) {
             $first = $first->format('r');
         }
@@ -56,6 +54,8 @@ if (isset($entities)) {
         ];
     }
 }
+// template expects an array down below
+$entityIds = array_values($entityIds);
 ?>
 
 <div class="entity-search <?php print implode(' ', array_keys($dataTypes)); ?>">

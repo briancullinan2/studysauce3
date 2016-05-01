@@ -21,8 +21,8 @@ if(isset($searchRequest['ss_group-id']) && !empty($group = $searchRequest['ss_gr
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
         'entities' => $users->toArray(),
-        'entityIds' => $ids]); ?>
-
+        'entityIds' => $ids,
+        'removedEntities' => array_values($users->filter(function (User $user) use ($pack) {return !empty($up = $user->getUserPack($pack)) ? $up->getRemoved() : false;})->toArray())]); ?>
     <a href="#add-entity" class="big-add" data-toggle="modal" data-target="#add-entity">Add
         <span>+</span> individual</a>
 </form>
