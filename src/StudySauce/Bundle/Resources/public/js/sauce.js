@@ -308,7 +308,7 @@ if (typeof key != 'undefined') {
         if (this.isShown && this.options.backdrop) {
             var doAnimate = $.support.transition && animate
 
-            this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
+            this.$backdrop = $('<div class="modal-backdrop ' + animate + '"><div class="modal-backdrop-top" /><div class="modal-backdrop-right" /><div class="modal-backdrop-bottom" /><div class="modal-backdrop-left" /></div>')
                 .appendTo(this.$body)
 
             this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
@@ -746,6 +746,36 @@ $(document).ready(function () {
         }, 15);
     });
 
+    var alreadyDragging = false;
+    body.on('mousedown', '.modal-header', function (evt) {
+        if(alreadyDragging) {
+            return;
+        }
+        alreadyDragging = true;
+        $(this).parents('.modal-content').draggable({handle: '.modal-header', drag: adjustBackdrop}).trigger(evt);
+        alreadyDragging = false;
+    });
+
+    function adjustBackdrop() {
+        setTimeout(function () {
+            var backdrop = $('.modal-backdrop:visible');
+            var currentDialog = $('.modal:visible .modal-content');
+            if(currentDialog.length == 0 || backdrop.length == 0) {
+                return;
+            }
+            var height = $(window).height();
+            var width = $(window).width();
+            var offset = currentDialog.offset();
+            offset.top = offset.top - $(window).scrollTop();
+            offset.left = offset.left - $(window).scrollLeft();
+            backdrop.find('.modal-backdrop-left').css('margin-right', (width / 2) - offset.left - 1);
+            backdrop.find('.modal-backdrop-right').css('margin-left', offset.left - (width / 2) + currentDialog.width() - 1);
+            backdrop.find('.modal-backdrop-bottom').css('margin-top', offset.top - (height / 2) + currentDialog.height() - 1);
+            backdrop.find('.modal-backdrop-top').css('margin-bottom', (height / 2) - offset.top - 1);
+        }, 13);
+    }
+    window.adjustBackdrop = adjustBackdrop;
+
     body.on('click', 'a[href="#yt-pause"]', function (evt) {
         evt.preventDefault();
         var frame = $(this).prev().closest('iframe');
@@ -765,6 +795,7 @@ $(document).ready(function () {
         centerTimeout = setTimeout(function () {
             centerize.apply(body.find('.centerized:visible'));
         }, 50);
+        adjustBackdrop();
     });
     $(window).trigger('resize');
 
@@ -813,6 +844,7 @@ $(document).ready(function () {
                     $(this).data('bs.modal').removeBackdrop();
                 }
             });
+        adjustBackdrop();
     });
 
     function activatePanel(panel) {

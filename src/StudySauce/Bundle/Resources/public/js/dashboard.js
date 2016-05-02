@@ -600,6 +600,7 @@ $(document).ready(function () {
                 dropdownParent: null,
                 closeAfterSelect: true,
                 options: options,
+                hideSelected: false,
                 plugins: {
                     'clear_selection': {}
                 },
@@ -608,6 +609,24 @@ $(document).ready(function () {
                 },
                 onItemRemove: function (value) {
                     handleSelectize.apply(field[0], [value, field[0].selectize.options[value], true]);
+                },
+                onOptionAdd: function () {
+                    adjustBackdrop();
+                },
+                onOptionRemove: function () {
+                    adjustBackdrop();
+                },
+                onLoad: function () {
+                    adjustBackdrop();
+                },
+                onType: function () {
+                    adjustBackdrop();
+                },
+                onBlur: function () {
+                    adjustBackdrop();
+                },
+                onFocus: function () {
+                    adjustBackdrop();
                 },
                 render: {
                     option: function (item) {

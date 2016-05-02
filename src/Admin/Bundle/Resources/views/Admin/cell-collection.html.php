@@ -92,7 +92,7 @@ $entityIds = array_values($entityIds);
                        value="<?php print $u->getId(); ?>"
                        checked="checked"/>
                 <i></i>
-                <span><?php print $view->escape($u->{'get' . ucfirst($tables[$joinTable][0])}()) . ' ' . $view->escape($u->{'get' . ucfirst($tables[$joinTable][1])}()); ?></span>
+                <span class="entity-title"><?php print $view->escape($u->{'get' . ucfirst($tables[$joinTable][0])}()) . ' ' . $view->escape($u->{'get' . ucfirst($tables[$joinTable][1])}()); ?></span>
                 <a href="#subtract-entity" title="Remove"></a>
             </label>
             <?php $i++;
@@ -115,7 +115,7 @@ $entityIds = array_values($entityIds);
                     <input type="hidden" name="<?php print implode('_', array_keys($tables)); ?>[<?php print $i; ?>][remove]" />
 
                     <i></i>
-                    <span><?php print $view->escape($u->{'get' . ucfirst($tables[$joinTable][0])}()) . ' ' . $view->escape($u->{'get' . ucfirst($tables[$joinTable][1])}()); ?></span>
+                    <span class="entity-title"><?php print $view->escape($u->{'get' . ucfirst($tables[$joinTable][0])}()) . ' ' . $view->escape($u->{'get' . ucfirst($tables[$joinTable][1])}()); ?></span>
                     <a href="#insert-entity" title="Add">&nbsp;</a>
                 </label>
                 <?php $i++;
@@ -123,11 +123,11 @@ $entityIds = array_values($entityIds);
         }
         ?>
 
-        <label class="checkbox template changed">
+        <label class="checkbox buttons-1d template changed">
             <input type="checkbox" name="<?php print implode('_', array_keys($tables)); ?>[{i}][id]" value="{value}"
                    checked="checked"/>
             <i></i>
-            <span>{<?php print implode('_', array_keys($tables)); ?>}</span>
+            <span class="entity-title">{<?php print implode('_', array_keys($tables)); ?>}</span>
             <a href="#insert-entity" title="Add">&nbsp;</a><a href="#subtract-entity" title="Remove">&nbsp;</a>
         </label>
 

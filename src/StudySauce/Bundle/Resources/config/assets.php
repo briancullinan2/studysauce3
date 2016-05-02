@@ -48,7 +48,7 @@ $container->loadFromExtension('assetic', [
         ],
         'layout' => [
             'inputs' => [
-                '@StudySauceBundle/Resources/public/js/jquery-2.1.4.js',
+                '@StudySauceBundle/Resources/public/js/jquery-2.2.3.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery.textfill.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery-ui.min.js',
                 '@StudySauceBundle/Resources/public/js/underscore-min.js'

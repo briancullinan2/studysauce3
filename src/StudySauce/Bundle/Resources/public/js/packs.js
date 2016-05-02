@@ -497,6 +497,7 @@ $(document).ready(function () {
     });
 
     // TODO: generalize and move this to dashboard using some sort of property binding API, data-target, data-toggle for selects toggles class of closest matching target?
+    // TODO: data-toggle="modal" on option brings up dialog for confirmation
 
     body.on('change', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');
@@ -506,6 +507,7 @@ $(document).ready(function () {
             select.val(select.data('oldValue'));
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
+                // TODO: if the template was the same language, we could just update the value visually
                 setTimeout(function () {
                     var publish = select.data('publish');
                     select.find('option[value="GROUP"]').text(publish.schedule <= new Date()

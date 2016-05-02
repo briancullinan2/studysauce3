@@ -1,121 +1,4 @@
-.modal-open {
-    overflow: hidden;
-}
-.modal {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1050;
-    display: none;
-    overflow: hidden;
-    -webkit-overflow-scrolling: touch;
-    outline: 0;
-}
-.modal.fade .modal-dialog {
-    -webkit-transition: -webkit-transform .3s ease-out;
-    -o-transition:      -o-transform .3s ease-out;
-    transition:         transform .3s ease-out;
-    -webkit-transform: translate3d(0, -25%, 0);
-    -o-transform: translate3d(0, -25%, 0);
-    transform: translate3d(0, -25%, 0);
-}
-.modal.in .modal-dialog {
-    -webkit-transform: translate3d(0, 0, 0);
-    -o-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-}
-.modal-open .modal {
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-.modal-dialog {
-    position: relative;
-    width: auto;
-    margin: 10px;
-}
-.modal-content {
-    position: relative;
-    background-color: #fff;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #999;
-    border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 6px;
-    outline: 0;
-    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
-    box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
-}
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1040;
-    background-color: #000;
-}
-.modal-backdrop.fade {
-    filter: alpha(opacity=0);
-    opacity: 0;
-}
-.modal-backdrop.in {
-    filter: alpha(opacity=50);
-    opacity: .5;
-}
-.modal-header {
-    min-height: 16.42857143px;
-    padding: 15px;
-    border-bottom: 1px solid #e5e5e5;
-}
-.modal-title {
-    margin: 0;
-    line-height: 1.42857143;
-}
-.modal-body {
-    position: relative;
-    padding: 15px;
-}
-.modal-footer {
-    padding: 15px;
-    text-align: right;
-    border-top: 1px solid #e5e5e5;
-}
-.modal-footer .btn + .btn {
-    margin-bottom: 0;
-    margin-left: 5px;
-}
-.modal-footer .btn-group .btn + .btn {
-    margin-left: -1px;
-}
-.modal-footer .btn-block + .btn-block {
-    margin-left: 0;
-}
-.modal-scrollbar-measure {
-    position: absolute;
-    top: -9999px;
-    width: 50px;
-    height: 50px;
-    overflow: scroll;
-}
-.close {
-    float: right;
-    font-size: 21px;
-    font-weight: bold;
-    line-height: 1;
-    color: #000;
-    filter: alpha(opacity=20);
-    opacity: .2;
-}
-.close:hover,
-.close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-    filter: alpha(opacity=50);
-    opacity: .5;
-}
+
 .nav {
     padding-left: 0;
     margin-bottom: 0;
@@ -169,9 +52,9 @@
 }
 .nav-tabs > li > a {
     margin-right: 2px;
-    line-height: 1.42857143;
+    line-height: 34px;
     border: 1px solid transparent;
-    border-radius: 4px 4px 0 0;
+    border-radius: 1px;
 }
 .nav-tabs > li > a:hover {
     border-color: #eee #eee #ddd;
@@ -246,8 +129,8 @@
         margin: 30px auto;
     }
     .modal-content {
-        -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+        -webkit-box-shadow: none;
+        box-shadow: none;
     }
     .modal-sm {
         width: 300px;
@@ -888,6 +771,7 @@ input:-webkit-autofill {
 {
     border-color: #BBB;
     border-radius: 0 0 2px 2px;
+    box-shadow: none;
 }
 
 .selectize-control.single .selectize-input .item,
@@ -1313,17 +1197,18 @@ sup.premium
 }
 
 .nav-tabs {
-    position: absolute;
-    right: 20px;
-    top: 20px;
     z-index: 10;
     max-width: 100%;
-    margin-top: -20px;
-    margin-right: -20px;
+    margin-top: -10px;
+    margin-right: 0;
     border-bottom: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    display: inline-block;
+    margin-bottom: -15px;
+    float: right;
+    height: 100%;
 }
 
 .nav-tabs>li
@@ -1334,16 +1219,16 @@ sup.premium
 
 .nav-tabs>li>a
 {
-    background: #eeeeee none;
+    background: transparent;
     border:0;
-    border-bottom:3px solid transparent;
     display:inline-block;
+    padding: 6px 15px;
 }
 
 .nav-tabs>li>a:hover
 {
-    border-bottom: 3px solid #0099BB;
     background: #FFFFFF none;
+    color:#09B;
 }
 
 .nav-tabs>li.active>a,
@@ -1351,7 +1236,6 @@ sup.premium
 .nav-tabs>li.active>a:focus
 {
     border: none;
-    border-bottom: 3px solid #FF9900;
 }
 
 @media all and (max-width: 1000px)
