@@ -803,9 +803,11 @@ $(document).ready(function () {
         var updates = {};
         for(var table in tables) {
             if(tables.hasOwnProperty(table)) {
-                updates[table] = field.data(table).map(function (g) {
-                    return {id: g.value.substr(8), remove: g['remove']};
-                });
+                (function (table) {
+                    updates[table] = field.data(table).map(function (g) {
+                        return {id: g.value.substr(table.length + 1), remove: g['remove']};
+                    });
+                })(table);
             }
         }
 
