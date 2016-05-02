@@ -25,6 +25,7 @@ use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Acl\Dbal\AclProvider;
@@ -730,6 +731,30 @@ class AdminController extends Controller
         }
 
         return $this->indexAction($request);
+    }
+
+    public function templateAction(Request $request) {
+
+        $parser = $this->get('templating.name_parser');
+        $locator = $this->get('templating.locator');
+
+        $path = $locator->locate($parser->parse('AdminBundle:Admin:' . $request->get('name') . '.html.php'));
+        $php = file_get_contents($path);
+        $php = preg_replace_callback('/\?>([\s\S]*?)(<\?php|$)/i', function ($match) {
+            return 'print(\'' . preg_replace('/\n/', "' + \"\\n\"\n + '", $match[1]) . '\');';
+        }, '?>' . $php);
+        $php = preg_replace('/use [a-z\\\\\/\s]*;/i', '', $php);
+        $php = preg_replace('/\./i', '+', $php);
+        $php = preg_replace('/->/i', '.', $php);
+        $php = preg_replace('/\$/i', '__vars.', $php);
+        preg_replace_callback('#(?=(\[(?>[^\[\]]|(?1))*+\]))#', function (&$match) use (&$php) {
+            if(strpos($match[1], '=>') !== false) {
+                $php = str_replace($match[1], str_replace(['[', ']', '=>'], ['{', '}', ':'], $match[1]), $php);
+            }
+            return $match[0];
+        }, $php);
+
+        return new Response('var __view; (__view = (function ' . preg_replace('/[^a-z0-9_]/i', '_', $request->get('name')) . '(__vars) { var results = \'\'; var print = function (s) {results += s}; ' . $php . '; return results;}));', 200, ['Content-Type' => 'text/javascript']);
     }
 
     /**

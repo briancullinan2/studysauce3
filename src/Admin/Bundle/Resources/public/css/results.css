@@ -402,6 +402,15 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 
 .last-right-expand header > .big-add {
     padding-left:3%;
+    float:none;
+    width:100%;
+    margin:3px 0;
+    font-size: inherit;
+}
+
+.last-right-expand header > .big-add span {
+    left: 1.5%;
+    margin-left: -12px;
 }
 
 .results header > *.id,
@@ -457,7 +466,7 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 }
 
 .last-right-expand [class*="-row"] .id {
-    text-align: left;
+    text-align: center;
     position: relative;
     vertical-align: middle;
     width: 3%;
@@ -669,12 +678,11 @@ table.results.expandable > tbody > tr:nth-child(even) > td
     clear:both;
 }
 
-.last-right-expand header
+.last-right-expand header > *:not(.big-add):not([class*="actions"])
 {
     border-bottom: 2px solid #bbb;
 }
 
-.last-right-expand > header > label:nth-of-type(1),
 .last-right-expand [class*="-row"] .title
 {
     width:25%;
@@ -682,7 +690,8 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 
 .last-right-expand > header > label:nth-of-type(1)
 {
-    margin-left:3%;
+    width:28%;
+    padding-left:3%;
 }
 
 .last-right-expand > header > label:nth-of-type(2),
@@ -727,13 +736,6 @@ table.results.expandable > tbody > tr:nth-child(even) > td
 .last-right-expand [class*="-row"] > [class*="Members"] > form {
     display:block;
     height: 100%;
-}
-
-.last-right-expand [class*="-row"] > [class*="Members"] > form > label:first-child {
-    color:#BBB;
-    position:relative;
-    top:-5px;
-    font-weight: normal;
 }
 
 .last-right-expand [class*="-row"] > [class*="Members"] > form > .entity-search {

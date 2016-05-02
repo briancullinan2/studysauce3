@@ -17,7 +17,6 @@ if(isset($searchRequest['ss_group-id']) && !empty($group = $searchRequest['ss_gr
 <form action="<?php print (!empty($group)
     ? $view['router']->generate('save_group', ['groupId' => $searchRequest['ss_group-id'], 'packId' => $pack->getId()])
     : $view['router']->generate('packs_create', ['packId' => $pack->getId()])); ?>">
-    <label><?php print $users->count(); ?> users</label>
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
         'entities' => $users->toArray(),

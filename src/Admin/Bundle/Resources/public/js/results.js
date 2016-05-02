@@ -274,6 +274,36 @@ $(document).ready(function () {
         loadResults.apply(results);
     });
 
+    function standardSave(data) {
+        var field = $(this);
+        var tab = field.closest('.results');
+        data = $.extend(data, {requestKey: getDataRequest.apply(tab).requestKey});
+        var actionItem = field.closest('[action], [data-action]');
+        var saveUrl = actionItem.data('action') || actionItem.attr('action');
+
+        if(typeof saveUrl == 'undefined') {
+            throw 'Save action not found!';
+        }
+
+        // TODO: loading animation from CTA or activating field?
+
+        $.ajax({
+            url: saveUrl,
+            type: 'POST',
+            dataType: 'text',
+            data: data,
+            success: function (data) {
+                tab.find('.squiggle').stop().remove();
+                // copy rows and select
+                loadContent.apply(tab, [data]);
+            },
+            error: function () {
+                tab.find('.squiggle').stop().remove();
+            }
+        });
+    }
+    window.standardSave = standardSave;
+
     function getTabId() {
         return getRowId.apply($(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first());
     }

@@ -75,9 +75,9 @@ $entityIds = array_values($entityIds);
     if (isset($entities) && (!isset($inline) || $inline !== true)) {
         $i = 0;
         ?>
-        <header><label>Current <?php print implode('/', array_map(function ($t) {
-                    return ucfirst(str_replace('ss_', '', $t)) . 's';
-                }, array_keys($tables))); ?></label></header>
+        <header><label>Members (<?php print implode('/', array_map(function ($t) use ($dataTypes) {
+                    return (isset($dataTypes[$t]) ? count($dataTypes[$t]) : 0) . ' ' . str_replace('ss_', '', $t) . 's';
+                }, array_keys($tables))); ?>)</label></header>
         <?php
         foreach ($entities as $u) {
             if(in_array($u, $removedEntities)) {
@@ -100,9 +100,9 @@ $entityIds = array_values($entityIds);
 
         if (!empty($removedEntities)) {
             ?>
-            <header><label>Removed <?php print implode('/', array_map(function ($t) {
-                        return ucfirst(str_replace('ss_', '', $t)) . 's';
-                    }, array_keys($tables))); ?></label></header>
+            <header><label>Removed (<?php print implode('/', array_map(function ($t) use ($dataTypes) {
+                        return (isset($dataTypes[$t]) ? count($dataTypes[$t]) : 0) . ' ' . str_replace('ss_', '', $t) . 's';
+                    }, array_keys($tables))); ?>)</label></header>
             <?php
             foreach ($removedEntities as $u) {
                 if(empty($joinTable = $getJoinTable($u))) {

@@ -81,7 +81,7 @@ $view['slots']->start('body'); ?>
                             ],
                             'Membership' => [
                                 'tables' => [
-                                    'ss_group-1' => ['id', 'title', 'counts', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
+                                    'ss_group-1' => ['id', 'title', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
                                     'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
                             ]

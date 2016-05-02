@@ -66,7 +66,7 @@ $view['slots']->start('body'); ?>
                     $tables = [
                         // view settings
                         'tables' => [
-                            'pack' => ['id', 'title', 'counts', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
+                            'pack' => ['id', 'title', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
                             'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
                         ],
                         'classes' => ['last-right-expand'],

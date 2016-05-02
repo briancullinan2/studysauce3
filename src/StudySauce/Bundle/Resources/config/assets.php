@@ -13,6 +13,7 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/keymaster.js',
                 '@StudySauceBundle/Resources/public/js/papaparse.min.js',
                 '@StudySauceBundle/Resources/public/js/sauce.js',
+                '@StudySauceBundle/Resources/public/js/dashboard-dialogs.js',
                 '@StudySauceBundle/Resources/public/js/contact.js',
             ],
             'filters' => [],
@@ -28,6 +29,10 @@ $container->loadFromExtension('assetic', [
                 //'@StudySauceBundle/Resources/public/js/plupload/js/moxie.js',
                 //'@StudySauceBundle/Resources/public/js/plupload/js/plupload.dev.js',
                 '@StudySauceBundle/Resources/public/js/dashboard.js',
+                '@StudySauceBundle/Resources/public/js/dashboard-search.js',
+                '@StudySauceBundle/Resources/public/js/dashboard-publish.js',
+                '@StudySauceBundle/Resources/public/js/dashboard-player.js',
+                '@StudySauceBundle/Resources/public/js/dashboard-upload.js',
             ],
             'filters' => [],
             'options' => [
@@ -36,9 +41,10 @@ $container->loadFromExtension('assetic', [
         ],
         'landing_scripts' => [
             'inputs' => [
+                '@StudySauceBundle/Resources/public/js/jquery.scrollintoview.js',
                 '@StudySauceBundle/Resources/public/js/landing.js',
                 '@StudySauceBundle/Resources/public/js/sauce.js',
-                '@StudySauceBundle/Resources/public/js/jquery.scrollintoview.js',
+                '@StudySauceBundle/Resources/public/js/dashboard-dialogs.js',
                 '@StudySauceBundle/Resources/public/js/contact.js'
             ],
             'filters' => [],

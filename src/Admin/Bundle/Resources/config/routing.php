@@ -24,6 +24,14 @@ $collection->add(
 );
 
 $collection->add(
+    'template',
+    new Route(
+        '/command/template',
+        ['_controller' => 'AdminBundle:Admin:template']
+    )
+);
+
+$collection->add(
     'activity',
     new Route(
         '/activity/{_format}',

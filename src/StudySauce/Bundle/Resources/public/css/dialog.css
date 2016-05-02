@@ -163,6 +163,7 @@
     height: 100%;
     width: 100%;
     display:none;
+    padding: 50px 10px 10px 10px;
 }
 
 .dialog-tracker
@@ -476,15 +477,6 @@ body.right-menu #bookmark
     padding-top:0;
 }
 
-.modal.in .modal-dialog {
-    top:50%;
-}
-
-.modal.in .modal-dialog .modal-content
-{
-    margin-top:-50%;
-}
-
 .modal-header .close
 {
     color: #FFF;
@@ -567,7 +559,7 @@ body.right-menu #bookmark
 
 #add-entity .entity-search header ~ label.checkbox:nth-of-type(even),
 #add-entity .selectize-dropdown-content .entity-search:nth-of-type(even) {
-    background:#fff;
+    background:rgba(255,255,255,0.90);
 }
 
 #add-entity .entity-search header ~ label.checkbox:nth-of-type(odd),
@@ -677,14 +669,9 @@ body.right-menu #bookmark
 
     .modal.in .modal-dialog {
         top: auto;
-        margin-top: 70px;
         transform:none;
     }
 
-    .modal.in .modal-dialog .modal-content
-    {
-        margin-top:0;
-    }
 }
 
 @media all and (max-width:700px)
