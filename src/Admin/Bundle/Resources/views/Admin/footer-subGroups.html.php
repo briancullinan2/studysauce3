@@ -25,9 +25,7 @@ if (!empty($results['pack'])) {
 <div class="highlighted-link form-actions <?php print $table; ?>">
     <?php if (empty($results['ss_group'])) { ?> <div class="empty-packs">No subgroups</div> <?php }
     if (!empty($entityIds)) { ?>
-    <form action="<?php print $view['router']->generate('packs_create', [
-        'packId' => $results['pack'][0]->getId(),
-        'ss_group' => [['id' => $results['ss_group'][0]->getId(), 'remove' => false]]]); ?>">
+    <form action="<?php print $view['router']->generate('packs_create', ['packId' => $results['pack'][0]->getId()]); ?>">
         <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
             'tables' => [
                 'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
