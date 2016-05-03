@@ -1,10 +1,4 @@
 
-window.strtolower = function(s) {return s.toLowerCase();};
-window.empty = function(s) {return s == '' || s == false;};
-window.json_encode = JSON.stringify;
-window.method_exists = function (s,m) {return typeof s == 'object' && typeof s[m] == 'function';};
-window.isset = function (s) {return typeof s != 'undefined';};
-
 $(document).ready(function () {
 
     // handles all navigation while on dashboard

@@ -408,33 +408,13 @@ $(document).ready(function () {
         if($(this).val() == 'GROUP') {
             select.val(select.data('oldValue'));
 
-            body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
-                // TODO: if the template was the same language, we could just update the value visually
-                setTimeout(function () {
-                    var publish = select.data('publish');
-                    select.find('option[value="GROUP"]').text(publish.schedule <= new Date()
-                        ? 'Published'
-                        : 'Pending (' + (publish.schedule.getMonth() + 1) + '/' + publish.schedule.getDay() + '/' + publish.schedule.getYear() + ' '
-                    + publish.schedule.getHours() + ':00)');
-                    row.find('.status > div').attr('class', publish.schedule <= new Date() ? 'group' : 'group pending');
-                    select.val('GROUP');
-                    // saves automatically
-                }, 50);
-            });
-
             showPublishDialog.apply(select, [getRowId.apply(row), row.find('.name input').val(), select.data('publish')]);
         }
         else {
             select.data('oldValue', select.val());
         }
 
-        var status = select.val().toLowerCase();
-        if(status == '') {
-            row.find('.status > div').attr('class', '');
-        }
-        else if(!row.find('.status > div').is('.' + status)) {
-            row.find('.status > div').attr('class', status);
-        }
+        cell_status_pack();
     });
 
 });
