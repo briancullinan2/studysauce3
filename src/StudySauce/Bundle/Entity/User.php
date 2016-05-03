@@ -268,6 +268,28 @@ class User extends BaseUser implements EncoderAwareInterface
     }
 
     /**
+     * Returns the user roles
+     *
+     * @return array The roles
+     */
+    public function getRoles()
+    {
+        $roles = $this->roles;
+
+        foreach ($this->getGroups()->toArray() as $group) {
+            /** @var Group $group */
+            $roles = array_merge($roles, $group->getRoles());
+        }
+
+        // we need to make sure to have at least one role
+        if(!empty(static::ROLE_DEFAULT)) {
+            $roles[] = static::ROLE_DEFAULT;
+        }
+
+        return array_values(array_unique(array_filter($roles, function ($r) {return !empty($r);})));
+    }
+
+    /**
      * Constructor
      */
     public function __construct()

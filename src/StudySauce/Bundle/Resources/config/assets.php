@@ -5,6 +5,8 @@ $container->loadFromExtension('assetic', [
     'assets' => [
         'funnel' => [
             'inputs' => [
+                '@StudySauceBundle/Resources/public/js/moment.min.js',
+                '@StudySauceBundle/Resources/public/js/moment.phpDateFormat.js',
                 '@StudySauceBundle/Resources/public/js/selectize.min.js',
                 '@StudySauceBundle/Resources/public/js/jquery.plugin.js',
                 '@StudySauceBundle/Resources/public/js/jquery.timeentry.js',

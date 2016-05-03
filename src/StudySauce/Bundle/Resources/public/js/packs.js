@@ -401,11 +401,11 @@ $(document).ready(function () {
     // TODO: generalize and move this to dashboard using some sort of property binding API, data-target, data-toggle for selects toggles class of closest matching target?
     // TODO: data-toggle="modal" on option brings up dialog for confirmation
 
-    body.on('change', '[id^="packs-"] .status select', function (evt) {
+    body.on('change confirm', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');
         var select = $(this);
 
-        if($(this).val() == 'GROUP') {
+        if($(this).val() == 'GROUP' && evt.type != 'confirm') {
             select.val(select.data('oldValue'));
 
             showPublishDialog.apply(select, [getRowId.apply(row), row.find('.name input').val(), select.data('publish')]);
@@ -414,7 +414,9 @@ $(document).ready(function () {
             select.data('oldValue', select.val());
         }
 
-        cell_status_pack();
+        var pack = {};
+        window.views.__render.apply(row.find('> .status'), ['cell_status_pack', {pack: pack}]);
     });
 
 });
+

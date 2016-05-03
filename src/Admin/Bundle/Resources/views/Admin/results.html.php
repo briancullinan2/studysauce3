@@ -13,8 +13,10 @@ $subVars = array_merge(['allGroups' => $allGroups, 'searchRequest' => $searchReq
 <div
     class="results <?php print (isset($searchRequest['classes']) && is_array($searchRequest['classes']) ? implode(' ', $searchRequest['classes']) : ''); ?>"
     data-request="<?php print $view->escape(json_encode($searchRequest)); ?>">
-    <?php if (!isset($searchRequest['headers'])) {
-        print $view->render('AdminBundle:Admin:header-search.html.php', $subVars);
+    <?php
+
+    if (!isset($searchRequest['headers'])) {
+        print $view->render('AdminBundle:Admin:header-search.html.php', array_merge($subVars, ['tables' => $tables]));
     }
 
     if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {

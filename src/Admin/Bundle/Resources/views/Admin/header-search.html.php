@@ -14,10 +14,9 @@
     </div>
 
     <?php foreach ($tables as $table => $t) {
-        $tableTotal = $table . '_total';
         ?>
         <div class="<?php print $table; ?> paginate"><?php
-        print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $$tableTotal]);
+        print $view->render('AdminBundle:Shared:paginate.html.php', ['total' => $results[$table . '_total']]);
         ?></div><?php
     } ?>
 
@@ -44,12 +43,10 @@
         }
     }
 
-    foreach ($tables as $table => $t) {
-        $tableTotal = $table . '_total';
-        ?>
+    foreach ($tables as $table => $t) { ?>
         <h2 class="<?php print $table; ?>"><?php print ucfirst(str_replace('ss_', '', $table)); ?>s <a
             href="#add-<?php print $table; ?>">+</a>
-        <small>(<?php print $$tableTotal; ?>)</small></h2><?php
+        <small>(<?php print $results[$table . '_total']; ?>)</small></h2><?php
     }
 
     foreach ($templates as $k => $classes) {

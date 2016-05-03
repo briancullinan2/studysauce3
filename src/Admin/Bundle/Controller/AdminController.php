@@ -756,17 +756,77 @@ class AdminController extends Controller
             return $match[0];
         }, $php);
 
-        $heading = '
-        var __view; (__view = (function ' . preg_replace('/[^a-z0-9_]/i', '_', $request->get('name')) . '(__vars) {
-            var output = \'\';
-        var print = function (s) {output += s};
-        var strtolower = function(s) {return s.toLowerCase();};
-        var empty = function(s) {return s == \'\' || s == false;};
-        var json_encode = JSON.stringify;
-        var method_exists = function (s,m) {return typeof s == \'object\' && typeof s[m] == \'function\';};
-        var isset = function (s) {return typeof s != \'undefined\';};';
+        $functionName = preg_replace('/[^a-z0-9_]/i', '_', $request->get('name'));
 
-        return new Response('' . $php . '; return output;}));', 200, ['Content-Type' => 'text/javascript']);
+        $js = <<< EOJS
+(function (jQuery) {
+
+if(typeof window == 'undefined') { window = {}; }
+if(typeof window.views == 'undefined') { window.views = {}; }
+if(typeof window.views.__vars == 'undefined') { window.views.__vars = {}; }
+if(typeof window.views.__varStack == 'undefined') { window.views.__varStack = []; }
+if(typeof window.views.__vars.app == 'undefined') { window.views.__vars.app = {}; }
+if(typeof window.views.__vars.view == 'undefined') { window.views.__vars.view = {}; }
+if(typeof window.views.__vars.view['slots'] == 'undefined') { window.views.__vars.view['slots'] = {}; }
+if(typeof window.views.__vars.view['slots'].output == 'undefined') { window.views.__vars.view['slots'].output = {}; }
+window.views.oldOutput = '';
+window.views.slotName = '';
+window.views.user = {};
+window.views.user.hasRole = function (role) {
+    return window.views.user.roles.indexOf(role) > -1;
+};
+window.views.user.getEmail = function (role) {
+    return window.views.user.email;
+};
+window.views.__vars.app.getUser = function () {
+    user = $.extend(window.views.user, $('#welcome-message').data('user'));
+    return user;
+};
+window.views.__vars.view['slots'].start = function (name) {
+    window.views.oldOutput = output;
+    output = '';
+    window.views.slotName = name;
+};
+window.views.__vars.view['slots'].stop = function () {
+    window.views.__vars.view['slots'].output[window.views.slotName] = output;
+    output = window.views.oldOutput;
+};
+window.views.__vars.view['slots'].get = function (name) {
+    return window.views.__vars.view['slots'].output[name];
+}
+window.views.__vars.view['slots'].output = function (name) {
+    return print(window.views.__vars.view['slots'].output[name]);
+}
+Date.prototype.format = function (format) {
+    if(format == 'r') {
+        return moment(this).formatPHP('ddd, DD MMM YYYY HH:mm:ss ZZ');
+    }
+    return moment(this).formatPHP(format);
+};
+if(typeof window.views.__render == 'undefined') {window.views.__render = function (name, vars) {
+    window.views.__varStack.push(window.views.__vars);
+    window.views.__vars = $.extend({this : this}, window.views.__vars);
+    window.views.__vars = $.extend(window.views.__vars, vars);
+    return window.views[name].apply(this, [window.views.__vars]);
+    window.views.__vars = window.views.__varStack.pop();
+}; }
+var output = '';
+var print = function (s) {output += s};
+var strtolower = function(s) {return s.toLowerCase();};
+var empty = function(s) {return s == '' || s == false;};
+var json_encode = JSON.stringify;
+var method_exists = function (s,m) {return typeof s == 'object' && typeof s[m] == 'function';};
+var isset = function (s) {return typeof s != 'undefined';};
+
+window.views['$functionName'] = (function $functionName (__vars) {
+
+$php
+
+; return output;});
+
+})(jQuery);
+EOJS;
+        return new Response($js, 200, ['Content-Type' => 'text/javascript']);
     }
 
     /**

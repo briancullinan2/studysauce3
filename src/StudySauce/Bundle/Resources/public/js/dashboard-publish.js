@@ -61,7 +61,7 @@ $(document).ready(function () {
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
                 field.data('publish', publish);
-                field.filter('select').val('GROUP').trigger('change');
+                field.filter('select').val('GROUP').trigger('confirm');
                 standardSave.apply(field, [{packId: packId.replace('pack-', ''), publish: publish}]);
             });
         });

@@ -32,7 +32,9 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/result
 <?php endforeach;
 foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
     <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
+<?php endforeach; ?>
+    <script type="text/javascript" src="<?php echo $view['router']->generate('template', ['name' => 'cell-status-pack']) ?>"></script>
+<?php
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>

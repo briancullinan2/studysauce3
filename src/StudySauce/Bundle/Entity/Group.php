@@ -184,6 +184,11 @@ class Group extends BaseGroup implements GroupInterface
         return '(' . count($groups) . ' subgroups / ' . count($packs) . ' packs)';
     }
 
+    public function getRoles()
+    {
+        return array_values(array_filter($this->roles, function ($r) {return !empty($r);}));
+    }
+
     /**
      * Constructor
      * @param null $name

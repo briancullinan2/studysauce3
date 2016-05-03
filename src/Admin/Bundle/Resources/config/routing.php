@@ -26,7 +26,7 @@ $collection->add(
 $collection->add(
     'template',
     new Route(
-        '/command/template',
+        '/command/template/{name}.js',
         ['_controller' => 'AdminBundle:Admin:template']
     )
 );
