@@ -388,7 +388,7 @@ class AccountController extends Controller
         $orm->persist($invite);
         $orm->flush();
 
-        InviteListener::setInviteRelationship($orm, $request, $child);
+        $groupInvite = InviteListener::setInviteRelationship($orm, $request, $child);
 
         if(!$user->hasRole('ROLE_PARENT')) {
             $user->addRole('ROLE_PARENT');
@@ -396,7 +396,7 @@ class AccountController extends Controller
         }
 
         $userManager->updateUser($child);
-        return $invite;
+        return $groupInvite;
     }
 
     /**
@@ -451,7 +451,8 @@ class AccountController extends Controller
         }
 
         if(!empty($request->get('childFirst')) && !empty($request->get('childLast'))) {
-            $childInvite = $this->setChildAccount($user, $request, $userManager, $orm);
+            /** @var Invite $groupInvite */
+            $groupInvite = $this->setChildAccount($user, $request, $userManager, $orm);
         }
 
         // get the path the user should go to after logging in
@@ -475,7 +476,7 @@ class AccountController extends Controller
             $emails = new EmailsController();
             $emails->setContainer($this->container);
             if ($user->hasRole('ROLE_PARENT')) {
-                $emails->welcomeParentAction($user, isset($childInvite) ? $childInvite : null);
+                $emails->welcomeParentAction($user, isset($groupInvite) ? $groupInvite->getGroup() : null);
             } elseif ($user->hasRole('ROLE_PARTNER')) {
                 $emails->welcomePartnerAction($user);
             } else {

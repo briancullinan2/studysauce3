@@ -56,10 +56,10 @@ class EmailsController extends Controller
 
     /**
      * @param User $user
-     * @param Invite $childInvite
+     * @param Group $inviteGroup
      * @return Response
      */
-    public function welcomeParentAction(User $user = null, Invite $childInvite = null)
+    public function welcomeParentAction(User $user = null, Group $inviteGroup = null)
     {
         /** @var $user User */
         if(empty($user))
@@ -72,8 +72,8 @@ class EmailsController extends Controller
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-parent.html.php', [
                 'link' => false,
-                'group' => !empty($childInvite) ? $childInvite->getGroup()->getName() : '',
-                'groupLogo' => !empty($childInvite) && !empty($childInvite->getGroup()->getLogo()) ? $childInvite->getGroup()->getLogo()->getUrl() : '',
+                'group' => !empty($inviteGroup) ? $inviteGroup->getName() : '',
+                'groupLogo' => !empty($inviteGroup) && !empty($inviteGroup->getLogo()) ? $inviteGroup->getLogo()->getUrl() : '',
                 'child' => !empty($groupInvite) ? $groupInvite->getInvitee()->getFirst() : '',
                 'greeting' => (empty($user->getFirst()) ? 'Howdy partner' : ('Hello ' . $user->getFirst())) . ','
             ]), 'text/html');

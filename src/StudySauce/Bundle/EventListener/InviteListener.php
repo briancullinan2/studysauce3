@@ -150,6 +150,7 @@ class InviteListener implements EventSubscriberInterface
      * @param EntityManager $orm
      * @param Request $request
      * @param User $user
+     * @return null|Invite
      */
     public static function setInviteRelationship(EntityManager $orm, Request $request, User $user) {
         if(!$user->hasRole('ROLE_DEMO') && !$user->hasRole('ROLE_GUEST')) {
@@ -195,6 +196,8 @@ class InviteListener implements EventSubscriberInterface
             if(!$user->hasGroup($group->getName()))
                 $user->addGroup($group);
         }
+
+        return isset($invite) ? $invite : null;
     }
 
 }
