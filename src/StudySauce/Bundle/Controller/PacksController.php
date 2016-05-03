@@ -126,8 +126,8 @@ class PacksController extends Controller
             }
             $groups = $user->getGroups();
         }
-        if(!empty($request->get('keyboard'))) {
-            $newPack->setProperty('keyboard', $request->get('keyboard'));
+        if(!empty($request->get('properties')) && !empty($request->get('properties')['keyboard'])) {
+            $newPack->setProperty('keyboard', $request->get('properties')['keyboard']);
         }
         if(!empty($request->get('title'))) {
             $newPack->setTitle($request->get('title'));
@@ -190,7 +190,7 @@ class PacksController extends Controller
 
         // process cards
         // TODO: break this up
-        foreach ($request->get('cards') ?: [] as $c) {
+        foreach ($request->get('card') ?: [] as $c) {
             /** @var Card $newCard */
             $newCard = $newPack->getCards()->filter(function (Card $x) use ($c) {
                 return $c['id'] == $x->getId() && !empty($x->getId());
@@ -218,6 +218,9 @@ class PacksController extends Controller
                 $newCard = new Card();
                 $newCard->setPack($newPack);
                 $newPack->addCard($newCard);
+            }
+            if(isset($c['upload'])) {
+                $c['content'] = $c['upload'] . '\n' . $c['content'];
             }
             $newCard->setContent($c['content']);
             if (isset($c['type'])) {

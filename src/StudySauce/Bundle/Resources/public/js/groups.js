@@ -1,12 +1,11 @@
 
 $(document).ready(function () {
 
-    var body = $('body'),
-        autoSaveTimeout = 0;
+    var body = $('body');
 
-    function groupsFunc(evt) {
+    function groupsFunc() {
         var tab = $(this).closest('.results:visible');
-        var groupRow = tab.find('.ss_group-row').addClass('changed');
+        var groupRow = tab.find('.ss_group-row');
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
             groupRow.removeClass('valid empty').addClass('invalid');
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
@@ -16,21 +15,18 @@ $(document).ready(function () {
             tab.find('.highlighted-link a[href^="#save-"]').removeAttr('disabled');
         }
 
-        // do not autosave from selectize because the input underneath will change
-        if(typeof evt != 'undefined' && $(evt.target).parents('.selectize-input').length > 0) {
-            return;
-        }
-
         // save at most every 2 seconds, don't autosave from admin lists
         //if (autoSaveTimeout === null && $('.panel-pane[id^="groups-"]:visible').length > 0) {
         //    autoSaveTimeout = setTimeout(function () {
         //        autoSave.apply(tab);
         //    }, 2000);
         //}
-
     }
 
-    body.on('click', '[id^="groups-"] a[href^="/groups/0"]', function (evt) {
+    body.on('validate', '[id^="groups-"]', groupsFunc);
+
+    // TODO: do this through some sort of view template default option in the URL
+    body.on('click', '[id^="groups-"] a[href^="/groups/0"]', function () {
         var row = $(this).parents('.panel-pane').find('.group-edit .ss_group-row:not(.template)');
         var groupId = getTabId.apply(row);
         body.one('show', '#groups-group0', function () {
@@ -71,22 +67,7 @@ $(document).ready(function () {
         });
     });
 
-    function autoSave(close) {
-        autoSaveTimeout = null;
-        var tab = $(this);
-        var row = tab.find('.ss_group-row.valid:not(.template)');
-        var groupId = getTabId.apply(tab);
-        if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]'))
-            return;
-        loadingAnimation(tab.find('a[href^="#save-"]'));
-        tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
-
-        var groupData = gatherFields.apply(row, [['upload', 'name', 'invite', 'parent']]);
-        standardSave.apply(tab.find('a[href^="#save-"]'), [groupData]);
-    }
-
     // TODO: refresh all intermediate group panels also
-    var shouldRefresh = false;
     body.on('resulted', '[id^="groups-"] .results', function () {
         var tab = $(this);
 
@@ -101,7 +82,6 @@ $(document).ready(function () {
             results['requestKey'] = null;
         }
 
-        shouldRefresh = true;
         var loaded = body.find('#groups');
         var parentId = tab.find('.ss_group-row .parent select').val();
         if(tab.parents('.panel-pane').attr('id') != 'groups-group' + parentId) {
@@ -125,26 +105,7 @@ $(document).ready(function () {
         });
     });
 
-    body.on('show', '.panel-pane[id^="groups-"]', function () {
-        autoSaveTimeout = 0;
-        groupsFunc.apply($(this).find('.group-edit .ss_group-row:not(.template)'));
-        autoSaveTimeout = null;
-    });
-
     // TODO: generalize some of this and move to results?
-    body.on('click', '[id^="groups-"] a[href="#save-ss_group"], [id^="groups-"] [value="#save-ss_group"]', function (evt) {
-        evt.preventDefault();
-        var tab = $(this).parents('.results:visible');
-        if (autoSaveTimeout != null) {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = null;
-        }
-        tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
-        groupsFunc.apply(tab);
-        autoSave.apply(tab, [true]);
-    });
-
-    body.on('change keyup keydown', '.group-edit .ss_group-row input, .group-edit .ss_group-row select, .group-edit .ss_group-row textarea', groupsFunc);
 
     var isSettingSelectize = false;
     body.on('change', '.list-packs .highlighted-link.pack input.selectized', function () {
@@ -161,19 +122,6 @@ $(document).ready(function () {
         showPublishDialog.apply(that, [id, packName, null]);
 
         isSettingSelectize = false;
-    });
-
-    $(window).on('beforeunload', function (evt) {
-        //if($('.panel-pane[id^="packs-"] .pack-edit .pack-row.changed:not(.template)').length > 0)
-        if($('.panel-pane[id^="groups-"]:visible').find('.group-edit .ss_group-row.edit.changed:not(.template):not(.removed)').length > 0) {
-            evt.preventDefault();
-            return "You have unsaved changes!  Please don't go!";
-        }
-    });
-
-    body.on('hide', '.panel-pane[id^="groups-"]', function () {
-        var row = $(this).find('.results [class*="-row"].edit');
-        row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
 

@@ -50,9 +50,9 @@ class AdminController extends Controller
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first','last','email'], 'groups', 'packs' => ['authored','userPacks.pack'], 'roles', 'actions' => ['deleted']],
-        'ss_group' => ['id' => ['created', 'id'], 'name' => ['name','userCountStr','descriptionStr'], 'parent', 'invites', 'packs' => ['packs','groupPacks'], 'actions' => ['deleted']],
-        'pack' => ['id' => ['modified', 'created', 'id'], 'name' => ['title','userCountStr','cardCountStr'], 'status', ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
-        'card' => ['id', 'name' => ['content','pack'], 'correct', 'actions' => ['deleted']],
+        'ss_group' => ['id' => ['created', 'id', 'upload'], 'name' => ['name','userCountStr','descriptionStr'], 'parent', 'invites', 'packs' => ['packs','groupPacks'], 'actions' => ['deleted']],
+        'pack' => ['id' => ['modified', 'created', 'id', 'upload'], 'name' => ['title','userCountStr','cardCountStr'], 'status', ['group','groups', 'user','userPacks.user'], 'properties', 'actions'],
+        'card' => ['id' => ['type', 'upload'], 'name' => ['content'], 'correct' => ['correct', 'answers'], ['pack'], 'actions' => ['deleted']],
         'invite' => ['id', 'name'=> ['code', 'email', 'created'], 'actions' => ['deleted']],
         'user_pack' => ['user', 'pack', 'removed']
         // TODO: this really generalized template

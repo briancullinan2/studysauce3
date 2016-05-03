@@ -5,7 +5,7 @@ use StudySauce\Bundle\Entity\Pack;
 ?>
 <div>
     <label class="input">
-        <select name="keyboard">
+        <select name="properties[keyboard]">
             <option value="basic">Normal (default)</option>
             <option value="number" <?php print ($pack->getProperty('keyboard') == 'number' ? 'selected="selected"' : ''); ?>>Numbers only</option>
         </select>

@@ -307,7 +307,7 @@ $(document).ready(function () {
     });
     $(window).trigger('resize');
 
-    body.on('show.bs.modal', function () {
+    body.on('show.bs.modal shown.bs.modal', function () {
         centerize.apply($('body').find('.centerized:visible'));
         adjustBackdrop();
     });
@@ -330,7 +330,6 @@ $(document).ready(function () {
                     }
                 });
         }
-        centerize.apply($('body').find('.centerized:visible'));
     });
 
     var alreadyDragging = false;

@@ -72,16 +72,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '.results.expandable > [class*="-row"]:nth-of-type(odd), .results.expandable > tbody > tr:nth-child(odd)', function () {
-        var row = $(this);
-        if(row.is('.selected')) {
-            row.removeClass('selected');
-        }
-        else {
-            row.addClass('selected');
-        }
-    });
-
     function resetHeader() {
         var command = $('.results.collapsible:visible').first();
         if (command.length == 0) {
@@ -241,29 +231,75 @@ $(document).ready(function () {
         }
     });
 
+    // inline edit
     body.on('click', '[class*="-row"] a[href^="#edit-"]', function (evt) {
         evt.preventDefault();
         var row = $(this).closest('[class*="-row"]');
         row.removeClass('read-only').addClass('edit');
     });
 
+    // footer edit
     body.on('click', '.form-actions a[href^="#edit-"]', function (evt) {
         evt.preventDefault();
-        var row = $(this).closest('.panel-pane').find('.results [class*="-row"].read-only');
+        var row = getTab.apply(this).find('[class*="-row"].read-only');
         row.removeClass('read-only').addClass('edit');
     });
 
+    // inline cancel
     body.on('click', '[class*="-row"] a[href="#cancel-edit"]', function (evt) {
         evt.preventDefault();
         var row = $(this).closest('[class*="-row"]');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
+    // footer cancel
     body.on('click', '.form-actions a[href^="#cancel-edit"], .form-actions .cancel-edit', function (evt) {
         evt.preventDefault();
-        var row = $(this).closest('.panel-pane').find('.results [class*="-row"].edit');
+        var row = getTab.apply(this).find('[class*="-row"].edit');
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
+
+    // footer save
+    body.on('click', '.form-actions a[href^="#save-"], .form-actions [value^="save-"]', function (evt) {
+        evt.preventDefault();
+        var tab = getTab.apply(this);
+        //if (autoSaveTimeout != null) {
+        //    clearTimeout(autoSaveTimeout);
+        //    autoSaveTimeout = null;
+        //}
+        tab.trigger('validate');
+        var rows = tab.find('[class*="-row"].empty:not(.template)');
+        rows.add(rows.next('.expandable')).removeClass('selected').addClass('removed');
+        tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
+        standardSave.apply(tab, [{}]);
+    });
+
+    var validationTimeout = null;
+    body.on('change keyup keydown', '.results [class*="-row"] input, .results [class*="-row"] select, .results [class*="-row"] textarea', function (evt) {
+        // do not autosave from selectize because the input underneath will change
+        if($(evt.target).parents('.selectize-input').length > 0) {
+            return;
+        }
+        var tab = getTab.apply(this);
+        $(this).parents('[class*="-row"]').addClass('changed');
+
+        if(validationTimeout != null) {
+            clearTimeout(validationTimeout);
+        }
+        validationTimeout = setTimeout(function () {
+            tab.trigger('validate');
+        }, 100);
+    });
+
+    function getTab(readonly) {
+        if (readonly) {
+            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit, [class*="-row"].read-only)');
+        }
+        else {
+            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit, [class*="-row"].read-only)');
+        }
+    }
+    window.getTab = getTab;
 
     body.on('click', '.results a[href^="#switch-view-"]', function (evt) {
         evt.preventDefault();
@@ -274,18 +310,71 @@ $(document).ready(function () {
         loadResults.apply(results);
     });
 
-    function standardSave(data) {
+    var isLoading = false;
+
+    function standardSave(save) {
         var field = $(this);
-        var tab = field.closest('.results');
-        data = $.extend(data, {requestKey: getDataRequest.apply(tab).requestKey});
+        var tab = field.closest('.results:has([class*="-row"].changed:not(.template)), .results:has([class*="-row"].removed:not(.template))');
+        var data = $.extend(save || {}, {requestKey: getDataRequest.apply(tab).requestKey});
         var actionItem = field.closest('[action], [data-action]');
+        if(actionItem.length == 0) {
+            actionItem = tab.find('[action], [data-action]')
+        }
         var saveUrl = actionItem.data('action') || actionItem.attr('action');
+        var saveButton = tab.find('.highlighted-link a[href^="#save-"]');
 
         if(typeof saveUrl == 'undefined') {
             throw 'Save action not found!';
         }
 
-        // TODO: loading animation from CTA or activating field?
+        if(saveButton.is('.read-only > *, [disabled]') || isLoading) {
+            // select incorrect row handled by #goto-error
+            return;
+        }
+
+        // loading animation from CTA or activating field
+        isLoading = true;
+        loadingAnimation(saveButton);
+
+        // get the parsed list of data
+        for(var r = 0; r < tab.length; r++) {
+            var tables = tab.data('request').tables;
+            for(var table in tables) {
+                if (tables.hasOwnProperty(table)) {
+                    // get list of possible fields in form
+                    var fields = [];
+                    for(var f in tables[table]) {
+                        if(tables[table].hasOwnProperty(f)) {
+                            if(typeof f == 'string') {
+                                fields = $.merge(fields, [f]);
+                            }
+                            if(typeof tables[table][f] == 'string') {
+                                fields = $.merge(fields, [tables[table][f]]);
+                            }
+                            else if (Array.isArray(tables[table][f])) {
+                                fields = $.merge(fields, tables[table][f]);
+                            }
+                            else {
+                                throw 'Not supported!';
+                            }
+                        }
+                    }
+                    var rows = tab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
+                    data[table] = [];
+                    for(var i = 0; i < rows.length; i++) {
+                        var row = $(rows[i]);
+                        var rowId = getRowId.apply(row);
+                        if($(this).is('.removed') || $(this).is('.empty')) {
+                            data[table][data[table].length] = {id: rowId, remove: true};
+                        }
+                        else {
+                            data[table][data[table].length] = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
+                        }
+                    }
+                    rows.removeClass('changed');
+                }
+            }
+        }
 
         $.ajax({
             url: saveUrl,
@@ -294,8 +383,9 @@ $(document).ready(function () {
             data: data,
             success: function (data) {
                 tab.find('.squiggle').stop().remove();
+                isLoading = false;
                 // copy rows and select
-                loadContent.apply(tab, [data]);
+                loadContent.apply(tab.first(), [data]);
             },
             error: function () {
                 tab.find('.squiggle').stop().remove();
@@ -303,6 +393,18 @@ $(document).ready(function () {
         });
     }
     window.standardSave = standardSave;
+
+    $(window).on('beforeunload', function (evt) {
+        if($('.panel-pane:visible').find('.results [class*="-row"].edit.changed:not(.template):not(.removed)').length > 0) {
+            evt.preventDefault();
+            return "You have unsaved changes!  Please don't go!";
+        }
+    });
+
+    body.on('hide', '.panel-pane', function () {
+        var row = $(this).find('.results [class*="-row"].edit');
+        row.removeClass('edit remove-confirm').addClass('read-only');
+    });
 
     function getTabId() {
         return getRowId.apply($(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first());
@@ -347,27 +449,28 @@ $(document).ready(function () {
                 var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
 
                 var getRowQuery,
-                    rowQuery = (getRowQuery = function (table) { return '> .views, > header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable' })(table);
+                    rowQuery = (getRowQuery = function (table) { return '> .views, > header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable:not([class*="-row"])' })(table);
 
                 admin.find(rowQuery)
                     // leave edit rows alone
-                    .filter('.template, header, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable')
+                    .filter('.template, .template + .expandable:not([class*="-row"]), header, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')
                     // remove existing rows
                     .remove();
 
                 var existing,
                     keepRows = (existing = admin.find('> .' + table + '-row')).map(function () {
                     var rowId = getRowId.apply(this);
-                    return '.' + table + '-id-' + rowId + ', .' + table + '-id-' + rowId + ' + .expandable';
+                    return '.' + table + '-id-' + rowId + ', .' + table + '-id-' + rowId + ' + .expandable:not([class*="-row"])';
                 }).toArray();
-                var last = existing.length == 0 ? admin.find(getRowQuery(tables[t-1])).last() : existing.last();
-                var newRows = content.find(rowQuery).not(keepRows.join(','));
-                var headerFooter = newRows.filter('.views, header, .highlighted-link, .' + table + '-row, .' + table + '-row + .expandable');
+                var last = existing.length == 0 ? admin.find(getRowQuery(tables[t-1])).last() : existing.add(existing.next('.expandable:not([class*="-row"])')).last();
+                var allNewTableContent = content.find(rowQuery);
+                var newRows = allNewTableContent.not($.merge(['.template'], keepRows).join(','));
+                var headerFooter = allNewTableContent.filter('.views, header, .highlighted-link, .template');
                 // put headers before and actions after
                 if(headerFooter.length > 0) {
                     if (existing.length > 0) {
                         headerFooter.filter('header, .views').insertBefore(existing.first());
-                        headerFooter.filter('.highlighted-link, .' + table + '-row, .' + table + '-row + .expandable').insertAfter(existing.last());
+                        headerFooter.filter('.highlighted-link, .template').insertAfter(last);
                     }
                     else {
                         if (last.length == 0) {
@@ -387,7 +490,7 @@ $(document).ready(function () {
                         continue;
                     }
                     else {
-                        row = row.add($(newRows[n]).next('.expandable'));
+                        row = row.add($(newRows[n]).next('.expandable:not([class*="-row"])'));
                     }
                     // update empty row ids TODO: verify this doesn't mistakenly pick out the wrong blank row added in between saving
                     if((noId = admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first()).length > 0) {

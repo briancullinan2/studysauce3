@@ -43,7 +43,9 @@ $view['slots']->start('body'); ?>
             <?php if ($entity !== null) { ?>
                 <form action="<?php print $view['router']->generate('save_group', ['groupId' => $entity->getId()]); ?>" class="group-edit">
                     <?php
-                    $tables = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']]];
+                    $tables = [
+                        'ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']]
+                    ];
                     $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-ss_group' => 1,

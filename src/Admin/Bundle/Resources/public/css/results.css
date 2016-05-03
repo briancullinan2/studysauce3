@@ -260,8 +260,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     font-size: 24px;
 }
 
-.results > [class*="-row"].selected > *:first-child:before,
-table.results.expandable > tbody > tr.selected > td:first-child:before
+.results > [class*="-row"].selected.expandable > *:first-child:before
 {
     transform: rotate(0deg);
     -webkit-transform: rotate(0deg);
@@ -271,23 +270,16 @@ table.results.expandable > tbody > tr.selected > td:first-child:before
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0);
 }
 
-.results > [class*="-row"] + *.expandable,
-table.results.expandable > tbody > tr:nth-child(even)
+.results > [class*="-row"] + *.expandable:not([class*="-row"])
 {
     display:none;
 }
 
-.results > [class*="-row"].selected + *.expandable {
+.results > [class*="-row"].selected + *.expandable:not([class*="-row"]) {
     display:block;
 }
 
-table.results.expandable > tbody > tr.selected + tr
-{
-    display:table-row;
-}
-
-.results > [class*="-row"] + *.expandable > *,
-table.results.expandable > tbody > tr:nth-child(even) > td
+.results > [class*="-row"] + *.expandable:not([class*="-row"]) > *
 {
     padding:0;
 }

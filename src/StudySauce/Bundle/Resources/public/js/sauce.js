@@ -390,7 +390,7 @@ function gatherFields(fields, visibleOnly) {
     var result = {};
     for(var f in fields) {
         if (fields.hasOwnProperty(f)) {
-            var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"]');
+            var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"], [name^="' + fields[f] + '["]');
             if(visibleOnly !== false) {
                 inputField = inputField.filter('[type="hidden"],:visible');
             }
@@ -592,8 +592,13 @@ if(typeof window.jqAjax == 'undefined') {
             if (data != null && typeof data.redirect != 'undefined') {
                 var a = document.createElement('a');
                 a.href = data.redirect;
-                if (typeof window.handleLink == 'undefined' || window.handleLink.apply(a, [jQuery.Event('click')])) {
-                    window.location = data.redirect;
+                if (Routing.match(window.location) == Routing.match(data.redirect) !== null) {
+                    // do nothing because we are already on the page
+                }
+                else {
+                    if (typeof window.handleLink == 'undefined' || window.handleLink.apply(a, [jQuery.Event('click')])) {
+                        window.location = data.redirect;
+                    }
                 }
             }
             if (typeof success != 'undefined')

@@ -3,10 +3,6 @@ $(document).ready(function () {
 
     var body = $('body');
 
-    function getTab() {
-        return $(this).closest('.panel-pane').find('.pack-edit .results, .card-list .results');
-    }
-
     key('⌘+v, ctrl+v, command+v', function () {
         var tab = $('[id*="packs-"]:visible');
         if(tab.find('input:focus, select:focus, textarea:focus').parents('.results [class*="-row"]').is('.empty')) {
@@ -80,6 +76,8 @@ $(document).ready(function () {
                 newRow.find('.type select').val('').trigger('change');
             }
 
+            setTypeClass.apply(newRow);
+
             // set correct answers
             newRow.find('.correct.type-mc textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
 
@@ -109,8 +107,6 @@ $(document).ready(function () {
                 newRow.find('input[name="upload"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
             }
         }
-
-        packsFunc.apply(tab.find('.card-row:not(.template):not(.removed)'));
     }
 
     function resizeTextAreas() {
@@ -234,18 +230,6 @@ $(document).ready(function () {
         centerize.apply(row.find(' + .expandable .preview-content div, + .expandable .preview-response div, + .expandable img, .pack-icon img'));
     }
 
-    $(window).on('beforeunload', function (evt) {
-        if($('.panel-pane[id^="packs-"]:visible').find('.pack-edit .pack-row.edit.changed:not(.template):not(.removed), .card-list .card-row.edit.changed:not(.template):not(.removed)').length > 0) {
-            evt.preventDefault();
-            return "You have unsaved changes!  Please don't go!";
-        }
-    });
-
-    body.on('hide', '.panel-pane[id^="packs-"]', function () {
-        var row = $(this).find('.results [class*="-row"].edit');
-        row.removeClass('edit remove-confirm').addClass('read-only');
-    });
-
     body.on('click', '[id^="packs-"] .preview-play .play', function () {
         var player = $('#jquery_jplayer');
         player.jPlayer("setMedia", {
@@ -254,46 +238,37 @@ $(document).ready(function () {
         player.jPlayer("play");
     });
 
-    function packsFunc (evt) {
-        var tab = getTab.apply(this);
-        var packRows = $(this).closest('.pack-row').filter(':not(.template):not(.removed)');
-        var cardRows = $(this).closest('.card-row').filter(':not(.template):not(.removed)');
+    function setTypeClass() {
+        var row = $(this);
+        var data = gatherFields.apply(row, [['type']]);
 
-        for(var c  = 0; c < cardRows.length; c++) {
-            var row = $(cardRows[c]);
-            var data = gatherFields.apply(row, [['type']]);
-
-            if(!row.is('.type-' + data.type)) {
-                row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
-                if (data.type != '' && data.type != null) {
-                    row.addClass('type-' + data.type);
-                }
+        if(!row.is('.type-' + data.type)) {
+            row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
+            if (data.type != '' && data.type != null) {
+                row.addClass('type-' + data.type);
             }
-
         }
-
-        // do not autosave from selectize because the input underneath will change
-        if(typeof evt != 'undefined') {
-            if($(evt.target).parents('.selectize-input').length > 0) {
-                return;
-            }
-            packRows.not('.changed').addClass('changed');
-            cardRows.not('.changed').addClass('changed');
-        }
-
-        if(validationTimeout != null) {
-            clearTimeout(validationTimeout);
-        }
-        validationTimeout = setTimeout(function () {
-            validateChanged.apply(tab);
-        }, 100);
     }
 
-    function validateChanged() {
+    body.on('change', '[id*="packs-"] .card-row select[name="type"]', setTypeClass);
+
+    var autoSaveTimeout = 0;
+
+    body.on('selected', '[id^="packs-"] .card-row', function () {
+        updatePreview.apply($(this));
+    });
+
+    body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
+
+    // TODO: generalize this
+
+    body.on('validate', '[id^="packs-"]', packsFunc);
+
+    function packsFunc() {
 
         var tab = getTab.apply(this);
-        var packRows = tab.find('.pack-row.changed:not(.template),.pack-row:not(.valid):not(.template)'); // <-- this is critical for autosave to work
-        var cardRows = tab.find('.card-row.changed:not(.removed):not(.template)');
+        var packRows = tab.find('.pack-row:not(.template),.pack-row:not(.valid):not(.template)'); // <-- this is critical for autosave to work
+        var cardRows = tab.find('.card-row:not(.removed):not(.template)');
 
         for(var c  = 0; c < cardRows.length; c++) {
             var row = $(cardRows[c]);
@@ -373,95 +348,28 @@ $(document).ready(function () {
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
-                autoSave.apply(tab, [false] /* do not close and return to /packs from edits */);
+                standardSave.apply(tab, [{}]);
             }, 2000);
         }
     }
 
-    var autoSaveTimeout = 0;
-    var validationTimeout = null;
-
-    body.on('selected', '[id^="packs-"] .card-row', function () {
-        updatePreview.apply($(this));
-    });
-
-    body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
-
-    body.on('click', '[id^="packs-"] a[href="#save-pack"], [id^="packs-"] [value="#save-pack"]', function (evt) {
-        evt.preventDefault();
-        var tab = getTab.apply(this);
-        if (autoSaveTimeout != null) {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = null;
-        }
-        tab.find('.card-row.empty:not(.template)').each(function () {
-            var that = jQuery(this);
-            if(that.find('.content textarea').val().trim() == '') {
-                that.add(that.next('.expandable')).removeClass('selected').addClass('removed');
-            }
-        });
-        tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
-        resizeTextAreas.apply(getTab.apply(this).find('.pack-row,.card-row'));
-        validateChanged.apply(tab);
-    });
-
-    var isLoading = false;
-
-    // TODO: generalize this
-    function autoSave(close) {
-        autoSaveTimeout = null;
-        var tab = getTab.apply(this);
-        var packRows = tab.find('.pack-row.valid:not(.template)');
-        var cardRows = tab.find('.card-row.valid.changed:not(.template),.card-row.removed:not(.template)');
-        if (packRows.length == 0) {
-            return;
-        }
-        if(tab.find('.highlighted-link a[href^="#save-"]').is('[disabled]') || isLoading) {
-            // select incorrect row handled by #goto-error
-            return;
-        }
-
-        isLoading = true;
-        loadingAnimation(tab.find('a[href="#save-pack"]'));
-
-        // get the parsed list of cards
-        var cards = [];
-        cardRows.each(function () {
-            var rowId = getRowId.apply($(this));
-            if($(this).is('.removed') || $(this).is('.empty')) {
-                cards[cards.length] = {
-                    id: rowId,
-                    remove: true
-                };
-            }
-            else {
-                cards[cards.length] = $.extend({id: rowId}, gatherFields.apply($(this), [['type', 'upload', 'content', 'answers', 'correct']]));
-            }
-        });
-        cardRows.removeClass('changed');
-
-        var packData = $.extend({cards: cards},
-            gatherFields.apply(packRows, [['upload', 'status', 'title', 'keyboard']]));
-        packRows.removeClass('changed');
-        standardSave.apply(tab.find('a[href="#save-pack"]'), [packData]);
-    }
-
-    var shouldRefresh = false;
     body.on('resulted', '[id^="packs-"] .results', function () {
-        isLoading = false;
         var tab = $(this);
+        autoSaveTimeout = null;
         if (tab.closest('.panel-pane').is('#packs-pack0')) {
             var id = getTabId.apply(tab);
             tab.closest('.panel-pane').attr('id', 'packs-pack' + id);
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));
         }
-        shouldRefresh = true;
+        var loaded = body.find('#groups');
+        loaded.off('show.resulted').on('show.resulted', function () {
+            loadResults.apply($(this).find('.results'));
+        });
     });
 
     function setupPackEditor() {
         autoSaveTimeout = 0;
         var tab = $(this).closest('.panel-pane');
-        validateChanged.apply(tab.find('.pack-row:not(.template)'));
         var cardRows = tab.find('.card-row:not(.removed):not(.template)');
 
         setTimeout(function () {
@@ -489,12 +397,6 @@ $(document).ready(function () {
 
     body.on('click', '.panel-pane[id^="packs-"] a[href="#edit-pack"]', setupPackEditor);
     body.on('show', '.panel-pane[id^="packs-"]', setupPackEditor);
-
-    body.on('show', '#packs', function () {
-        if (shouldRefresh) {
-            loadResults.apply($(this).find('.results'));
-        }
-    });
 
     // TODO: generalize and move this to dashboard using some sort of property binding API, data-target, data-toggle for selects toggles class of closest matching target?
     // TODO: data-toggle="modal" on option brings up dialog for confirmation
@@ -534,8 +436,5 @@ $(document).ready(function () {
             row.find('.status > div').attr('class', status);
         }
     });
-
-    body.on('change keyup', '[id^="packs-"] .card-row input, [id^="packs-"] .card-row select, [id^="packs-"] .card-row textarea', packsFunc);
-    body.on('change keyup', '[id^="packs-"] .pack-row input, [id^="packs-"] .pack-row select, [id^="packs-"] .pack-row textarea', packsFunc);
 
 });

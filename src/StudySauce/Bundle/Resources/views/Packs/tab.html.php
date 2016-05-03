@@ -43,7 +43,7 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tables = [
                         // view settings
-                        'tables' => ['pack', 'card'],
+                        'tables' => ['pack'],
                         'headers' => ['pack' => 'packPacks'],
                         'footers' => ['pack' => 'packPacks'],
                         'new' => empty($entity->getId()),
@@ -53,7 +53,6 @@ $view['slots']->start('body'); ?>
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
                         // for new=true the template generates the -count number of empty rows, and no database query is performed
                         'count-pack' => 1,
-                        'count-card' => -1,
                     ];
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
                     ?>
