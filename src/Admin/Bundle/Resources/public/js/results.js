@@ -314,14 +314,15 @@ $(document).ready(function () {
 
     function standardSave(save) {
         var field = $(this);
-        var tab = field.closest('.results:has([class*="-row"].changed:not(.template)), .results:has([class*="-row"].removed:not(.template))');
-        var data = $.extend(save || {}, {requestKey: getDataRequest.apply(tab).requestKey});
+        var tab = getTab.apply(field);
+        var fieldTab = field.closest('.results');
+        var data = $.extend(save || {}, {requestKey: getDataRequest.apply(fieldTab).requestKey});
         var actionItem = field.closest('[action], [data-action]');
         if(actionItem.length == 0) {
-            actionItem = tab.find('[action], [data-action]')
+            actionItem = fieldTab.find('[action], [data-action]')
         }
         var saveUrl = actionItem.data('action') || actionItem.attr('action');
-        var saveButton = tab.find('.highlighted-link a[href^="#save-"]');
+        var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]');
 
         if(typeof saveUrl == 'undefined') {
             throw 'Save action not found!';
@@ -382,13 +383,13 @@ $(document).ready(function () {
             dataType: 'text',
             data: data,
             success: function (data) {
-                tab.find('.squiggle').stop().remove();
+                fieldTab.find('.squiggle').stop().remove();
                 isLoading = false;
                 // copy rows and select
-                loadContent.apply(tab.first(), [data]);
+                loadContent.apply(fieldTab.first(), [data]);
             },
             error: function () {
-                tab.find('.squiggle').stop().remove();
+                fieldTab.find('.squiggle').stop().remove();
             }
         });
     }
