@@ -16,6 +16,7 @@ table.results > thead > tr > th
     vertical-align: bottom;
 }
 
+.last-right-expand footer > *:not(.big-add),
 .results header > *:not(.big-add)
 {
     display:inline-block;
@@ -396,7 +397,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     padding-left:3%;
     float:none;
     width:100%;
-    margin:3px 0;
+    margin:10px 0;
     font-size: inherit;
 }
 
@@ -636,6 +637,11 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
 {
     display:none;
 }
+.results [class*="-row"].edit .pack-icon br,
+.results [class*="-row"].edit .pack-icon .reveal
+{
+    display:inline-block;
+}
 
 .tiles [class*="-row"] .name {
     display:block;
@@ -680,17 +686,25 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     width:25%;
 }
 
+.last-right-expand > footer > label:nth-of-type(1),
 .last-right-expand > header > label:nth-of-type(1)
 {
     width:28%;
     padding-left:3%;
+    margin-left:0;
 }
 
+.last-right-expand > footer > label:nth-of-type(2),
+.last-right-expand > footer > label:nth-of-type(3),
 .last-right-expand > header > label:nth-of-type(2),
 .last-right-expand > header > label:nth-of-type(3)
 {
     width:7.5%;
     text-align: center;
+}
+
+.last-right-expand > footer > label {
+    color:#bbb;
 }
 
 .last-right-expand [class*="-row"].selected {
@@ -764,11 +778,11 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     margin-left:8px;
 }
 
-.last-right-expand [class*="-row"] > .counts {
+.last-right-expand [class*="-row"] > [class*="counts"] {
     width:15%;
 }
 
-.last-right-expand [class*="-row"] > .counts label {
+.last-right-expand [class*="-row"] > [class*="counts"] label {
     width:50%;
     margin:0 -2px;
     padding:0 2px;

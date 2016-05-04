@@ -20,11 +20,11 @@ if (!empty($results['pack'])) {
         $entityIds[] = 'ss_group-' . $g->getId();
     }
 }
-
 ?>
 <div class="highlighted-link form-actions <?php print $table; ?>">
-    <?php if (empty($results['ss_group'])) { ?> <div class="empty-packs">No subgroups</div> <?php }
-    if (!empty($entityIds)) { ?>
+    <?php if (empty($results['ss_group'])) { ?> <div class="empty-packs">No subgroups</div> <?php } ?>
+
+    <?php if (!empty($entityIds)) { ?>
     <form action="<?php print $view['router']->generate('packs_create', ['packId' => $results['pack'][0]->getId()]); ?>">
         <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
             'tables' => [

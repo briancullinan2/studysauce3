@@ -12,7 +12,7 @@ $time = method_exists($ss_group, 'getModified') && !empty($ss_group->getModified
         foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/upload_image.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
             <img width="300" height="100" src="<?php echo $view->escape($url) ?>" class="default centerized" alt="Upload"/>
         <?php endforeach;
-    } else { ?><img height="50" src="<?php print $ss_group->getLogo()->getUrl(); ?>" /><?php } ?>
+    } else { ?><img height="50" src="<?php print $ss_group->getLogo()->getUrl(); ?>" class="centerized" /><?php } ?>
     <input name="upload" value="<?php print (!empty($ss_group->getLogo()) ? $ss_group->getLogo()->getUrl() : ''); ?>" type="hidden" />
     <br />
     <span class="reveal"> Image</span>

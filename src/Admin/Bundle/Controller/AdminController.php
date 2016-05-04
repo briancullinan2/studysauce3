@@ -735,28 +735,53 @@ class AdminController extends Controller
         return $this->indexAction($request);
     }
 
+    static $forCounter = 0;
     public function templateAction(Request $request) {
 
         $parser = $this->get('templating.name_parser');
         $locator = $this->get('templating.locator');
 
-        $path = $locator->locate($parser->parse('AdminBundle:Admin:' . $request->get('name') . '.html.php'));
-        $php = file_get_contents($path);
-        $php = preg_replace_callback('/\?>([\s\S]*?)(<\?php|$)/i', function ($match) {
-            return 'print(\'' . preg_replace('/\n/', "' + \"\\n\"\n + '", $match[1]) . '\');';
-        }, '?>' . $php);
-        $php = preg_replace('/use [a-z\\\\\/\s]*;/i', '', $php);
-        $php = preg_replace('/\./i', '+', $php);
-        $php = preg_replace('/->/i', '.', $php);
-        $php = preg_replace('/\$/i', '__vars.', $php);
-        preg_replace_callback('#(?=(\[(?>[^\[\]]|(?1))*+\]))#', function (&$match) use (&$php) {
-            if(strpos($match[1], '=>') !== false) {
-                $php = str_replace($match[1], str_replace(['[', ']', '=>'], ['{', '}', ':'], $match[1]), $php);
-            }
-            return $match[0];
-        }, $php);
+        $names = explode(',', $request->get('name'));
+        $php = '/*----------------------------------------------------------- Table of Contents -----------------------------------------------------------
 
-        $functionName = preg_replace('/[^a-z0-9_]/i', '_', $request->get('name'));
+        ' . implode('
+        ', $names) . '
+
+        */';
+        foreach($names as $name) {
+            $path = $locator->locate($parser->parse('AdminBundle:Admin:' . $name . '.html.php'));
+            $file = file_get_contents($path);
+            $file = preg_replace_callback('/\?>([\s\S]*?)(<\?php|$)/i', function ($match) {
+                return 'print(\'' . preg_replace('/\n/', "' + \"\\n\"\n + '", $match[1]) . '\');';
+            }, '?>' . $file);
+            $file = preg_replace('/use [a-z\\\\\/\s]*;/i', '', $file);
+            $file = preg_replace('/->/i', '.', $file);
+            $file = preg_replace_callback('/foreach\s*\((.*?) as (.*?)(=>(.*)?)\)\s*\{/i', function ($match) {
+                self::$forCounter++;
+                $key = !empty($match[3]) ? $match[2] : self::$forCounter;
+                $name = !empty($match[3]) ? $match[4] : $match[2];
+                return 'for (' . $key . ' in ' . $match[1] . ') {
+                    if(!' . $match[1] . '.hasOwnProperty(' . $key . ')) { continue; }
+                    ' . $name . ' = ' . $match[1] . '[' . $key . '];';
+            }, $file);
+            $file = preg_replace('/\$/i', '__vars.', $file);
+            preg_replace_callback('#(?=(\[(?>[^\[\]]|(?1))*+\]))#', function (&$match) use (&$file) {
+                if(strpos($match[1], '=>') !== false) {
+                    $file = str_replace($match[1], '{' . trim(str_replace('=>', ':', $match[1]), " \t\n\r\0\x0B" . '[]') . '}', $file);
+                }
+                return $match[0];
+            }, $file);
+            $functionName = preg_replace('/[^a-z0-9_]/i', '_', $name);
+            $file = '
+
+//-----------------------------------------------------------' . $functionName . '-----------------------------------------------------------
+
+window.views[\'' . $functionName . '\'] = ( function ' . $functionName . ' (__vars) {' . $file . '; return output;});
+
+            ';
+            $php .= $file;
+        }
+
 
         $js = <<< EOJS
 (function (jQuery) {
@@ -811,18 +836,15 @@ if(typeof window.views.__render == 'undefined') {window.views.__render = functio
     window.views.__vars = window.views.__varStack.pop();
 }; }
 var output = '';
-var print = function (s) {output += s};
-var strtolower = function(s) {return s.toLowerCase();};
-var empty = function(s) {return s == '' || s == false;};
+var concat = function () { var str = ''; for(var a = 0; a < arguments.length; a++) { str += arguments[a]; } return str; };
+var print = function (s) { output += s };
+var strtolower = function(s) { return s.toLowerCase(); };
+var empty = function(s) { return s == '' || s == false; };
 var json_encode = JSON.stringify;
-var method_exists = function (s,m) {return typeof s == 'object' && typeof s[m] == 'function';};
-var isset = function (s) {return typeof s != 'undefined';};
-
-window.views['$functionName'] = (function $functionName (__vars) {
+var method_exists = function (s,m) { return typeof s == 'object' && typeof s[m] == 'function'; };
+var isset = function (s) { return typeof s != 'undefined'; };
 
 $php
-
-; return output;});
 
 })(jQuery);
 EOJS;

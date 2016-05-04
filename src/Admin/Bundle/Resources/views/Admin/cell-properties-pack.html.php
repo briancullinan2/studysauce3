@@ -3,7 +3,7 @@ use StudySauce\Bundle\Entity\Pack;
 
 /** @var Pack $pack */
 ?>
-<div>
+<div data-pack-properties="<?php //$view->escape(json_encode($pack->getProperties())); ?>">
     <label class="input">
         <select name="properties[keyboard]">
             <option value="basic">Normal (default)</option>

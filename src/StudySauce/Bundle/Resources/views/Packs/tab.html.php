@@ -33,7 +33,7 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/result
 foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
     <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
-    <script type="text/javascript" src="<?php echo $view['router']->generate('template', ['name' => 'cell-status-pack']) ?>"></script>
+    <script type="text/javascript" src="<?php echo $view['router']->generate('template', ['name' => 'cell-status-pack,cells,row']) ?>"></script>
 <?php
 $view['slots']->stop();
 
@@ -67,7 +67,7 @@ $view['slots']->start('body'); ?>
                     $tables = [
                         // view settings
                         'tables' => [
-                            'pack' => ['id', 'title', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
+                            'pack' => ['id', 'title', 'countsZeros', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
                             'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
                         ],
                         'classes' => ['last-right-expand'],
@@ -76,7 +76,7 @@ $view['slots']->start('body'); ?>
                         'edit' => false,
                         'read-only' => false,
                         // search settings
-                        'pack-id' => $entity->getId(),
+                        'pack-id' => empty($entity->getId()) ? '0' : $entity->getId(),
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
                         'ss_group-deleted' => false,
                         'count-ss_group' => 0,

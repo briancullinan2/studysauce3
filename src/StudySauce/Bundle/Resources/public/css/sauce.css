@@ -763,7 +763,7 @@ input:-webkit-autofill {
 .selectize-control.single .selectize-input,
 .selectize-control.multi .selectize-input
 {
-    padding: 1px 5px;
+    padding: 2px 5px;
 }
 
 .selectize-dropdown.single,

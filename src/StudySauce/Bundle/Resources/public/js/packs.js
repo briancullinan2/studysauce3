@@ -239,7 +239,7 @@ $(document).ready(function () {
     });
 
     function setTypeClass() {
-        var row = $(this);
+        var row = $(this).closest('.card-row');
         var data = gatherFields.apply(row, [['type']]);
 
         if(!row.is('.type-' + data.type)) {

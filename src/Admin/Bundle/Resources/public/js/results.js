@@ -450,11 +450,11 @@ $(document).ready(function () {
                 var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
 
                 var getRowQuery,
-                    rowQuery = (getRowQuery = function (table) { return '> .views, > header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable:not([class*="-row"])' })(table);
+                    rowQuery = (getRowQuery = function (table) { return '> .views, > footer.' + table + ', > header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable:not([class*="-row"])' })(table);
 
                 admin.find(rowQuery)
                     // leave edit rows alone
-                    .filter('.template, .template + .expandable:not([class*="-row"]), header, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')
+                    .filter('.template, .template + .expandable:not([class*="-row"]), header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')
                     // remove existing rows
                     .remove();
 
@@ -466,12 +466,12 @@ $(document).ready(function () {
                 var last = existing.length == 0 ? admin.find(getRowQuery(tables[t-1])).last() : existing.add(existing.next('.expandable:not([class*="-row"])')).last();
                 var allNewTableContent = content.find(rowQuery);
                 var newRows = allNewTableContent.not($.merge(['.template'], keepRows).join(','));
-                var headerFooter = allNewTableContent.filter('.views, header, .highlighted-link, .template');
+                var headerFooter = allNewTableContent.filter('.views, header, footer, .highlighted-link, .template');
                 // put headers before and actions after
                 if(headerFooter.length > 0) {
                     if (existing.length > 0) {
                         headerFooter.filter('header, .views').insertBefore(existing.first());
-                        headerFooter.filter('.highlighted-link, .template').insertAfter(last);
+                        headerFooter.filter('.highlighted-link, .template, footer').insertAfter(last);
                     }
                     else {
                         if (last.length == 0) {

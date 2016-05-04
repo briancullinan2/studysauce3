@@ -5700,7 +5700,12 @@ phpQuery::$plugins = new phpQueryPlugins();
 // include bootstrap file (personal library config)
 if (file_exists(dirname(__FILE__).'/phpQuery/bootstrap.php'))
     require_once dirname(__FILE__).'/phpQuery/bootstrap.php';
+
+// TODO: move this somewhere safer?
 function jQuery ($context) {
     // TODO: something with context
     return phpQuery::newDocument('');
 };
+function concat() {
+    return implode('', func_get_args());
+}

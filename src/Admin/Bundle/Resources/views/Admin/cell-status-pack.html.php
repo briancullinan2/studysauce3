@@ -26,43 +26,42 @@ $view['slots']->stop();
 // update the template
 $row = jQuery($this);
 
+// TODO: generalize this in a cell-select generic template
 $status = $row->find('> div');
 if($status->length == 0) {
     $status = $row->append($view['slots']->get('cell_status_pack'))->find('> div');
-}
-
-$select = $status->find('select');
-
-$schedule = $select->data('publish');
-$value = $select->val();
-if(empty($schedule)) {
-    $schedule = [
-        'schedule' => !empty($pack->getProperty('schedule')) ? $pack->getProperty('schedule')->format('r') : '',
+    // TODO: this is specific to status
+    $select = $status->find('select');
+    if ($app->getUser()->hasRole('ROLE_ADMIN') && $app->getUser()->getEmail() == 'brian@studysauce.com') {
+        $select->append($view['slots']->get('cell_status_pack_admin'));
+    }
+    // TODO: this could be some sort of binding API
+    $publish = [
+        'schedule' => !empty($pack->getProperty('schedule'))
+            ? $pack->getProperty('schedule')->format('r')
+            : '',
         'email' => $pack->getProperty('email'),
         'alert' => $pack->getProperty('alert'),
     ];
-    $select->data('publish', $schedule)->attr('data-publish', json_encode($schedule));
     $value = $pack->getStatus();
+    $select->val(empty($value) ? '' : $value);
+    $select->data('publish', $publish)->attr('data-publish', json_encode($publish));
+    $select->find(concat('option[value="' , $value , '"]'))->attr('selected', 'selected');
 }
+else {
+// TODO: this is update code specific to status field, generalize this in model
+    $select = $status->find('select');
+    $publish = $select->data('publish');
+}
+$schedule = new Date($publish['schedule']);
 
-$status->attr('class', strtolower($value) . ($schedule['schedule'] <= new Date() ? '' : ' pending'));
+$status->attr('class', concat(strtolower($select->val()) , ($schedule <= new Date() ? '' : ' pending')));
 
 // set schedule data
-$status->find('option[value="GROUP"]')->text($schedule['schedule'] > new Date()
-    ? ('Pending (' . $schedule['schedule']->format('m/d/Y H:m') . ')')
+$status->find('option[value="GROUP"]')->text($schedule > new Date()
+    ? concat('Pending (' , $schedule->format('m/d/Y H:m') , ')')
     : (!empty($schedule) ? 'Published' : 'Publish'));
 
-if ($app->getUser()->hasRole('ROLE_ADMIN') && $app->getUser()->getEmail() == 'brian@studysauce.com' &&
-    $status->find('option[value="PUBLIC"]')->length == 0
-) {
-    $select->append($view['slots']->get('cell_status_pack_admin'));
-}
-
-if($select->val() != $value) {
-    $status->find('option[selected]')->removeAttr('selected');
-    $select->val(empty($value) ? '' : $value);
-    $select->find('option[value="' . $value . '"]')->attr('selected', 'selected');
-}
 
 print ($row->html());
 

@@ -83,7 +83,7 @@ $view['slots']->start('body'); ?>
                             ],
                             'Membership' => [
                                 'tables' => [
-                                    'ss_group-1' => ['id', 'title', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
+                                    'ss_group-1' => ['id', 'title', 'countsZeros', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
                                     'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
                             ]
@@ -99,7 +99,7 @@ $view['slots']->start('body'); ?>
                             'edit' => false,
                             'read-only' => false,
                             'headers' => false,
-                            'footers' => false,
+                            'footers' => ['ss_group' => 'groupCount'],
                             'views' => $tableViews
                         ])));
                     } ?>
