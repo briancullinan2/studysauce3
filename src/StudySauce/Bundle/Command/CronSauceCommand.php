@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Command;
 
 use Doctrine\ORM\EntityManager;
+use Exception;
 use StudySauce\Bundle\Controller\EmailsController;
 use StudySauce\Bundle\Controller\PacksController;
 use StudySauce\Bundle\Entity\Group;
@@ -224,12 +225,12 @@ EOF
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
                             print "\t" . $groupInvite->getName() . ' added a new pack, "' . $alerting[0]->getTitle() . '"';
-                            $controller->sendNotification($groupInvite->getName() . ' added a new pack, "'
+                            $this->sendNotification($groupInvite->getName() . ' added a new pack, "'
                                 . $alerting[0]->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
                             print "\t" . 'You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce';
-                            $controller->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
+                            $this->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
                                 . '" on Study Sauce', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                     }
@@ -246,6 +247,48 @@ EOF
                 }
             }
         }
+    }
+
+    public function sendNotification($message, $count, $deviceToken) {
+        try {
+            $body['aps'] = array(
+                'alert' => $message,
+                'badge' => $count
+            );
+
+            //$body['category'] = 'message';
+            //$body['category'] = 'profile';
+            //$body['category'] = 'dates';
+            //$body['category'] = 'daily_dates';
+            //$body['sender'] = 'jamesHAW';
+            $body['sender'] = 'web.StudySauce';
+
+            //Server stuff
+            $ctx = stream_context_create();
+            stream_context_set_option($ctx, 'ssl', 'local_cert', __DIR__ . '/' . 'com.studysauce.companyapp.pem');
+            $fp = stream_socket_client(
+                'ssl://gateway' . ($this->getContainer()->get('kernel')->getEnvironment() == 'prod' ? '' : '.sandbox') . '.push.apple.com:2195', $err,
+                $errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
+            if (!$fp)
+                throw new Exception("Failed to connect: $err $errstr" . PHP_EOL);
+            $this->getContainer()->get('logger')->debug('Connected to APNS' . PHP_EOL);
+            $payload = json_encode($body);
+
+            // Build the binary notification
+            $msg = chr(0) . pack('n', 32) . pack('H*', $deviceToken) . pack('n', strlen($payload)) . $payload;
+
+            // Send it to the server
+            $result = fwrite($fp, $msg, strlen($msg));
+            if (!$result)
+                throw new Exception('Message not delivered' . PHP_EOL);
+            else
+                $this->getContainer()->get('logger')->debug('Message successfully delivered' . PHP_EOL);
+            fclose($fp);
+        }
+        catch (Exception $e) {
+            $this->getContainer()->get('logger')->debug($e);
+        }
+
     }
 
     /**

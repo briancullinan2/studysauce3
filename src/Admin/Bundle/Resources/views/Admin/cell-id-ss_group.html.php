@@ -10,4 +10,4 @@ if (empty($ss_group->getLogo())) {
     foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/upload_image.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
         <img width="300" height="100" src="<?php echo $view->escape($url) ?>" class="default centerized" alt="Upload"/>
     <?php endforeach;
-} else { ?><img height="50" src="<?php print $ss_group->getLogo()->getUrl(); ?>" /><?php } ?>
+} else { ?><img height="50" src="<?php print $ss_group->getLogo()->getUrl(); ?>" class="centerized" /><?php } ?>
