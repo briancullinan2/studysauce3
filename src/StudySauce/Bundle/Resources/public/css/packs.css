@@ -50,13 +50,7 @@
     float: left;
 }
 
-#packs .pack-row .id {
-    text-align: center;
-    position:relative;
-}
-
-.pack-edit .pack-row .id {
-    text-align: center;
+.pack-edit .pack-row > [class^="id"] {
     position: absolute;
     padding-bottom: 10%;
     width:10%;
@@ -490,7 +484,6 @@
     color:#BBB;
 }
 
-#packs .pack-row .id img,
 [id^="packs-"] .card-row + .expandable .preview-prompt img,
 [id^="packs-"] .card-row + .expandable .preview-inner img {
     height:auto;

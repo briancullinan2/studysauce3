@@ -458,11 +458,15 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     display:none;
 }
 
-.last-right-expand [class*="-row"] .id {
+.last-right-expand [class*="-row"] > [class^="id"] {
     text-align: center;
     position: relative;
     vertical-align: middle;
     width: 3%;
+    display: inline-block;
+    height: 26px;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .results .search {
@@ -580,12 +584,13 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     z-index: 1;
 }
 
-.tiles [class*="-row"] .id {
+.tiles [class*="-row"] > [class^="id"] {
     display:block;
     width:auto;
     height: 120px;
     text-align: center;
     position:relative;
+    padding-bottom:25px;
 }
 
 .tiles [class*="-row"] .packList {
@@ -614,21 +619,21 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     display:none;
 }
 
-.results [class*="-row"] .id .pack-icon {
-    position:absolute;
+.results [class*="-row"] > [class^="id"] .pack-icon {
+    display:inline-block;
     height:100%;
     width:100%;
     top:0;
     left:0;
+    text-align: center;
+}
+
+.results [class^="id"] .pack-icon:hover ~ * a {
+    color:#09B;
 }
 
 .tiles .pack-list {
     display:block;
-}
-
-.tiles [class*="-row"].read-only .pack-icon
-{
-    z-index: -1;
 }
 
 .results [class*="-row"] > label.checkbox:nth-last-child(1),
@@ -660,7 +665,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     color:#09B;
 }
 
-.results [class*="-row"] .id img {
+.results [class*="-row"] > [class^="id"] img {
     height: auto;
     width: auto;
     max-height: 100%;

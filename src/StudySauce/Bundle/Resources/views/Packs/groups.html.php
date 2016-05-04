@@ -64,7 +64,7 @@ $view['slots']->start('body'); ?>
             <div class="membership">
                 <div class="group-list">
                     <?php
-                    $tiles = ['ss_group' => ['id' => ['created', 'id'], 'name' => ['name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
+                    $tiles = ['ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
                     if (empty($entity)) {
                         print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                             'tables' => $tiles,

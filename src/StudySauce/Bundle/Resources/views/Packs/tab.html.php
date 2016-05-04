@@ -45,7 +45,7 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tables = [
                         // view settings
-                        'tables' => ['pack'],
+                        'tables' => ['pack' => ['idEdit' => ['modified', 'created', 'id', 'upload'], 'name' => ['title','userCountStr','cardCountStr'], 'status', ['group','groups', 'user','userPacks.user'], 'properties', 'actions']],
                         'headers' => ['pack' => 'packPacks'],
                         'footers' => ['pack' => 'packPacks'],
                         'new' => empty($entity->getId()),
@@ -115,7 +115,7 @@ $view['slots']->start('body'); ?>
             }
             else {
                 $tables['count-pack'] = 0;
-                $tables['tables'] = ['pack' => ['id' => ['created', 'id'], 'name' => ['title', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
+                $tables['tables'] = ['pack' => ['idTiles' => ['created', 'id', 'title', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
                 $tables['classes'] = ['tiles'];
                 $tables['headers'] = ['pack' => 'newPack'];
                 $tables['footers'] = ['pack' => 'newPack'];
