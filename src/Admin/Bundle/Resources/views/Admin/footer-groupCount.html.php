@@ -1,5 +1,5 @@
 <?php
-if(empty($results['ss_group-1'])) { ?>
+if (empty($results['ss_group-1'])) { ?>
     <footer class="ss_group">
         <label>Total in this Group</label>
         <label>0</label>
@@ -13,5 +13,5 @@ if(empty($results['ss_group-1'])) { ?>
         <label><?php print count($users); ?></label>
         <label><?php print count($packs); ?></label>
     </footer>
-    <?
+    <?php
 }
