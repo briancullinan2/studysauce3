@@ -31,18 +31,18 @@
     opacity: 1;
 }
 
-.group-edit .highlighted-link.ss_group
-{
-    margin: 50px 0;
-    clear:both;
-}
-
 .group-edit .ss_group-row > .parent
 {
     width: 45%;
     padding-left:150px;
     margin-right:-4px;
     padding-right:4px;
+}
+
+[id^="groups-"] .group-edit {
+    margin:-30px -100px 40px;
+    padding: 30px 100px 20px;
+    background-color: #FFF;
 }
 
 .group-edit .results .ss_group-row.read-only:hover
@@ -110,15 +110,8 @@
     display:none;
 }
 
-.group-edit .ss_group-row.edit ~ .highlighted-link.ss_group
-{
-    visibility: visible;
-    border-top: 2px solid #FFF;
-}
-
 .group-edit .ss_group-row.read-only .pack-icon
 {
-    z-index: -1;
     pointer-events: none;
 }
 

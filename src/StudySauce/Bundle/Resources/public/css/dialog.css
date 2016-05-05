@@ -652,11 +652,14 @@ body.right-menu #bookmark
         display:none;
     }
 
-    body.modal-open .panel-pane,
-    body.modal-open .pane-content
+    body.modal-open .panel-pane
     {
         max-height: 100%;
         overflow:hidden;
+    }
+
+    body.modal-open .pane-content {
+        max-height: 100%;
     }
 
     .modal.in .modal-dialog {

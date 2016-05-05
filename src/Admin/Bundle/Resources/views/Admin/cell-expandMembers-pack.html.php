@@ -18,7 +18,7 @@ if(isset($searchRequest['ss_group-id']) && !empty($group = $searchRequest['ss_gr
     ? $view['router']->generate('save_group', ['groupId' => $searchRequest['ss_group-id'], 'packId' => $pack->getId()])
     : $view['router']->generate('packs_create', ['packId' => $pack->getId()])); ?>">
     <a href="#add-entity" class="big-add" data-toggle="modal" data-target="#add-entity">Add
-        <span>+</span> individual</a><br /><br />
+        <span>+</span> individual</a>
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
         'entities' => $users->toArray(),

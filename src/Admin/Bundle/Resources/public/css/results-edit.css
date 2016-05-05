@@ -41,6 +41,7 @@
 
 [class*="-edit"] [class*="-row"] > [class^="id"] .pack-icon {
     padding-top: 100%;
+    position: absolute;
 }
 
 [class*="-edit"] [class*="-row"] .pack-icon img {
@@ -51,6 +52,11 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+
+[class*="-edit"] .highlighted-link
+{
+    clear:both;
 }
 
 [class*="-edit"] [class*="-row"] .pack-icon img.default {

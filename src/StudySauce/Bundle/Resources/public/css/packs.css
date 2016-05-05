@@ -37,11 +37,6 @@
     opacity: 1;
 }
 
-[id^="packs-"] .highlighted-link.pack {
-    margin: 50px 0;
-    clear:both;
-}
-
 #packs .pack-row .status .unpublished .selectize-input,
 [id^="packs-"] .pack-row .status .unpublished .selectize-input,
 #packs .pack-row .status .unpublished select,
@@ -86,6 +81,12 @@
     padding-left:150px;
     margin-right:0;
     padding-right:5%;
+}
+
+[id^="packs-"] .pack-edit {
+    margin:-30px -100px 40px;
+    padding: 30px 100px 20px;
+    background-color: #FFF;
 }
 
 [id^="packs-"] .pack-row > .users {
