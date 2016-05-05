@@ -471,12 +471,6 @@
     display:inline-block;
 }
 
-[id^="packs-"] .results .pack-row.read-only:hover
-{
-    background-color:transparent;
-    border-color:transparent;
-}
-
 [id^="packs-"] .card-row .correct.editing .radios span {
     z-index: -1;
     position:relative;
