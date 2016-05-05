@@ -568,11 +568,11 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
 [class*="-edit"] header label:nth-child(3),
 [class*="-edit"] header label:nth-child(1) {
     padding-left:10%;
+    width:55%;
 }
 
-[class*="-edit"] header label:nth-child(1),
-[class*="-edit"] header label:nth-child(2),
-[class*="-edit"] header label:nth-child(3) {
+[class*="-edit"] header label:nth-child(2)
+{
     width:45%;
 }
 
