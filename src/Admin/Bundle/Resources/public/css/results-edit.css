@@ -1,0 +1,58 @@
+
+[class*="-edit"] [class*="-row"]
+{
+    position:relative;
+}
+
+[class*="-edit"] header {
+    position:absolute;
+    width:100%;
+    z-index: 0;
+    line-height:27px;
+    margin-top:1px;
+}
+
+[class*="-edit"] header label:nth-child(3),
+[class*="-edit"] header label:nth-child(1) {
+    padding-left:10%;
+    width:55%;
+}
+
+[class*="-edit"] header label:nth-child(2)
+{
+    width:45%;
+}
+
+[class*="-edit"] [class*="-row"] > [class^="id"]:before {
+    content: " ";
+    display: inline-block;
+    padding-bottom: 100%;
+    position: static;
+}
+
+[class*="-edit"] [class*="-row"] > [class^="id"] {
+    text-align: center;
+    position: absolute;
+    vertical-align: top;
+    width: 10%;
+    max-height: 100%;
+    padding-right: 20px;
+}
+
+[class*="-edit"] [class*="-row"] > [class^="id"] .pack-icon {
+    padding-top: 100%;
+}
+
+[class*="-edit"] [class*="-row"] .pack-icon img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+[class*="-edit"] [class*="-row"] .pack-icon img.default {
+    width:100%;
+}

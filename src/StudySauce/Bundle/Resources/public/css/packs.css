@@ -88,17 +88,6 @@
     padding-right:5%;
 }
 
-[id^="packs-"] .pack-row.read-only .pack-icon
-{
-    z-index: -1;
-    pointer-events: none;
-}
-
-[id^="packs-"] .pack-row.read-only .pack-icon .reveal
-{
-    display:none;
-}
-
 [id^="packs-"] .pack-row > .users {
     width: 25%;
 }

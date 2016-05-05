@@ -122,11 +122,6 @@
     pointer-events: none;
 }
 
-.group-edit .ss_group-row.read-only .pack-icon .reveal
-{
-    display:none;
-}
-
 .group-edit .ss_group-row.edit .highlighted-link > .remove-icon
 {
     display:inline-block !important;

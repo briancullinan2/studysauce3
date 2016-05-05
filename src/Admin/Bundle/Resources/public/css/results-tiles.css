@@ -1,0 +1,123 @@
+
+.tiles {
+    margin-left:-1%;
+    padding-right:4px;
+}
+
+.tiles .highlighted-link {
+    padding: 0;
+}
+
+.tiles > header,
+.tiles > .highlighted-link {
+    padding: 0 1%;
+}
+
+.tiles [class*="-row"]:hover {
+    border:1px solid #09B !important;
+    background: #e9e9e9;
+}
+
+.tiles [class*="-row"] {
+    display:inline-block;
+    width:24%;
+    margin: 10px -4px 10px 1%;
+    padding: 10px;
+    border: 1px solid #bbb;
+    position:relative;
+    background: #e9e9e9;
+    text-align: left;
+    border-radius:1px;
+    z-index: 1;
+    vertical-align: middle;
+}
+
+.tiles [class*="-row"] > [class^="id"] {
+    display:block;
+    width:auto;
+    height: 120px;
+    text-align: center;
+    position:relative;
+    padding-bottom:25px;
+}
+
+.tiles [class*="-row"] > [class^="id"] label {
+    display: inline-block;
+    width: 100%;
+    clear: both;
+    position: absolute;
+    top: 100%;
+    left: 0;
+}
+
+.tiles [class*="-row"] .packList {
+    display:block;
+    width:auto;
+    height: 120px;
+    background: #FFF;
+    white-space: normal;
+    overflow: auto;
+    padding:10px;
+    line-height: 140%;
+}
+
+.tiles [class*="-row"] .packList label {
+    color: #BBB;
+    font-weight: normal;
+}
+
+.tiles [class*="-row"] [class*="actions"] {
+    position:absolute;
+    right:10px;
+    top:10px;
+    padding:0;
+    margin:0;
+    width:auto;
+    display:none;
+}
+
+.tiles .pack-list {
+    display:block;
+}
+
+.tiles [class*="-row"] .name {
+    display:block;
+    width:auto;
+    padding-right:10px;
+    position:relative;
+    padding-left: 10px;
+}
+
+.tiles [class*="-row"].read-only .name input
+{
+    cursor: pointer;
+}
+
+.tiles [class*="-row"].read-only:hover .name input {
+    color:#09B;
+}
+
+.tiles [class*="-row"] .packList span {
+    float:right;
+}
+
+@media (max-width: 1500px) {
+    .tiles [class*="-row"]
+    {
+        width:32.33%;
+    }
+}
+
+@media (max-width: 700px) {
+    .tiles [class*="-row"]
+    {
+        width:49%;
+    }
+}
+
+@media (max-width: 500px) {
+    .tiles [class*="-row"]
+    {
+        width:99%;
+    }
+}

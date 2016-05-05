@@ -53,20 +53,7 @@ $collection = $router->getRouteCollection();
         <title><?php $view['slots']->output('title', 'StudySauce') ?></title>
 
         <?php
-
-        foreach ($view['assetic']->stylesheets([
-            '@StudySauceBundle/Resources/public/css/jquery-ui.min.css',
-            '@StudySauceBundle/Resources/public/css/normalize.css',
-            '@StudySauceBundle/Resources/public/css/selectize.default.css',
-            '@StudySauceBundle/Resources/public/js/datetimepicker-master/jquery.datetimepicker.css',
-            '@StudySauceBundle/Resources/public/css/fonts.css',
-            '@StudySauceBundle/Resources/public/css/sauce.css',
-            '@StudySauceBundle/Resources/public/css/dialog.css',
-        ],
-            [],
-            ['output' => 'bundles/studysauce/css/*.css']
-        ) as $url):
-            ?>
+        foreach ($view['assetic']->stylesheets(['@layout_css'], [], ['output' => 'bundles/studysauce/css/*.css'] ) as $url): ?>
             <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
         <?php endforeach;
 
@@ -232,7 +219,6 @@ EOCSS;
             }
             <?php } ?>
         </style>
-
         <?php $view['slots']->output('stylesheets'); ?>
     </head>
     <body class="<?php $view['slots']->output('classes') ?>">
