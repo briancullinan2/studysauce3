@@ -51,15 +51,6 @@
     border-color:transparent;
 }
 
-.list-packs .results .pack-row > .title
-{
-    cursor: pointer;
-}
-
-.list-packs .results .pack-row:hover > .title {
-    color:#09B;
-}
-
 .group-edit .results .ss_group-row [class*="actions"]
 {
     position:absolute;
@@ -78,11 +69,6 @@
 .group-edit .results .ss_group-row.read-only .subgroup,
 .group-edit .results .ss_group-row.read-only [class*="actions"] {
     display:none;
-}
-
-.group-edit .ss_group-row
-{
-    position:relative;
 }
 
 .group-edit .ss_group-row > .name
@@ -113,32 +99,6 @@
 
 .group-list .ss_group-row .parent {
     display:none;
-}
-
-.group-edit header.ss_group {
-    position:absolute;
-    width:100%;
-    z-index: 0;
-    line-height:27px;
-    margin-top:1px;
-}
-
-.group-edit header.ss_group label:nth-child(1) {
-    padding-left:10%;
-    width:50%;
-    margin-right:5%;
-}
-
-.group-edit header.ss_group label:nth-child(3) {
-    width:50%;
-}
-
-.group-edit header.ss_group label:nth-child(2) {
-    width:45%;
-}
-
-.group-edit header.ss_group label:nth-child(3) {
-    padding-left:10%;
 }
 
 .membership {

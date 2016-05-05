@@ -552,6 +552,30 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     100% { width:21px;height: 21px;  opacity: 0.0; font-size: 100%;}
 }
 
+[class*="-edit"] [class*="-row"]
+{
+    position:relative;
+}
+
+[class*="-edit"] header {
+    position:absolute;
+    width:100%;
+    z-index: 0;
+    line-height:27px;
+    margin-top:1px;
+}
+
+[class*="-edit"] header label:nth-child(3),
+[class*="-edit"] header label:nth-child(1) {
+    padding-left:10%;
+}
+
+[class*="-edit"] header label:nth-child(1),
+[class*="-edit"] header label:nth-child(2),
+[class*="-edit"] header label:nth-child(3) {
+    width:45%;
+}
+
 [class*="-edit"] [class*="-row"] > [class^="id"]:before {
     content: " ";
     display: inline-block;
@@ -625,6 +649,10 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     text-align: center;
     position:relative;
     padding-bottom:25px;
+}
+
+.tiles [class*="-row"] > [class^="id"] label {
+    display:block;
 }
 
 .tiles [class*="-row"] .packList {
@@ -766,7 +794,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     width:50%;
     background: #E9E9E9;
     z-index: 110;
-    padding: 60px 20px 70px;
+    padding: 60px 20px 20px;
     display:none;
     margin-left: 0;
     margin-right: 0;
@@ -796,6 +824,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     height:100%;
     overflow-y:scroll;
     margin-bottom:10px;
+    clear:both;
 }
 
 .last-right-expand [class*="-row"] > [class*="Members"] > form > .entity-search > label.input {
@@ -818,9 +847,9 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     display:inline-block !important;
 }
 
-.last-right-expand .entity-search + .big-add {
-    float:none;
-    margin-left:8px;
+.last-right-expand [class*="-row"] > [class*="Members"] .big-add {
+    position: absolute;
+    top: 60px;
 }
 
 .last-right-expand [class*="-row"] > .title label:nth-child(1),
