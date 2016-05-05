@@ -184,13 +184,13 @@ function centerize() {
         if(!($(this).is('.centerized'))) {
             $(this).addClass('centerized');
         }
-        $(this).css('margin-top', '');
+        $(this).css('margin-top', '').css('top', '');
         var myheight = $(this).outerHeight(true);
         var relativeParent = $(this).parents().filter(function () {return (/relative|absolute|fixed/i).test($(this).css('position'));}).first().outerHeight();
         if(relativeParent.length == 0) {
             relativeParent = $(this).parent().height();
         }
-        $(this).css('margin-top', ((relativeParent - myheight) / 2) + 'px')
+        $(this).css((/relative/i).test($(this).css('position')) ? 'top' : 'margin-top', ((relativeParent - myheight) / 2) + 'px')
     });
 }
 
