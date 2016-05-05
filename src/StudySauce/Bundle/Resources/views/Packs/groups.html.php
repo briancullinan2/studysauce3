@@ -44,7 +44,7 @@ $view['slots']->start('body'); ?>
                 <form action="<?php print $view['router']->generate('save_group', ['groupId' => $entity->getId()]); ?>" class="group-edit">
                     <?php
                     $tables = [
-                        'ss_group' => ['idEdit' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [''], 'invite' => ['invites'], 'actions' => ['deleted']]
+                        'ss_group' => ['idEdit' => ['created', 'id'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
                     $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
@@ -83,8 +83,8 @@ $view['slots']->start('body'); ?>
                             ],
                             'Membership' => [
                                 'tables' => [
-                                    'ss_group-1' => ['id', 'title', 'countsZeros', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
-                                    'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
+                                    'ss_group-1' => ['id', 'title', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
+                                    'ss_group' => ['id', 'title', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
                                 'classes' => ['last-right-expand'],
                             ]
                         ];
@@ -108,7 +108,7 @@ $view['slots']->start('body'); ?>
                 <div class="list-packs">
                     <?php
                     $tables = ['ss_group' => ['id', 'deleted']];
-                    $tables['pack'] = ['id', 'title', 'counts', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $tables['pack'] = ['id', 'title', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                     $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-pack' => $isNew ? -1 : 0,
@@ -134,8 +134,8 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('sincludes');
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']), ['strategy' => 'sinclude']);
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']));
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']));
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']));
 $view['slots']->stop();
 

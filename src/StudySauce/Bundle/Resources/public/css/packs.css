@@ -42,30 +42,6 @@
     clear:both;
 }
 
-[id^="packs-"] .pack-row:before {
-    content: " ";
-    display: inline-block;
-    padding-bottom: 10%;
-    position: static;
-    float: left;
-}
-
-.pack-edit .pack-row > [class^="id"] {
-    position: absolute;
-    padding-bottom: 10%;
-    width:10%;
-    top:-20px;
-}
-
-.pack-edit .pack-row .pack-icon {
-    padding:0 20px 0 5px;
-}
-
-#packs .pack-row .pack-icon
-{
-    padding:0;
-}
-
 #packs .pack-row .status .unpublished .selectize-input,
 [id^="packs-"] .pack-row .status .unpublished .selectize-input,
 #packs .pack-row .status .unpublished select,

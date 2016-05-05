@@ -261,8 +261,8 @@ EOCSS;
     if ($app->getEnvironment() == 'dev' || $app->getEnvironment() == 'test') {
         echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'error']));
     }
-    echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'contact-support']), ['strategy' => 'sinclude']);
-    echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'general-dialog']), ['strategy' => 'sinclude']);
+    echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'contact-support']));
+    echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'general-dialog']));
     echo $view->render('StudySauceBundle:Shared:footer.html.php');
     ?>
     <script>

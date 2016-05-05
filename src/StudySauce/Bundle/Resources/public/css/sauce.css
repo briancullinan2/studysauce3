@@ -687,7 +687,6 @@ img, video, canvas, svg
 label
 {
     text-align: left;
-    display:block;
     margin:5px 0;
     font-weight: normal;
 }

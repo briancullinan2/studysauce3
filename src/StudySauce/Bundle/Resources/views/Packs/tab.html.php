@@ -68,7 +68,7 @@ $view['slots']->start('body'); ?>
                         // view settings
                         'tables' => [
                             'pack' => ['id', 'title', 'countsZeros', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
-                            'ss_group' => ['id', 'title', 'counts', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
+                            'ss_group' => ['id', 'title', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
                         ],
                         'classes' => ['last-right-expand'],
                         'headers' => ['pack' => 'subGroups'],
@@ -126,8 +126,8 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('sincludes');
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']), ['strategy' => 'sinclude']);
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']), ['strategy' => 'sinclude']);
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']));
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']));
+echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']));
 $view['slots']->stop();
 

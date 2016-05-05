@@ -37,14 +37,6 @@
     clear:both;
 }
 
-.group-edit .ss_group-row:before {
-    content: " ";
-    display: inline-block;
-    padding-bottom: 10%;
-    position: static;
-    float: left;
-}
-
 .group-edit .ss_group-row > .parent
 {
     width: 45%;
@@ -123,36 +115,6 @@
     display:none;
 }
 
-.group-edit .ss_group-row > [class^="id"] {
-    text-align: center;
-    position: absolute;
-    vertical-align: top;
-    padding-bottom: 10%;
-    width:10%;
-    top: -20px;
-}
-
-.group-edit .ss_group-row .pack-icon {
-    position: absolute;
-    padding: 0 20px 0 5px;
-    height:100%;
-    width:100%;
-    top:0;
-    left:0;
-
-}
-
-.group-edit .ss_group-row .pack-icon img {
-    max-height:100%;
-    max-width: 100%;
-    width:auto;
-    height:auto;
-}
-
-.group-edit .ss_group-row .pack-icon img.default {
-    width:100%;
-}
-
 .group-edit header.ss_group {
     position:absolute;
     width:100%;
@@ -191,6 +153,7 @@
 .group-edit .ss_group-row.edit ~ .highlighted-link.ss_group
 {
     visibility: visible;
+    border-top: 2px solid #FFF;
 }
 
 .group-edit .ss_group-row.read-only .pack-icon

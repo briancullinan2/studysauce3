@@ -185,10 +185,12 @@ function centerize() {
             $(this).addClass('centerized');
         }
         $(this).css('margin-top', '');
-        var myheight = $(this).outerHeight(false);
-        if ($(this).parent().height() > myheight) {
-            $(this).css('margin-top', (($(this).parent().height() - myheight) / 2) + 'px')
+        var myheight = $(this).outerHeight(true);
+        var relativeParent = $(this).parents().filter(function () {return (/relative|absolute|fixed/i).test($(this).css('position'));}).first().outerHeight();
+        if(relativeParent.length == 0) {
+            relativeParent = $(this).parent().height();
         }
+        $(this).css('margin-top', ((relativeParent - myheight) / 2) + 'px')
     });
 }
 

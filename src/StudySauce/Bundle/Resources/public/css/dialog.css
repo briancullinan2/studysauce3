@@ -442,10 +442,8 @@ body.right-menu #bookmark
 
 .modal .modal-header
 {
-    background-color: #0099BB;
     border-radius: 1px 1px 0 0;
     border-bottom: none;
-    color: #fff;
     padding-right:50px;
     font-family: 'Rufina',serif;
     font-size: 22px;
@@ -458,16 +456,10 @@ body.right-menu #bookmark
     padding-top:15px;
 }
 
-.modal .modal-header a
-{
-    color:#ffffff;
-}
-
 .modal .modal-header h2,
 .modal .modal-header h3,
 .modal .modal-header h4,
 .modal .modal-header h5 {
-    color:#fff;
     margin:-2px 0;
 }
 
@@ -486,10 +478,10 @@ body.right-menu #bookmark
     right: 0;
     position: absolute;
     height: 100%;
-    background-color: rgba(255,255,255,.2);
+    background-color: #BBB;
     border-top-right-radius: 1px;
     width:50px;
-    transition: background-color ease-in-out .15s;
+    transition: background-color ease-in-out .15s, color ease-in-out .15s;
 }
 
 .modal-header .close span {
@@ -504,7 +496,7 @@ body.right-menu #bookmark
 {
     color:#FFF;
     opacity: 1;
-    background-color: rgba(0,0,0,.2);
+    background-color: #09B;
 }
 
 #pack-publish .input {
