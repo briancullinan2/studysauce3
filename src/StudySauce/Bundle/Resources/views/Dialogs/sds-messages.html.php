@@ -1,4 +1,4 @@
-<?php $view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+<?php $view->extend('AdminBundle:Admin:dialog.html.php');
 
  $view['slots']->start('modal-header') ?>
 <span class="full-only">Your study tip for this session</span><span class="mobile-only">Study tip</span>

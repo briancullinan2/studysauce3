@@ -4,7 +4,7 @@ use StudySauce\Bundle\Entity\User;
 /** @var User $user */
 $user = $app->getUser();
 
-$view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+$view->extend('AdminBundle:Admin:dialog.html.php');
 
 $view['slots']->start('modal-header') ?>
 Send an email to have someone prepay for Study Sauce.  We will then alert you when your account has been activated.

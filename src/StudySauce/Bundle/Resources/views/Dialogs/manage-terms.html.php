@@ -1,7 +1,7 @@
 <?php use StudySauce\Bundle\Entity\Course;
 use StudySauce\Bundle\Entity\Schedule;
 
-$view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+$view->extend('AdminBundle:Admin:dialog.html.php');
 /** @var $schedule Schedule */
 
 $view['slots']->start('modal-header'); ?>

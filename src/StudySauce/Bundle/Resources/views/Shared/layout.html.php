@@ -225,11 +225,13 @@ EOCSS;
     <?php $view['slots']->output('body') ?>
     <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
     <script src="<?php echo $view['assets']->getUrl('bundles/fosjsrouting/js/router.js'); ?>"></script>
-    <script
-        src="<?php echo $view['router']->generate('fos_js_routing_js', array('callback' => 'fos.Router.setData')); ?>"></script>
+    <script src="<?php echo $view['router']->generate('fos_js_routing_js', array('callback' => 'fos.Router.setData')); ?>"></script>
     <?php foreach ($view['assetic']->javascripts(['@layout'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
         <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-    <?php endforeach;
+    <?php endforeach; ?>
+    <script type="text/javascript" src="<?php echo $view['router']->generate('template', [
+        'name' => 'dialog,add-entity,cell-collection,cell-status-pack,cells,row']) ?>"></script>
+    <?php
     $agent = strtolower($app->getRequest()->server->get('HTTP_USER_AGENT'));
     if ((strpos($agent, 'android') && strpos($agent, 'chrome') === false) ||
         preg_match('/(?i)msie/', $agent)

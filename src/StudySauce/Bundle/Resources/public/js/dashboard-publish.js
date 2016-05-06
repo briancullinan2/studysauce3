@@ -67,6 +67,12 @@ $(document).ready(function () {
         });
     }
 
+    body.on('hidden.bs.modal', '#pack-publish', function () {
+        setTimeout(function () {
+            body.off('click.publish');
+        }, 100);
+    });
+
     window.showPublishDialog = showPublishDialog;
 
 });

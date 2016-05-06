@@ -532,6 +532,7 @@ body.right-menu #bookmark
     padding-bottom:0;
 }
 
+#add-entity .modal-header,
 #add-entity .modal-footer {
     background: #fff;
     padding-top:10px;
@@ -559,39 +560,9 @@ body.right-menu #bookmark
     background:rgba(255,255,255,0.70);
 }
 
-    /*
-    #add-entity .template {
-        display:none;
-    }
-
-    #add-entity .nav-tabs {
-        display: inline-block;
-        padding-left:100px;
-        position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
-    }
-
-    #add-entity h2 {
-        display:inline-block;
-    }
-
-    #add-entity .nav-tabs li {
-        position:static;
-        transition: left ease-in-out .15s;
-        text-align:center;
-    }
-
-    #add-entity .nav-tabs li>a {
-        width:100px;
-    }
-
-    #add-entity .nav-tabs li.active {
-        position:absolute;
-        left:0;
-    }
-    */
+#add-entity .template {
+    display:none;
+}
 
 .dialog
 {

@@ -430,6 +430,7 @@ $(document).ready(function () {
         if(typeof data == 'object') {
             throw 'Not allowed';
             /*
+            TODO: run template system
             if(typeof data.tables == 'undefined') {
                 throw 'Not a "results" request.';
             }

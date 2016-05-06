@@ -4,7 +4,7 @@ use StudySauce\Bundle\Entity\User;
 /** @var User $user */
 $user = $app->getUser();
 
-$view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+$view->extend('AdminBundle:Admin:dialog.html.php');
 
 $view['slots']->start('modal-header') ?>
     Give your notebook a name.

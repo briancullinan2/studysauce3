@@ -1,7 +1,7 @@
 <?php
 $agent = strtolower($app->getRequest()->server->get('HTTP_USER_AGENT'));
 
-$view->extend('StudySauceBundle:Dialogs:dialog.html.php');
+$view->extend('AdminBundle:Admin:dialog.html.php');
 
 $view['slots']->start('modal-header') ?>
 Add to home screen

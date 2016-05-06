@@ -285,7 +285,7 @@ $(document).ready(function () {
 
         if(isTemplate) {
             obj.remove = existing.indexOf(value) > -1;
-            createEntityRow.apply(entityField.parents('label'), [obj, obj.remove]);
+            window.views.render.apply(entityField.parents('.entity-search'), ['cell-collection', {entities: [obj]}]);
             this.selectize.setValue('', true);
         }
         else {
@@ -421,66 +421,11 @@ $(document).ready(function () {
         //TODO: update field data
     });
 
-    body.on('click', '*:has(input[data-entities]) ~ a[href="#add-entity"]', function () {
+    body.on('click', '*:has(input[data-entities]) ~ a[href="#add-entity"], form *:has(input[data-entities]) ~ * a[href="#add-entity"]', function () {
         var field = $(this).siblings().find('input[data-entities]');
-        var dialog = $('#add-entity').prop('field', field);
         // TODO create fields
         var tables = field.data('tables');
-
-        dialog.find('.tab-pane.active, li').removeClass('active');
-        dialog.find('li').hide();
-        for(var tableName in tables) {
-            if(tables.hasOwnProperty(tableName)) {
-
-                var entityField = dialog.find('input[name="' + tableName + '"][type="text"]');
-                if(entityField.length == 0) {
-                    var newTemplate = dialog.find('.tab-pane.template').clone()
-                        .attr('id', 'add-entity-' + tableName).insertBefore(dialog.find('.tab-pane.template'));
-                    newTemplate.removeClass('template active');
-                    var title = tableName.replace('ss_', '').substr(0, 1).toUpperCase() + tableName.replace('ss_', '').substr(1);
-                    entityField = newTemplate.find('input').attr('name', tableName).attr('placeholder', 'Search for ' + title);
-                    newTemplate.find('header label').text('Current ' + title + 's');
-                    dialog.find('li.template').clone().appendTo(dialog.find('ul')).removeClass('template active')
-                        .find('a').attr('href', '#add-entity-' + tableName).data('target', '#add-entity-' + tableName).text(title);
-                }
-                dialog.find('a[href="#add-entity-' + tableName + '"]').parent().show();
-            }
-        }
-
-        dialog.one('shown.bs.modal', function () {
-            var first = null;
-            for(var tableName in tables) {
-                if (tables.hasOwnProperty(tableName)) {
-                    if(first == null) {
-                        first = tableName;
-                    }
-                    var entityField = dialog.find('input[name="' + tableName + '"]');
-                    var entities = field.data(tableName);
-                    var tmpTables = {};
-                    tmpTables[tableName] = tables[tableName];
-                    entityField.data('tables', tmpTables);
-                    entityField.data('oldValue', '');
-                    entityField.data('entities', field.data('entities').slice(0));
-                    entityField.data(tableName, entities.slice(0));
-                    //entityField.
-
-                    // remove existing rows
-                    dialog.find('.checkbox:not(.template)').remove();
-
-                    if(entityField.is('.selectized')) {
-                        entityField.val('');
-                        entityField[0].selectize.setValue('');
-                        entityField[0].selectize.renderCache = {};
-                        entityField[0].selectize.clearOptions();
-                        entityField[0].selectize.addOption(entities);
-                    }
-                }
-            }
-
-            setTimeout(function () {
-                dialog.find('a[href="#add-entity-' + first + '"]').trigger('click');
-            }, 50);
-        });
+        window.views.render.apply(body, ['add-entity', {tables: tables, entities: field.data('entities').splice(0)}]);
     });
 
     body.on('click', '#add-entity [href^="#add-entity-"]', function () {
@@ -494,47 +439,6 @@ $(document).ready(function () {
     body.on('hidden.bs.modal', '#add-entity', function () {
         setTimeout(function () {
             body.off('click.modify_entities');
-        }, 100);
-    });
-
-    function createEntityRow(option, remove) {
-        var field = $(this),
-            input = field.find('input[data-entities]'),
-            i = field.siblings('.checkbox:not(.template)').length,
-            id = option.value.substr(input.attr('name').length + 1),
-            existing = field.siblings('.checkbox').find('input[name^="' + input.attr('name') + '["][value="' + id + '"]'),
-            newRow;
-        if (existing.length > 0) {
-            i = (/\[([0-9]*)]/i).exec(existing.attr('name'))[1];
-            existing.parents('label').replaceWith(newRow = field.siblings('.template').clone());
-        }
-        else {
-            newRow = field.siblings('.template').clone().insertBefore(field.siblings('label.checkbox').first());
-        }
-
-        newRow.find('span').text(option.text);
-        newRow.find('input').attr('name', input.attr('name') + '[' + i + '][id]').val(id);
-
-        if (remove) {
-            // remove entity
-            newRow.addClass('buttons-1');
-            newRow.find('[href="#subtract-entity"]').remove();
-            $('<input type="hidden" name="' + newRow.find('input').attr('name').replace('[id]', '[remove]') + '" value="true" />').insertAfter(newRow.find('input'));
-        }
-        else {
-            // add entity
-            newRow.addClass('buttons-1');
-            newRow.find('[href="#insert-entity"]').remove();
-        }
-        newRow.removeClass('template');
-        return newRow;
-    }
-
-    // TODO: insert publish dialog here
-
-    body.on('hidden.bs.modal', '#pack-publish', function () {
-        setTimeout(function () {
-            body.off('click.publish');
         }, 100);
     });
 });

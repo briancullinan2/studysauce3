@@ -9,7 +9,7 @@ list($users, $packs) = $ss_group->getUsersPacksGroupsRecursively();
 
 
 if (isset($searchRequest['parent-ss_group-id']) && $ss_group->getId() == $searchRequest['parent-ss_group-id']) {
-    print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => ['All users not in subgroups below', 0, 0]]));
+    print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => ['All users (not in subgroups below)', 0, 0]]));
 } else { ?>
     <a href="<?php print ($view['router']->generate('groups_edit', ['group' => $ss_group->getId()])); ?>">
     <?php print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => [$ss_group->getName(), count($users), count($packs)]])); ?>

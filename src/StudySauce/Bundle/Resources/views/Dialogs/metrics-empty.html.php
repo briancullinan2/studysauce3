@@ -1,4 +1,4 @@
-<?php $view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+<?php $view->extend('AdminBundle:Admin:dialog.html.php');
 
 $view['slots']->start('modal-header') ?>
 <a href="<?php print $view['router']->generate('checkin'); ?>">Check in to start tracking your study hours</a>

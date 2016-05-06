@@ -33,7 +33,6 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/result
 foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
     <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
-    <script type="text/javascript" src="<?php echo $view['router']->generate('template', ['name' => 'cell-status-pack,cells,row']) ?>"></script>
 <?php
 $view['slots']->stop();
 
@@ -128,6 +127,5 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->start('sincludes');
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']));
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']));
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']));
 $view['slots']->stop();
 

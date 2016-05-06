@@ -41,6 +41,10 @@
     padding-bottom:25px;
 }
 
+.tiles [class*="-row"] > [class^="id"] img {
+    margin-bottom:10px;
+}
+
 .tiles [class*="-row"] > [class^="id"] label {
     display: inline-block;
     width: 100%;

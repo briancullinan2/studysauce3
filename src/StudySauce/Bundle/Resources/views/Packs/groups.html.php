@@ -136,6 +136,5 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->start('sincludes');
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']));
 echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']));
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'add-entity']));
 $view['slots']->stop();
 

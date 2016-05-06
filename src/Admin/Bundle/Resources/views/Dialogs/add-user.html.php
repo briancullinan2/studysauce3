@@ -1,7 +1,7 @@
 <?php
 use StudySauce\Bundle\Entity\Group;
 
-$view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+$view->extend('AdminBundle:Admin:dialog.html.php');
 
 $view['slots']->start('modal-header') ?>
 Create a new user.

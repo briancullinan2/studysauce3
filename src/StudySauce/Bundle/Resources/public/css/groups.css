@@ -42,7 +42,7 @@
 [id^="groups-"] .group-edit {
     margin:-30px -100px 40px;
     padding: 30px 100px 20px;
-    background-color: #FFF;
+    background-color: #BBB;
 }
 
 .group-edit .results .ss_group-row.read-only:hover

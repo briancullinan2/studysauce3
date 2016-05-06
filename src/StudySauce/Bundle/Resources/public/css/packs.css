@@ -86,7 +86,7 @@
 [id^="packs-"] .pack-edit {
     margin:-30px -100px 40px;
     padding: 30px 100px 20px;
-    background-color: #FFF;
+    background-color: #BBB;
 }
 
 [id^="packs-"] .pack-row > .users {
@@ -440,6 +440,7 @@
 [id^="packs-"] .card-row + .expandable .preview-card:not(.preview-answer) .preview-content {
     font-size: 30px;
     line-height: 120%;
+    position: relative;
 }
 
 [id^="packs-"] .card-row + .expandable .type-mc:not(.preview-answer) .preview-inner {

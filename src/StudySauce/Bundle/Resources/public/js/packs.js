@@ -415,7 +415,7 @@ $(document).ready(function () {
         }
 
         var pack = {};
-        window.views.__render.apply(row.find('> .status'), ['cell_status_pack', {pack: pack}]);
+        window.views.render.apply(row.find('> .status'), ['cell_status_pack', {pack: pack}]);
     });
 
 });

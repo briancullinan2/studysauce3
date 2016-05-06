@@ -1,4 +1,4 @@
-<?php $view->extend('StudySauceBundle::Dialogs/dialog.html.php');
+<?php $view->extend('AdminBundle:Admin:dialog.html.php');
 
 $view['slots']->start('modal-header') ?>
 <h3>Upload an image</h3>

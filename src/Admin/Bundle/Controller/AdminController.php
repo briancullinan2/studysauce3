@@ -61,6 +61,21 @@ class AdminController extends Controller
 
     public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
+    public static function getJoinTable($u)
+    {
+        $type = get_class($u);
+        $ti = array_search($type, self::$allTableClasses);
+        if ($ti === false) {
+            $type = get_parent_class($u);
+            $ti = array_search($type, self::$allTableClasses);
+        }
+        if ($ti === false) {
+            return false;
+        }
+        $joinTable = self::$allTableMetadata[$ti]->table['name'];
+        return $joinTable;
+    }
+
 
     private static function getSearchValue($field, $k, $f, $table, $request) {
         // search for unions in original request only
@@ -756,9 +771,10 @@ class AdminController extends Controller
             }, '?>' . $file);
             $file = preg_replace('/use [a-z\\\\\/\s]*;/i', '', $file);
             $file = preg_replace('/->/i', '.', $file);
-            $file = preg_replace_callback('/foreach\s*\((.*?) as (.*?)(=>(.*)?)\)\s*\{/i', function ($match) {
+            $file = preg_replace('/::/i', '.', $file);
+            $file = preg_replace_callback('/foreach\s*\((.*?)\s*as\s*([^\s]*)\s*(=>\s*([^\s]*)\s*)?\)\s*\{/i', function ($match) {
                 self::$forCounter++;
-                $key = !empty($match[3]) ? $match[2] : self::$forCounter;
+                $key = !empty($match[3]) ? $match[2] : ('$for___' . self::$forCounter);
                 $name = !empty($match[3]) ? $match[4] : $match[2];
                 return 'for (' . $key . ' in ' . $match[1] . ') {
                     if(!' . $match[1] . '.hasOwnProperty(' . $key . ')) { continue; }
@@ -836,6 +852,7 @@ if(typeof window.views.__render == 'undefined') {window.views.__render = functio
     window.views.__vars = window.views.__varStack.pop();
 }; }
 var output = '';
+var call_user_func_array = function (context, params) {return context[context[1]].apply(context[0], params);};
 var concat = function () { var str = ''; for(var a = 0; a < arguments.length; a++) { str += arguments[a]; } return str; };
 var print = function (s) { output += s };
 var strtolower = function(s) { return s.toLowerCase(); };
