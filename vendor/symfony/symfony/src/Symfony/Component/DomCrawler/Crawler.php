@@ -16,6 +16,7 @@ use Symfony\Component\CssSelector\CssSelector;
 /**
  * Crawler eases navigation of a list of \DOMElement objects.
  *
+ * @property int length
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Crawler extends \SplObjectStorage
@@ -53,6 +54,13 @@ class Crawler extends \SplObjectStorage
         $this->baseHref = $baseHref ?: $currentUri;
 
         $this->add($node);
+    }
+
+    public function __get($name) {
+        switch($name) {
+            case 'length':
+                return count($this);
+        }
     }
 
     /**
@@ -840,6 +848,49 @@ class Crawler extends \SplObjectStorage
         }
 
         return $crawler;
+    }
+
+    public function find($selector) {
+        $xpath = CssSelector::toXPath($selector);
+        $prefixes = $this->findNamespacePrefixes($xpath);
+
+        $crawler = $this->createSubCrawler(null);
+
+        foreach ($this as $node) {
+            $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
+            $crawler->add($domxpath->query($xpath, $node));
+        }
+
+        return $crawler;
+    }
+
+    public function val() {
+        if (count(func_get_args()) > 0) {
+            if ($this->eq(0)->is('select')) {
+                $selected = $this->eq(0)->find('option[selected=selected]');
+                if ($selected->is('[value]'))
+                    return $selected->attr('value');
+                else
+                    return $selected->text();
+            } else if ($this->eq(0)->is('textarea'))
+                return $this->eq(0)->html();
+            else
+                return $this->eq(0)->attr('value');
+        }
+    }
+
+    public function is($selector) {
+        $xpath = CssSelector::toXPath($selector);
+        $prefixes = $this->findNamespacePrefixes($xpath);
+
+        foreach ($this as $node) {
+            $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
+            $result = $domxpath->query($xpath, $node);
+            if($result->length > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

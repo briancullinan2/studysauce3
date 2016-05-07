@@ -1,6 +1,8 @@
 <?php
 
-$view->extend('AdminBundle:Admin:dialog.html.php');
+use Admin\Bundle\Controller\AdminController;
+
+$view->extend('AdminBundle:Admin:dialog.html.php', ['id' => 'add-entity']);
 
 $context = jQuery($this);
 $dialog = $context->find('#add-entity');
@@ -36,33 +38,32 @@ $view['slots']->start('modal-body'); ?>
 <form action="<?php print ($view['router']->generate('command_callback')); ?>" method="post">
     <div class="tab-content">
         <?php
+        // remove existing rows
+        $dialog->find('.checkbox')->remove();
         $first = true;
         foreach($tables as $tableName => $fields) {
+            $tmpTables;
+            $tmpTables[$tableName] = $tables[$tableName];
             $entityField = $dialog->find(concat('input[name="', $tableName, '"][type="text"]'));
-            if ($entityField->length == 0) { ?>
-                <div id="add-entity-<?php print ($tableName); ?>" class="tab-pane">
-                    <?php ($this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $tables[$tableName], 'entities' => $entities])); ?>
-                </div>
-            <?php }
-            else {
-                $entityField->parents('.tab-pane')->show();
-                $tmpTables = [];
-                $tmpTables[$tableName] = $tables[$tableName];
-                // TODO: move this to cell-collection
-                $entityField->data('tables', $tmpTables);
-                $entityField->data('oldValue', '');
-                $entityField->data($tableName, $entities);
+            ?>
+            <div id="add-entity-<?php print ($tableName); ?>" class="tab-pane <?php print ($first ? 'active' : ''); ?>">
+                <?php print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
+                    'context' => $entityField->length > 0
+                        ? $entityField->parents('.tab-pane')
+                        : jQuery('<div/>'), 'tables' => $tmpTables, 'entities' => $entities, 'entityIds' => $entityIds])); ?>
+            </div>
+            <?php
+            $entityField->parents('.tab-pane')->show();
 
-                // remove existing rows
-                $dialog->find('.checkbox:not(.template)')->remove();
-
-                if($entityField->is('.selectized')) {
-                    $entityField->val('');
+            if($entityField->is('.selectized')) {
+                setTimeout(function () {
+                    $entityField->val('')->focus();
                     $entityField[0]['selectize']->setValue('');
                     $entityField[0]['selectize']->renderCache = [];
                     $entityField[0]['selectize']->clearOptions();
+                    $entityField[0]['selectize']->settings->searchField = AdminController::getAllFieldNames($tmpTables);
                     $entityField[0]['selectize']->addOption($entities);
-                }
+                }, 50);
             }
 
             if($first) {
@@ -84,4 +85,5 @@ $view['slots']->start('modal-footer'); ?>
 if($dialog->length == 0) {
     //$dialog = $context->append($view['slots']->get('cell_status_pack'))->find('form');
 }
+
 

@@ -229,8 +229,6 @@ EOCSS;
     <?php foreach ($view['assetic']->javascripts(['@layout'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
         <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
     <?php endforeach; ?>
-    <script type="text/javascript" src="<?php echo $view['router']->generate('template', [
-        'name' => 'dialog,add-entity,cell-collection,cell-status-pack,cells,row']) ?>"></script>
     <?php
     $agent = strtolower($app->getRequest()->server->get('HTTP_USER_AGENT'));
     if ((strpos($agent, 'android') && strpos($agent, 'chrome') === false) ||
@@ -244,11 +242,16 @@ EOCSS;
     }
 
     $view['slots']->output('javascripts');
+    ?>
+    <script type="text/javascript" src="<?php echo $view['router']->generate('template', [
+        'name' => 'dialog,add-entity,cell-collection,cell-collectionRow,cell-status-pack,cells,row']) ?>"></script>
+    <?php
     $view['slots']->output('sincludes');
     // show error dialogs in debug environment
     if ($app->getEnvironment() == 'dev' || $app->getEnvironment() == 'test') {
         echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'error']));
     }
+    // TODO: remove this in favor of using the javascript template system
     echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'contact-support']));
     echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'general-dialog']));
     echo $view->render('StudySauceBundle:Shared:footer.html.php');

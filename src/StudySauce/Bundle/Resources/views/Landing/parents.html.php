@@ -31,7 +31,6 @@ $view['slots']->start('javascripts');
 foreach ($view['assetic']->javascripts(['@landing_scripts'],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
     <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
-    <!-- Facebook Conversion Code for Facebook -->
     <script>(function() {
             var _fbq = window._fbq || (window._fbq = []);
             if (!_fbq.loaded) {

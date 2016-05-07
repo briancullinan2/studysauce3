@@ -143,8 +143,8 @@ $(document).ready(function () {
          });
          */
 
-        var that = body.find('input[type="text"][data-tables]:not(.selectized)');
-        that.each(function () {
+        var that = body.find('input[type="text"][data-tables]:not(.selectized):not(.selectizing)');
+        that.addClass('selectizing').each(function () {
             var field = $(this);
             if(field.parents('.template').length > 0) {
                 return;
@@ -156,11 +156,11 @@ $(document).ready(function () {
                     options = $.merge(options, field.data(i) || []);
                 }
             }
-
+            var fields = getAllFields(tables);
             field.data('oldValue', field.val()).selectize({
                 persist: false,
                 delimiter: ' ',
-                searchField: ['text', 'value', '0'],
+                searchField: fields,
                 maxItems: 20,
                 dropdownParent: null,
                 closeAfterSelect: true,
@@ -195,23 +195,9 @@ $(document).ready(function () {
                 },
                 render: {
                     option: function (item) {
-                        var desc = '<span class="entity-title">'
-                            + '<span class="entity-name"><i class="icon source"></i>' + item.text + '</span>'
-                            + '<span class="entity-by">' + (typeof item[0] != 'undefined' ? item[0] : '') + '</span>'
-                            + '</span>';
-                        var buttons = 1,
-                            entities;
-                        if((entities = field.data('entities')) != null) {
-                            if (entities.indexOf(item.value) > -1)
-                            {
-                                desc += '<a href="#subtract-entity" title="Remove">&nbsp;</a>';
-                            }
-                            else
-                            {
-                                desc += '<a href="#insert-entity" title="Add">&nbsp;</a>';
-                            }
-                        }
-                        return '<div class="entity-search buttons-' + buttons + '">' + desc + '</div>';
+                        var tmpTables = {};
+                        tmpTables[item['table']] = tables[item['table']];
+                        return window.views.render('cell_collectionRow', {context: $('<div/>'), entity: item, tables: tmpTables});
                     }
                 },
                 load: function (query, callback) {
@@ -239,16 +225,7 @@ $(document).ready(function () {
                                 }
                                 var table = isNaN(parseInt(t)) ? t : tables[t];
                                 if (typeof content.results[table] != 'undefined') {
-                                    (function (table) {
-                                        results = $.merge(results, content.results[table].map(function (e) {
-                                            return {
-                                                table: table,
-                                                value: table + '-' + e.id,
-                                                text: e[tables[table][0]] + (typeof e[tables[table][1]] != 'undefined' ? (' ' + e[tables[table][1]]) : ''),
-                                                0: e[tables[table][2]]
-                                            }
-                                        }));
-                                    })(table);
+                                    results = $.merge(results, content.results[table]);
                                 }
                             }
                             callback(results);
@@ -423,9 +400,15 @@ $(document).ready(function () {
 
     body.on('click', '*:has(input[data-entities]) ~ a[href="#add-entity"], form *:has(input[data-entities]) ~ * a[href="#add-entity"]', function () {
         var field = $(this).siblings().find('input[data-entities]');
+        if(field.length == 0) {
+            field = $(this).parents('form').find('input[data-entities]');
+        }
         // TODO create fields
-        var tables = field.data('tables');
-        window.views.render.apply(body, ['add-entity', {tables: tables, entities: field.data('entities').splice(0)}]);
+        var tables = $.extend({}, field.data('tables'));
+        var dialogStr = window.views.render.apply(body, ['add_entity', {tables: tables, entities: field.data('ss_user').slice(0), entityIds: field.data('entities').slice(0)}]);
+        if ($('#add-entity').length == 0) {
+            $(dialogStr).appendTo(body);
+        }
     });
 
     body.on('click', '#add-entity [href^="#add-entity-"]', function () {

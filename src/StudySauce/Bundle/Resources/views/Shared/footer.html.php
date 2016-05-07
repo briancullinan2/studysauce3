@@ -15,8 +15,6 @@ $user = $app->getUser();
             <a target="_blank" href="https://www.facebook.com/pages/Study-Sauce/519825501425670?ref=stream">&nbsp;</a>
             <a href="https://plus.google.com/115129369224575413617/about">&nbsp;</a>
             <a href="https://twitter.com/StudySauce">&nbsp;</a>
-            <!--<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://www.studysauce.com">Like us</a>
-            <a href="https://plus.google.com/share?url=https://www.studysauce.com">Like us</a>-->
         </div>
         <ul class="menu secondary-menu">
             <li class="first"><a href="<?php print $view['router']->generate('terms'); ?>">Terms of service</a></li>

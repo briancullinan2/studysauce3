@@ -540,6 +540,8 @@ body.right-menu #bookmark
 
 #add-entity .tab-pane > .entity-search {
     margin:-10px -10px 0 -10px;
+    max-height: 400px;
+    overflow: auto;
 }
 
 #add-entity .tab-pane > .entity-search > label.input {

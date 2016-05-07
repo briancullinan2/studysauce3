@@ -392,6 +392,9 @@ $(document).ready(function () {
                     currentDialog.draggable('instance')._setContainment();
                     containment = currentDialog.draggable('instance').containment;
                     goingToY = containment[3] - containment[1];
+                    if (goingToY < containment[1]) {
+                        goingToY = containment[1];
+                    }
                     currentDialog.stop().animate({top: containment[3] - containment[1], step: function () {
                         //adjustBackdrop();
                     }}, 250, function () {
