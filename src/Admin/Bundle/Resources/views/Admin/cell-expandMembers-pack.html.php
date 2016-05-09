@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
@@ -22,7 +23,7 @@ usort($sorted, function (User $p1, User $p2) {
     ? $view['router']->generate('save_group', ['groupId' => $searchRequest['ss_group-id'], 'packId' => $pack->getId()])
     : $view['router']->generate('packs_create', ['packId' => $pack->getId()])); ?>">
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
-        'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
+        'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
         'entities' => $sorted,
         'entityIds' => $ids,
         'removedEntities' => array_values($users->filter(function (User $user) use ($pack) {return !empty($up = $user->getUserPack($pack)) ? $up->getRemoved() : false;})->toArray())]); ?>

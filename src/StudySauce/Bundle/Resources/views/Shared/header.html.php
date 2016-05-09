@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\PartnerInvite;
@@ -60,10 +61,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
                     </ul>
                 <?php } ?>
-                <label class="input"><input type="text" name="search" data-confirm="false" data-tables="<?php print $view->escape(json_encode([
-                        'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
-                        'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
-                        'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted']])); ?>" placeholder="Search" /></label>
+                <label class="input"><input type="text" name="search" data-confirm="false" data-tables="<?php print $view->escape(json_encode(AdminController::$defaultMiniTables)); ?>" placeholder="Search" /></label>
                 <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>
                 <a href="<?php print $view['router']->generate('logout'); ?>" title="Log out">logout</a></div>
             <div id="jquery_jplayer" style="width: 0; height: 0;"></div>

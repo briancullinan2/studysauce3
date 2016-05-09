@@ -388,6 +388,16 @@ $(document).ready(function () {
         }
     });
 
+    body.on('click', 'a[data-target="#create-entity"]', function () {
+        var tableNames = $(this).attr('href').split('-').slice(1);
+        var tmpTables = {};
+        tmpTables[tableNames[0]] = AdminController.__vars.defaultMiniTables[tableNames[0]];
+        var dialogStr = window.views.render.apply(body, ['create_entity', {tables: tmpTables, entities: [], entityIds: []}]);
+        if ($('#create-entity').length == 0) {
+            $(dialogStr).appendTo(body);
+        }
+    });
+
     body.on('click', '#add-entity [href^="#add-entity-"]', function () {
         var input = $('#add-entity').find($(this).attr('href')).find('.selectize-input input');
         input.trigger('click');

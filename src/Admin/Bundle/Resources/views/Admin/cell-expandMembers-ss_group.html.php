@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
@@ -26,13 +27,13 @@ $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs)
     if((!isset($searchRequest['pack-id']) || empty($searchRequest['pack-id'])) &&
         (!isset($searchRequest['parent-ss_group-id']) || $ss_group->getId() != $searchRequest['parent-ss_group-id'])) {
         print $this->render('AdminBundle:Admin:cell-collection.html.php', [
-            'tables' => ['pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status']],
+            'tables' => ['pack' => AdminController::$defaultMiniTables['pack']],
             'entities' => $packs,
             'entityIds' => $packIds]);
     } ?>
 
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
-        'tables' => ['ss_user' => ['first', 'last', 'email', 'id', 'deleted']],
+        'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
         'entities' => $users,
         'entityIds' => $ids]); ?>
 </form>

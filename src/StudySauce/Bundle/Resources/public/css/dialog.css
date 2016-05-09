@@ -566,6 +566,34 @@ body.right-menu #bookmark
     display:none;
 }
 
+#create-entity .modal-body {
+    text-align: center;
+}
+
+#create-entity .modal-body a {
+    margin:20px;
+    padding: 120px 20px 20px;
+    background:url(../images/create_entity.png) no-repeat center 20px transparent;
+    border:1px solid #555;
+    display: inline-block;
+}
+
+#create-entity .modal-body a:hover {
+    border-color: #09B;
+}
+
+#create-entity .modal-body a:nth-of-type(1):hover {
+    background-position:center -180px;
+}
+
+#create-entity .modal-body a:nth-of-type(2) {
+    background-position:center -380px;
+}
+
+#create-entity .modal-body a:nth-of-type(2):hover {
+    background-position:center -580px;
+}
+
 .dialog
 {
     z-index: 99;

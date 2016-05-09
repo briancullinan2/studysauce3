@@ -2,6 +2,8 @@
     <label>Study pack</label>
     <label>Members</label>
     <label>Cards</label>
-    <a href="<?php print $view['router']->generate('packs_new'); ?>" class="big-add">Add
+    <a href="#create-pack" data-target="#create-entity" data-toggle="modal" data-action="<?php print ($view['router']->generate('save_group', [
+    'groupId' => $searchRequest['ss_group-id'],
+    'ss_group' => [['id' => $searchRequest['ss_group-id'], 'remove' => false]]])); ?>" class="big-add">Add
         <span>+</span> new pack</a>
 </header>

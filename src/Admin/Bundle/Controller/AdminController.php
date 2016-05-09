@@ -91,6 +91,11 @@ namespace Admin\Bundle\Controller {
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
         ];
 
+        public static $defaultMiniTables = [
+            'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
+            'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
+            'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted']];
+
         public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
         private static function getJoinTable($u)
@@ -847,17 +852,18 @@ window.views[\'' . $functionName . '\'] = ( function ' . $functionName . ' (__va
                 $php .= $file;
             }
 
-
+            $miniTables = json_encode(self::$defaultMiniTables);
             $js = <<< EOJS
 (function (jQuery) {
 // ^ scope for functions below, so we don't override anything
 
 // TODO port entities here
-var AdminController = {};
-AdminController.toFirewalledEntityArray = function (e) { return e; };
-AdminController.__vars = {};
-AdminController.__vars.radioCounter = 100000000;
-AdminController.getAllFieldNames = function (tables) { return window.getAllFields(tables); };
+window.AdminController = {};
+window.AdminController.toFirewalledEntityArray = function (e) { return e; };
+window.AdminController.__vars = {};
+window.AdminController.__vars.radioCounter = 100000000;
+window.AdminController.__vars.defaultMiniTables = JSON.parse('$miniTables');
+window.AdminController.getAllFieldNames = function (tables) { return window.getAllFields(tables); };
 
 var trim = function (str) {return (str || '').trim();};
 var explode = function (del, str) {return (str || '').split(del);};
