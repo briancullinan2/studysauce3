@@ -30,10 +30,9 @@ $view['slots']->stop();
 $row = jQuery($this);
 
 // TODO: generalize this in a cell-select generic template
-$status = $row->find('> div');
-if ($status->length == 0) {
-    $status = $row->append($view['slots']->get('cell_status_pack'))->find('> div');
-    $select = $status->find('select');
+$select = $row->find('select');
+if ($select->length == 0) {
+    $select = $row->append($view['slots']->get('cell_status_pack'))->find('select');
     // TODO: this could be some sort of binding API
     $value = $pack->getStatus();
     $publish = [
@@ -49,17 +48,16 @@ if ($status->length == 0) {
     $select->find(concat('option[value="', $value, '"]'))->attr('selected', 'selected');
 } else {
 // TODO: this is update code specific to status field, generalize this in model
-    $select = $status->find('select');
     $publish = $select->data('publish');
     $value = $select->val();
 }
 $schedule = new Date($publish['schedule']);
 
 // TODO: this is specific to status
-$status->attr('class', concat(strtolower($value), ($schedule <= new Date() ? '' : ' pending')));
+$select->parents('.status')->attr('class', implode('', ['status ' , strtolower($value) , ($schedule <= new Date() ? '' : ' pending')]));
 
 // set schedule data
-$status->find('option[value="GROUP"]')->text($schedule > new Date()
+$select->find('option[value="GROUP"]')->text($schedule > new Date()
     ? concat('Pending (', $schedule->format('m/d/Y H:m'), ')')
     : (!empty($schedule) ? 'Published' : 'Publish'));
 

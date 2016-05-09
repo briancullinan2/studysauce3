@@ -38,6 +38,7 @@ $(document).ready(function () {
 
             var newRow = tab.find('.card-row.empty:not(.template):not(.removed):not(.changed)').first();
             if(newRow.length == 0) {
+                // TODO: use template system instead
                 tab.find('[href="#add-card"]').first().trigger('click');
                 newRow = tab.find('.card-row.empty:not(.template):not(.removed):not(.changed)').first();
             }
@@ -81,6 +82,7 @@ $(document).ready(function () {
             // set correct answers
             newRow.find('.correct.type-mc textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
 
+            // TODO: merge this with row template and just pass a model containing type, answers, correct, content
             if(clipRows[i].length == 2) {
                 newRow.find('.content textarea').val(clipRows[i][0]).trigger('change');
                 newRow.find('.correct textarea').val(clipRows[i][1]).trigger('change');
@@ -172,64 +174,6 @@ $(document).ready(function () {
         newVal.prop('checked', true);
     });
 
-    function updatePreview() {
-        var row = $(this);
-        if(row.length == 0) {
-            return;
-        }
-        var template = row.find('select[name="type"]').val() == ''
-            ? row.find('+ .expandable .preview-card:not([class*="type-"])')
-            : row.find('+ .expandable .preview-card.type-' + row.find('select[name="type"]').val().split(' ')[0]);
-        var newTemplate = row.find('select[name="type"]').val() == ''
-            ? row.find('~ .card-row + .expandable.template .preview-card:not([class*="type-"])')
-            : row.find('~ .card-row + .expandable.template .preview-card.type-' + row.find('select[name="type"]').val().split(' ')[0]);
-        // switch templates if needed
-        if (newTemplate.length != template.length) {
-            row.find('+ .expandable .preview-card').remove();
-            template = newTemplate.clone().appendTo(row.find('+ .expandable .preview'))
-        }
-
-        // replace with image
-        var url;
-        if((url = row.find('input[name="upload"]').val().trim()) != '') {
-            template.find('img').attr('src', url).load(function () {
-                centerize.apply($(this));
-            });
-            template.filter(':not(.preview-answer)').find('.preview-content').replaceWith($('<img src="' + url + '" />').load(function () {
-                centerize.apply($(this));
-            }));
-            template.filter('.preview-answer').find('.preview-prompt .preview-content').replaceWith($('<img src="' + url + '" />').load(function () {
-                centerize.apply($(this));
-            }));
-            if(row.find('.content textarea').val().trim() != '') {
-                template.find('[type="text"]').val(row.find('.content textarea').val());
-            }
-            else {
-                template.find('[type="text"]').val('Type your answer');
-            }
-        }
-        else {
-            template.find('[type="text"]').val('Type your answer');
-        }
-
-        // insert content and multiple choice answers
-        var content = row.find('.content textarea:visible').val() || '';
-        template.find('.preview-content div').text(content.replace(/\\n/ig, "\n"));
-        var answers = row.find('.correct.type-mc:visible textarea').val();
-        if (answers != null) {
-            answers = answers.split("\n");
-            template.find('.preview-response div').each(function () {
-                $(this).text(answers[$(this).parent().parent().find('.preview-response').index($(this).parent())]);
-            });
-        }
-        var answer = row.find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked').val() || '';
-        template.filter('.preview-answer').find('.preview-inner .preview-content div').text(answer.replace(/\\n/ig, "\n"));
-
-        $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
-        // center some preview fields
-        centerize.apply(row.find(' + .expandable .preview-content div, + .expandable .preview-response div, + .expandable img, .pack-icon img'));
-    }
-
     body.on('click', '[id^="packs-"] .preview-play .play', function () {
         var player = $('#jquery_jplayer');
         player.jPlayer("setMedia", {
@@ -238,6 +182,7 @@ $(document).ready(function () {
         player.jPlayer("play");
     });
 
+    // TODO: merge with row-card.html.php or cell-id-card.html.php
     function setTypeClass() {
         var row = $(this).closest('.card-row');
         var data = gatherFields.apply(row, [['type']]);
@@ -254,9 +199,17 @@ $(document).ready(function () {
 
     var autoSaveTimeout = 0;
 
-    body.on('selected', '[id^="packs-"] .card-row', function () {
-        updatePreview.apply($(this));
-    });
+    function updatePreview() {
+        if($(this).length == 0) {
+            return;
+        }
+        var row = $(this).add($(this).next('.expandable'));
+        window.views.render.apply(row, ['cell_preview_card', []]);
+        centerize.apply(row.find('.centerized:visible'));
+        $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
+    }
+
+    body.on('selected', '[id^="packs-"] .card-row', updatePreview);
 
     body.on('click', '[id^="packs-"] .card-row [href="#remove-confirm-card"]', packsFunc);
 
@@ -264,6 +217,7 @@ $(document).ready(function () {
 
     body.on('validate', '[id^="packs-"]', packsFunc);
 
+    // TODO: merge this with template then run changes through template on server and check each cell for invalid class to validate before saving to database
     function packsFunc() {
 
         var tab = getTab.apply(this);
@@ -367,6 +321,7 @@ $(document).ready(function () {
         });
     });
 
+    // TODO: shouldn't need to do this anymore
     function setupPackEditor() {
         autoSaveTimeout = 0;
         var tab = $(this).closest('.panel-pane');
@@ -407,7 +362,7 @@ $(document).ready(function () {
 
         if($(this).val() == 'GROUP' && evt.type != 'confirm') {
             select.val(select.data('oldValue'));
-
+            evt.preventDefault();
             showPublishDialog.apply(select, [getRowId.apply(row), row.find('.name input').val(), select.data('publish')]);
         }
         else {

@@ -5,7 +5,6 @@ use Admin\Bundle\Controller\AdminController;
 
 AdminController::$radioCounter++;
 
-$dataEntity = AdminController::toFirewalledEntityArray($entity, $tables);
 $tableNames = array_keys($tables);
 
 $view['slots']->start('cell-collection-row'); ?>
@@ -22,9 +21,14 @@ $view['slots']->start('cell-collection-row'); ?>
 $context = jQuery($this);
 $newRow = jQuery($view['slots']->get('cell-collection-row'));
 // update names of fields
-$newRow->find('span')->text($view->escape(concat($dataEntity[$tables[$dataEntity['table']][0]], ' ', $dataEntity[$tables[$dataEntity['table']][1]])));
-$newRow->find('input[type="checkbox"]')->attr('name', concat(implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][id]'))->val($dataEntity['id']);
+$newRow->find('span')->text(concat($entity[$tables[$entity['table']][0]], ' ', $entity[$tables[$entity['table']][1]]));
+$newRow->find('input[type="checkbox"]')->attr('name', concat(implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][id]'))->val($entity['id']);
 $newRow->find('input[type="hidden"]')->attr('name', concat(implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][remove]'));
-
+if(isset($entity['removed']) && $entity['removed']) {
+    $newRow->find('[href="#subtract-entity"]')->remove();
+}
+else {
+    $newRow->find('[href="#insert-entity"]')->remove();
+}
 $context->append($newRow);
 print ($context->html());

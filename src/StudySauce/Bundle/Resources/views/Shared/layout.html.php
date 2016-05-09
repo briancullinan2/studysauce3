@@ -244,7 +244,7 @@ EOCSS;
     $view['slots']->output('javascripts');
     ?>
     <script type="text/javascript" src="<?php echo $view['router']->generate('template', [
-        'name' => 'dialog,add-entity,cell-collection,cell-collectionRow,cell-status-pack,cells,row']) ?>"></script>
+        'name' => 'dialog,add-entity,cell-collection,cell-collectionRow,cell-preview-card,cell-status-pack,cells,row']) ?>"></script>
     <?php
     $view['slots']->output('sincludes');
     // show error dialogs in debug environment

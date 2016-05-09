@@ -248,7 +248,7 @@ $(document).ready(function () {
 
     function getDataRequest() {
         var admin = $(this).closest('.results');
-        var result = $.extend({}, admin.data('request'));
+        var result = {requestKey: admin.data('request').requestKey};
         var dataTables = result['tables'];
         var tables = {};
         if (admin.find('.class-names').length > 0) {
@@ -320,6 +320,7 @@ $(document).ready(function () {
 
     var radioCounter = 5000;
 
+    // TODO: remove this in favor of creating a blank through the template system
     body.on('click', '.results a[href^="#add-"]', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results');
@@ -443,10 +444,11 @@ $(document).ready(function () {
 
     var isLoading = false;
 
+    // TODO: port to server in a shared code file, saves to database at the end
     function standardSave(save) {
         var field = $(this);
         var tab = getTab.apply(field);
-        var fieldTab = field.closest('.results');
+        var fieldTab = field.closest('.results').first();
         var data = $.extend(save || {}, {requestKey: getDataRequest.apply(fieldTab).requestKey});
         var actionItem = field.closest('[action], [data-action]');
         if (actionItem.length == 0) {
@@ -470,7 +472,7 @@ $(document).ready(function () {
 
         // get the parsed list of data
         for (var r = 0; r < tab.length; r++) {
-            var tables = tab.data('request').tables;
+            var tables = $(tab[r]).data('request').tables;
             for (var table in tables) {
                 if (tables.hasOwnProperty(table)) {
                     // get list of possible fields in form
@@ -478,8 +480,13 @@ $(document).ready(function () {
                     tmpTables[table] = tables[table];
                     var fields = getAllFields(tmpTables);
                     var rows = tab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
-                    data[table] = [];
                     for (var i = 0; i < rows.length; i++) {
+                        if (typeof data[table] == 'undefined') {
+                            data[table] = [];
+                        }
+                        if (data[table].constructor !== Array) {
+                            data[table] = [data[table]];
+                        }
                         var row = $(rows[i]);
                         var rowId = getRowId.apply(row);
                         if ($(this).is('.removed') || $(this).is('.empty')) {
@@ -487,6 +494,9 @@ $(document).ready(function () {
                         }
                         else {
                             data[table][data[table].length] = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
+                        }
+                        if (rows.length == 1 && data[table].length == 1) {
+                            data[table] = data[table][0];
                         }
                     }
                     rows.removeClass('changed');
@@ -567,6 +577,7 @@ $(document).ready(function () {
 
     window.getRowId = getRowId;
 
+    // TODO: remove this entire method and merge update features with template system, same as results.html.php and rows.html.php
     function loadContent(data, tables) {
         var admin = $(this).closest('.results').first();
         if (!tables) {

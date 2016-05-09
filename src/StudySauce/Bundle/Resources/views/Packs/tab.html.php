@@ -60,13 +60,10 @@ $view['slots']->start('body'); ?>
                 </form>
                 <div class="group-list">
                     <?php
-                    $newCards = $entity->getCards()->filter(function (Card $c) {
-                            return !$c->getDeleted();
-                        })->count() == 0;
                     $tables = [
                         // view settings
                         'tables' => [
-                            'pack' => ['id', 'title', 'countsZeros', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
+                            'pack' => ['id', 'title', 'expandMembers' => [], ['status'] /* search field but don't display a template */],
                             'ss_group' => ['id', 'title', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
                         ],
                         'classes' => ['last-right-expand'],
@@ -97,9 +94,9 @@ $view['slots']->start('body'); ?>
                         'tables' => ['pack', 'card'],
                         'expandable' => ['card' => ['preview']],
                         'headers' => ['card' => 'packCards'],
-                        'footers' => ['card' => true],
+                        'footers' => ['card' => 'packCards'],
                         'new' => $newCards,
-                        'edit' => $newCards,
+                        'edit' => empty($entity->getId()),
                         // search settings
                         'pack-id' => $entity->getId(),
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',

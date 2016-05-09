@@ -36,7 +36,7 @@ else {
 
 $entityIds = isset($entityIds) && is_array($entityIds) ? $entityIds : [];
 $listIds = [];
-$dataTypes = [];
+$dataTypes = (array)(new stdClass());
 $removedEntities = isset($removedEntities) && is_array($removedEntities) ? $removedEntities : [];
 if (isset($entities)) {
     foreach ($entities as $entity) {
@@ -48,33 +48,28 @@ if (isset($entities)) {
             $dataEntity['removed'] = false;
         }
         $key = concat($dataEntity['table'] , '-' , $dataEntity['id']);
+        $table = $dataEntity['table'];
         $listIds[count($listIds)] = $key;
         $unsetId = array_search($key, $entityIds);
         if (!$dataEntity['removed'] && $unsetId === false) {
             $entityIds[count($entityIds)] = $key;
         }
         else if ($dataEntity['removed'] && $unsetId !== false) {
-            unset($entityIds[$unsetId]);
+            array_splice($entityIds, $unsetId, 1);
         }
-        if(!isset($dataTypes[$dataEntity['table']])) {
+        if(!isset($dataTypes[$table])) {
             // TODO: fix this syntax in JS
-            $dataTypes[$dataEntity['table']] = [];
+            $dataTypes[$table] = [];
         }
-        $dataTypes[$dataEntity['table']][count($dataTypes[$dataEntity['table']])] = $dataEntity;
+        $dataTypes[$table][count($dataTypes[$table])] = $dataEntity;
 
         // if we are dealing with a list of entities
 
         if (isset($entities) && (!isset($inline) || $inline !== true)) {
-            $newRow = jQuery($view->render('AdminBundle:Admin:cell-collectionRow.html.php', ['entity' => $entity, 'tables' => $tables]));
+            $newRow = jQuery($view->render('AdminBundle:Admin:cell-collectionRow.html.php', ['entity' => $dataEntity, 'tables' => $tables]));
             $newRow->find('input[name*="[remove]"]')->val($dataEntity['removed'] ? 'true' : 'false');
-            if($dataEntity['removed']) {
-                $newRow->find('[href="#subtract-entity"]')->remove();
-            }
-            else {
-                $newRow->find('[href="#insert-entity"]')->remove();
-            }
 
-            $existing = $search->find('.input ~ .checkbox')->find(concat('input[name^="' , $dataEntity['table'] , '["][value="' , $dataEntity['id'] , '"]'));
+            $existing = $search->find('.input ~ .checkbox')->find(concat('input[name^="' , $table , '["][value="' , $dataEntity['id'] , '"]'));
             if($existing->length == 0) {
                 // TODO: insert in the right place
                 if($search->find('header:contains(Removed)')->length == 0) {
@@ -83,7 +78,7 @@ if (isset($entities)) {
                 $search->append($newRow);
             }
             else {
-                $existing->replaceWith($newRow);
+                $existing->parents('.checkbox')->replaceWith($newRow);
             }
         }
     }
@@ -127,6 +122,40 @@ foreach ($tableNames as $t) {
         ->attr(concat('data-' , $t), json_encode($types));
 }
 
+/*
+ * TODO: merge this with template scripts
+function updateRows (toField, value, item) {
+    isSettingSelectize = true;
+    var tableName = value.split('-')[0];
+    var existing = (toField.data('entities') || []);
+    var existingEntities = toField.data(tableName) || [];
+    var oldValue = toField.val().split(' ');
+    var valueField = toField[0].selectize.settings.valueField;
+        var entity;
+        if((entity = existingEntities.filter(function (e) {return e[valueField] == item[valueField]})).length > 0) {
+            entity[0].remove = item.remove;
+        }
+        else {
+            existingEntities[existingEntities.length] = item;
+        }
+        if (item.remove) {
+            existing = existing.filter(function (i) {return i != item[valueField]});
+            oldValue = oldValue.filter(function (i) {return i != item[valueField]});
+        }
+        else {
+            if(existing.indexOf(item[valueField]) == -1) {
+                existing[existing.length] = item[valueField];
+            }
+            if(oldValue.indexOf(item[valueField]) == -1) {
+                oldValue[oldValue.length] = item[valueField];
+            }
+        }
+        toField.data('oldValue', oldValue.join(' '));
+        toField.data('entities', existing);
+        toField.data(tableName, existingEntities);
+        isSettingSelectize = false;
+    }
+*/
 
 print ($context->html());
 

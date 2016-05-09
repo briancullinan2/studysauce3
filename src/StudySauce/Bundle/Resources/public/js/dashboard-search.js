@@ -94,7 +94,7 @@ Selectize.define('continue_editing', function(options) {
             if(v.trim() != '') {
                 var option = this.options[v] || { value: v, text: v };
                 this.addOption(option);
-                this.setValue(option.value);
+                this.setValue(option[this.settings.valueField]);
             }
         };
     })();
@@ -160,6 +160,8 @@ $(document).ready(function () {
             field.data('oldValue', field.val()).selectize({
                 persist: false,
                 delimiter: ' ',
+                valueField: '_tableValue',
+                searchConjunction: 'or',
                 searchField: fields,
                 maxItems: 20,
                 dropdownParent: null,
@@ -257,24 +259,23 @@ $(document).ready(function () {
         isSettingSelectize = true;
         var existing = (entityField.data('entities') || []);
         var isDialog = entityField.parents('#add-entity').length > 0;
-        var isTemplate = entityField.is('label:has(~ .checkbox.template) input.selectized[data-tables][data-entities]');
-        var obj = $.extend({remove: remove}, item);
+        var isInline = entityField.parents('.entity-search').find('header').length > 0;
+        var obj = $.extend({removed: remove}, item);
 
-        if(isTemplate) {
-            obj.remove = existing.indexOf(value) > -1;
-            window.views.render.apply(entityField.parents('.entity-search'), ['cell-collection', {entities: [obj]}]);
-            this.selectize.setValue('', true);
+        if(isInline) {
+            obj.removed = existing.indexOf(value) > -1;
+            entityField[0].selectize.setValue('', true);
         }
         else {
             var oldValue = entityField.data('oldValue').split(' ');
-            this.selectize.setValue(oldValue, true);
+            entityField[0].selectize.setValue(oldValue, true);
         }
-        this.selectize.renderCache = {};
+        entityField[0].selectize.renderCache = {};
         entityField.blur();
 
         if (isDialog) {
             var dialog = $('#add-entity');
-            updateRows(entityField, value, obj);
+            window.views.render.apply(entityField.parents('.entity-search').parent(), ['cell-collection', {tables: $.extend({}, entityField.data('tables')), entities: [obj], entityIds: entityField.data('entities').slice(0)}]);
             adjustBackdrop();
             dialog.find('input[data-entities]').data('entities', entityField.data('entities')); // copy to other fields in dialog for syncronicity
             body.off('click.modify_entities').one('click.modify_entities', 'a[href="#submit-entities"]', function () {
@@ -289,10 +290,14 @@ $(document).ready(function () {
 
                 // show confirmation dialog
                 var message = (addItems.length > 0 ? (' add ' + addItems.map(function (e) {
-                        return dialog.find('input[name="' + e.split('-')[0] + '"]')[0].selectize.options[e].text;}).join(', ')) : '')
+                        var field = dialog.find('input[name="' + e.split('-')[0] + '"]');
+                        var option = field[0].selectize.options[e];
+                        return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '')
                     + (addItems.length > 0 && removeItems.length > 0 ? ' and ' : '')
                     + (removeItems.length > 0 ? (' remove ' + removeItems.map(function (e) {
-                        return dialog.find('input[name="' + e.split('-')[0] + '"]')[0].selectize.options[e].text;}).join(', ')) : '');
+                        var field = dialog.find('input[name="' + e.split('-')[0] + '"]');
+                        var option = field[0].selectize.options[e];
+                        return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '');
 
                 // confirmation dialog
                 body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
@@ -319,11 +324,12 @@ $(document).ready(function () {
             });
         }
         else {
-            var message = (obj.remove ? 'remove ' : 'add ') + obj.text;
+            var tables = entityField.data('tables');
+            var message = (obj.removed ? 'remove ' : 'add ') + obj[tables[obj['table']][0]] + ' ' + obj[tables[obj['table']][1]];
 
             // confirmation dialog
             body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-                updateRows(entityField, value, obj);
+                window.views.render.apply(entityField.parents('.entity-search').parent(), ['cell-collection', {tables: $.extend({}, entityField.data('tables')), entities: [obj], entityIds: entityField.data('entities').slice(0)}]);
                 // oldValue actually contains updates values
                 var oldValue = entityField.data('oldValue').split(' ');
                 confirmEntitySelect.apply(entityField, [oldValue]);
@@ -348,7 +354,7 @@ $(document).ready(function () {
             if(tables.hasOwnProperty(table)) {
                 (function (table) {
                     updates[table] = field.data(table).map(function (g) {
-                        return {id: g.value.substr(table.length + 1), remove: g['remove']};
+                        return {id: g[field[0].selectize.settings.valueField].substr(table.length + 1), remove: g['removed']};
                     });
                 })(table);
             }
@@ -358,44 +364,15 @@ $(document).ready(function () {
         isSettingSelectize = false;
     }
 
-    function updateRows (toField, value, item) {
-        isSettingSelectize = true;
-        var tableName = value.split('-')[0];
-        var existing = (toField.data('entities') || []);
-        var existingEntities = toField.data(tableName) || [];
-        var oldValue = toField.val().split(' ');
-        var entity;
-        if((entity = existingEntities.filter(function (e) {return e.value == item.value})).length > 0) {
-            entity[0].remove = item.remove;
-        }
-        else {
-            existingEntities[existingEntities.length] = item;
-        }
-        if (item.remove) {
-            existing = existing.filter(function (i) {return i != item.value});
-            oldValue = oldValue.filter(function (i) {return i != item.value});
-        }
-        else {
-            if(existing.indexOf(item.value) == -1) {
-                existing[existing.length] = item.value;
-            }
-            if(oldValue.indexOf(item.value) == -1) {
-                oldValue[oldValue.length] = item.value;
-            }
-        }
-        toField.data('oldValue', oldValue.join(' '));
-        toField.data('entities', existing);
-        toField.data(tableName, existingEntities);
-        isSettingSelectize = false;
-    }
-
     body.on('click', 'a[href="#insert-entity"], a[href="#subtract-entity"]', function (evt) {
         evt.preventDefault();
         var field = $(this).parents('.entity-search').find('input.selectized[data-tables]');
         var check = $(this).parents('label').find('input[type="checkbox"]');
         var id = check.attr('name').split('[')[0] + '-' + parseInt(check.val());
-        field[0].selectize.setValue(id);
-        //TODO: update field data
+        var item = field[0].selectize.options[id];
+        handleSelectize.apply(field[0], [id, item, true]);
+        //item.removed = typeof item.removed == 'undefined' ? true : !item.removed;
+        //window.views.render.apply(field.parents('.entity-search').parent(), ['cell-collection', {tables: $.extend({}, field.data('tables')), entities: [item], entityIds: field.data('entities').slice(0)}]);
     });
 
     body.on('click', '*:has(input[data-entities]) ~ a[href="#add-entity"], form *:has(input[data-entities]) ~ * a[href="#add-entity"]', function () {

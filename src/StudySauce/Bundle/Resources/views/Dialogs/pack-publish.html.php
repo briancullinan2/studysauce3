@@ -10,7 +10,7 @@ $view['slots']->start('modal-body') ?>
     <input type="radio" name="date" value="later" checked="checked" />
     <i></i>
     <span>Publish later</span>
-</label>
+</label><br />
 <label class="input">
     <input type="text" name="schedule" placeholder="Date/time" />
 </label>

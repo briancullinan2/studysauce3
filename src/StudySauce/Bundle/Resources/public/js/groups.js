@@ -3,8 +3,9 @@ $(document).ready(function () {
 
     var body = $('body');
 
+    // TODO: move this to template system and use validation
     function groupsFunc() {
-        var tab = $(this).closest('.results:visible');
+        var tab = getTab.apply(this);
         var groupRow = tab.find('.ss_group-row');
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
             groupRow.removeClass('valid empty').addClass('invalid');
@@ -37,6 +38,7 @@ $(document).ready(function () {
         });
     });
 
+    // TODO: use template system to update values
     body.on('click', '[id^="groups-"] a[href^="/packs/0"]', function () {
         var row = $(this).parents('.results').find('.ss_group-row:not(.template)');
         var groupId = getTabId.apply(this);

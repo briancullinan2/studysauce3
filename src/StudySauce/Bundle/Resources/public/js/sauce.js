@@ -191,6 +191,9 @@ function centerize() {
             relativeParent = $(this).parent().height();
         }
         $(this).css((/relative/i).test($(this).css('position')) ? 'top' : 'margin-top', ((relativeParent - myheight) / 2) + 'px')
+        if($(this).is('img')) {
+            $(this).one('load', centerize);
+        }
     });
 }
 
@@ -388,23 +391,41 @@ function ssMergeScripts(content)
 centerize.apply($('body').find('.centerized:visible'));
 
 function gatherFields(fields, visibleOnly) {
-    var context = $(this);
+    var context = $(this),
+        form;
     var result = {};
-    for(var f in fields) {
-        if (fields.hasOwnProperty(f)) {
-            var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"], [name^="' + fields[f] + '["]');
-            if(visibleOnly !== false) {
-                inputField = inputField.filter('[type="hidden"],:visible');
+    var formFields = [];
+    if ((form = context.closest('form')).length > 0) {
+        formFields = form.serializeArray();
+    }
+    else {
+        for(var f in fields) {
+            if (fields.hasOwnProperty(f)) {
+                var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"], [name^="' + fields[f] + '["]');
+                var key = fields[f];
+                if(inputField.is('[name^="' + fields[f] + '["]')) {
+                    key = inputField.attr('name');
+                }
+                var item = null;
+                if (inputField.is('[type="checkbox"],[type="radio"]')) {
+                    item = {name: key, value: inputField.filter(':checked').val()};
+                }
+                else if (inputField.is('.dateTimePicker')) {
+                    item = {name: key, value: inputField.datetimepicker('getValue')};
+                }
+                else if (inputField.length > 0) {
+                    item = {name: key, value: inputField.val()};
+                }
+                if (item != null) {
+                    formFields[formFields.length] = item;
+                }
             }
-            if (inputField.is('[type="checkbox"],[type="radio"]')) {
-                result[fields[f]] = inputField.filter(':checked').val();
-            }
-            else if (inputField.is('.dateTimePicker')) {
-                result[fields[f]] = inputField.datetimepicker('getValue');
-            }
-            else {
-                result[fields[f]] = inputField.val();
-            }
+        }
+    }
+    for(var i = 0; i < formFields.length; i++) {
+        if(fields.indexOf(formFields[i].name) > -1 &&
+            (!visibleOnly || form.find('[name="' + formFields[i].name + '"]:visible').length > 0)) {
+            result[formFields[i].name] = formFields[i].value;
         }
     }
     return result;

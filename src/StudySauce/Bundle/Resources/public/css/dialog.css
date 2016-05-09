@@ -553,12 +553,12 @@ body.right-menu #bookmark
 }
 
 #add-entity .entity-search header ~ label.checkbox:nth-of-type(even),
-#add-entity .selectize-dropdown-content .entity-search:nth-of-type(even) {
+#add-entity .selectize-dropdown-content .buttons-1:nth-of-type(even) {
     background:rgba(255,255,255,0.90);
 }
 
 #add-entity .entity-search header ~ label.checkbox:nth-of-type(odd),
-#add-entity .selectize-dropdown-content .entity-search:nth-of-type(odd) {
+#add-entity .selectize-dropdown-content .buttons-1:nth-of-type(odd) {
     background:rgba(255,255,255,0.70);
 }
 

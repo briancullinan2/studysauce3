@@ -14,7 +14,7 @@ namespace  {
         function jQuery($context)
         {
             if ($context instanceof TimedPhpEngine) {
-                return HtmlPageCrawler::create('<div/>');
+                return HtmlPageCrawler::create('<div/>')->find('div');
             }
             return HtmlPageCrawler::create($context);
         }
@@ -95,6 +95,9 @@ namespace Admin\Bundle\Controller {
 
         private static function getJoinTable($u)
         {
+            if(is_array($u) && isset($u['table'])) {
+                return $u['table'];
+            }
             $type = get_class($u);
             $ti = array_search($type, self::$allTableClasses);
             if ($ti === false) {
@@ -501,8 +504,19 @@ namespace Admin\Bundle\Controller {
             }
             $allowedFields = self::getAllFieldNames([$tableName => self::$defaultTables[$tableName]]);
             $fields = array_intersect(self::getAllFieldNames([$tableName => $tables[$tableName]]), $allowedFields);
-            $obj = ['table' => $tableName];
+            if(is_array($e)) {
+                $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . $e['id']];
+            }
+            else {
+                $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . $e->getId()];
+            }
             foreach ($fields as $f) {
+                if(is_array($e)) {
+                    if(isset($e[$f])) {
+                        $obj[$f] = $e[$f];
+                    }
+                    continue;
+                }
                 if (!method_exists($e, 'get' . ucfirst($f))) {
                     continue;
                 }
@@ -806,6 +820,7 @@ namespace Admin\Bundle\Controller {
                 $file = preg_replace('/use [a-z\\\\\/\s]*;/i', '', $file);
                 $file = preg_replace('/->/i', '.', $file);
                 $file = preg_replace('/::/i', '.', $file);
+                $file = preg_replace('/\(array\)\(new stdClass\(\)\)/i', '{}', $file);
                 $file = preg_replace_callback('/foreach\s*\((.*?)\s*as\s*([^\s]*)\s*(=>\s*([^\s]*)\s*)?\)\s*\{/i', function ($match) {
                     self::$forCounter++;
                     $key = !empty($match[3]) ? $match[2] : ('$for___' . self::$forCounter);
@@ -844,20 +859,23 @@ AdminController.__vars = {};
 AdminController.__vars.radioCounter = 100000000;
 AdminController.getAllFieldNames = function (tables) { return window.getAllFields(tables); };
 
-var array_search = function (item, arr) { return arr.indexOf(item); };
-var count = function (arr) { return arr.length; };
-var in_array = function (needle, haystack) { return haystack.indexOf(needle) > -1; };
-var array_values = function (arr) { return arr.slice(0); };
+var trim = function (str) {return (str || '').trim();};
+var explode = function (del, str) {return (str || '').split(del);};
+var array_splice = function (arr, start, length) {return (arr || []).splice(start, length);};
+var array_search = function (item, arr) { var index = (arr || []).indexOf(item); return index == -1 ? false : index; };
+var count = function (arr) { return (arr || []).length; };
+var in_array = function (needle, arr) { return (arr || []).indexOf(needle) > -1; };
+var array_values = function (arr) { return (arr || []).slice(0); };
 var is_array = function (obj) { return typeof obj == 'array' || typeof obj == 'object'; }; // PHP and javascript don't make a distinction between arrays and objects syntax wise using [property], all php objects should be restful anyways
 var array_keys = function (obj) {var result=[]; for (var k in obj) { if (obj.hasOwnProperty(k)) { result[result.length] = k } } return result; };
-var implode = function (sep, arr) {return arr.join(sep);};
-var ucfirst = function (str) {return str.substr(0, 1).toUpperCase() + str.substr(1);};
+var implode = function (sep, arr) {return (arr || []).join(sep);};
+var ucfirst = function (str) {return (str || '').substr(0, 1).toUpperCase() + str.substr(1);};
 var str_replace = function (needle, replacement, haystack) {return haystack.replace(needle, replacement);};
 var call_user_func_array = function (context, params) {return context[context[1]].apply(context[0], params);};
 var concat = function () { var str = ''; for(var a = 0; a < arguments.length; a++) { str += arguments[a]; } return str; };
 var print = function (s) { window.views.__output += s };
 var strtolower = function(s) { return s.toLowerCase(); };
-var empty = function(s) { return typeof s == 'undefined' || s == '' || s == false || s == null; };
+var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s == false || s == null; };
 var json_encode = JSON.stringify;
 var method_exists = function (s,m) { return typeof s == 'object' && typeof s[m] == 'function'; };
 var isset = function (s) { return typeof s != 'undefined'; };

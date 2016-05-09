@@ -771,6 +771,7 @@ input:-webkit-autofill {
     border-color: #BBB;
     border-radius: 0 0 2px 2px;
     box-shadow: none;
+    font-size: inherit;
 }
 
 .selectize-control.single .selectize-input .item,

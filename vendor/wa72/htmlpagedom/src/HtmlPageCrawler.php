@@ -1,6 +1,7 @@
 <?php
 namespace Wa72\HtmlPageDom;
 
+use DOMElement;
 use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -717,6 +718,13 @@ class HtmlPageCrawler extends Crawler
         }
     }
 
+    /**
+     * @param int $int
+     * @return HtmlPageCrawler
+     */
+    public function eq($int) {
+        return parent::eq($int);
+    }
 
     /**
      * Add or remove one or more classes from each element in the set of matched elements, depending the class’s presence.
@@ -755,12 +763,27 @@ class HtmlPageCrawler extends Crawler
         return $result;
     }
 
+    /**
+     * @return HtmlPageCrawler $this
+     */
     public function show() {
         $this->css('display', 'block');
+        return $this;
     }
 
+    /**
+     * @return HtmlPageCrawler $this
+     */
     public function hide() {
         $this->css('display', 'none');
+        return $this;
+    }
+
+    /**
+     * @return \DOMElement
+     */
+    public function parent() {
+        return $this->getNode(0)->parentNode;
     }
 
     /**
@@ -971,6 +994,18 @@ class HtmlPageCrawler extends Crawler
     }
 
     /**
+     * @return HtmlPageCrawler
+     */
+    public function children()
+    {
+        if (!count($this)) {
+            return new static([], $this->uri);
+        }
+        // TODO: something with selector
+        return parent::children();
+    }
+
+    /**
      * @param string $selector Get the descendants of each element in the current set of matched elements, filtered by a selector, or element.
      * @return static
      */
@@ -1004,11 +1039,12 @@ class HtmlPageCrawler extends Crawler
             if ($this->is('select')) {
                 $selected = $this->find('option');
                 foreach($selected as $o) {
-                    if ($o->val() == $value) {
-                        $selected->attr('selected', 'selected');
+                    /** @var DOMElement $o */
+                    if ($o->getAttribute('value') == $value) {
+                        $o->setAttribute('selected', 'selected');
                     }
                     else {
-                        $selected->removeAttr('selected');
+                        $o->removeAttribute('selected');
                     }
                 }
             } else if ($this->is('textarea'))

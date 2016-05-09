@@ -88,6 +88,7 @@ $subVars = array_merge(['allGroups' => $allGroups, 'searchRequest' => $searchReq
                 }
             }
         }
+        /*
         $classes = 'template empty';
         $templateSubVars = $subVars;
         $templateSubVars['searchRequest'] = array_merge($templateSubVars['searchRequest'], ['read-only' => false, 'edit' => false]);
@@ -96,6 +97,7 @@ $subVars = array_merge(['allGroups' => $allGroups, 'searchRequest' => $searchReq
         } else {
             print $view->render('AdminBundle:Admin:row.html.php',                array_merge($templateSubVars, ['classes' => $classes, 'entity' => $entity, 'table' => $table]));
         }
+        */
 
         // show footer at the end of each result list
         if (!isset($aliasedRequest['footers']) || is_array($footers = $aliasedRequest['footers'])

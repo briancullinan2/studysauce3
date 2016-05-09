@@ -17,19 +17,20 @@ $view['slots']->start('modal-header'); ?>
     foreach($tables as $tableName => $fields) {
         $tabItem = $dialog->find(concat('li a[href="#add-entity-' , $tableName , '"]'));
         if ($tabItem->length == 0) { ?>
-            <li>
+            <li class="<?php print ($first ? 'active' : ''); ?>">
                 <a href="#add-entity-<?php print ($tableName); ?>"
                    data-target="#add-entity-<?php print ($tableName); ?>"
                    data-toggle="tab"><?php print (ucfirst(str_replace('ss_', '', ($tableName)))); ?></a></li>
             <?php
         }
         else {
-            $tabItem->parent()->show();
+            $button = $tabItem->parents('li')->show();
+            if ($first) {
+                $button->addClass('active');
+            }
         }
 
-        if ($first) {
-            $tabItem->parent()->addClass('active');
-        }
+        $first = false;
     }
         ?></ul>
 <?php $view['slots']->stop();
@@ -42,7 +43,7 @@ $view['slots']->start('modal-body'); ?>
         $dialog->find('.checkbox')->remove();
         $first = true;
         foreach($tables as $tableName => $fields) {
-            $tmpTables;
+            $tmpTables = (array)(new stdClass());
             $tmpTables[$tableName] = $tables[$tableName];
             $entityField = $dialog->find(concat('input[name="', $tableName, '"][type="text"]'));
             ?>
@@ -55,13 +56,14 @@ $view['slots']->start('modal-body'); ?>
             <?php
             $entityField->parents('.tab-pane')->show();
 
+            // TODO: this is UI only code, maybe this should be in a method?
             if($entityField->is('.selectized')) {
                 setTimeout(function () {
                     $entityField->val('')->focus();
                     $entityField[0]['selectize']->setValue('');
                     $entityField[0]['selectize']->renderCache = [];
                     $entityField[0]['selectize']->clearOptions();
-                    $entityField[0]['selectize']->settings->searchField = AdminController::getAllFieldNames($tmpTables);
+                    $entityField[0]['selectize']->settings->searchField = AdminController::getAllFieldNames($tmpTables)->slice(0, 3);
                     $entityField[0]['selectize']->addOption($entities);
                 }, 50);
             }

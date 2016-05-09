@@ -514,7 +514,7 @@ class Crawler extends \SplObjectStorage
         $node = $this->getNode(0)->firstChild;
 
         return $this->createSubCrawler($node ? $this->sibling($node) : array());
-    }
+}
 
     /**
      * Returns the attribute value of the first node of the list.

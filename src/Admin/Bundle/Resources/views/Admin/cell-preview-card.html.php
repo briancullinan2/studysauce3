@@ -3,101 +3,162 @@ use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
 
 /** @var Card $card */
-$packTitle = !empty($card->getPack()) ? $card->getPack()->getTitle() : '';
-$cardCount = !empty($card->getPack()) ? ($card->getIndex() + 1 . ' of ' . $card->getPack()->getCards()->count()) : '1 or 10';
-$content = $card->getContent();
-$content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
-/** @var Answer[] $answers */
-$answers = array_values($card->getAnswers()->filter(function (Answer $a) {return !$a->getDeleted();})->toArray());
-if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
-    $url = trim($matches[0]);
+
+// check if we need to update or create template
+$row = !empty($context) ? $context : jQuery($this);
+$preview = $row->find('.preview');
+// TODO: how to get data from object or from view in the same way?
+// TODO: use applyFields and gatherFields here too?  at the row level?
+if($preview->length == 0) {
+    return;
+    $type = $card->getResponseType();
+    $content = $card->getContent();
+    $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
+    $correct = !empty($card->getCorrect()) ? preg_replace('/\\\\n(\\\\r)?/i', "\n", $card->getCorrect()->getContent()) : '';
+    /** @var Answer[] $answers */
+    $answersUnique = [];
+    foreach($card->getAnswers()->toArray() as $answer) {
+        /** @var Answer $answer */
+        if(!$answer->getDeleted() && !in_array($answer->getContent(), $answersUnique)) {
+            $answersUnique[count($answersUnique)] = $answer->getContent();
+        }
+    }
+    if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
+        $url = trim($matches[0]);
+    }
+}
+else {
+    $type = explode(' ', $row->find('select[name="type"]')->val())[0];
+    $url = trim($row->find('input[name="upload"]')->val());
+    $content = str_replace('\\n', "\n", $row->find('.content textarea')->val());
+    $answers = explode("\n", $row->find('.correct.type-mc:visible textarea')->val());
+    $answersUnique = [];
+    foreach($answers as $answer) {
+        if(!in_array($answer, $answersUnique)) {
+            $answersUnique[count($answersUnique)] = $answer;
+        }
+    }
+    $correct = $row->find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked')->val();
+    $correct = str_replace('\\n', "\n", $correct);
+}
+
+$isImage = false;
+$isAudio = false;
+if(!empty($url)) {
     $isImage = substr($url, -4) == '.jpg' || substr($url, -4) == '.jpeg' || substr($url, -4) == '.gif' || substr($url, -4) == '.png';
     $isAudio = substr($url, -4) == '.mp3' || substr($url, -4) == '.m4a';
-    $content = preg_replace('/\s*\n\r?/i', '\n', trim(str_replace($url, '', $content)));
+    $content = trim(str_replace($url, '', $content));
 }
-?>
-<h3>Preview: </h3>
-<?php if (empty($card->getResponseType()) || empty($card->getId())) { ?>
-    <div class="preview-card">
-        <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
-            <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
-            <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
-            <?php } ?>
+
+$template = $type == ''
+    ? $preview->find('.preview-card:not([class*="type-"])')
+    : $preview->find(implode('', ['.preview-card.type-' , $type]));
+// switch templates if needed
+if (2 != $template->length) {
+    $preview->children()->remove();
+    // TODO: re-render preview completely because type has changed
+    $view['slots']->start('card-preview-prompt'); ?>
+    <?php if (!empty($isImage)) { ?><img src="<?php print ($url); ?>" class="centerized" /><?php } ?>
+    <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print ($url); ?>" class="play centerized"></a><a href="#pause" class="pause centerized"></a></div><?php } ?>
+    <?php if (empty($isImage) && empty($isAudio)) { ?>
+        <div class="preview-content"><div class="centerized"><?php print ($view->escape($content)); ?></div></div>
+    <?php } ?>
+    <?php $view['slots']->stop();
+
+    $view['slots']->start('card-preview'); ?>
+    <h3>Preview: </h3>
+    <?php if (empty($type)) { ?>
+        <div class="preview-card">
+            <div class="preview-inner">
+                <?php $view['slots']->output('card-preview-prompt'); ?>
+            </div>
+            <div class="preview-tap">Tap to see answer</div>
         </div>
-        <div class="preview-tap">Tap to see answer</div>
-    </div>
-    <div class="preview-card preview-answer">
-        <div class="preview-prompt">
-            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
-            <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
-            <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
-            <?php } ?>
+        <div class="preview-card preview-answer">
+            <div class="preview-prompt">
+                <?php $view['slots']->output('card-preview-prompt'); ?>
+            </div>
+            <div class="preview-inner">
+                <div class="preview-correct">Correct answer:</div>
+                <div class="preview-content"><div class="centerized"></div></div>
+            </div>
+            <div class="preview-wrong">✘</div>
+            <div class="preview-guess">Did you guess correctly?</div>
+            <div class="preview-right">✔︎</div>
         </div>
-        <div class="preview-inner">
-            <div class="preview-correct">Correct answer:</div>
-            <div class="preview-content"><div><?php print $view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getContent() : ''); ?></div></div>
+    <?php } ?>
+    <?php if ($type == 'mc') { ?>
+        <div class="preview-card type-mc">
+            <div class="preview-inner">
+                <?php $view['slots']->output('card-preview-prompt'); ?>
+            </div>
+            <div class="preview-response"><div class="centerized"></div></div>
+            <div class="preview-response"><div class="centerized"></div></div>
+            <div class="preview-response"><div class="centerized"></div></div>
+            <div class="preview-response"><div class="centerized"></div></div>
         </div>
-        <div class="preview-wrong">✘</div>
-        <div class="preview-guess">Did you guess correctly?</div>
-        <div class="preview-right">✔︎</div>
-    </div>
-<?php } ?>
-<?php if ($card->getResponseType() == 'mc' || empty($card->getId())) { ?>
-    <div class="preview-card type-mc">
-        <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
-            <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
-            <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
-            <?php } ?>
+    <?php } ?>
+    <?php if ($type == 'tf') { ?>
+        <div class="preview-card type-tf">
+            <div class="preview-inner">
+                <?php $view['slots']->output('card-preview-prompt'); ?>
+            </div>
+            <div class="preview-false">False</div>
+            <div class="preview-guess"> </div>
+            <div class="preview-true">True</div>
         </div>
-        <div class="preview-response"><div><?php print (count($answers) > 0 ? $view->escape($answers[0]->getContent()) : ''); ?></div></div>
-        <div class="preview-response"><div><?php print (count($answers) > 1 ? $view->escape($answers[1]->getContent()) : ''); ?></div></div>
-        <div class="preview-response"><div><?php print (count($answers) > 2 ? $view->escape($answers[2]->getContent()) : ''); ?></div></div>
-        <div class="preview-response"><div><?php print (count($answers) > 3 ? $view->escape($answers[3]->getContent()) : ''); ?></div></div>
-    </div>
-<?php } ?>
-<?php if ($card->getResponseType() == 'tf' || empty($card->getId())) { ?>
-    <div class="preview-card type-tf">
-        <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
-            <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
-            <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
-            <?php } ?>
+    <?php } ?>
+    <?php if ($type == 'sa') { ?>
+        <div class="preview-card type-sa">
+            <div class="preview-inner">
+                <?php $view['slots']->output('card-preview-prompt'); ?>
+            </div>
+            <label class="input"><input type="text" value=""/></label>
         </div>
-        <div class="preview-false">False</div>
-        <div class="preview-guess"> </div>
-        <div class="preview-true">True</div>
-    </div>
-<?php } ?>
-<?php if ($card->getResponseType() == 'sa' || empty($card->getId())) { ?>
-    <div class="preview-card type-sa">
-        <div class="preview-inner">
-            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
-            <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
-            <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
-            <?php } ?>
+    <?php } ?>
+    <?php if (!empty($type)) { ?>
+        <div class="preview-card type-mc type-tf type-sa preview-answer">
+            <div class="preview-prompt">
+                <?php $view['slots']->output('card-preview-prompt'); ?>
+            </div>
+            <div class="preview-inner">
+                <div class="preview-correct">Correct answer:</div>
+                <div class="preview-content"><div class="centerized"></div></div>
+            </div>
         </div>
-        <label class="input"><input type="text" value="<?php print (!empty($isImage) || !empty($isAudio) ? $view->escape($content) : 'Type your answer'); ?>"/></label>
-    </div>
-<?php } ?>
-<?php if (!empty($card->getResponseType()) || empty($card->getId())) { ?>
-    <div class="preview-card type-mc type-tf type-sa preview-answer">
-        <div class="preview-prompt">
-            <?php if (!empty($isImage)) { ?><img src="<?php print $url; ?>" /><?php } ?>
-            <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print $url; ?>" class="play"></a><a href="#pause" class="pause"></a></div><?php } ?>
-            <?php if (empty($isImage) && empty($isAudio)) { ?>
-                <div class="preview-content"><div><?php print $view->escape($content); ?></div></div>
-            <?php } ?>
-        </div>
-        <div class="preview-inner">
-            <div class="preview-correct">Correct answer:</div>
-            <div class="preview-content"><div><?php print $view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getContent() : ''); ?></div></div>
-        </div>
-    </div>
-<?php } ?>
+    <?php }
+    $view['slots']->stop();
+
+    $preview->append($view['slots']->get('card-preview'));
+}
+
+//$packTitle = !empty($card->getPack()) ? $card->getPack()->getTitle() : '';
+//$cardCount = !empty($card->getPack()) ? ($card->getIndex() + 1 . ' of ' . $card->getPack()->getCards()->count()) : '1 or 10';
+
+// replace with image
+if($isImage && isset($url)) {
+    // TODO: change this if we need to support image and text at the same time not using entry box
+    $preview->find('.preview-card:not(.preview-answer) .preview-inner img, .preview-answer .preview-prompt img, .preview-card:not(.preview-answer) .preview-inner .preview-content, .preview-answer .preview-prompt .preview-content')
+        ->replaceWith(implode('', ['<img src="', $url, '" />']));
+
+    // TODO: if type-sa?
+    if(!empty($content)) {
+        $preview->find('[type="text"]')->val($content);
+    }
+    else {
+        $preview->find('[type="text"]')->val('Type your answer');
+    }
+}
+else {
+    $preview->find('[type="text"]')->val('Type your answer');
+}
+
+$preview->find('.preview-content div')->text($content);
+
+for ($ai = 0; $ai < count($answersUnique); $ai++) {
+    $preview->find('.preview-response')->eq($ai)->find('div')->text($answersUnique[$ai]);
+}
+
+$preview->find('.preview-answer .preview-inner .preview-content div')->text($correct);
+
+print ($row->html());

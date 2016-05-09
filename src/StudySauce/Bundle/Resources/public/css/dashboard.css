@@ -302,11 +302,11 @@
     display: none;
 }
 
-.entity-search.buttons-1 {
+.buttons-1 {
     position:relative;
 }
 
-.entity-search .entity-title {
+.buttons-1 .entity-title {
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -317,18 +317,9 @@
     width:100%;
 }
 
-#add-entity .entity-search .entity-title,
-.entity-search .selectize-control .entity-title {
+#add-entity .entity-title,
+.selectize-control .entity-title {
     padding-left:10px;
-}
-
-.entity-search.buttons-1 .entity-title {
-}
-
-.entity-search.buttons-2 .entity-title {
-    padding:0 90px 0 10px;
-    margin-right:-80px;
-    width:100%;
 }
 
 a[href="#insert-entity"],
@@ -342,10 +333,6 @@ a[href="#subtract-entity"] {
     text-align: center;
 }
 
-.entity-search label.checkbox.template {
-    display:none !important;
-}
-
 .read-only a[href="#insert-entity"],
 .read-only a[href="#subtract-entity"] {
     display: none !important;
@@ -356,29 +343,27 @@ a[href="#subtract-entity"] {
     height: 30px;
 }
 
-.entity-search label.checkbox {
+.entity-search label.buttons-1,
+.selectize-dropdown label.buttons-1,
+label.buttons-1 {
     display:block;
-    margin:0;
+    margin-top:0;
+    margin-bottom:0;
 }
 
-.entity-search label.checkbox i {
+label.buttons-1.checkbox i {
     display:none;
 }
 
-.entity-search label.checkbox.changed span:after {
+label.buttons-1.checkbox.changed span:after {
     content: " will be added ";
     color: #bbb;
     display:inline-block;
     padding-left:10px;
 }
 
-.entity-search label.checkbox.changed input[name*="remove"] ~ span:after {
+label.buttons-1.checkbox.changed input[name*="remove"] ~ span:after {
     content: " will be removed ";
-}
-
-.entity-search label.checkbox.buttons-2 span {
-    margin-right:-80px;
-    padding-right: 90px;
 }
 
 a[href="#insert-entity"]:before {
@@ -413,8 +398,8 @@ a[href="#insert-entity"]:before {
     color: transparent;
 }
 
-.entity-search .checkbox:hover a[href="#insert-entity"]:before,
-.entity-search .entity-title:hover + a[href="#insert-entity"]:before,
+.checkbox:hover a[href="#insert-entity"]:before,
+.entity-title:hover + a[href="#insert-entity"]:before,
 a[href="#insert-entity"]:hover:before {
     color: #555;
 }
@@ -424,20 +409,20 @@ a[href="#subtract-entity"]:before {
     opacity: 0;
 }
 
-.entity-search .checkbox:hover a[href="#subtract-entity"]:before,
-.entity-search .entity-title:hover + a[href="#subtract-entity"]:before,
+.checkbox:hover a[href="#subtract-entity"]:before,
+.entity-title:hover + a[href="#subtract-entity"]:before,
 a[href="#subtract-entity"]:hover:before {
     color: #555;
     opacity: 1;
 }
 
-.entity-search .entity-name {
+.buttons-1 .entity-name {
     font-weight: bold;
     margin-right: 5px;
     display:block;
 }
 
-.entity-search .description {
+.buttons-1 .description {
     display: block;
     opacity: 0.5;
     white-space: nowrap;
@@ -446,7 +431,7 @@ a[href="#subtract-entity"]:hover:before {
     overflow: hidden;
 }
 
-.entity-search .entity-by {
+.buttons-1 .entity-by {
     opacity: 0.8;
 }
 

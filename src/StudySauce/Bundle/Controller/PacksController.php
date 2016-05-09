@@ -257,7 +257,7 @@ class PacksController extends Controller
         $orm->flush();
 
         // TODO: $shouldNewCards = $newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0;
-        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: '');
+        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
         return $this->forward('AdminBundle:Admin:results', array_merge($searchRequest, [
             'edit' => false,
             'read-only' => ['pack'],
@@ -564,33 +564,15 @@ class PacksController extends Controller
             $since = intval($request->get('since'));
         }
         // only sync responses for specific pack
+        $packs = self::getPacksForUser($currentUser);
+        $packs = array_filter($packs, function (Pack $x) {return !($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || $x->getProperty('schedule') > new \DateTime());});
         if (!empty($request->get('pack'))) {
-            $packs = $user->getPacks()->filter(function (Pack $p) use ($request) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && !empty($p->getStatus()) && $p->getId() == intval($request->get('pack'));});
-            $retention = self::getRetention($packs->first(), $user);
+            $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return $p->getId() == intval($request->get('pack')) && in_array($user, $p->getChildUsers($currentUser));}));
+            $retention = self::getRetention($packs[0], $user);
         }
         else {
-            $packs = $user->getPacks()->filter(function (Pack $p) use ($user, $currentUser) {return !$p->getDeleted() && $p->getStatus() != 'UNPUBLISHED' && !empty($p->getStatus()) && in_array($user, $p->getChildUsers($user));});
-            $retention = array_values($packs->map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];})->toArray());
-        }
-
-        if(intval($request->get('version')) == 2) {
-            $responses = [];
-        }
-        else {
-            $responses = array_values(array_map(function (Response $r) {
-                return [
-                    'id' => $r->getId(),
-                    'card' => $r->getCard()->getId(),
-                    'answer' => empty($r->getAnswer()) ? 0 : $r->getAnswer()->getId(),
-                    'correct' => $r->getCorrect() ? 1 : 0,
-                    'value' => $r->getValue(),
-                    'created' => $r->getCreated()->format('r'),
-                    'user' => $r->getUser()->getId()
-                ];
-            }, $user->getResponses()->filter(function (Response $r) use ($user, $since, $packs) {
-                return $r->getUser() == $user && !$r->getCard()->getDeleted() && $packs->contains($r->getCard()->getPack())
-                && $r->getCreated() <= new \DateTime() && $r->getId() > $since;
-            })->toArray()));
+            $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return in_array($user, $p->getChildUsers($currentUser));}));
+            $retention = array_values(array_map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];}, $packs));
         }
 
         $ids = array_map(function ($r) {
@@ -598,7 +580,7 @@ class PacksController extends Controller
             return empty($r) ? null : $r->getId();
         }, $result);
 
-        return new JsonResponse(['ids' => $ids, 'responses' => $responses, 'retention' => $retention]);
+        return new JsonResponse(['ids' => $ids, 'retention' => $retention]);
     }
 
     /**
