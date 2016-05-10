@@ -3,6 +3,7 @@
 namespace  {
 
     use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
+    use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
     use Wa72\HtmlPageDom\HtmlPage;
     use Wa72\HtmlPageDom\HtmlPageCrawler;
 
@@ -13,7 +14,7 @@ namespace  {
          */
         function jQuery($context)
         {
-            if ($context instanceof TimedPhpEngine) {
+            if ($context instanceof PhpEngine) {
                 return HtmlPageCrawler::create('<div/>')->find('div');
             }
             return HtmlPageCrawler::create($context);
