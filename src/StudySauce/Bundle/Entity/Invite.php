@@ -45,17 +45,17 @@ class Invite
     /**
      * @ORM\Column(type="string", length=256, name="first")
      */
-    protected $first;
+    protected $first = '';
 
     /**
      * @ORM\Column(type="string", length=256, name="last")
      */
-    protected $last;
+    protected $last = '';
 
     /**
      * @ORM\Column(type="string", length=256, name="email")
      */
-    protected $email;
+    protected $email = '';
 
     /**
      * @ORM\Column(type="boolean", name="activated")

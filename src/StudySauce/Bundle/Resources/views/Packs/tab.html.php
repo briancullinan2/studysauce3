@@ -44,7 +44,7 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tables = [
                         // view settings
-                        'tables' => ['pack' => ['idEdit' => ['modified', 'created', 'id', 'upload'], 'name' => ['title','userCountStr','cardCountStr'], 'status', ['group','groups', 'user','userPacks.user'], 'properties', 'actions']],
+                        'tables' => ['pack' => ['idEdit' => ['modified', 'created', 'id', 'logo'], 'name' => ['title','userCountStr','cardCountStr'], 'status', ['group','groups', 'user','userPacks.user'], 'properties', 'actions']],
                         'headers' => ['pack' => 'packPacks'],
                         'footers' => ['pack' => 'packPacks'],
                         'new' => empty($entity->getId()),

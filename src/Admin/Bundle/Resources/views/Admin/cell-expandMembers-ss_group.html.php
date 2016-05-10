@@ -18,9 +18,7 @@ usort($packs, function (Pack $p1, Pack $p2) {
 });
 $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs);
 ?>
-<form action="<?php print (isset($searchRequest['pack-id']) && !empty($group = $searchRequest['pack-id'])
-    ? $view['router']->generate('save_group', ['packId' => $searchRequest['pack-id'], 'groupId' => $ss_group->getId()])
-    : $view['router']->generate('save_group', ['groupId' => $ss_group->getId()])); ?>">
+<form action="<?php print ($view['router']->generate('save_group', ['group' => ['id' => $ss_group->getId()]])); ?>">
 
     <?php
 

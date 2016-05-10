@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Controller;
 
+use Admin\Bundle\Controller\AdminController;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
@@ -60,36 +61,12 @@ class PacksController extends Controller
 
         /** @var Pack $newPack */
         // process pack settings
-        $newPack = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
-            ->where('p.id = :id')
-            ->setParameter('id', intval($request->get('packId')))
-            ->getQuery()
-            ->getOneOrNullResult();
-        if (empty($newPack)) {
-            $newPack = new Pack();
-            $newPack->setUser($user);
-        }
-        if ($user->hasRole('ROLE_ADMIN')) {
-            if(!empty($request->get('upload'))) {
-                $newPack->setProperty('logo', $request->get('upload'));
-            }
-            $groups = new ArrayCollection($orm->getRepository('StudySauceBundle:Group')->findAll());
-        } else {
-            /** @var File $logo */
-            if(!empty($request->get('upload'))) {
-                $logo = $user->getFiles()->filter(function (File $f) use ($request) {
-                    return $f->getUrl() == $request->get('upload');
-                })->first();
-                $newPack->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
-            }
-            $groups = $user->getGroups();
-        }
+        AdminController::standardSave($request, $this->container);
+
         if(!empty($request->get('properties')) && !empty($request->get('properties')['keyboard'])) {
             $newPack->setProperty('keyboard', $request->get('properties')['keyboard']);
         }
-        if(!empty($request->get('title'))) {
-            $newPack->setTitle($request->get('title'));
-        }
+
         if (!empty($publish = $request->get('publish'))) {
             $newPack->setProperty('schedule', new \DateTime($publish['schedule']));
             $newPack->setProperty('email', isset($publish['email']) && $publish['email'] == 'true');
@@ -135,16 +112,6 @@ class PacksController extends Controller
                 $orm->persist($up);
             }
         }
-        if(!empty($request->get('status'))) {
-            $newPack->setStatus($request->get('status'));
-        }
-        if (empty($newPack->getId())) {
-            $orm->persist($newPack);
-        } else {
-            $newPack->setModified(new \DateTime());
-            $orm->merge($newPack);
-        }
-        $orm->flush();
 
         // process cards
         // TODO: break this up

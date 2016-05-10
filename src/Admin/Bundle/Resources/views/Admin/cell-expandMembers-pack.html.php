@@ -20,8 +20,8 @@ usort($sorted, function (User $p1, User $p2) {
 });
 ?>
 <form action="<?php print (!empty($group)
-    ? $view['router']->generate('save_group', ['groupId' => $searchRequest['ss_group-id'], 'packId' => $pack->getId()])
-    : $view['router']->generate('packs_create', ['packId' => $pack->getId()])); ?>">
+    ? $view['router']->generate('save_group', ['ss_group' => ['id' => $searchRequest['ss_group-id']]])
+    : $view['router']->generate('packs_create', ['pack' => ['id' => $pack->getId()]])); ?>">
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
         'entities' => $sorted,

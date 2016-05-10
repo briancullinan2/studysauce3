@@ -8,6 +8,6 @@ $time = method_exists($ss_group, 'getModified') && !empty($ss_group->getModified
 ?>
 <a href="#upload-image" data-target="#upload-file" data-toggle="modal" class="pack-icon cloak centerized">
     <?php print ($view->render('AdminBundle:Admin:cell-id-ss_group.html.php', ['ss_group' => $ss_group])); ?>
-    <input name="upload" value="<?php print (!empty($ss_group->getLogo()) ? $ss_group->getLogo()->getUrl() : ''); ?>" type="hidden" />
+    <input name="logo" value="<?php print (!empty($ss_group->getLogo()) ? $ss_group->getLogo()->getUrl() : ''); ?>" type="hidden" />
     <span class="reveal"> Image</span>
 </a>

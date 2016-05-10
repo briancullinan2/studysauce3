@@ -516,6 +516,7 @@ $(document).ready(function () {
                 loadContent.apply(fieldTab.first(), [data]);
             },
             error: function () {
+                isLoading = false;
                 fieldTab.find('.squiggle').stop().remove();
             }
         });

@@ -31,12 +31,16 @@ namespace  {
 
 namespace Admin\Bundle\Controller {
 
+    use Doctrine\Common\Collections\Criteria;
     use Doctrine\ORM\Mapping\ClassMetadata;
+    use Doctrine\ORM\Mapping\ClassMetadataInfo;
     use Doctrine\ORM\Query;
     use Doctrine\ORM\Query\Parameter;
     use Doctrine\ORM\QueryBuilder;
     use Doctrine\ORM\EntityManager;
     use FOS\UserBundle\Doctrine\UserManager;
+    use ReflectionClass;
+    use ReflectionParameter;
     use StudySauce\Bundle\Controller\AccountController;
     use StudySauce\Bundle\Controller\BuyController;
     use StudySauce\Bundle\Controller\EmailsController as StudySauceEmails;
@@ -53,6 +57,7 @@ namespace Admin\Bundle\Controller {
     use StudySauce\Bundle\Entity\UserPack;
     use Symfony\Bundle\FrameworkBundle\Controller\Controller;
     use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
     use Symfony\Component\HttpFoundation\JsonResponse;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
@@ -82,12 +87,13 @@ namespace Admin\Bundle\Controller {
         /** @var array $defaultTables A list of all available fields, firewall */
         public static $defaultTables = [ // database table and field firewall
             // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
-            'ss_user' => ['id' => ['lastVisit', 'created', 'id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
-            'ss_group' => ['id' => ['created', 'id', 'upload'], 'name' => ['name', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks'], 'actions' => ['deleted']],
-            'pack' => ['id' => ['modified', 'created', 'id', 'upload'], 'name' => ['title', 'userCountStr', 'cardCountStr'], 'status', ['group', 'groups', 'user', 'userPacks.user'], 'properties', 'actions'],
-            'card' => ['id' => ['type', 'upload'], 'name' => ['content'], 'correct' => ['correct', 'answers'], ['pack'], 'actions' => ['deleted']],
-            'invite' => ['id', 'name' => ['code', 'email', 'created'], 'actions' => ['deleted']],
-            'user_pack' => ['user', 'pack', 'removed']
+            'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
+            'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks'], 'actions' => ['deleted']],
+            'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['group', 'groups', 'user', 'userPacks.user'], 'properties', 'actions'],
+            'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers'], ['pack'], 'actions' => ['deleted']],
+            'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
+            'user_pack' => ['user', 'pack', 'removed'],
+            'file' => ['id' => ['id', 'url']]
             // TODO: this really generalized template
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
         ];
@@ -316,6 +322,20 @@ namespace Admin\Bundle\Controller {
             return $allFields;
         }
 
+        public static function setUpClasses(EntityManager $orm) {
+
+            self::$allTableClasses = $orm->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
+
+            self::$allTableMetadata = array_map(function ($table) use ($orm) {
+                return $orm->getMetadataFactory()->getMetadataFor($table);
+            }, self::$allTableClasses);
+
+            self::$allTables = array_combine(array_map(function (ClassMetadata $md) {
+                return $md->getTableName();
+            }, self::$allTableMetadata), self::$allTableMetadata);
+
+        }
+
         public function resultsAction(Request $request)
         {
             set_time_limit(0);
@@ -329,15 +349,7 @@ namespace Admin\Bundle\Controller {
                 throw new AccessDeniedHttpException();
             }
 
-            self::$allTableClasses = $orm->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
-
-            self::$allTableMetadata = array_map(function ($table) use ($orm) {
-                return $orm->getMetadataFactory()->getMetadataFor($table);
-            }, self::$allTableClasses);
-
-            self::$allTables = array_combine(array_map(function (ClassMetadata $md) {
-                return $md->getTableName();
-            }, self::$allTableMetadata), self::$allTableMetadata);
+            self::setUpClasses($orm);
 
             // pull out field searches
             $allFields = self::getAllFieldNames(self::$defaultTables);
@@ -628,6 +640,135 @@ namespace Admin\Bundle\Controller {
 
         /**
          * @param Request $request
+         * @param ContainerInterface $container
+         * @return array
+         * @throws \Exception
+         */
+        public static function standardSave(Request $request, ContainerInterface $container) {
+            /** @var $orm EntityManager */
+            $orm = $container->get('doctrine')->getManager();
+
+            self::setUpClasses($orm);
+
+            $searchRequest = unserialize($container->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+            if(empty($searchRequest) || !isset($searchRequest['tables'])) {
+                throw new \Exception('Don\'t know what to save!');
+            }
+            $tables = $searchRequest['tables'];
+
+            $results = [];
+
+            foreach($tables as $tableName => $fields) {
+
+                if (!empty($entities = $request->get($tableName))) {
+
+                    if(!isset($entities[0])) {
+                        $entities = [$entities];
+                    }
+
+                    foreach($entities as $e) {
+                        $class = AdminController::$allTables[$tableName]->name;
+                        $entity = self::applyFields($class, $tableName, $fields, $e, $orm);
+
+                        if(empty($entity->getId())) {
+                            $orm->persist($entity);
+                        }
+                        else {
+                            $orm->merge($entity);
+                        }
+                        $orm->flush();
+                        $results[] = $entity;
+                    }
+                }
+            }
+            return $results;
+        }
+
+        /**
+         * @param $class
+         * @param $tableName
+         * @param $fields
+         * @param $e
+         * @param EntityManager $orm
+         * @return null|object
+         * @throws \Exception
+         */
+        public static function applyFields($class, $tableName, $fields, $e, EntityManager $orm) {
+            $allFields = self::getAllFieldNames([$tableName => $fields]);
+            if(is_array($e) && empty($e['id'])) {
+                $entity = new $class;
+            }
+            else {
+                $criteria = Criteria::create();
+                foreach(self::$defaultTables[$tableName]['id'] as $f) {
+                    if(!is_array($e) || isset($e[$f])) {
+                        $criteria = $criteria->orWhere(Criteria::expr()->eq($f, '' . (is_array($e) ? $e[$f] : $e)));
+                    }
+                }
+                $entity = $orm->getRepository($class)->matching($criteria->setMaxResults(1))->first();
+            }
+            if(empty($entity)) {
+                throw new \Exception('Item not found!');
+            }
+
+            // TODO: put remove logic here
+
+            foreach($allFields as $f) {
+
+                if(isset($e[$f])) { // only apply fields that are set, removes have to be set to 'remove' => 'true'
+
+                    if(isset(self::$allTables[$tableName]->associationMappings[$f])) {
+                        $association = self::$allTables[$tableName]->associationMappings[$f];
+                        if($association['type'] == ClassMetadataInfo::ONE_TO_ONE || $association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
+                            // create entities from array using same assignment functions as here
+                            $tableIndex = array_search($association['targetEntity'], self::$allTableClasses);
+                            $joinTable = array_keys(self::$allTables)[$tableIndex];
+                            $value = self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $e[$f], $orm);
+                            // many to one, just lookup object and call set property normally
+                            if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
+                                call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
+                            }
+                        }
+                        // one to many, look for add function instead
+                        else if (($type = self::parameterType('add' . ucfirst($f), $entity)) !== false) {
+                            // TODO: if dealing with multiple entities, perform actions for each
+                            $entities = $e[$f];
+                            if(!isset($entities[0])) {
+                                $entities = [$entities];
+                            }
+
+                            foreach($entities as $e) {
+
+                            }
+                        }
+                    }
+                    else if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
+                        // TODO: handle roles, properties and datetime data types
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], [$e[$f]]);
+                    }
+                }
+            }
+
+            return $entity;
+        }
+
+        /**
+         * @param $method
+         * @param $entity
+         * @return bool|ReflectionParameter
+         */
+        public static function parameterType($method, $entity) {
+            if(method_exists($entity, $method)) {
+                $class = new ReflectionClass($entity);
+                $method = $class->getMethod($method);
+                $params = $method->getParameters();
+                return $params[0];
+            }
+            return false;
+        }
+
+        /**
+         * @param Request $request
          * @return \Symfony\Component\HttpFoundation\Response
          */
         public function saveGroupAction(Request $request)
@@ -635,8 +776,6 @@ namespace Admin\Bundle\Controller {
 
             /** @var $orm EntityManager */
             $orm = $this->get('doctrine')->getManager();
-            /** @var $userManager UserManager */
-            $userManager = $this->get('fos_user.user_manager');
 
             /** @var $user User */
             $user = $this->getUser();
@@ -644,59 +783,8 @@ namespace Admin\Bundle\Controller {
                 throw new AccessDeniedHttpException();
             }
 
-            /** @var Group $g */
-            if (empty($request->get('groupId'))) {
-                $g = new Group();
-            } else {
-                $g = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $request->get('groupId')]);
-            }
-
-            if (!empty($request->get('upload'))) {
-                $logo = $user->getFiles()->filter(function (File $f) use ($request) {
-                    return $f->getUrl() == $request->get('upload');
-                })->first();
-                $g->setLogo(empty($logo) ? null : $logo);
-            }
-
-            if (!empty($request->get('parent'))) {
-                /** @var Group $parent */
-                $parent = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['id' => $request->get('parent')]);
-                if (!empty($parent) && $parent == $g) {
-                    $parent->removeSubgroup($g);
-                    $g->setParent(null);
-                } else if (!empty($parent)) {
-                    $g->setParent($parent);
-                    $parent->addSubgroup($g);
-                }
-            }
-
-            if (!empty($name = $request->get('groupName'))) {
-                $g->setName(trim($name));
-            }
-
-            if ($request->get('description') !== false) {
-                $g->setDescription(!empty($request->get('description')) ? $request->get('description') : '');
-            }
-
-            // add new roles
-            if (!empty($request->get('roles'))) {
-                $roles = $g->getRoles();
-                $newRoles = explode(',', $request->get('roles'));
-                // intersection with current groups is a removal, intersection with request is an addition
-                foreach (array_diff($roles, $newRoles) as $i => $role) {
-                    $g->removeRole($role);
-                }
-                foreach (array_diff($newRoles, $roles) as $i => $role) {
-                    $g->addRole($role);
-                }
-            }
-
-            // do pack add/remove, not group remove
-            if (!empty($request->get('packId')) && !empty($g->getId())) {
-                $this->forward('StudySauceBundle:Packs:create', ['packId' => $request->get('packId'), 'ss_group' => $request->get('ss_group'), 'ss_user' => $request->get('ss_user'), 'publish' => $request->get('publish')]);
-            } else if (empty($g->getId())) {
-                $orm->persist($g);
-            } else if ($request->get('remove') == 'true') {
+            // TODO: generalize this in a standardRemove function that specifies which associations to disassociate from and how to mark it removed
+            if ($request->get('remove') == 'true') {
                 // remove group from users
                 $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
                 foreach ($invites as $i => $in) {
@@ -722,35 +810,13 @@ namespace Admin\Bundle\Controller {
                 //}
                 $orm->flush();
                 return $this->redirect($this->generateUrl('groups'));
-            } else {
-                $orm->merge($g);
             }
-            $orm->flush();
-
-            if (!empty($request->get('invite'))) {
-                $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['code' => $request->get('invite')]);
-                if (count($invites) == 0) {
-                    $newInvite = new Invite();
-                    $newInvite->setCode($request->get('invite'));
-                } else {
-                    $newInvite = $invites[0];
-                }
-                $newInvite->setUser($user);
-                $newInvite->setFirst('');
-                $newInvite->setLast('');
-                $newInvite->setEmail('');
-                $newInvite->setGroup($g);
-                $newInvite->setActivated(true);
-                $g->addInvite($newInvite);
-                if (count($invites) == 0) {
-                    $orm->persist($newInvite);
-                } else {
-                    $orm->merge($newInvite);
-                }
-                $orm->flush();
+            else {
+                /** @var Group $g */
+                list($g) = self::standardSave($request, $this->container);
             }
 
-            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: '');
+            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
             return $this->forward('AdminBundle:Admin:results', array_merge($searchRequest, [
                 'edit' => false,
                 'read-only' => ['ss_group'],

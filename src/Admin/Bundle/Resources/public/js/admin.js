@@ -95,31 +95,6 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '#command [value="#save-group"]', function (evt) {
-        evt.preventDefault();
-        var that = $(this);
-        var row = that.parents('.ss_group-row').removeClass('edit').addClass('read-only');
-        if(that.parents('.highlighted-link').is('.invalid'))
-            return;
-        loadingAnimation(that);
-        that.parents('.highlighted-link').removeClass('valid').addClass('invalid');
-        $.ajax({
-            url: Routing.generate('save_group'),
-            type: 'POST',
-            dataType: 'text',
-            data: {
-                groupName: row.find('input[name="name"]').val().trim(),
-                description: row.find('textarea[name="description"]').val().trim(),
-                roles: row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                groupId: ((/ss_group-id-([0-9]*)(\s|$)/ig).exec(row.attr('class')) || [])[1]
-            },
-            success: loadContent,
-            error: function () {
-                that.find('.squiggle').stop().remove();
-            }
-        });
-    });
-
     body.on('click', '#command a[href*="_switch_user"]', function () {
         if(searchRequest != null)
             searchRequest.abort();

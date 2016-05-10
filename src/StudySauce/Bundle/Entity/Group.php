@@ -95,7 +95,7 @@ class Group extends BaseGroup implements GroupInterface
         $groups = $this->getSubgroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();
         foreach($groups as $g) {
             /** @var Group $g */
-            if($g->getDeleted()) {
+            if($g->getDeleted() || in_array($g, $groups)) {
                 continue;
             }
             list($subUsers, $subPacks, $subGroups) = $g->getUsersPacksGroupsRecursively();
@@ -431,8 +431,11 @@ class Group extends BaseGroup implements GroupInterface
      */
     public function setParent(\StudySauce\Bundle\Entity\Group $parent = null)
     {
-        $this->parent = $parent;
-
+        if (empty($parent) || $parent == $this) {
+            $this->parent = null;
+        } else {
+            $this->parent = $parent;
+        }
         return $this;
     }
 

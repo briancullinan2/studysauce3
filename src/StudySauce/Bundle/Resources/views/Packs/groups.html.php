@@ -41,10 +41,10 @@ $view['slots']->start('body'); ?>
         id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
-                <form action="<?php print $view['router']->generate('save_group', ['groupId' => $entity->getId()]); ?>" class="group-edit">
+                <form action="<?php print $view['router']->generate('save_group'); ?>" class="group-edit">
                     <?php
                     $tables = [
-                        'ss_group' => ['idEdit' => ['created', 'id', 'upload'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'actions' => ['deleted']]
+                        'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
                     $isNew = empty($entity->getId());
                     print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [

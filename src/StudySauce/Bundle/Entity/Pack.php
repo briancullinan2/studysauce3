@@ -118,6 +118,10 @@ class Pack
                 : '');
     }
 
+    public function setLogo(File $logo) {
+        $this->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
+    }
+
     /**
      * @param $prop
      * @param $value
@@ -530,9 +534,11 @@ class Pack
      * @param \StudySauce\Bundle\Entity\Group
      * @return User
      */
-    public function addGroup(Group $groups)
+    public function addGroup(Group $group)
     {
-        $this->groups[] = $groups;
+        if(!$this->groups->contains($group)) {
+            $this->groups[] = $group;
+        }
 
         return $this;
     }
