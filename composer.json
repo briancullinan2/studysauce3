@@ -27,7 +27,8 @@
         "codeception/codeception": "*",
         "evernote/evernote-cloud-sdk-php": "dev-master",
         "google/apiclient": "~1.1",
-        "friendsofsymfony/jsrouting-bundle": "^1.6"
+        "friendsofsymfony/jsrouting-bundle": "^1.6",
+        "wa72/htmlpagedom": "^1.2"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"

@@ -3266,7 +3266,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/16b04c49af05dd3fb381e4abe04f0e5e231ac76d",
+            "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/def27463609e24af410b2606f0062de46fab5662",
             "reference": "16b04c49af05dd3fb381e4abe04f0e5e231ac76d",
             "shasum": ""
         },
@@ -3337,7 +3337,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/evernote/evernote-cloud-sdk-php/zipball/7a3357fa8b8d7a0a943c634283ee7f7edafd4d8a",
+            "url": "https://api.github.com/repos/evernote/evernote-cloud-sdk-php/zipball/b6f1a418e882c68c8c727380af208a50b10b2749",
             "reference": "7a3357fa8b8d7a0a943c634283ee7f7edafd4d8a",
             "shasum": ""
         },
@@ -4269,6 +4269,64 @@
             "Js Routing",
             "javascript",
             "routing"
+        ]
+    },
+    {
+        "name": "wa72/htmlpagedom",
+        "version": "v1.2.3",
+        "version_normalized": "1.2.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wasinger/htmlpagedom.git",
+            "reference": "ec73f018ab8de53eb3abdd82d54b11158af3af27"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/wasinger/htmlpagedom/zipball/ec73f018ab8de53eb3abdd82d54b11158af3af27",
+            "reference": "ec73f018ab8de53eb3abdd82d54b11158af3af27",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0",
+            "symfony/css-selector": ">=2.3",
+            "symfony/dom-crawler": "^2.3 <2.8 | ^2.8.3 | ^3.0.1"
+        },
+        "require-dev": {
+            "wa72/html-pretty-min": "^0.1.2"
+        },
+        "suggest": {
+            "wa72/html-pretty-min": "Minify or indent HTML documents"
+        },
+        "time": "2016-03-22 14:52:23",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.2.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Wa72\\HtmlPageDom\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christoph Singer",
+                "email": "singer@webagentur72.de",
+                "homepage": "http://www.webagentur72.de"
+            }
+        ],
+        "description": "PHP implementation of the jQuery DOM manipulation API for HTML documents",
+        "homepage": "http://github.com/wasinger/htmlpagedom",
+        "keywords": [
+            "crawler",
+            "dom",
+            "html"
         ]
     }
 ]
