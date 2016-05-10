@@ -876,8 +876,9 @@ var array_values = function (arr) { return (arr || []).slice(0); };
 var is_array = function (obj) { return typeof obj == 'array' || typeof obj == 'object'; }; // PHP and javascript don't make a distinction between arrays and objects syntax wise using [property], all php objects should be restful anyways
 var array_keys = function (obj) {var result=[]; for (var k in obj) { if (obj.hasOwnProperty(k)) { result[result.length] = k } } return result; };
 var implode = function (sep, arr) {return (arr || []).join(sep);};
+var preg_replace = function (needle, replacement, subject) {debugger; return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0]), replacement);};
 var ucfirst = function (str) {return (str || '').substr(0, 1).toUpperCase() + str.substr(1);};
-var str_replace = function (needle, replacement, haystack) {return haystack.replace(needle, replacement);};
+var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};
 var call_user_func_array = function (context, params) {return context[context[1]].apply(context[0], params);};
 var concat = function () { var str = ''; for(var a = 0; a < arguments.length; a++) { str += arguments[a]; } return str; };
 var print = function (s) { window.views.__output += s };

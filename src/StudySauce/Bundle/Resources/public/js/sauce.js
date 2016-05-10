@@ -165,7 +165,9 @@ window.onerror = function (errorMessage, url, lineNumber) {
     }
     return true;
 };
-
+RegExp.escape= function(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+};
 // datepicker modifications to turn onAfterUpdate in to a settable event callback
 $.datepicker._defaults.onAfterUpdate = null;
 
@@ -186,11 +188,21 @@ function centerize() {
         }
         $(this).css('margin-top', '').css('top', '');
         var myheight = $(this).outerHeight(true);
-        var relativeParent = $(this).parents().filter(function () {return (/relative|absolute|fixed/i).test($(this).css('position'));}).first().outerHeight();
+        var relativeParent = $(this).parents().filter(function () {return (/relative|absolute|fixed/i).test($(this).css('position'));}).first();
+        var relativeHeight = relativeParent.outerHeight();
         if(relativeParent.length == 0) {
-            relativeParent = $(this).parent().height();
+            relativeParent = parent();
+            relativeHeight = relativeParent.height();
         }
-        $(this).css((/relative/i).test($(this).css('position')) ? 'top' : 'margin-top', ((relativeParent - myheight) / 2) + 'px')
+        else {
+
+        }
+        var offsetY = (relativeHeight - myheight) / 2;
+        if(relativeParent.css('overflow') == 'auto' && offsetY < 0) {
+            // this should scroll instead of centering
+            offsetY = 0;
+        }
+        $(this).css((/relative/i).test($(this).css('position')) ? 'top' : 'margin-top', offsetY + 'px');
         if($(this).is('img')) {
             $(this).one('load', centerize);
         }
@@ -615,7 +627,7 @@ if(typeof window.jqAjax == 'undefined') {
             if (data != null && typeof data.redirect != 'undefined') {
                 var a = document.createElement('a');
                 a.href = data.redirect;
-                if (Routing.match(window.location) == Routing.match(data.redirect) !== null) {
+                if (window.location.pathname == data.redirect) {
                     // do nothing because we are already on the page
                 }
                 else {
