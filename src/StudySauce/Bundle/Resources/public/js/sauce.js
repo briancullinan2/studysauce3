@@ -9,6 +9,38 @@ window.noError = false;
 $(window).unload(function() {
     window.noError = true;
 });
+function getQueryObject(url) {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = url.substr(url.indexOf('?') + 1);
+
+    var urlParams = {};
+    while (match = search.exec(query)) {
+        var key = decode(match[1]);
+        assignSubKey(urlParams, key, decode(match[2]));
+    }
+
+    return urlParams;
+}
+
+function assignSubKey(obj, key, value) {
+    var keys = key.split(/\]?\[/ig);
+    for(var k = 0; k < keys.length; k++) {
+        var subKey = keys[k];
+        if(subKey.substr(-1) == ']') {
+            subKey = subKey.substr(0, subKey.length-1);
+        }
+        if (k == keys.length - 1) {
+            obj[subKey] = value;
+        }
+        else if (typeof obj[subKey] == 'undefined') {
+            obj[subKey] = {};
+        }
+        obj = obj[subKey];
+    }
+}
 
 function setSelectionRange(input, selectionStart, selectionEnd) {
     if (input.setSelectionRange) {

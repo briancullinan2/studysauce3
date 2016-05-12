@@ -43,32 +43,27 @@ $view['slots']->start('modal-body'); ?>
         $dialog->find('.checkbox')->remove();
         $first = true;
         foreach($tables as $tableName => $fields) {
-            $tmpTables = (array)(new stdClass());
-            $tmpTables[$tableName] = $tables[$tableName];
             $entityField = $dialog->find(concat('input[name="', $tableName, '"][type="text"]'));
-            ?>
-            <div id="add-entity-<?php print ($tableName); ?>" class="tab-pane <?php print ($first ? 'active' : ''); ?>">
-                <?php print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
-                    'context' => $entityField->length > 0
-                        ? $entityField->parents('.tab-pane')
-                        : jQuery('<div/>'), 'tables' => $tmpTables, 'entities' => $entities, 'entityIds' => $entityIds])); ?>
-            </div>
-            <?php
-            $entityField->parents('.tab-pane')->show();
-
-            // TODO: this is UI only code, maybe this should be in a method?
-            if($entityField->is('.selectized')) {
-                setTimeout(function () {
-                    $entityField->val('')->focus();
-                    $entityField[0]['selectize']->setValue('');
-                    $entityField[0]['selectize']->renderCache = [];
-                    $entityField[0]['selectize']->clearOptions();
-                    $entityField[0]['selectize']->settings->searchField = AdminController::getAllFieldNames($tmpTables)->slice(0, 3);
-                    $entityField[0]['selectize']->addOption($entities);
-                }, 50);
+            if($dialog->find(implode('', ['#add-entity-', $tableName]))->length == 0) {
+                $tmpTables = (array)(new stdClass());
+                $tmpTables[$tableName] = $tables[$tableName];
+                ?>
+                <div id="add-entity-<?php print ($tableName); ?>"
+                     class="tab-pane <?php print ($first ? 'active' : ''); ?>">
+                    <?php print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
+                        'context' => $entityField->length > 0
+                            ? $entityField->parents('.tab-pane')
+                            : jQuery('<div/>'), 'tables' => $tmpTables,
+                        'entities' => $entities,
+                        'entityIds' => $entityIds,
+                        'inline' => true])); ?>
+                </div>
+                <?php
             }
 
-            if($first) {
+            $entityField->parents('.tab-pane')->show();
+
+            if ($first) {
                 $entityField->parents('.tab-pane')->addClass('active');
             }
             $first = false;
@@ -84,8 +79,10 @@ $view['slots']->start('modal-footer'); ?>
 <?php $view['slots']->stop();
 
 // TODO: decide what to we do when it is extended?  what does jQuery($this) do?
-if($dialog->length == 0) {
+if($dialog->length > 0) {
     //$dialog = $context->append($view['slots']->get('cell_status_pack'))->find('form');
+    $dialog->find('.nav-tabs')->append(jQuery($view['slots']->get('modal-header'))->find('li'));
+    $dialog->find('.tab-content')->append(jQuery($view['slots']->get('modal-body'))->find('.tab-pane'));
 }
 
 

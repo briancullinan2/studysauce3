@@ -9,7 +9,7 @@ $tableNames = array_keys($tables);
 
 $view['slots']->start('cell-collection-row'); ?>
     <label class="checkbox buttons-1">
-        <input type="checkbox" name="" value="" checked="checked" />
+        <input type="checkbox" name="" value="" />
         <input type="hidden" name="" />
         <i></i>
         <span class="entity-title"></span>

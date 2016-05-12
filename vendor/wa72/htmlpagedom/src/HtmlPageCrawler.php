@@ -1002,7 +1002,13 @@ class HtmlPageCrawler extends Crawler
             return new static([], $this->uri);
         }
         // TODO: something with selector
-        return parent::children();
+        $result = parent::children();
+
+        if(count(func_get_args()) > 0) {
+            return $result->filter(func_get_args()[0]);
+        }
+
+        return $result;
     }
 
     /**

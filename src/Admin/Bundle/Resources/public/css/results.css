@@ -25,10 +25,6 @@ table.results > thead > tr > th
     vertical-align: bottom;
 }
 
-.results header label {
-    font-weight: bold;
-}
-
 .results header label.filtered > input,
 .results header label.filtered > select
 {

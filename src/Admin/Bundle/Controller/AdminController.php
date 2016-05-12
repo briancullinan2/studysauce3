@@ -508,6 +508,7 @@ namespace Admin\Bundle\Controller {
                             : $searchRequest['tables'][$tableName]]);
                     }, $vars['results'][$table]);
                 }
+                // TODO: return a newKey to pair up with some randomized value generated from the client, so we make sure we get all the right edit rows accounted for in-case it has changed while we were saving.
                 return new JsonResponse($vars);
             }
 
@@ -650,11 +651,16 @@ namespace Admin\Bundle\Controller {
 
             self::setUpClasses($orm);
 
-            $searchRequest = unserialize($container->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
-            if(empty($searchRequest) || !isset($searchRequest['tables'])) {
+            if(!empty($request->get('tables'))) {
+                $tables = $request->get('tables');
+            }
+            else {
+                $searchRequest = unserialize($container->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+                $tables = $searchRequest['tables'];
+            }
+            if(empty($tables)) {
                 throw new \Exception('Don\'t know what to save!');
             }
-            $tables = $searchRequest['tables'];
 
             $results = [];
 
@@ -695,7 +701,11 @@ namespace Admin\Bundle\Controller {
          */
         public static function applyFields($class, $tableName, $fields, $e, EntityManager $orm) {
             $allFields = self::getAllFieldNames([$tableName => $fields]);
-            if(is_array($e) && empty($e['id'])) {
+            if($e instanceof $class) {
+                $entity = $e;
+                $e = (array)$e;
+            }
+            else if(is_array($e) && empty($e['id'])) {
                 $entity = new $class;
             }
             else {
@@ -719,26 +729,37 @@ namespace Admin\Bundle\Controller {
 
                     if(isset(self::$allTables[$tableName]->associationMappings[$f])) {
                         $association = self::$allTables[$tableName]->associationMappings[$f];
+                        $tableIndex = array_search($association['targetEntity'], self::$allTableClasses);
+                        $joinTable = array_keys(self::$allTables)[$tableIndex];
                         if($association['type'] == ClassMetadataInfo::ONE_TO_ONE || $association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
                             // create entities from array using same assignment functions as here
-                            $tableIndex = array_search($association['targetEntity'], self::$allTableClasses);
-                            $joinTable = array_keys(self::$allTables)[$tableIndex];
                             $value = self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $e[$f], $orm);
                             // many to one, just lookup object and call set property normally
                             if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                                 call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
                             }
                         }
-                        // one to many, look for add function instead
-                        else if (($type = self::parameterType('add' . ucfirst($f), $entity)) !== false) {
+                        // one to many, look for add function instead, remove ending s from field name like addGroupPack
+                        else if (($type = self::parameterType('add' . ucfirst(rtrim($f, 's')), $entity)) !== false) {
                             // TODO: if dealing with multiple entities, perform actions for each
                             $entities = $e[$f];
                             if(!isset($entities[0])) {
                                 $entities = [$entities];
                             }
 
-                            foreach($entities as $e) {
-
+                            foreach($entities as $subE) {
+                                // automatically do inverse mapping
+                                if(isset($association['mappedBy'])) {
+                                    $subE = array_merge([$association['mappedBy'] => [$entity]], $subE);
+                                }
+                                $childEntity = self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $subE, $orm);
+                                call_user_func_array([$entity, 'add' . ucfirst(rtrim($f, 's'))], [$childEntity]);
+                                if(empty($childEntity->getId())) {
+                                    $orm->persist($childEntity);
+                                }
+                                else {
+                                    $orm->merge($childEntity);
+                                }
                             }
                         }
                     }
@@ -958,7 +979,12 @@ $php
 
 })(jQuery);
 EOJS;
-            return new Response($js, 200, ['Content-Type' => 'text/javascript']);
+            return new Response($js, 200, [
+                'Content-Type' => 'text/javascript',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => 0
+            ]);
         }
 
         /**

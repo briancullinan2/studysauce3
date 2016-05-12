@@ -94,6 +94,10 @@
     overflow-y:scroll;
 }
 
+.last-right-expand label.buttons-1.checkbox i {
+    display:none;
+}
+
 .last-right-expand [class*="-row"].selected > [class*="expand"],
 .last-right-expand [class*="-row"]:hover > [class*="expand"]
 {

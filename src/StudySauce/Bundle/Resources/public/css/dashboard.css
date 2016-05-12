@@ -317,7 +317,6 @@
     width:100%;
 }
 
-#add-entity .entity-title,
 .selectize-control .entity-title {
     padding-left:10px;
 }
@@ -349,10 +348,6 @@ label.buttons-1 {
     display:block;
     margin-top:0;
     margin-bottom:0;
-}
-
-label.buttons-1.checkbox i {
-    display:none;
 }
 
 label.buttons-1.checkbox.changed span:after {

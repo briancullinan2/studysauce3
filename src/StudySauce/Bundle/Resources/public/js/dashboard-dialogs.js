@@ -425,4 +425,36 @@ $(document).ready(function () {
         }, 100);
     });
 
+    body.on('change', 'input[data-confirm], select:has(option[data-confirm])', function () {
+       // TODO: reset to oldValue, show confirmation dialog, then set to new value
+    });
+
+    body.on('click', 'a[data-confirm][data-toggle="modal"]', function (evt) {
+        evt.preventDefault();
+        var that = $(this);
+        body.one('click.confirm_action', '#general-dialog a[href="#submit"]', function () {
+            if(that.is('[data-action]')) {
+
+                $.ajax({
+                    url: that.data('action'),
+                    type: 'GET',
+                    dataType: that.data('type') || 'json',
+                    success: function (data) {
+                        if (that.data('type') == 'text') {
+                            loadContent.apply(that.parents('.results'), [data]);
+                        }
+                        that.parents('.results').trigger('resulted');
+                    }
+                });
+
+            }
+            else {
+                // TODO: set the field value?
+            }
+
+        });
+
+        $('#general-dialog').find('.modal-body').html(that.data('dialog'));
+    });
+
 });

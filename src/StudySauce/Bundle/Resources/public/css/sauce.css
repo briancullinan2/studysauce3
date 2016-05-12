@@ -691,6 +691,10 @@ label
     font-weight: normal;
 }
 
+header label {
+    font-weight: bold;
+}
+
 .selectize-input,
 .selectize-control.multi .selectize-input.has-items,
 .selectize-control.single .selectize-input,

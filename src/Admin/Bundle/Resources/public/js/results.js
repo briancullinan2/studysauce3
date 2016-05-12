@@ -455,6 +455,9 @@ $(document).ready(function () {
             actionItem = fieldTab.find('[action], [data-action]')
         }
         var saveUrl = actionItem.data('action') || actionItem.attr('action');
+        data = $.extend(true, data, getQueryObject(saveUrl));
+        saveUrl = saveUrl.replace(/\?.*/ig, '');
+
         var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]');
 
         if (typeof saveUrl == 'undefined') {
@@ -579,12 +582,16 @@ $(document).ready(function () {
     window.getRowId = getRowId;
 
     // TODO: remove this entire method and merge update features with template system, same as results.html.php and rows.html.php
-    function loadContent(data, tables) {
+    function loadContent(data, tableNames) {
         var admin = $(this).closest('.results').first();
-        if (!tables) {
-            tables = $.unique(admin.find('[class*="-row"].template').map(function () {
-                return (/(.*)-row/i).exec($(this).attr('class'))[1];
-            }).toArray());
+        if (!tableNames) {
+            tableNames = [];
+            var tables = admin.first().data('request')['tables'];
+            for(var tn in tables) {
+                if(tables.hasOwnProperty(tn)) {
+                    tableNames[tableNames.length] = tn;
+                }
+            }
         }
         var content;
         if (typeof data == 'object') {
@@ -606,7 +613,7 @@ $(document).ready(function () {
         }
 
         admin.find('> .views').remove();
-        for (var t = 0; t < tables.length; t++) {
+        for (var t = 0; t < tableNames.length; t++) {
             (function (table) {
                 var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
 
@@ -626,7 +633,7 @@ $(document).ready(function () {
                         var rowId = getRowId.apply(this);
                         return '.' + table + '-id-' + rowId + ', .' + table + '-id-' + rowId + ' + .expandable:not([class*="-row"])';
                     }).toArray();
-                var last = existing.length == 0 ? admin.find(getRowQuery(tables[t - 1])).last() : existing.add(existing.next('.expandable:not([class*="-row"])')).last();
+                var last = existing.length == 0 ? admin.find(getRowQuery(tableNames[t - 1])).last() : existing.add(existing.next('.expandable:not([class*="-row"])')).last();
                 var allNewTableContent = content.find(rowQuery);
                 var newRows = allNewTableContent.not($.merge(['.template'], keepRows).join(','));
                 var headerFooter = allNewTableContent.filter('.views, header, footer, .highlighted-link, .template');
@@ -678,7 +685,7 @@ $(document).ready(function () {
                 if (selected) {
                     admin.find('> .' + table + '-id-' + selected[1]).addClass('selected');
                 }
-            })(tables[t]);
+            })(tableNames[t]);
         }
         resetHeader();
         admin.trigger('resulted');
@@ -807,26 +814,6 @@ $(document).ready(function () {
         });
 
         loadResults.apply(admin);
-    });
-
-    body.on('click', 'a[data-target="#general-dialog"][data-action]', function (evt) {
-        evt.preventDefault();
-        var that = $(this);
-        body.one('click.confirm_action', '#general-dialog a[href="#submit"]', function () {
-            $.ajax({
-                url: that.data('action'),
-                type: 'GET',
-                dataType: that.data('type') || 'json',
-                success: function (data) {
-                    if (that.data('type') == 'text') {
-                        loadContent.apply(that.parents('.results'), [data]);
-                    }
-                    that.parents('.results').trigger('resulted');
-                }
-            });
-        });
-
-        $('#general-dialog').find('.modal-body').html(that.data('dialog'));
     });
 
     body.on('click', 'a[href="#goto-error"]', function (evt) {

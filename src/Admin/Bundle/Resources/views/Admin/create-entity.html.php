@@ -22,6 +22,9 @@ if($tableName == 'ss_group') {
     $newPath = $view['router']->generate('groups_new');
 }
 
+// TODO copy settings to add-entity dialog also!
+
+
 $view['slots']->start('modal-body'); ?>
     <a href="<?php print ($newPath); ?>" class="cloak"><span class="reveal">Start from scratch</span></a>
     <a href="#add-entity" data-target="#add-entity" data-toggle="modal" class="cloak"><span class="reveal">Find existing <?php print (str_replace('ss_', '', $tableName)); ?>s</span></a>

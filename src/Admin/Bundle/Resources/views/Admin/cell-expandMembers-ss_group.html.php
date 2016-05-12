@@ -21,7 +21,7 @@ $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs)
 <form action="<?php print ($view['router']->generate('save_group', ['group' => ['id' => $ss_group->getId()]])); ?>">
 
     <?php
-
+    // TODO: add field name
     if((!isset($searchRequest['pack-id']) || empty($searchRequest['pack-id'])) &&
         (!isset($searchRequest['parent-ss_group-id']) || $ss_group->getId() != $searchRequest['parent-ss_group-id'])) {
         print $this->render('AdminBundle:Admin:cell-collection.html.php', [

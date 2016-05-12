@@ -390,14 +390,16 @@ class Group extends BaseGroup implements GroupInterface
     }
 
     /**
-     * Add groupPacks
+     * Add groupPack
      *
-     * @param \StudySauce\Bundle\Entity\Pack $groupPacks
+     * @param \StudySauce\Bundle\Entity\Pack $groupPack
      * @return Group
      */
-    public function addGroupPack(\StudySauce\Bundle\Entity\Pack $groupPacks)
+    public function addGroupPack(\StudySauce\Bundle\Entity\Pack $groupPack)
     {
-        $this->groupPacks[] = $groupPacks;
+        if(!in_array($groupPack, $this->groupPacks->toArray())) {
+            $this->groupPacks[] = $groupPack;
+        }
 
         return $this;
     }

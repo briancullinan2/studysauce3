@@ -34,6 +34,12 @@ else {
     $input = $search->find('.input > input');
 }
 
+if (isset($entities) && (!isset($inline) || $inline !== true)) {
+    if ($search->find('header:not(.removed)')->length == 0) {
+        jQuery($view['slots']->get('cell-collection-header'))->insertBefore($search->find('.input'));
+    }
+}
+
 $entityIds = isset($entityIds) && is_array($entityIds) ? $entityIds : [];
 $listIds = [];
 $dataTypes = (array)(new stdClass());
@@ -68,48 +74,63 @@ if (isset($entities)) {
         if (isset($entities) && (!isset($inline) || $inline !== true)) {
             $newRow = jQuery($view->render('AdminBundle:Admin:cell-collectionRow.html.php', ['entity' => $dataEntity, 'tables' => $tables]));
             $newRow->find('input[name*="[remove]"]')->val($dataEntity['removed'] ? 'true' : 'false');
-
-            $existing = $search->find('.input ~ .checkbox')->find(concat('input[name^="' , $table , '["][value="' , $dataEntity['id'] , '"]'));
-            if($existing->length == 0) {
-                // TODO: insert in the right place
-                if($search->find('header:contains(Removed)')->length == 0) {
-
+            $newRow->find('input[name*="[id]"]')->attr('checked', 'checked');
+            $existing = $search->children('.checkbox')->find(implode('', ['input[name^="' , $table , '["][value="' , $dataEntity['id'] , '"]']));
+            if($existing->length > 0) {
+                $existing->parents('.checkbox')->remove();
+            }
+            // insert under the the right heading
+            if($dataEntity['removed']) {
+                if ($search->find('header.removed')->length == 0) {
+                    jQuery($view['slots']->get('cell-collection-header'))
+                        ->insertBefore($search->find('.input'))
+                        ->addClass('removed');
                 }
-                $search->append($newRow);
+                $newRow->insertAfter($search->find('header.removed'));
             }
             else {
-                $existing->parents('.checkbox')->replaceWith($newRow);
+                if ($search->find('header:not(.removed)')->length == 0) {
+                    jQuery($view['slots']->get('cell-collection-header'))->insertBefore($search->find('.input'));
+                }
+                $newRow->insertAfter($search->find('header:not(.removed)'));
             }
         }
     }
 }
 
+$headerTitle = '';
+$placeHolder = '';
+foreach ($tableNames as $t) {
+    $headerTitle = implode('', [$headerTitle, !empty($headerTitle) ? '/' : '', (isset($dataTypes[$t])
+        ? count($dataTypes[$t])
+        : 0), ' ', str_replace('ss_', '', $t), 's']);
+
+    $placeHolder = concat((!empty($placeHolder) ? '/' : ''), ucfirst(str_replace('ss_', '', $t)));
+}
+$placeHolder = concat('Search for ', $placeHolder);
+// some final tweak to the input field
+$input->attr('placeholder', $placeHolder);
+
+// if its inline, update header counts
 if (isset($entities) && (!isset($inline) || $inline !== true)) {
-    $header = $search->find('.input + header');
-    if($header->length == 0) {
-        $header = jQuery($view['slots']->get('cell-collection-header'))->insertAfter($search->find('.input'));
-    }
-    $headerTitle = '';
-    $placeHolder = '';
-    foreach ($tableNames as $t) {
-        $headerTitle = concat((!empty($headerTitle) ? '/' : ''), (isset($dataTypes[$t])
-            ? count($dataTypes[$t])
-            : 0), ' ', str_replace('ss_', '', $t), 's');
-
-        $placeHolder = concat((!empty($placeHolder) ? '/' : ''), ucfirst(str_replace('ss_', '', $t)));
-    }
+    $header = $search->find('header:not(.removed)');
     $headerTitle = concat('Members (', $headerTitle, ')');
-    $placeHolder = concat('Search for ', $placeHolder);
     $header->find('label')->text($headerTitle);
-
-    // some final tweak to the input field
-    $input->attr('placeholder', $placeHolder);
+    $search->find('header.removed label')->text('Removed');
+    //if($search->find('header:not(.removed) ~ .checkbox')->length == 0 ||
+    //    $search->find('header:not(.removed) + header')->length > 0) {
+    //    $search->find('header:not(.removed)')->remove();
+    //}
+    if($search->find('header.removed ~ .checkbox')->length == 0 ||
+        $search->find('header.removed + header')->length > 0) {
+        $search->find('header.removed')->remove();
+    }
 }
 
 // this is the update stuff that we do every time the template is called
 
 $entityIds = array_values($entityIds);
-$input->val(isset($inline) && $inline === true ? implode(' ', $listIds) : '');
+//$input->val(isset($inline) && $inline === true ? implode(' ', $listIds) : '');
 // force it to use string keys
 $input->data('tables', $tables)
     ->data('oldValue', '')
@@ -123,7 +144,7 @@ foreach ($tableNames as $t) {
 }
 
 /*
- * TODO: merge this with template scripts
+ * TODO: merge this with template scripts if we need inline version
 function updateRows (toField, value, item) {
     isSettingSelectize = true;
     var tableName = value.split('-')[0];

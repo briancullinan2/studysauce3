@@ -515,9 +515,36 @@ body.right-menu #bookmark
     border: none;
     background:transparent;
 }
-
 #add-entity header {
+    padding: 0;
+    display: block;
+    background: #FFF;
+    margin: 0;
+}
+#add-entity header label:first-of-type {
+    position: relative;
+    padding: 5px 60px;
+    display: inline-block;
+    margin: 0;
+}
+#add-entity header label:before {
+    content: "add";
+    position: absolute;
+    bottom: 5px;
+    left: 2px;
+    font-size: 14px;
+}
+#add-entity header.removed label:before {
+    content: "remove";
+}
+#add-entity header .big-add {
     display:none;
+}
+
+#add-entity .entity-title
+{
+    padding-left:60px;
+    margin-left:-30px;
 }
 
 #add-entity h3,
@@ -540,8 +567,6 @@ body.right-menu #bookmark
 
 #add-entity .tab-pane > .entity-search {
     margin:-10px -10px 0 -10px;
-    max-height: 400px;
-    overflow: auto;
 }
 
 #add-entity .tab-pane > .entity-search > label.input {
