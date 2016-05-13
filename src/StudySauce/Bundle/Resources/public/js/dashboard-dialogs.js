@@ -436,8 +436,9 @@ $(document).ready(function () {
             if(that.is('[data-action]')) {
 
                 $.ajax({
-                    url: that.data('action'),
-                    type: 'GET',
+                    url: that.data('action').replace(/\?.*/ig, ''),
+                    type: 'POST',
+                    data: $.extend({requestKey: getDataRequest.apply(that).requestKey}, getQueryObject(that.data('action'))),
                     dataType: that.data('type') || 'json',
                     success: function (data) {
                         if (that.data('type') == 'text') {
@@ -454,7 +455,7 @@ $(document).ready(function () {
 
         });
 
-        $('#general-dialog').find('.modal-body').html(that.data('dialog'));
+        $('#general-dialog').find('.modal-body').html(that.data('confirm'));
     });
 
 });

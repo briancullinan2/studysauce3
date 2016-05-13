@@ -8,7 +8,7 @@ $tableNames = array_keys($tables);
 $view['slots']->start('cell-collection-create'); ?>
     <div class="entity-search <?php print (implode(' ', $tableNames)); ?>">
         <label class="input">
-            <input type="text" name="<?php print (implode('_', $tableNames)); ?>" value=""
+            <input type="text" name="<?php print (isset($fieldName) ? $fieldName : implode('_', $tableNames)); ?>" value=""
                    data-confirm="<?php print (!isset($dataConfirm) || $dataConfirm ? 'true' : 'false'); ?>" /></label>
     </div>
 <?php $view['slots']->stop();

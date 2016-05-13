@@ -740,25 +740,34 @@ namespace Admin\Bundle\Controller {
                             }
                         }
                         // one to many, look for add function instead, remove ending s from field name like addGroupPack
-                        else if (($type = self::parameterType('add' . ucfirst(rtrim($f, 's')), $entity)) !== false) {
-                            // TODO: if dealing with multiple entities, perform actions for each
+                        else {
                             $entities = $e[$f];
                             if(!isset($entities[0])) {
                                 $entities = [$entities];
                             }
 
+                            // if dealing with multiple entities, perform actions for each
                             foreach($entities as $subE) {
                                 // automatically do inverse mapping
+                                $fields = self::$defaultTables[$joinTable]; //[$joinTable => array_keys($subE)];
+                                $isAdding = true;
                                 if(isset($association['mappedBy'])) {
-                                    $subE = array_merge([$association['mappedBy'] => [$entity]], $subE);
+                                    // set to entity or set to null if removing a many-to-one
+                                    $isAdding = !isset($subE['remove']) || $association['type'] != ClassMetadataInfo::ONE_TO_MANY || $subE['remove'] !== 'true';
+                                    $subE = array_merge([$association['mappedBy'] => $isAdding ? [$entity] : null, 'remove' => $subE['remove']], $subE);
+                                    $fields = array_merge($fields, [$association['mappedBy']]);
                                 }
-                                $childEntity = self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $subE, $orm);
-                                call_user_func_array([$entity, 'add' . ucfirst(rtrim($f, 's'))], [$childEntity]);
-                                if(empty($childEntity->getId())) {
-                                    $orm->persist($childEntity);
+                                if(isset($e['remove']) && $e['remove'] === 'true') {
+                                    $isAdding = false;
                                 }
-                                else {
-                                    $orm->merge($childEntity);
+                                $childEntity = self::applyFields($association['targetEntity'], $joinTable, $fields, $subE, $orm);
+                                if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
+                                    call_user_func_array([$entity, $method], [$childEntity]);
+                                    if (empty($childEntity->getId())) {
+                                        $orm->persist($childEntity);
+                                    } else {
+                                        $orm->merge($childEntity);
+                                    }
                                 }
                             }
                         }
@@ -842,7 +851,7 @@ namespace Admin\Bundle\Controller {
                 'edit' => false,
                 'read-only' => ['ss_group'],
                 'new' => false,
-                'ss_group-id' => $g->getId(),
+                isset($searchRequest['ss_group-id']) ? 'ss_group-id' : 'parent-ss_group-id' => $g->getId(),
                 'requestKey' => null
             ]));
         }

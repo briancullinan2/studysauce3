@@ -270,7 +270,8 @@ $(document).ready(function () {
         isSettingSelectize = true;
 
         // do a few extra things to help list in dialog stay open after clicking
-        if (entityField.parents('#add-entity').length > 0) {
+        var dialog;
+        if ((dialog = entityField.parents('#add-entity')).length > 0) {
             var existing = (entityField.data('entities') || []);
             var obj = $.extend({}, item);
             obj.removed = existing.indexOf(value) > -1;
@@ -287,6 +288,9 @@ $(document).ready(function () {
                 entities: [obj],
                 entityIds: entityField.data('entities').slice(0)
             }]);
+            // synchronize with other fields in the dialog for consistency
+            dialog.find('.input input.selectized').not(entityField).data('entities', entityField.data('entities'));
+
             // TODO: update confirmation message
 
             adjustBackdrop();
@@ -313,7 +317,7 @@ $(document).ready(function () {
             tables: $.extend({}, field.data('tables') || {}),
             entityIds:  (field.data('entities') || []).slice(0),
             confirm: field.data('confirm') || true, // dialog uses this to determine if a confirm should be displayed at the end, as opposed to confirming every field change
-            entities: []
+            entities: [] // TODO: include default entities
         };
         for(var t in settings.tables) {
             if(settings.tables.hasOwnProperty(t)) {

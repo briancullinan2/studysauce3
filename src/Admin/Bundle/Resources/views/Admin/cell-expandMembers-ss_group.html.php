@@ -18,7 +18,7 @@ usort($packs, function (Pack $p1, Pack $p2) {
 });
 $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs);
 ?>
-<form action="<?php print ($view['router']->generate('save_group', ['group' => ['id' => $ss_group->getId()]])); ?>">
+<form action="<?php print ($view['router']->generate('save_group', ['ss_group' => ['id' => $ss_group->getId()], 'tables' => ['ss_group' => ['users']]])); ?>">
 
     <?php
     // TODO: add field name
@@ -27,11 +27,13 @@ $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs)
         print $this->render('AdminBundle:Admin:cell-collection.html.php', [
             'tables' => ['pack' => AdminController::$defaultMiniTables['pack']],
             'entities' => $packs,
-            'entityIds' => $packIds]);
+            'entityIds' => $packIds,
+            'fieldName' => 'ss_group[packs]']);
     } ?>
 
     <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
         'entities' => $users,
-        'entityIds' => $ids]); ?>
+        'entityIds' => $ids,
+        'fieldName' => 'ss_group[users]']); ?>
 </form>
