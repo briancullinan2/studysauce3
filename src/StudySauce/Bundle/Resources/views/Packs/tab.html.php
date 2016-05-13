@@ -67,8 +67,8 @@ $view['slots']->start('body'); ?>
                             'ss_group' => ['id', 'title', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */]
                         ],
                         'classes' => ['last-right-expand'],
-                        'headers' => ['pack' => 'subGroups'],
-                        'footers' => ['ss_group' => 'subGroups'],
+                        'headers' => ['pack' => 'createSubGroups'],
+                        'footers' => false,
                         'edit' => false,
                         'read-only' => false,
                         // search settings

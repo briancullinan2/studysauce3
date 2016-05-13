@@ -549,9 +549,12 @@ class Pack
      * @param \StudySauce\Bundle\Entity\Group
      * @return $this|\FOS\UserBundle\Model\GroupableInterface|void
      */
-    public function removeGroup(Group $groups)
+    public function removeGroup(Group $group)
     {
-        $this->groups->removeElement($groups);
+        $this->groups->removeElement($group);
+        if($this->group == $group) {
+            $this->group = null;
+        }
     }
 
     /**

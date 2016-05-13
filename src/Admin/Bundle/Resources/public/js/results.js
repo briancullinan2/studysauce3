@@ -650,7 +650,9 @@ $(document).ready(function () {
                         else {
                             headerFooter.insertAfter(last);
                         }
-                        last = headerFooter.filter('header, .views').last();
+                        if(headerFooter.filter('header, .views').length > 0) {
+                            last = headerFooter.filter('header, .views').last();
+                        }
                     }
                     newRows = newRows.not(headerFooter);
                 }

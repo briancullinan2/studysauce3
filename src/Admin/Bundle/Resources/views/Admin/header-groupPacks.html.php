@@ -14,9 +14,8 @@ foreach($results['pack'] as $p) {
     <label>Study pack</label>
     <label>Members</label>
     <label>Cards</label>
-    <a href="#create-entity" data-target="#create-entity"
+    <a href="#create-entity" data-target="#create-entity" data-toggle="modal"
        name="ss_group[groupPacks]"
-       data-toggle="modal"
        data-tables="<?php print ($view->escape(json_encode(['pack' => AdminController::$defaultMiniTables['pack']]))); ?>"
        data-entities="<?php print ($view->escape(json_encode($entityIds))); ?>"
        data-action="<?php print ($view['router']->generate('save_group', [

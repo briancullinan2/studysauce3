@@ -7,7 +7,7 @@ use StudySauce\Bundle\Entity\User;
 /** @var Pack $pack */
 
 if (isset($searchRequest['pack-id']) && $pack->getId() == $searchRequest['pack-id']) {
-    print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => ['All users in this pack', 0, 0]]));
+    print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => ['All users (not in subgroups below)', 0, 0]]));
 } else { ?>
     <a href="<?php print ($view['router']->generate('packs_edit', ['pack' => $pack->getId()])); ?>">
     <?php

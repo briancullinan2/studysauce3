@@ -358,13 +358,29 @@ $(document).ready(function () {
                 var option = field[0].selectize.options[e];
                 return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '');
 
+        // TODO: on pack entities show publish-confirm dialog
+        if(typeof tables['pack'] != 'undefined') {
+            // TODO: add additional messaging concerning subgroups
+            var rows = toField.parents('.panel-pane').find('.ss_group-row:visible'); // TODO: not() same id as this page?
+            message += ' ' + (addItems.length > 0 ? 'to' : '')
+                + (addItems.length > 0 && removeItems.length ? '/' : '')
+                + (removeItems.length > 0 ? 'from' : '')
+                + ' ALL ' + (rows.length - 1) + ' subgroups (affects ' + rows.map(function () {
+                    var result = parseInt($(this).find('.title label:nth-child(2) span').text());
+                    return isNaN(result) ? 0 : result;}).toArray().reduce(function (a, b) {return a + b;}) + ' users) ';
+            //if(addItems.length > 0) {
+            //    // TODO: if adding show publish dialog instead
+            //    showPublishDialog.apply(toField, [addItems[0], packName, null]);
+            //}
+        }
+
         // confirmation dialog
         body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
             copyFromDialog.apply(toField);
         });
 
         $('#general-dialog').modal({show: true, backdrop: true})
-            .find('.modal-body').html('<p>Are you sure you want to ' + message + '?');
+            .find('.modal-body').html('<p>Are you sure you want to ' + message.trim() + '?');
     });
 
     function resetFieldToData() {

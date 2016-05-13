@@ -14,6 +14,11 @@ if(isset($searchRequest['ss_group-id']) && !empty($group = $searchRequest['ss_gr
     $users = $users->filter(function (User $u) use ($group) {
         return $u->getGroups()->filter(function (Group $g) use ($group) {return $g->getId() == $group;})->count() > 0;});
 }
+else if (isset($results['ss_group'])) {
+    // displaying the list of users not in subgroups which are displayed right below this row
+    $users = $users->filter(function (User $u) use ($results) {
+        return $u->getGroups()->filter(function (Group $g) use ($results) {return in_array($g, $results['ss_group']);})->count() == 0;});
+}
 $sorted = $users->toArray();
 usort($sorted, function (User $p1, User $p2) {
     return strcmp($p1->getFirst() . ' ' . $p1->getLast(), $p2->getFirst() . ' ' . $p2->getLast());

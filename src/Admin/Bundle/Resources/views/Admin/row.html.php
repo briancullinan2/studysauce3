@@ -25,12 +25,12 @@ print (isset($searchRequest['edit']) && ($searchRequest['edit'] === true || is_a
         : 'read-only')); ?> <?php
 print (isset($expandable[$table]) ? 'expandable' : ''); ?> <?php
 print (!empty($classes) ? $classes : ''); ?>">
-    <?php print ($view->render('AdminBundle:Admin:cells.html.php', ['entity' => $entity, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest])); ?>
+    <?php print ($view->render('AdminBundle:Admin:cells.html.php', ['entity' => $entity, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest, 'results' => $results])); ?>
     <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
 </div>
 <?php if (isset($expandable[$table])) { ?>
     <div class="expandable <?php
     print (!empty($classes) ? $classes : ''); ?>">
-    <?php print ($view->render('AdminBundle:Admin:cells.html.php', ['entity' => $entity, 'tables' => $expandable, 'table' => $table, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest])); ?>
+    <?php print ($view->render('AdminBundle:Admin:cells.html.php', ['entity' => $entity, 'tables' => $expandable, 'table' => $table, 'allGroups' => $allGroups, 'searchRequest' => $searchRequest, 'results' => $results])); ?>
     </div><?php
 }

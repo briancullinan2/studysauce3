@@ -9,11 +9,20 @@ foreach ($tables[$table] as $f => $fields) {
 <div class="<?php print ($field); ?>">
     <?php
     if ($view->exists(concat('AdminBundle:Admin:cell-' , $field , '-' , $table , '.html.php'))) {
-        $specificCell = ['groups' => $allGroups, 'table' => $table, 'searchRequest' => $searchRequest];
+        $specificCell = [
+            'groups' => $allGroups,
+            'table' => $table,
+            'searchRequest' => $searchRequest,
+            'results' => $results];
         $specificCell[$table] = $entity;
         print ($view->render(concat('AdminBundle:Admin:cell-' , $field , '-' , $table , '.html.php'), $specificCell));
     } else if ($view->exists(concat('AdminBundle:Admin:cell-' , $field , '.html.php'))) {
-        print ($view->render(concat('AdminBundle:Admin:cell-' , $field , '.html.php'), ['entity' => $entity, 'groups' => $allGroups, 'table' => $table, 'searchRequest' => $searchRequest]));
+        print ($view->render(concat('AdminBundle:Admin:cell-' , $field , '.html.php'), [
+            'entity' => $entity,
+            'groups' => $allGroups,
+            'table' => $table,
+            'searchRequest' => $searchRequest,
+            'results' => $results]));
     } else {
         print ($view->render('AdminBundle:Admin:cell-generic.html.php', [
             'tables' => $tables,
@@ -22,7 +31,8 @@ foreach ($tables[$table] as $f => $fields) {
             'entity' => $entity,
             'groups' => $allGroups,
             'table' => $table,
-            'searchRequest' => $searchRequest]));
+            'searchRequest' => $searchRequest,
+            'results' => $results]));
     }
     ?></div>
 

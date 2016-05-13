@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\Group as BaseGroup;
 use FOS\UserBundle\Model\GroupInterface;
+use StudySauce\Bundle\Entity\Pack;
 
 /**
  * @ORM\Entity
@@ -241,10 +242,10 @@ class Group extends BaseGroup implements GroupInterface
     /**
      * Add packs
      *
-     * @param \StudySauce\Bundle\Entity\Pack $packs
+     * @param Pack $packs
      * @return Group
      */
-    public function addPack(\StudySauce\Bundle\Entity\Pack $packs)
+    public function addPack(Pack $packs)
     {
         $this->packs[] = $packs;
 
@@ -254,9 +255,9 @@ class Group extends BaseGroup implements GroupInterface
     /**
      * Remove packs
      *
-     * @param \StudySauce\Bundle\Entity\Pack $packs
+     * @param Pack $packs
      */
-    public function removePack(\StudySauce\Bundle\Entity\Pack $packs)
+    public function removePack(Pack $packs)
     {
         $this->packs->removeElement($packs);
     }
@@ -392,13 +393,19 @@ class Group extends BaseGroup implements GroupInterface
     /**
      * Add groupPack
      *
-     * @param \StudySauce\Bundle\Entity\Pack $groupPack
+     * @param Pack $groupPack
      * @return Group
      */
-    public function addGroupPack(\StudySauce\Bundle\Entity\Pack $groupPack)
+    public function addGroupPack(Pack $groupPack)
     {
         if(!in_array($groupPack, $this->groupPacks->toArray())) {
             $this->groupPacks[] = $groupPack;
+
+            foreach($this->subgroups->toArray() as $s) {
+                /** @var Group $s */
+                $s->addGroupPack($groupPack);
+            }
+
         }
 
         return $this;
@@ -407,11 +414,21 @@ class Group extends BaseGroup implements GroupInterface
     /**
      * Remove groupPacks
      *
-     * @param \StudySauce\Bundle\Entity\Pack $groupPacks
+     * @param Pack $pack
      */
-    public function removeGroupPack(\StudySauce\Bundle\Entity\Pack $groupPacks)
+    public function removeGroupPack(Pack $pack)
     {
-        $this->groupPacks->removeElement($groupPacks);
+        if($this->packs->contains($pack)) {
+            $this->groupPacks->removeElement($pack);
+
+            foreach($this->subgroups->toArray() as $s) {
+                /** @var Group $s */
+                $s->removeGroupPack($pack);
+            }
+        }
+        if($this->packs->contains($pack)) {
+            $this->packs->removeElement($pack);
+        }
     }
 
     /**

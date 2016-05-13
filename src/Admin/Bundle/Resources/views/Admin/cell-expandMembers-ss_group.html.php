@@ -21,19 +21,27 @@ $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs)
 <form action="<?php print ($view['router']->generate('save_group', ['ss_group' => ['id' => $ss_group->getId()], 'tables' => ['ss_group' => ['users']]])); ?>">
 
     <?php
-    // TODO: add field name
-    if((!isset($searchRequest['pack-id']) || empty($searchRequest['pack-id'])) &&
-        (!isset($searchRequest['parent-ss_group-id']) || $ss_group->getId() != $searchRequest['parent-ss_group-id'])) {
-        print $this->render('AdminBundle:Admin:cell-collection.html.php', [
-            'tables' => ['pack' => AdminController::$defaultMiniTables['pack']],
-            'entities' => $packs,
-            'entityIds' => $packIds,
-            'fieldName' => 'ss_group[packs]']);
-    } ?>
-
-    <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', [
+    $groupMembersList = [
         'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
         'entities' => $users,
         'entityIds' => $ids,
-        'fieldName' => 'ss_group[users]']); ?>
+        'fieldName' => 'ss_group[users]'];
+
+    // TODO: add field name
+    if(!isset($searchRequest['pack-id']) || empty($searchRequest['pack-id'])) {
+        if((!isset($searchRequest['parent-ss_group-id'])
+            || $ss_group->getId() != $searchRequest['parent-ss_group-id'])) {
+            print $this->render('AdminBundle:Admin:cell-collection.html.php', [
+                'tables' => ['pack' => AdminController::$defaultMiniTables['pack']],
+                'entities' => $packs,
+                'entityIds' => $packIds,
+                'fieldName' => 'ss_group[packs]']);
+        }
+    }
+    else {
+        $groupMembersList['removedEntities'] = array_values(array_filter($users, function (User $user) use ($results) {return !empty($up = $user->getUserPack($results['pack'][0])) ? $up->getRemoved() : false;}));
+    }
+    ?>
+
+    <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', $groupMembersList); ?>
 </form>

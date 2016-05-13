@@ -4,7 +4,6 @@ imports:
 parameters:
     defer_all_emails: "studymarketing@mailinator.com"
 
-
 doctrine:
     dbal:
         driver:   "pdo_mysql"
@@ -18,8 +17,8 @@ services:
         class: Doctrine\DBAL\Driver\PDOConnection
         arguments:
             - "mysql:host=localhost;port=3306;dbname=studysauce3"
-            - study2
-            - itekIO^#(1234
+            - "study2"
+            - "itekIO^#(1234"
         calls:
             - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
 
@@ -27,7 +26,7 @@ monolog:
     handlers:
         main:
             type:         stream
-            action_level: debug
+            action_level: error
             handler:      nested
         nested:
             type:  stream

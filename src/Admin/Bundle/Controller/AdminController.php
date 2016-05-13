@@ -753,8 +753,8 @@ namespace Admin\Bundle\Controller {
                                 $isAdding = true;
                                 if(isset($association['mappedBy'])) {
                                     // set to entity or set to null if removing a many-to-one
-                                    $isAdding = !isset($subE['remove']) || $association['type'] != ClassMetadataInfo::ONE_TO_MANY || $subE['remove'] !== 'true';
-                                    $subE = array_merge([$association['mappedBy'] => $isAdding ? [$entity] : null, 'remove' => $subE['remove']], $subE);
+                                    $isAdding = !isset($subE['remove']) || $subE['remove'] !== 'true';
+                                    $subE = array_merge([$association['mappedBy'] => $isAdding || $association['type'] != ClassMetadataInfo::ONE_TO_MANY ? [$entity] : null, 'remove' => $subE['remove']], $subE);
                                     $fields = array_merge($fields, [$association['mappedBy']]);
                                 }
                                 if(isset($e['remove']) && $e['remove'] === 'true') {
@@ -813,8 +813,28 @@ namespace Admin\Bundle\Controller {
                 throw new AccessDeniedHttpException();
             }
 
+            /** @var Group $g */
+            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+            list($g) = self::standardSave($request, $this->container);
+            if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
+                if(isset($request->get('ss_group')['remove']) && $request->get('ss_group')['remove'] == 'true') {
+                    return $this->redirect($this->generateUrl('groups'));
+                }
+                // if the ID was empty, update the results request with the new ID
+                if(isset($request->get('ss_group')['id']) && empty($request->get('ss_group')['id'])) {
+                    $searchRequest['edit'] = false;
+                    $searchRequest['read-only'] = ['ss_group'];
+                    $searchRequest['new'] = false;
+                    $searchRequest['ss_group-id'] = $g->getId();
+                    $searchRequest['requestKey'] = null;
+                }
+            }
+            else {
+
+            }
+
             // TODO: generalize this in a standardRemove function that specifies which associations to disassociate from and how to mark it removed
-            if ($request->get('remove') == 'true') {
+            /*
                 // remove group from users
                 $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
                 foreach ($invites as $i => $in) {
@@ -822,7 +842,7 @@ namespace Admin\Bundle\Controller {
                 }
                 $coupons = $orm->getRepository('StudySauceBundle:Coupon')->findBy(['group' => $request->get('groupId')]);
                 foreach ($coupons as $i => $c) {
-                    /** @var Coupon $c */
+                    /** @var Coupon $c
                     $c->setGroup(null);
                     $orm->merge($c);
                 }
@@ -833,27 +853,16 @@ namespace Admin\Bundle\Controller {
                     $g->setDeleted(true);
                 }
                 //foreach($g->getUsers()->toArray() as $i => $u) {
-                //    /** @var User $u */
+                //    /** @var User $u
                 //    $u->removeGroup($g);
                 //    $g->removeUser($u);
                 //    $userManager->updateUser($u, false);
                 //}
                 $orm->flush();
-                return $this->redirect($this->generateUrl('groups'));
             }
-            else {
-                /** @var Group $g */
-                list($g) = self::standardSave($request, $this->container);
-            }
+            */
 
-            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
-            return $this->forward('AdminBundle:Admin:results', array_merge($searchRequest, [
-                'edit' => false,
-                'read-only' => ['ss_group'],
-                'new' => false,
-                isset($searchRequest['ss_group-id']) ? 'ss_group-id' : 'parent-ss_group-id' => $g->getId(),
-                'requestKey' => null
-            ]));
+            return $this->forward('AdminBundle:Admin:results', $searchRequest);
         }
 
         /**
