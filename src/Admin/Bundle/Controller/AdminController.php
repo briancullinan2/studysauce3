@@ -803,7 +803,6 @@ namespace Admin\Bundle\Controller {
          */
         public function saveGroupAction(Request $request)
         {
-
             /** @var $orm EntityManager */
             $orm = $this->get('doctrine')->getManager();
 
@@ -814,8 +813,10 @@ namespace Admin\Bundle\Controller {
             }
 
             /** @var Group $g */
-            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
             list($g) = self::standardSave($request, $this->container);
+
+            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+
             if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
                 if(isset($request->get('ss_group')['remove']) && $request->get('ss_group')['remove'] == 'true') {
                     return $this->redirect($this->generateUrl('groups'));
@@ -827,6 +828,21 @@ namespace Admin\Bundle\Controller {
                     $searchRequest['new'] = false;
                     $searchRequest['ss_group-id'] = $g->getId();
                     $searchRequest['requestKey'] = null;
+                }
+                // TODO: generalize this recursive stuff, maybe if parent_path can be used to lookup all entities and perform the same action on each
+                if(isset($request->get('ss_group')['groupPacks'])) {
+                    foreach($g->getUsersPacksGroupsRecursively()[2] as $subGroup) {
+                        /** @var Group $subGroup */
+                        $entity = self::applyFields(AdminController::$allTables['ss_group']->name, 'ss_group', ['groupPacks'], array_merge($request->get('ss_group'), ['id' => $subGroup->getId()]), $orm);
+
+                        if(empty($entity->getId())) {
+                            $orm->persist($entity);
+                        }
+                        else {
+                            $orm->merge($entity);
+                        }
+                        $orm->flush();
+                    }
                 }
             }
             else {

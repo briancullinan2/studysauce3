@@ -400,12 +400,6 @@ class Group extends BaseGroup implements GroupInterface
     {
         if(!in_array($groupPack, $this->groupPacks->toArray())) {
             $this->groupPacks[] = $groupPack;
-
-            foreach($this->subgroups->toArray() as $s) {
-                /** @var Group $s */
-                $s->addGroupPack($groupPack);
-            }
-
         }
 
         return $this;
@@ -418,14 +412,7 @@ class Group extends BaseGroup implements GroupInterface
      */
     public function removeGroupPack(Pack $pack)
     {
-        if($this->packs->contains($pack)) {
-            $this->groupPacks->removeElement($pack);
-
-            foreach($this->subgroups->toArray() as $s) {
-                /** @var Group $s */
-                $s->removeGroupPack($pack);
-            }
-        }
+        $this->groupPacks->removeElement($pack);
         if($this->packs->contains($pack)) {
             $this->packs->removeElement($pack);
         }
