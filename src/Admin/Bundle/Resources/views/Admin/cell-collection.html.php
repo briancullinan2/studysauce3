@@ -42,7 +42,7 @@ if (isset($entities) && (!isset($inline) || $inline !== true)) {
 
 $entityIds = isset($entityIds) && is_array($entityIds) ? $entityIds : [];
 $listIds = [];
-$dataTypes = (array)(new stdClass());
+$dataTypes = (array)(new stdClass()); // TODO: fix this syntax in JS
 $removedEntities = isset($removedEntities) && is_array($removedEntities) ? $removedEntities : [];
 if (isset($entities)) {
     foreach ($entities as $entity) {
@@ -64,7 +64,6 @@ if (isset($entities)) {
             array_splice($entityIds, $unsetId, 1);
         }
         if(!isset($dataTypes[$table])) {
-            // TODO: fix this syntax in JS
             $dataTypes[$table] = [];
         }
         $dataTypes[$table][count($dataTypes[$table])] = $dataEntity;

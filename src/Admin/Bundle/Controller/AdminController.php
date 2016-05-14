@@ -143,7 +143,6 @@ namespace Admin\Bundle\Controller {
 
         private static function joinBuilder(QueryBuilder $qb, $joinTable, $joinName, $field, $request, &$joins = [])
         {
-            // TODO: add userPacks-removed = false search field
             $result = '';
             $joinFields = explode('.', $field);
             foreach ($joinFields as $jf) {
@@ -160,6 +159,7 @@ namespace Admin\Bundle\Controller {
                     if (!in_array($newName, $joins)) {
                         $joins[] = $newName;
                         $qb = $qb->leftJoin($joinName . '.' . $jf, $newName);
+                        // allow searching of connected fields like userPacks-removed = false
                         if (in_array($joinTable, array_keys($request['tables']))) {
                             $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $newName, $request, $joins);
                         }
@@ -639,6 +639,15 @@ namespace Admin\Bundle\Controller {
             return $this->forward('AdminBundle:Admin:results', ['tables' => ['ss_user', 'ss_group']]);
         }
 
+        public function saveAction(Request $request) {
+
+            self::standardSave($request, $this->container);
+
+            if(!empty($url = $request->get('redirect'))) {
+                return $this->redirect($url);
+            }
+        }
+
         /**
          * @param Request $request
          * @param ContainerInterface $container
@@ -721,8 +730,6 @@ namespace Admin\Bundle\Controller {
                 throw new \Exception('Item not found!');
             }
 
-            // TODO: put remove logic here
-
             foreach($allFields as $f) {
 
                 if(isset($e[$f])) { // only apply fields that are set, removes have to be set to 'remove' => 'true'
@@ -760,6 +767,7 @@ namespace Admin\Bundle\Controller {
                                 if(isset($e['remove']) && $e['remove'] === 'true') {
                                     $isAdding = false;
                                 }
+                                // TODO: add entity[clear] = 'true' to clear lists to support deleting and disassociating, maybe has to submit has of all IDs for safety?
                                 $childEntity = self::applyFields($association['targetEntity'], $joinTable, $fields, $subE, $orm);
                                 if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
                                     call_user_func_array([$entity, $method], [$childEntity]);
@@ -772,9 +780,19 @@ namespace Admin\Bundle\Controller {
                             }
                         }
                     }
-                    else if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
+                    else if(($rp = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
+                        $type = $rp->getClass();
+                        $value = $e[$f];
+                        if(is_object($type) && $type->getNamespaceName() == 'StudySauce\\Bundle\\Entity') {
+                            $tableIndex = array_search($type->getName(), self::$allTableClasses);
+                            $joinTable = array_keys(self::$allTables)[$tableIndex];
+                            $value = self::applyFields($type->getName(), $joinTable, $fields, $value, $orm);
+                        }
                         // TODO: handle roles, properties and datetime data types
-                        call_user_func_array([$entity, 'set' . ucfirst($f)], [$e[$f]]);
+                        else if (is_object($type) && $type->getName() == '\\DateTime') {
+                            $value = new \DateTime($value);
+                        }
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
                     }
                 }
             }
@@ -843,6 +861,11 @@ namespace Admin\Bundle\Controller {
                         }
                         $orm->flush();
                     }
+                }
+                if(isset($request->get('ss_group')['deleted'])) {
+                    $g->setName($g->getName() . '-Deleted On ' . time());
+                    $orm->merge($g);
+                    $orm->flush();
                 }
             }
             else {

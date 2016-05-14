@@ -61,7 +61,7 @@ class PacksController extends Controller
 
         /** @var Pack $newPack */
         // process pack settings
-        AdminController::standardSave($request, $this->container);
+        list($newPack) = AdminController::standardSave($request, $this->container);
 
         if(!empty($request->get('properties')) && !empty($request->get('properties')['keyboard'])) {
             $newPack->setProperty('keyboard', $request->get('properties')['keyboard']);
@@ -232,41 +232,6 @@ class PacksController extends Controller
             'pack-id' => $newPack->getId(),
             'requestKey' => null,
         ]));
-    }
-
-    public function removeAction(Pack $pack = null)
-    {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
-        if (!empty($pack)) {
-            // TODO: set deleted flag if there are existing responses, we don't delete here
-            foreach ($pack->getUserPacks()->toArray() as $up) {
-                /** @var UserPack $up */
-                $pack->removeUserPack($up);
-                $up->getUser()->removeUserPack($up);
-                $orm->remove($up);
-            }
-            foreach ($pack->getCards()->toArray() as $c) {
-                /** @var Card $c */
-                foreach ($c->getAnswers()->toArray() as $a) {
-                    $c->removeAnswer($a);
-                    $orm->remove($a);
-                }
-                foreach ($c->getResponses()->toArray() as $r) {
-                    /** @var Response $r */
-                    $c->removeResponse($r);
-                    $r->getUser()->removeResponse($r);
-                    $orm->remove($r);
-                }
-                $c->getPack()->removeCard($c);
-                $orm->remove($c);
-            }
-            $orm->remove($pack);
-            $orm->flush();
-        }
-
-        return $this->redirect($this->generateUrl('packs'));
     }
 
     /**

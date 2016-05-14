@@ -1,8 +1,8 @@
 <?php
 
-//TODO: in javascript convert this to window.views.__vars? global $i;
 use Admin\Bundle\Controller\AdminController;
 
+// in javascript convert this to window.views.__vars global $i;
 AdminController::$radioCounter++;
 
 $tableNames = array_keys($tables);

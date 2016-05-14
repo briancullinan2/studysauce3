@@ -24,6 +24,14 @@ $collection->add(
 );
 
 $collection->add(
+    'command_save',
+    new Route(
+        '/command/save',
+        ['_controller' => 'AdminBundle:Admin:save']
+    )
+);
+
+$collection->add(
     'template',
     new Route(
         '/command/template/{name}.js',

@@ -56,7 +56,8 @@ $template = $type == ''
 // switch templates if needed
 if (2 != $template->length) {
     $preview->children()->remove();
-    // TODO: re-render preview completely because type has changed
+
+    // this is all prompt content
     $view['slots']->start('card-preview-prompt'); ?>
     <?php if (!empty($isImage)) { ?><img src="<?php print ($url); ?>" class="centerized" /><?php } ?>
     <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print ($url); ?>" class="play centerized"></a><a href="#pause" class="pause centerized"></a></div><?php } ?>
@@ -65,6 +66,7 @@ if (2 != $template->length) {
     <?php } ?>
     <?php $view['slots']->stop();
 
+    // re-render preview completely because type has changed
     $view['slots']->start('card-preview'); ?>
     <h3>Preview: </h3>
     <?php if (empty($type)) { ?>

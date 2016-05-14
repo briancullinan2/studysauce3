@@ -17,9 +17,11 @@ function getQueryObject(url) {
         query  = url.substr(url.indexOf('?') + 1);
 
     var urlParams = {};
-    while (match = search.exec(query)) {
-        var key = decode(match[1]);
-        assignSubKey(urlParams, key, decode(match[2]));
+    if(url.indexOf('?') > -1) {
+        while (match = search.exec(query)) {
+            var key = decode(match[1]);
+            assignSubKey(urlParams, key, decode(match[2]));
+        }
     }
 
     return urlParams;
@@ -450,18 +452,18 @@ function gatherFields(fields, visibleOnly) {
                 if(inputField.is('[name^="' + fields[f] + '["]')) {
                     key = inputField.attr('name');
                 }
-                var item = null;
+                var value;
                 if (inputField.is('[type="checkbox"],[type="radio"]')) {
-                    item = {name: key, value: inputField.filter(':checked').val()};
+                    value = inputField.filter(':checked').val();
                 }
                 else if (inputField.is('.dateTimePicker')) {
-                    item = {name: key, value: inputField.datetimepicker('getValue')};
+                    value = inputField.datetimepicker('getValue');
                 }
                 else if (inputField.length > 0) {
-                    item = {name: key, value: inputField.val()};
+                    value = inputField.val();
                 }
-                if (item != null) {
-                    formFields[formFields.length] = item;
+                if(typeof value != 'undefined') {
+                    formFields[formFields.length] = {name: key, value: item};
                 }
             }
         }
@@ -469,7 +471,7 @@ function gatherFields(fields, visibleOnly) {
     for(var i = 0; i < formFields.length; i++) {
         if(fields.indexOf(formFields[i].name) > -1 &&
             (!visibleOnly || form.find('[name="' + formFields[i].name + '"]:visible').length > 0)) {
-            result[formFields[i].name] = formFields[i].value;
+            assignSubKey(result, formFields[i].name, formFields[i].value);
         }
     }
     return result;

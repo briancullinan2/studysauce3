@@ -303,6 +303,7 @@ $(document).ready(function () {
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
                 standardSave.apply(tab, [{}]);
+                autoSaveTimeout = null;
             }, 2000);
         }
     }
