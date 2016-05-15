@@ -53,7 +53,7 @@ if (isset($entities)) {
         if(!isset($dataEntity['removed'])) {
             $dataEntity['removed'] = false;
         }
-        $key = concat($dataEntity['table'] , '-' , $dataEntity['id']);
+        $key = implode('', [$dataEntity['table'] , '-' , $dataEntity['id']]);
         $table = $dataEntity['table'];
         $listIds[count($listIds)] = $key;
         $unsetId = array_search($key, $entityIds);
@@ -104,16 +104,16 @@ foreach ($tableNames as $t) {
         ? count($dataTypes[$t])
         : 0), ' ', str_replace('ss_', '', $t), 's']);
 
-    $placeHolder = concat((!empty($placeHolder) ? '/' : ''), ucfirst(str_replace('ss_', '', $t)));
+    $placeHolder = implode('', [!empty($placeHolder) ? '/' : '', ucfirst(str_replace('ss_', '', $t))]);
 }
-$placeHolder = concat('Search for ', $placeHolder);
+$placeHolder = implode('', ['Search for ', $placeHolder]);
 // some final tweak to the input field
 $input->attr('placeholder', $placeHolder);
 
 // if its inline, update header counts
 if (isset($entities) && (!isset($inline) || $inline !== true)) {
     $header = $search->find('header:not(.removed)');
-    $headerTitle = concat('Members (', $headerTitle, ')');
+    $headerTitle = implode('', ['Members (', $headerTitle, ')']);
     $header->find('label')->text($headerTitle);
     $search->find('header.removed label')->text('Removed');
     //if($search->find('header:not(.removed) ~ .checkbox')->length == 0 ||
@@ -139,7 +139,7 @@ $input->data('tables', $tables)
 foreach ($tableNames as $t) {
     $types = isset($dataTypes[$t]) ? $dataTypes[$t] : [];
     $input->data($t, $types)
-        ->attr(concat('data-' , $t), json_encode($types));
+        ->attr(implode('', ['data-' , $t]), json_encode($types));
 }
 
 /*

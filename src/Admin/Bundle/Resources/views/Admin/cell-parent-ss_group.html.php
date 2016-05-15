@@ -4,25 +4,15 @@ use StudySauce\Bundle\Entity\Group;
 ?>
 <label>
     <select name="parent">
-        <option value="<?php print $ss_group->getId(); ?>" <?php print (empty($ss_group->getParent()) ? 'selected="selected"' : ''); ?>>No parent</option>
+        <option value="<?php print ($ss_group->getId()); ?>" <?php print (empty($ss_group->getParent()) ? 'selected="selected"' : ''); ?>>No parent</option>
         <?php
-        $options = function () {};
-        $options = function ($groups) use ($ss_group, $view, &$options) {
-            foreach ($groups as $g) {
-                /** @var Group $g */
-                ?>
-                <option
-                    value="<?php print $g->getId(); ?>" <?php print ($g == $ss_group->getParent() ? 'selected="selected"' : ''); ?>><?php print $view->escape($g->getName()); ?></option>
-                <?php
-                if ($g->getSubgroups()->count() > 0) { ?>
-                    <optgroup label="<?php print $view->escape($g->getName()); ?> Group">
-                        <?php $options($g->getSubgroups()->toArray()); ?>
-                    </optgroup>
-                <?php
-                }
+        $topGroups = [];
+        foreach($groups as $g) {
+            /** @var Group $g */
+            if(empty($g->getParent())) {
+                $topGroups[count($topGroups)] = $g;
             }
-        };
-        $options(array_values(array_filter($groups, function (Group $g) {return empty($g->getParent());})));
-        ?>
+        }
+        print ($view->render('AdminBundle:Admin:cell-parentOptions-ss_group.html.php', ['groups' => $topGroups, 'ss_group' => $ss_group])); ?>
     </select>
 </label>

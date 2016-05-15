@@ -437,6 +437,9 @@ function ssMergeScripts(content)
 centerize.apply($('body').find('.centerized:visible'));
 
 function gatherFields(fields, visibleOnly) {
+    var fieldMatch = function (f) {
+        return '[name="' + f + '"], [name^="' + f + '-"], [name^="' + f + '["]';
+    }
     var context = $(this),
         form;
     var result = {};
@@ -447,7 +450,7 @@ function gatherFields(fields, visibleOnly) {
     else {
         for(var f in fields) {
             if (fields.hasOwnProperty(f)) {
-                var inputField = context.find('[name="' + fields[f] + '"], [name^="' + fields[f] + '-"], [name^="' + fields[f] + '["]');
+                var inputField = context.find(fieldMatch(fields[f]));
                 var key = fields[f];
                 if(inputField.is('[name^="' + fields[f] + '["]')) {
                     key = inputField.attr('name');
@@ -463,14 +466,14 @@ function gatherFields(fields, visibleOnly) {
                     value = inputField.val();
                 }
                 if(typeof value != 'undefined') {
-                    formFields[formFields.length] = {name: key, value: item};
+                    formFields[formFields.length] = {name: key, value: value};
                 }
             }
         }
     }
     for(var i = 0; i < formFields.length; i++) {
-        if(fields.indexOf(formFields[i].name) > -1 &&
-            (!visibleOnly || form.find('[name="' + formFields[i].name + '"]:visible').length > 0)) {
+        if(fields.indexOf(formFields[i].name.split(/[-\[]/ig)[0]) > -1 &&
+            (!visibleOnly || form.find(fieldMatch(fields[f])).filter(':visible').length > 0)) {
             assignSubKey(result, formFields[i].name, formFields[i].value);
         }
     }

@@ -1,4 +1,4 @@
-<header class="<?php print $table; ?>">
+<header class="<?php print ($table); ?>">
     <?php
     $templates = []; // template name => classes
     // TODO: build backwards so its right aligned when there are different field counts
@@ -9,8 +9,8 @@
             continue;
         }
         ?>
-        <label class="<?php print $field; ?>">
-            <?php print $view->render('AdminBundle:Admin:heading.html.php', ['groups' => $allGroups, 'field' => $field]); ?>
+        <label class="<?php print ($field); ?>">
+            <?php print ($view->render('AdminBundle:Admin:heading.html.php', ['groups' => $allGroups, 'field' => $field])); ?>
         </label>
         <?php
     } ?>

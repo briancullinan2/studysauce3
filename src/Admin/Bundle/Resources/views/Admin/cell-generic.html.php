@@ -1,4 +1,6 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
+use Doctrine\Common\Collections\Collection;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
@@ -11,16 +13,16 @@ foreach($fields as $subfield) {
     $joinName = $table;
     $joinFields = explode('.', $subfield);
     foreach ($joinFields as $jf) {
-        $associated = \Admin\Bundle\Controller\AdminController::$allTables[$joinTable]->getAssociationMappings();
+        $associated = AdminController::$allTables[$joinTable]->getAssociationMappings();
         if (isset($associated[$jf])) {
             $te = $associated[$jf]['targetEntity'];
-            $ti = array_search($te, \Admin\Bundle\Controller\AdminController::$allTableClasses);
+            $ti = array_search($te, AdminController::$allTableClasses);
             if ($ti !== false) {
-                $joinTable = \Admin\Bundle\Controller\AdminController::$allTableMetadata[$ti]->table['name'];
+                $joinTable = AdminController::$allTableMetadata[$ti]->table['name'];
             } else {
                 continue;
             }
-            $newName = $joinName . '_' . preg_replace('[^a-z]', '_', $jf) . $joinTable;
+            $newName = implode('', [$joinName , '_' , preg_replace('[^a-z]', '_', $jf) , $joinTable]);
             $joinName = $newName;
         } else {
             // join failed, don't search any other tables this round
@@ -29,16 +31,13 @@ foreach($fields as $subfield) {
         }
     }
     // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-    if (!empty($joinName) && isset(\Admin\Bundle\Controller\AdminController::$defaultTables[$joinTable])) {
-        $searchTables[$joinTable] = \Admin\Bundle\Controller\AdminController::$defaultTables[$joinTable]['name'];
+    if (!empty($joinName) && isset(AdminController::$defaultTables[$joinTable])) {
+        $searchTables[$joinTable] = AdminController::$defaultTables[$joinTable]['name'];
     }
 }
 
-if (count($searchTables) > 0 && method_exists($entity, 'get' . ucfirst($field))) {
-    $result = $entity->{'get' . ucfirst($field)}();
-
-    if ($result instanceof \Doctrine\Common\Collections\Collection) {
-        print $this->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $searchTables, 'entities' => $result->toArray(), 'inline' => true]);
-    }
+if (count($searchTables) > 0 && method_exists($entity, implode('', ['get' , ucfirst($field)]))) {
+    $result = call_user_func_array([$entity, implode('', ['get' , ucfirst($field)])], []);
+    print ($view->render('AdminBundle:Admin:cell-collection.html.php', ['tables' => $searchTables, 'entities' => $result->toArray(), 'inline' => true]));
 }
 

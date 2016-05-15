@@ -15,7 +15,7 @@ $view['slots']->start('modal-header'); ?>
     <?php
     $first = true;
     foreach($tables as $tableName => $fields) {
-        $tabItem = $dialog->find(concat('li a[href="#add-entity-' , $tableName , '"]'));
+        $tabItem = $dialog->find(implode('', ['li a[href="#add-entity-' , $tableName , '"]']));
         if ($tabItem->length == 0) { ?>
             <li class="<?php print ($first ? 'active' : ''); ?>">
                 <a href="#add-entity-<?php print ($tableName); ?>"
@@ -43,7 +43,7 @@ $view['slots']->start('modal-body'); ?>
         $dialog->find('.checkbox')->remove();
         $first = true;
         foreach($tables as $tableName => $fields) {
-            $entityField = $dialog->find(concat('input[name="', $tableName, '"][type="text"]'));
+            $entityField = $dialog->find(implode('', ['input[name="', $tableName, '"][type="text"]']));
             if($dialog->find(implode('', ['#add-entity-', $tableName]))->length == 0) {
                 $tmpTables = (array)(new stdClass());
                 $tmpTables[$tableName] = $tables[$tableName];

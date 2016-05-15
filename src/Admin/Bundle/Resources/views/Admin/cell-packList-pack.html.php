@@ -5,26 +5,47 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
 /** @var User|Group $ss_group */
-$entityIds = [];
 /** @var Pack $pack */
 
-$groups = $pack->getGroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();
-$users = $pack->getUsers()->toArray();
-$entityIds = [];
+$groups = [];
 $groupIds = [];
-$diffIds = [];
-$diffUsers = array_values(array_filter($users, function (User $u) use (&$entityIds, $groups) {
-    $entityIds[] = 'ss_user-' . $u->getId();
-    return count(array_intersect($u->getGroups()->map(function (Group $g) {
-        return $g->getId();
-    })->toArray(), array_map(function (Group $g) {
-        return $g->getId();
-    }, $groups))) == 0;
-}));
+$groupUsers = 0;
+foreach($pack->getGroups()->toArray() as $g) {
+    /** @var Group $g */
+    if(!$g->getDeleted()) {
+        $groups[count($groups)] = $g;
+        $groupIds[count($groupIds)] = $g->getId();
+        $groupUsers += $g->getUsers()->count();
+    }
+}
+/** @var User[] $users */
+$users = $pack->getUsers()->toArray();
+// only show the users not included in any groups
+$diffUsers = [];
+foreach($users as $u) {
+    $shouldExclude = false;
+    foreach($u->getGroups()->toArray() as $g) {
+        if(in_array($g->getId(), $groupIds)) {
+            $shouldExclude = true;
+        }
+    }
+    if(!$shouldExclude) {
+        $diffUsers[count($diffUsers)] = $u;
+    }
+}
+
+$cardCount = 0;
+foreach($pack->getCards()->toArray() as $c) {
+    /** @var Card $c */
+    if(!$c->getDeleted()) {
+        $cardCount += 1;
+    }
+}
+
 ?>
 
 <div>
-    <label><?php print count($groups); ?> groups / <?php print array_sum(array_map(function (Group $g) {return $g->getUsers()->count();}, $groups)) + count($diffUsers); ?> users / <?php print $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count(); ?> cards</label>
+    <label><?php print (count($groups)); ?> groups / <?php print ($groupUsers + count($diffUsers)); ?> users / <?php print ($cardCount); ?> cards</label>
     <?php
     foreach ($groups as $p) {
         /** @var Group $p */
@@ -32,13 +53,13 @@ $diffUsers = array_values(array_filter($users, function (User $u) use (&$entityI
             continue;
         }
         ?>
-        <a href="<?php print $view['router']->generate('groups_edit', ['group' => $p->getId()]); ?>" class="pack-list"><?php print $p->getName(); ?>
-            <span><?php print $p->getUsers()->count(); ?></span></a>
+        <a href="<?php print ($view['router']->generate('groups_edit', ['group' => $p->getId()])); ?>" class="pack-list"><?php print ($p->getName()); ?>
+            <span><?php print ($p->getUsers()->count()); ?></span></a>
     <?php }
     foreach ($diffUsers as $g) {
         /** @var User $g */
         ?>
-        <a href="#<?php //print $view['router']->generate('groups_edit', ['group' => $g->getId()]); ?>" class="pack-list"><?php print $g->getFirst() . ' ' . $g->getLast(); ?>
+        <a href="<?php print ($view['router']->generate('home_user', ['user' => $g->getId()])); ?>" class="pack-list"><?php print (implode('', [$g->getFirst() , ' ' , $g->getLast()])); ?>
             <span>1</span></a>
     <?php } ?>
 

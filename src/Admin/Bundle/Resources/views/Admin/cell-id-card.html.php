@@ -15,7 +15,7 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
 ?>
 
 <label class="input type">
-    <span><?php print $card->getIndex() + 1; ?></span>
+    <span><?php print ($card->getIndex() + 1); ?></span>
     <select name="type">
         <option value="" <?php print (empty($card->getResponseType()) ? 'selected="selected"' : ''); ?>>Flash card</option>
         <option value="mc" <?php print ($card->getResponseType() == 'mc' ? 'selected="selected"' : ''); ?>>Multiple choice</option>

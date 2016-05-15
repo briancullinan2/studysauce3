@@ -12,5 +12,5 @@ $invite = $ss_group->getInvites()->first();
     <input type="hidden" name="invite[id]" value="<?php print (!empty($invite) ? $invite->getId() : ''); ?>" />
     <input type="text" name="invite[code]" value="<?php print (!empty($invite) ? $invite->getCode() : ''); ?>" />
     <input type="hidden" name="invite[activated]" value="<?php print (!empty($invite) ? $invite->getActivated() : ''); ?>" />
-    <input type="hidden" name="invite[group]" value="<?php print $ss_group->getId(); ?>" />
+    <input type="hidden" name="invite[group]" value="<?php print ($ss_group->getId()); ?>" />
 </label>

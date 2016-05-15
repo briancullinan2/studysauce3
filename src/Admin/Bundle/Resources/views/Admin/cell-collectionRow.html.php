@@ -21,9 +21,9 @@ $view['slots']->start('cell-collection-row'); ?>
 $context = jQuery($this);
 $newRow = jQuery($view['slots']->get('cell-collection-row'));
 // update names of fields
-$newRow->find('span')->text(concat($entity[$tables[$entity['table']][0]], ' ', $entity[$tables[$entity['table']][1]]));
-$newRow->find('input[type="checkbox"]')->attr('name', concat(implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][id]'))->val($entity['id']);
-$newRow->find('input[type="hidden"]')->attr('name', concat(implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][remove]'));
+$newRow->find('span')->text(implode('', [$entity[$tables[$entity['table']][0]], ' ', $entity[$tables[$entity['table']][1]]]));
+$newRow->find('input[type="checkbox"]')->attr('name', implode('', [implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][id]']))->val($entity['id']);
+$newRow->find('input[type="hidden"]')->attr('name', implode('', [implode('_', $tableNames) , '[' , AdminController::$radioCounter , '][remove]']));
 if(isset($entity['removed']) && $entity['removed']) {
     $newRow->find('[href="#subtract-entity"]')->remove();
 }

@@ -5,11 +5,11 @@ use StudySauce\Bundle\Entity\User;
 
 /** @var Pack $pack */
 /** @var User $user */
-if(!empty($pack->getUser()) && $pack->getUser()->getId() == $searchRequest['ss_user-id']) {
+if(!empty($pack->getUser()) && $pack->getUser()->getId() == $request['ss_user-id']) {
     $user = $pack->getUser();
 }
 else {
-    $user = $pack->getUserById($searchRequest['ss_user-id']);
+    $user = $pack->getUserById($request['ss_user-id']);
 }
 $isNew = true;
 if(!empty($user)) {
@@ -17,4 +17,4 @@ if(!empty($user)) {
 }
 ?>
 
-<label><?php print ($isNew ? '<strong>New </strong>' : ''); ?><span><?php print $view->escape($pack->getTitle()); ?></span></label>
+<label><?php print ($isNew ? '<strong>New </strong>' : ''); ?><span><?php print ($view->escape($pack->getTitle())); ?></span></label>

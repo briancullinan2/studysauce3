@@ -1,6 +1,6 @@
 <?php $view->extend('AdminBundle:Admin:dialog.html.php');
 
-$view['slots']->start('modal-body') ?>
+$view['slots']->start('modal-body'); ?>
 <label class="radio">
     <input type="radio" name="date" value="now" />
     <i></i>
@@ -27,6 +27,6 @@ $view['slots']->start('modal-body') ?>
 </label>
 <?php $view['slots']->stop();
 
-$view['slots']->start('modal-footer') ?>
+$view['slots']->start('modal-footer'); ?>
 <a href="#submit-publish" class="btn btn-primary" data-dismiss="modal">Publish</a>
-<?php $view['slots']->stop() ?>
+<?php $view['slots']->stop(); ?>

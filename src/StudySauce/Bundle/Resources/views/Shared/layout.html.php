@@ -234,17 +234,16 @@ EOCSS;
     if ((strpos($agent, 'android') && strpos($agent, 'chrome') === false) ||
         preg_match('/(?i)msie/', $agent)
     ) {
-        print $this->render('StudySauceBundle:Dialogs:unsupported.html.php', ['id' => 'unsupported']);
+        print $view->render('StudySauceBundle:Dialogs:unsupported.html.php', ['id' => 'unsupported']);
     }
     // load the Use the App! dialog if we haven't seen it today
     if (preg_match('/(iPad|iPhone|iPod)/i', $agent)) {
-        print $this->render('StudySauceBundle:Dialogs:gettheapp.html.php', ['id' => 'gettheapp']);
+        print $view->render('StudySauceBundle:Dialogs:gettheapp.html.php', ['id' => 'gettheapp']);
     }
 
     $view['slots']->output('javascripts');
     ?>
-    <script type="text/javascript" src="<?php echo $view['router']->generate('template', [
-        'name' => 'dialog,add-entity,create-entity,cell-collection,cell-collectionRow,cell-preview-card,cell-status-pack,cells,row']) ?>"></script>
+    <script type="text/javascript" src="<?php print ($view['router']->generate('template')); ?>"></script>
     <?php
     $view['slots']->output('sincludes');
     // show error dialogs in debug environment

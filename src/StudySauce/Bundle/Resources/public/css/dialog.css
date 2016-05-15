@@ -587,10 +587,6 @@ body.right-menu #bookmark
     background:rgba(255,255,255,0.70);
 }
 
-#add-entity .template {
-    display:none;
-}
-
 #create-entity .modal-body {
     text-align: center;
 }

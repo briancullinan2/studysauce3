@@ -21,16 +21,11 @@ namespace  {
         }
     }
 
-    if (!function_exists('concat')) {
-        function concat()
-        {
-            return implode('', func_get_args());
-        }
-    }
 }
 
 namespace Admin\Bundle\Controller {
 
+    use Doctrine\Common\Collections\Collection;
     use Doctrine\Common\Collections\Criteria;
     use Doctrine\ORM\Mapping\ClassMetadata;
     use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -89,10 +84,10 @@ namespace Admin\Bundle\Controller {
             // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
             'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
             'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks'], 'actions' => ['deleted']],
-            'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['group', 'groups', 'user', 'userPacks.user'], 'properties', 'actions'],
+            'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
             'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers'], ['pack'], 'actions' => ['deleted']],
             'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
-            'user_pack' => ['user', 'pack', 'removed'],
+            'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
             'file' => ['id' => ['id', 'url']]
             // TODO: this really generalized template
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
@@ -104,6 +99,12 @@ namespace Admin\Bundle\Controller {
             'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted']];
 
         public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
+
+        public static function createEntity($table)
+        {
+            $class = AdminController::$allTables[$table]->name;
+            return $entity = new $class();
+        }
 
         private static function getJoinTable($u)
         {
@@ -176,6 +177,15 @@ namespace Admin\Bundle\Controller {
                 $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
             }
             return $result;
+        }
+
+        public static function sortByFields(&$arr, $fields) {
+            usort($arr, function ($p1, $p2) use ($fields) {
+                return strcmp(
+                    $p1->{'get' . ucfirst($fields[0])}() . (count($fields) > 1 ? (' ' . $p1->{'get' . ucfirst($fields[1])}()) : ''),
+                    $p2->{'get' . ucfirst($fields[0])}() . (count($fields) > 1 ? (' ' . $p2->{'get' . ucfirst($fields[1])}()) : '')
+                );
+            });
         }
 
         /**
@@ -490,7 +500,7 @@ namespace Admin\Bundle\Controller {
             $serialized = serialize($searchRequest);
             $searchRequest['requestKey'] = md5($serialized);
             $this->get('cache')->save($searchRequest['requestKey'], $serialized);
-            $vars['searchRequest'] = $searchRequest;
+            $vars['request'] = $searchRequest;
 
             // if request is json, merge the table fields plus a list of all the groups the user has access to
             if (in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
@@ -504,8 +514,7 @@ namespace Admin\Bundle\Controller {
                         $tableName = 'ss_group';
                     }
                     $vars['results'][$table] = array_map(function ($e) use ($tableName, $table, $searchRequest) {
-                        return self::toFirewalledEntityArray($e, [$tableName => $table == 'allGroups' ? self::$defaultTables['ss_group']
-                            : $searchRequest['tables'][$tableName]]);
+                        return self::toFirewalledEntityArray($e, $searchRequest['tables']);
                     }, $vars['results'][$table]);
                 }
                 // TODO: return a newKey to pair up with some randomized value generated from the client, so we make sure we get all the right edit rows accounted for in-case it has changed while we were saving.
@@ -515,7 +524,8 @@ namespace Admin\Bundle\Controller {
             return $this->render('AdminBundle:Admin:results.html.php', $vars);
         }
 
-        public static function toFirewalledEntityArray($e, $tables = [])
+        // $levels helps stop recursion, this number should not be high and it should not be override by anyone else
+        public static function toFirewalledEntityArray($e, $tables = [], $levels = 3)
         {
             $tableName = self::getJoinTable($e);
             if (empty($tables[$tableName])) {
@@ -527,7 +537,7 @@ namespace Admin\Bundle\Controller {
                 $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . $e['id']];
             }
             else {
-                $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . $e->getId()];
+                $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . (method_exists($e, 'getId') ? $e->getId() : '')];
             }
             foreach ($fields as $f) {
                 if(is_array($e)) {
@@ -539,10 +549,28 @@ namespace Admin\Bundle\Controller {
                 if (!method_exists($e, 'get' . ucfirst($f))) {
                     continue;
                 }
-                if (is_object($e->{'get' . ucfirst($f)}()) && $e->{'get' . ucfirst($f)}() instanceof \DateTime) {
-                    $obj[$f] = $e->{'get' . ucfirst($f)}()->format('r');
-                } else {
-                    $obj[$f] = $e->{'get' . ucfirst($f)}();
+                $value = $e->{'get' . ucfirst($f)}();
+                if (is_object($value) && $value instanceof \DateTime) {
+                    $obj[$f] = $value->format('r');
+                } else if (isset($tables[$tableName]) && isset(self::$allTables[$tableName]->getAssociationMappings()[$f])) {
+                    $association = self::$allTables[$tableName]->getAssociationMappings()[$f];
+                    $tableIndex = array_search($association['targetEntity'], self::$allTableClasses);
+                    $joinTable = array_keys(self::$allTables)[$tableIndex];
+                    if(isset($tables[$joinTable]) && !empty($value)) {
+                        if ($value instanceof Collection) {
+                            if (!isset($obj[$f])) {
+                                $obj[$f] = [];
+                            }
+                            foreach ($value->toArray() as $subE) {
+                                $obj[$f][] = self::toFirewalledEntityArray($subE, $levels - 1 == 0 ? [$joinTable => $tables[$joinTable]] : $tables, $levels - 1);
+                            }
+                        } else {
+                            $obj[$f] = self::toFirewalledEntityArray($value, $levels - 1 == 0 ? [$joinTable => $tables[$joinTable]] : $tables, $levels - 1);
+                        }
+                    }
+                }
+                else {
+                    $obj[$f] = $value;
                 }
             }
             return $obj;
@@ -950,20 +978,27 @@ namespace Admin\Bundle\Controller {
 
         public function templateAction(Request $request)
         {
+            /** @var $orm EntityManager */
+            $orm = $this->get('doctrine')->getManager();
+
+            self::setUpClasses($orm);
 
             $parser = $this->get('templating.name_parser');
             $locator = $this->get('templating.locator');
 
-            $names = explode(',', $request->get('name'));
-            $php = '/*----------------------------------------------------------- Table of Contents -----------------------------------------------------------
+            $toc = '/*----------------------------------------------------------- Table of Contents -----------------------------------------------------------';
+            $php = '';
+            $path = $locator->locate($parser->parse('AdminBundle:Admin:groups.html.php'));
+            $handle = opendir(dirname($path));
+            while (false !== ($name = readdir($handle))) {
+                if (substr($name, strlen($name) - strlen('.html.php')) != '.html.php') {
+                    continue;
+                }
+                $name = substr($name, 0, strlen($name) - strlen('.html.php'));
+                $toc .= '
+        ' . $name;
 
-        ' . implode('
-        ', $names) . '
-
-        */';
-            foreach ($names as $name) {
-                $path = $locator->locate($parser->parse('AdminBundle:Admin:' . $name . '.html.php'));
-                $file = file_get_contents($path);
+                $file = file_get_contents(dirname($path) . DIRECTORY_SEPARATOR . $name . '.html.php');
                 $file = preg_replace_callback('/\?>([\s\S]*?)(<\?php|$)/i', function ($match) {
                     return 'print(\'' . preg_replace('/\n/', "' + \"\\n\"\n + '", $match[1]) . '\');';
                 }, '?>' . $file);
@@ -980,9 +1015,16 @@ namespace Admin\Bundle\Controller {
                     ' . $name . ' = ' . $match[1] . '[' . $key . '];';
                 }, $file);
                 $file = preg_replace('/\$/i', '__vars.', $file);
-                preg_replace_callback('#(?=(\[(?>[^\[\]]|(?1))*+\]))#', function (&$match) use (&$file) {
+                $innerMatches = [];
+                $replacements = [];
+                preg_replace_callback('#(?=(\[(?>[^\[\]]|(?1))*+\]))#', function (&$match) use (&$file, &$innerMatches, &$replacements) {
                     if (strpos($match[1], '=>') !== false) {
-                        $file = str_replace($match[1], '{' . trim(str_replace('=>', ':', $match[1]), " \t\n\r\0\x0B" . '[]') . '}', $file);
+                        $object = trim(str_replace('=>', ':', $match[1]), " \t\n\r\0\x0B");
+                        $innerMatches[] = $match[1];
+                        $replacements[] = '{' . substr($object, 1, strlen($object) - 2) . '}';
+                        $innerMatches[] = str_replace(array_keys($innerMatches), array_values($innerMatches), $object);
+                        $replacements[] = '{' . substr($object, 1, strlen($object) - 2) . '}';
+                        $file = str_replace($innerMatches, $replacements, $file);
                     }
                     return $match[0];
                 }, $file);
@@ -997,8 +1039,11 @@ window.views[\'' . $functionName . '\'] = ( function ' . $functionName . ' (__va
                 $php .= $file;
             }
 
-            $miniTables = json_encode(self::$defaultMiniTables);
+            $miniTables = addslashes(json_encode(self::$defaultMiniTables));
+            $allTables = addslashes(json_encode(self::$allTables)); // TODO: run this through firewall
+            $defaultTables = addslashes(json_encode(self::$defaultTables));
             $js = <<< EOJS
+            $toc */
 (function (jQuery) {
 // ^ scope for functions below, so we don't override anything
 
@@ -1008,8 +1053,24 @@ window.AdminController.toFirewalledEntityArray = function (e) { return e; };
 window.AdminController.__vars = {};
 window.AdminController.__vars.radioCounter = 100000000;
 window.AdminController.__vars.defaultMiniTables = JSON.parse('$miniTables');
+window.AdminController.__vars.allTables = JSON.parse('$allTables');
+window.AdminController.__vars.defaultTables = JSON.parse('$defaultTables');
+window.AdminController.createEntity = function (t) {return $.extend({}, window.views.__defaultEntities[t]);};
+window.AdminController.sortByFields = function (arr, fields) {
+    arr.sort(function (a, b) { return (a[fields[0]] + ' ' + a[fields[1]]).toLocaleLowerCase() > (b[fields[0]] + ' ' + b[fields[1]]).toLocaleLowerCase() }); }
+window.AdminController.TableMapping = {
+    getAssociationMappings: function () { return this.associationMappings; }
+};
+for(var t in window.AdminController.__vars.allTables) {
+    if(window.AdminController.__vars.allTables.hasOwnProperty(t)) {
+        window.AdminController.__vars.allTables[t] = $.extend(window.AdminController.__vars.allTables[t], window.AdminController.TableMapping);
+    }
+}
 window.AdminController.getAllFieldNames = function (tables) { return window.getAllFields(tables); };
 
+var is_numeric = function (num) {return !isNaN(parseInt(num)) || !isNaN(parseFloat(num));};
+var strlen = function (str) {return (''+(str || '')).length;};
+var array_merge = function () {var args = []; for(var a = 0; a < arguments.length; a++) { args[args.length] = arguments[a]; }; return args.reduce(function (a, b) {return typeof a == 'object' ? $.extend(a, b) : $.merge(a, b);});};
 var trim = function (str) {return (str || '').trim();};
 var explode = function (del, str) {return (str || '').split(del);};
 var array_splice = function (arr, start, length) {return (arr || []).splice(start, length);};
@@ -1021,12 +1082,11 @@ var is_array = function (obj) { return typeof obj == 'array' || typeof obj == 'o
 var array_keys = function (obj) {var result=[]; for (var k in obj) { if (obj.hasOwnProperty(k)) { result[result.length] = k } } return result; };
 var implode = function (sep, arr) {return (arr || []).join(sep);};
 var preg_replace = function (needle, replacement, subject) {debugger; return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0]), replacement);};
-var ucfirst = function (str) {return (str || '').substr(0, 1).toUpperCase() + str.substr(1);};
+var ucfirst = function (str) {return (str || '').substr(0, 1).toLocaleUpperCase() + str.substr(1);};
 var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};
 var call_user_func_array = function (context, params) {return context[context[1]].apply(context[0], params);};
-var concat = function () { var str = ''; for(var a = 0; a < arguments.length; a++) { str += arguments[a]; } return str; };
 var print = function (s) { window.views.__output += s };
-var strtolower = function(s) { return s.toLowerCase(); };
+var strtolower = function(s) { return s.toLocaleLowerCase(); };
 var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s == false || s == null; };
 var json_encode = JSON.stringify;
 var method_exists = function (s,m) { return typeof s == 'object' && typeof s[m] == 'function'; };
@@ -1037,7 +1097,7 @@ $php
 })(jQuery);
 EOJS;
             return new Response($js, 200, [
-                'Content-Type' => 'text/javascript',
+                'Content-Type' => 'application/javascript',
                 'Cache-Control' => 'no-cache, no-store, must-revalidate',
                 'Pragma' => 'no-cache',
                 'Expires' => 0

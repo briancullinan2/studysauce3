@@ -37,7 +37,7 @@ class PacksController extends Controller
             $pack = new Pack();
         }
 
-        return $this->render('StudySauceBundle:Packs:tab.html.php', ['entity' => $pack]);
+        return $this->render('AdminBundle:Admin:packs.html.php', ['entity' => $pack]);
     }
 
     public function groupsAction(Request $request, Group $group = null)
@@ -46,9 +46,7 @@ class PacksController extends Controller
             $group = new Group();
         }
 
-        return $this->render('StudySauceBundle:Packs:groups.html.php', [
-            'entity' => $group
-        ]);
+        return $this->render('AdminBundle:Admin:groups.html.php', ['entity' => $group]);
     }
 
     public function createAction(Request $request)

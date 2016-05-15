@@ -443,7 +443,7 @@ $(document).ready(function () {
                 var options = fromField.data(tableName);
                 for(var o = 0; o < options.length; o++) {
                     var g = options[o];
-                    assignSubKey(updates, (toField.attr('name') || tableName) + '[' + o + ']', {
+                    assignSubKey(updates, decodeURIComponent(toField.attr('name') || tableName) + '[' + o + ']', {
                         id: g[fromField[0].selectize.settings.valueField].substr(tableName.length + 1),
                         remove: g['removed']
                     });

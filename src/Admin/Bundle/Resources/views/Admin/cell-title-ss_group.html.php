@@ -5,10 +5,11 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
 /** @var Group $ss_group */
-list($users, $packs) = $ss_group->getUsersPacksGroupsRecursively();
+$usersGroupsPacks = $ss_group->getUsersPacksGroupsRecursively();
+$users = $usersGroupsPacks[0];
+$packs = $usersGroupsPacks[1];
 
-
-if (isset($searchRequest['parent-ss_group-id']) && $ss_group->getId() == $searchRequest['parent-ss_group-id']) {
+if (isset($request['parent-ss_group-id']) && $ss_group->getId() == $request['parent-ss_group-id']) {
     print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => ['All users (not in subgroups below)', 0, 0]]));
 } else { ?>
     <a href="<?php print ($view['router']->generate('groups_edit', ['group' => $ss_group->getId()])); ?>">

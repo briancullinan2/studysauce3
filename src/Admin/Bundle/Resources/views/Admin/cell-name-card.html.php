@@ -14,5 +14,5 @@ if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
 ?>
 
 <label class="input content">
-    <textarea name="content" placeholder="Prompt"><?php print $view->escape($content); ?></textarea>
+    <textarea name="content" placeholder="Prompt"><?php print ($view->escape($content)); ?></textarea>
 </label>

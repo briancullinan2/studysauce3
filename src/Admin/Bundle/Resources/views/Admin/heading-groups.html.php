@@ -9,7 +9,7 @@
             /** @var Group $g */
             ?>
             <option
-            value="<?php print $g->getId(); ?>"><?php print $g->getName(); ?></option><?php
+            value="<?php print ($g->getId()); ?>"><?php print ($g->getName()); ?></option><?php
         } ?>
         <option value="nogroup">No Groups</option>
     </select></label>

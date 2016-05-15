@@ -338,6 +338,13 @@ class HtmlPageCrawler extends Crawler
     }
 
     /**
+     * @return HtmlPageCrawler
+     */
+    public function last() {
+        return parent::last();
+    }
+
+    /**
      * Removes all child nodes and text from all nodes in set
      *
      * Equivalent to jQuery's empty() function which is not a valid function name in PHP

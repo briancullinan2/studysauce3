@@ -35,18 +35,17 @@ if (typeof window.views.__globalVars.view['slots'].output == 'undefined') {
     window.views.__globalVars.view['slots'].output = {};
 }
 window.views.slotStack = [];
-window.views.user = {};
-window.views.user.hasRole = function (role) {
-    return window.views.user.roles.indexOf(role) > -1;
-};
-window.views.user.getEmail = function () {
-    return window.views.user.email;
-};
 window.views.__globalVars.app.getUser = function () {
-    var user = $.extend(window.views.user, $('#welcome-message').data('user'));
+    var user = $.extend({}, $('#welcome-message').data('user'));
+    user = $.extend(user, window.views.__defaultEntities['ss_user']);
     return user;
 };
-
+if(typeof window.views.exists == 'undefined') {
+    window.views.exists = function (name) {
+        name = name.replace(/.*?:.*?:|\.html\.php/ig, '').replace(/[^a-z0-9]/ig, '_');
+        return typeof window.views[name] != 'undefined';
+    };
+}
 if (typeof window.views.render == 'undefined') {
     window.views.render = function (name, vars) {
         name = name.replace(/.*?:.*?:|\.html\.php/ig, '').replace(/[^a-z0-9]/ig, '_');
@@ -103,10 +102,76 @@ if (typeof window.views.render == 'undefined') {
         return output;
     };
 }
-
+window.views.__defaultEntities = {};
+window.views.__defaultEntities['ss_group'] = {
+    getId: function () {return this.id;},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    getLogo: function () {return this.logo;}
+};
+window.views.__defaultEntities['pack'] = {
+    user: null,
+    userPacks: $([]),
+    cards: $([]),
+    getId: function () {return this.id;},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    getLogo: function () {return this.logo;},
+    getUsers: function () {
+        var users = [];
+        if(this.user) {
+            users[users.length] = applyEntityObj(this.user);
+        }
+        for(var u = 0; u < this.userPacks.length; u++) {
+            // TODO fix this relational caching, lookup needs to merge with single instance
+            var up;
+            if(!(up = applyEntityObj(this.userPacks[u])).getRemoved()) {
+                users[users.length] = applyEntityObj(this.userPacks[u].user);
+            }
+        }
+        return $(users);
+    },
+    getCards: function () {
+        return $(this.cards.map(function (c) {return applyEntityObj(c)}));
+    },
+    getTitle: function () {return this.title;},
+    getUserPacks: function () {return $(this.userPacks.map(function (up) {return applyEntityObj(up);}));},
+    getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));}
+};
+window.views.__defaultEntities['user_pack'] = {
+    getRemoved: function () {return this.removed},
+    getUser: function () {return applyEntityObj(this.user);},
+    getPack: function () {return applyEntityObj(this.pack);},
+    getDownloaded: function () {return !(this.downloaded) ? null : new Date(this.downloaded);}
+};
+window.views.__defaultEntities['card'] = {
+    getDeleted: function () {return this.deleted},
+    getId: function () {return this.id}
+};
+window.views.__defaultEntities['ss_user'] = {
+    userPacks: $([]),
+    getId: function () {return this.id;},
+    getEmailCanonical: function () {return this.email.toLowerCase();},
+    hasRole: function (role) { return window.views.user.roles.indexOf(role) > -1; },
+    getEmail: function () { return window.views.user.email; },
+    getUserPack: function (pack) {
+        for(var up = 0; up < this.userPacks.length; up++) {
+            if(this.userPacks[up].pack.id == pack.id) {
+                return applyEntityObj(this.userPacks[up]);
+            }
+        }
+        for(var up2 = 0; up2 < pack.userPacks.length; up2++) {
+            if(pack.userPacks[up2].user.id == this.id) {
+                return applyEntityObj(pack.userPacks[up2]);
+            }
+        }
+    },
+    getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));}
+};
+window.views.__globalVars.view.exists = window.views.exists;
 window.views.__globalVars.view.render = window.views.render;
 window.views.__globalVars.view.router = Routing;
 window.views.__globalVars.view.escape = _.escape;
+window.views.__globalVars.view['assets'] = {};
+window.views.__globalVars.view['assets'].getUrl = function (url) {return '/' + url;};
 window.views.__globalVars.view['slots'].start = function (name) {
     window.views.__outputStack.push(window.views.__output);
     window.views.__output = '';
@@ -128,6 +193,12 @@ Date.prototype.format = function (format) {
     }
     return moment(this).formatPHP(format);
 };
+
+function applyEntityObj(data) {
+    var obj = $.extend({}, window.views.__defaultEntities[data['table']]);
+    obj = $.extend(obj, data);
+    return obj;
+}
 
 $(document).ready(function () {
 
@@ -318,36 +389,12 @@ $(document).ready(function () {
         }
     });
 
-    var radioCounter = 5000;
-
-    // TODO: remove this in favor of creating a blank through the template system
     body.on('click', '.results a[href^="#add-"]', function (evt) {
         evt.preventDefault();
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);
-        var newRow = results.find('.' + table + '-row.template, .' + table + '-row.template + .expandable.template').clone();
-        newRow.each(function () {
-            var that = $(this);
-            that.attr('class', that.attr('class').replace(new RegExp(table + '-id-[0-9]*(\\s|$)', 'ig'), table + '-id- '));
-            that.removeClass('template removed read-only historic').addClass('edit empty');
-            that.find('select, textarea, input[type="text"]').val('').trigger('change');
-            var radio = that.find('input[type="radio"]');
-            if (radio.length > 0) {
-                radioCounter++;
-                var renamed = [];
-                radio.each(function () {
-                    var origName = $(this).attr('name');
-                    var name = origName.replace(/[0-9]*/, '') + radioCounter;
-                    // find radios with the same name as the one we are on
-                    if (renamed.indexOf(origName) == -1) {
-                        renamed[renamed.length] = origName;
-                        renamed[renamed.length] = name;
-                    }
-                    that.find('input[type="radio"][name="' + origName + '"]').attr('name', name).trigger('change');
-                });
-            }
-            that.find('input[type="checkbox"]').prop('checked', false).trigger('change');
-        });
+        // TODO: fix this creating a blank through the template system
+        var newRow = window.views.render('row', {table: table});
         newRow.insertBefore(results.find('.' + table + '-row').first());
     });
 
@@ -510,7 +557,7 @@ $(document).ready(function () {
         $.ajax({
             url: saveUrl,
             type: 'POST',
-            dataType: 'text',
+            dataType: 'json',
             data: data,
             success: function (data) {
                 fieldTab.find('.squiggle').stop().remove();
@@ -581,114 +628,25 @@ $(document).ready(function () {
 
     window.getRowId = getRowId;
 
-    // TODO: remove this entire method and merge update features with template system, same as results.html.php and rows.html.php
-    function loadContent(data, tableNames) {
+    function loadContent(data) {
         var admin = $(this).closest('.results').first();
-        if (!tableNames) {
-            tableNames = [];
-            var tables = admin.first().data('request')['tables'];
-            for(var tn in tables) {
-                if(tables.hasOwnProperty(tn)) {
-                    tableNames[tableNames.length] = tn;
+
+        // merge updates using template system, same as results.html.php and rows.html.php
+        if (typeof data == 'object') {
+            for(var t in data.results) {
+                if(data.results.hasOwnProperty(t) && window.views.__defaultEntities.hasOwnProperty(t)) {
+                    for(var o = 0; o < data.results[t].length; o++) {
+                        data.results[t][o] = applyEntityObj(data.results[t][o]);
+                    }
                 }
             }
-        }
-        var content;
-        if (typeof data == 'object') {
-            throw 'Not allowed';
-            /*
-             TODO: run template system
-             if(typeof data.tables == 'undefined') {
-             throw 'Not a "results" request.';
-             }
-             admin.data('request', {requestKey: data.searchRequest.requestKey});
-             */
+
+            window.views.render.apply(admin, ['results', data]);
         }
         else {
-            content = $(data).filter('.results');
-            if (content.find('.panel-pane').length > 0) {
-                throw 'Not a "results" request.';
-            }
-            admin.data('request', content.data('request')).attr('class', content.attr('class'));
+            throw 'Not allowed';
         }
 
-        admin.find('> .views').remove();
-        for (var t = 0; t < tableNames.length; t++) {
-            (function (table) {
-                var selected = getRowId.apply(admin.find('> .' + table + '-row.selected'));
-
-                var getRowQuery,
-                    rowQuery = (getRowQuery = function (table) {
-                        return '> .views, > footer.' + table + ', > header.' + table + ', > .highlighted-link.' + table + ', > .' + table + '-row, > .' + table + '-row + .expandable:not([class*="-row"])'
-                    })(table);
-
-                admin.find(rowQuery)
-                    // leave edit rows alone
-                    .filter('.template, .template + .expandable:not([class*="-row"]), header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')
-                    // remove existing rows
-                    .remove();
-
-                var existing,
-                    keepRows = (existing = admin.find('> .' + table + '-row')).map(function () {
-                        var rowId = getRowId.apply(this);
-                        return '.' + table + '-id-' + rowId + ', .' + table + '-id-' + rowId + ' + .expandable:not([class*="-row"])';
-                    }).toArray();
-                var last = existing.length == 0 ? admin.find(getRowQuery(tableNames[t - 1])).last() : existing.add(existing.next('.expandable:not([class*="-row"])')).last();
-                var allNewTableContent = content.find(rowQuery);
-                var newRows = allNewTableContent.not($.merge(['.template'], keepRows).join(','));
-                var headerFooter = allNewTableContent.filter('.views, header, footer, .highlighted-link, .template');
-                // put headers before and actions after
-                if (headerFooter.length > 0) {
-                    if (existing.length > 0) {
-                        headerFooter.filter('header, .views').insertBefore(existing.first());
-                        headerFooter.filter('.highlighted-link, .template, footer').insertAfter(last);
-                    }
-                    else {
-                        if (last.length == 0) {
-                            headerFooter.prependTo(admin);
-                        }
-                        else {
-                            headerFooter.insertAfter(last);
-                        }
-                        if(headerFooter.filter('header, .views').length > 0) {
-                            last = headerFooter.filter('header, .views').last();
-                        }
-                    }
-                    newRows = newRows.not(headerFooter);
-                }
-
-                for (var n = 0; n < newRows.length; n++) {
-                    var noId, row = $(newRows[n]);
-                    if (!row.is('.' + table + '-row')) {
-                        continue;
-                    }
-                    else {
-                        row = row.add($(newRows[n]).next('.expandable:not([class*="-row"])'));
-                    }
-                    // update empty row ids TODO: verify this doesn't mistakenly pick out the wrong blank row added in between saving
-                    if ((noId = admin.find('> .' + table + '-row.edit.' + table + '-id-:not(.template)').first()).length > 0) {
-                        noId.removeClass(table + '-id-').addClass(table + '-id-' + getRowId.apply(newRows[n]));
-                    }
-                    else {
-                        if (last.length == 0) {
-                            row.prependTo(admin);
-                        }
-                        else {
-                            row.insertAfter(last);
-                        }
-                        last = row.last();
-                    }
-                }
-                admin.find('.paginate.' + table + ' .page-total').text(content.find('.paginate.' + table + ' .page-total').text());
-                // TODO: even if we are keeping the existing rows, still update data-action attributes for each ID
-                for (var r = 0; r < keepRows.length; r++) {
-                    admin.find(keepRows[r]).find('> [class*="actions"]').replaceWith(content.find(keepRows[r]).find('> [class*="actions"]'))
-                }
-                if (selected) {
-                    admin.find('> .' + table + '-id-' + selected[1]).addClass('selected');
-                }
-            })(tableNames[t]);
-        }
         resetHeader();
         admin.trigger('resulted');
         centerize.apply(admin.find('.centerized'));
@@ -708,7 +666,7 @@ $(document).ready(function () {
                 searchRequest = $.ajax({
                     url: Routing.generate('command_callback'),
                     type: 'GET',
-                    dataType: 'text',
+                    dataType: 'json',
                     data: getDataRequest.apply(that),
                     success: function (data) {
                         loadContent.apply(that, [data]);

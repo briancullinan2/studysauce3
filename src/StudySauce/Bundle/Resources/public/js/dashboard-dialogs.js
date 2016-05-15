@@ -439,11 +439,9 @@ $(document).ready(function () {
                     url: that.data('action').replace(/\?.*/ig, ''),
                     type: 'POST',
                     data: $.extend({requestKey: getDataRequest.apply(that).requestKey}, getQueryObject(that.data('action'))),
-                    dataType: that.data('type') || 'json',
+                    dataType: 'json',
                     success: function (data) {
-                        if (that.data('type') == 'text') {
-                            loadContent.apply(that.parents('.results'), [data]);
-                        }
+                        loadContent.apply(that.parents('.results'), [data]);
                         that.parents('.results').trigger('resulted');
                     }
                 });

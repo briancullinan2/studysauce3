@@ -235,10 +235,6 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     z-index:12;
 }
 
-.results [class*="-row"].template {
-    display:none !important;
-}
-
 .results [class*="-row"] textarea
 {
     height: 27px;

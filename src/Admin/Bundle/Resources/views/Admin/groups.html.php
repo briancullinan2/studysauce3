@@ -17,37 +17,36 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(['@results_css'], [], ['output' => 'bundles/admin/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/groups.css'], [], ['output' => 'bundles/studysauce/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
+foreach ($view['assetic']->stylesheets(['@results_css'], [], ['output' => 'bundles/admin/css/*.css']) as $url) { ?>
+    <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
+<?php }
+foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/groups.css'], [], ['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
+    <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
+<?php }
 $view['slots']->stop();
 
 $view['slots']->start('javascripts');
-foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/results.js'], [], ['output' => 'bundles/admin/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
-foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/groups.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
+foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/results.js'], [], ['output' => 'bundles/admin/js/*.js']) as $url) { ?>
+    <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
+<?php }
+foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/groups.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
+    <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
+<?php }
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div
-        class="panel-pane <?php
+    <div class="panel-pane <?php
         print (!empty($entity) && $entity->getSubgroups()->count() > 0 ? ' has-subgroups' : ''); ?>"
-        id="groups<?php print ($entity !== null ? ('-group' . intval($entity->getId())) : ''); ?>">
+        id="groups<?php print ($entity !== null ? implode('', ['-group' , intval($entity->getId())]) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
-                <form action="<?php print $view['router']->generate('save_group'); ?>" class="group-edit">
+                <form action="<?php print ($view['router']->generate('save_group')); ?>" class="group-edit">
                     <?php
                     $tables = [
                         'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
                     $isNew = empty($entity->getId());
-                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-ss_group' => 1,
                         'ss_group-deleted' => $entity->getDeleted(),
                         'edit' => !$isNew ? false : ['ss_group'],
@@ -57,7 +56,7 @@ $view['slots']->start('body'); ?>
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups'],
                         'footers' => ['ss_group' => 'groupGroups']
-                    ]));
+                    ])));
                     ?>
                 </form>
             <?php } ?>
@@ -66,30 +65,29 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tiles = ['ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
                     if (empty($entity)) {
-                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                             'tables' => $tiles,
                             'parent-ss_group-id' => 'NULL',
                             'count-ss_group' => 0,
                             'classes' => ['tiles'],
                             'headers' => ['ss_group' => 'newGroup'],
                             'footers' => ['ss_group' => 'newGroup']
-                        ]));
+                        ])));
                     } else {
                         // TODO: check view setting
-                        $tableViews = [
-                            'Tiles' => [
-                                'tables' => $tiles,
-                                'classes' => ['tiles'],
-                            ],
-                            'Membership' => [
-                                'tables' => [
-                                    'ss_group-1' => ['id', 'title', 'expandMembers' => ['deleted'] /* search field but don't display a template */],
-                                    'ss_group' => ['id', 'title', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */]],
-                                'classes' => ['last-right-expand'],
-                            ]
+                        $tableViews = (array)(new stdClass());
+                        $tableViews['Tiles'] = (array)(new stdClass());
+                        $tableViews['Tiles'] = [
+                            'tables' => $tiles,
+                            'classes' => ['tiles'],
                         ];
+                        $tableViews['Membership'] = (array)(new stdClass());
+                        $tableViews['Membership']['tables'] = (array)(new stdClass());
+                        $tableViews['Membership']['tables']['ss_group-1'] = ['0' => 'id', '1' => 'title', 'expandMembers' => ['deleted'] /* search field but don't display a template */];
+                        $tableViews['Membership']['tables']['ss_group'] = ['0' => 'id', '1' => 'title', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
+                        $tableViews['Membership']['classes'] = ['last-right-expand'];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
-                        print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
+                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
                             'ss_group-1headers' => ['ss_group' => 'subGroups'],
                             'ss_group-1footers' => false,
                             'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
@@ -101,27 +99,30 @@ $view['slots']->start('body'); ?>
                             'headers' => false,
                             'footers' => ['ss_group' => 'groupCount'],
                             'views' => $tableViews
-                        ])));
+                        ]))));
                     } ?>
                 </div>
                 <?php if (!empty($entity)) { ?>
                 <div class="list-packs">
                     <?php
-                    $tables = ['ss_group' => ['id', 'deleted']];
-                    $tables['pack'] = ['id', 'title', 'expandMembers' => ['group', 'groups'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $tables = ['ss_group' => ['id', 'deleted'], 'ss_user' => ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'], 'user_pack' => ['user', 'pack', 'removed', 'downloaded'], 'card' => ['id', 'deleted']];
+                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['group', 'groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                     $isNew = empty($entity->getId());
-                    print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                         'count-pack' => $isNew ? -1 : 0,
                         'count-ss_group' => 1,
+                        'count-card' => -1,
+                        'count-ss_user' => -1,
+                        'count-user_pack' => -1,
                         'ss_group-deleted' => $entity->getDeleted(),
                         'edit' => false,
                         'classes' => ['last-right-expand'],
                         'read-only' => false,
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
-                        'headers' => ['pack' => 'groupPacks'],
+                        'headers' => ['ss_group' => 'groupPacks'],
                         'footers' => ['pack' => 'groupPacks']
-                    ]));
+                    ])));
                     ?>
                 </div>
                 <div class="empty-members">
@@ -134,7 +135,5 @@ $view['slots']->start('body'); ?>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('sincludes');
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'upload-file']));
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'pack-publish']));
 $view['slots']->stop();
 

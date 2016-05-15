@@ -7,16 +7,24 @@ use StudySauce\Bundle\Entity\User;
 /** @var Group $ss_group */
 
 $entityIds = [];
+/** @var User[] $users */
 $users = $ss_group->getUsers()->toArray();
-usort($users, function (User $p1, User $p2) {
-    return strcmp($p1->getFirst() . ' ' . $p1->getLast(), $p2->getFirst() . ' ' . $p2->getLast());
-});
-$ids = array_map(function (User $u) {return 'ss_user-' . $u->getId();}, $users);
+AdminController::sortByFields($users, ['first', 'last']);
+$ids = [];
+$removed = [];
+foreach($users as $u) {
+    $ids[count($ids)] = implode('', ['ss_user-' , $u->getId()]);
+    if(!empty($request['pack-id']) && !empty($up = $u->getUserPack($results['pack'][0])) && $up->getRemoved()) {
+        $removed[count($removed)] = $u;
+    }
+}
+/** @var Pack[] $packs */
 $packs = $ss_group->getPacks()->toArray();
-usort($packs, function (Pack $p1, Pack $p2) {
-    return strcmp($p1->getTitle(), $p2->getTitle());
-});
-$packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs);
+AdminController::sortByFields($packs, ['title']);
+$packIds = [];
+foreach($packs as $p) {
+    $packIds[count($packIds)] = implode('', ['pack-' , $p->getId()]);
+}
 ?>
 <form action="<?php print ($view['router']->generate('save_group', ['ss_group' => ['id' => $ss_group->getId()], 'tables' => ['ss_group' => ['users']]])); ?>">
 
@@ -28,20 +36,20 @@ $packIds = array_map(function (Pack $u) {return 'pack-' . $u->getId();}, $packs)
         'fieldName' => 'ss_group[users]'];
 
     // TODO: add field name
-    if(!isset($searchRequest['pack-id']) || empty($searchRequest['pack-id'])) {
-        if((!isset($searchRequest['parent-ss_group-id'])
-            || $ss_group->getId() != $searchRequest['parent-ss_group-id'])) {
-            print $this->render('AdminBundle:Admin:cell-collection.html.php', [
+    if(!isset($request['pack-id']) || empty($request['pack-id'])) {
+        if((!isset($request['parent-ss_group-id'])
+            || $ss_group->getId() != $request['parent-ss_group-id'])) {
+            print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
                 'tables' => ['pack' => AdminController::$defaultMiniTables['pack']],
                 'entities' => $packs,
                 'entityIds' => $packIds,
-                'fieldName' => 'ss_group[packs]']);
+                'fieldName' => 'ss_group[packs]']));
         }
     }
     else {
-        $groupMembersList['removedEntities'] = array_values(array_filter($users, function (User $user) use ($results) {return !empty($up = $user->getUserPack($results['pack'][0])) ? $up->getRemoved() : false;}));
+        $groupMembersList['removedEntities'] = $removed;
     }
     ?>
 
-    <?php print $this->render('AdminBundle:Admin:cell-collection.html.php', $groupMembersList); ?>
+    <?php print ($view->render('AdminBundle:Admin:cell-collection.html.php', $groupMembersList)); ?>
 </form>

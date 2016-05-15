@@ -45,7 +45,7 @@ if ($select->length == 0) {
     // create update code vs read code below?
     $select->val(empty($value) ? '' : $value);
     $select->attr('data-publish', json_encode($publish));
-    $select->find(concat('option[value="', $value, '"]'))->attr('selected', 'selected');
+    $select->find(implode('', ['option[value="', $value, '"]']))->attr('selected', 'selected');
 } else {
 // TODO: this is update code specific to status field, generalize this in model
     $publish = $select->data('publish');
@@ -58,7 +58,7 @@ $select->parents('.status')->attr('class', implode('', ['status ' , strtolower($
 
 // set schedule data
 $select->find('option[value="GROUP"]')->text($schedule > new Date()
-    ? concat('Pending (', $schedule->format('m/d/Y H:m'), ')')
+    ? implode('', ['Pending (', $schedule->format('m/d/Y H:m'), ')'])
     : (!empty($schedule) ? 'Published' : 'Publish'));
 
 
