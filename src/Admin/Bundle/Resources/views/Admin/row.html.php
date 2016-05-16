@@ -31,7 +31,7 @@ print (isset($request['edit']) && ($request['edit'] === true
         ? ''
         : 'read-only')); ?> <?php
 print (isset($expandable[$table]) ? 'expandable' : ''); ?> <?php
-print (!empty($classes) ? $classes : ''); ?>">
+print (!empty($classes) ? $classes : ''); ?> ">
     <?php print ($view->render('AdminBundle:Admin:cells.html.php', [
         'entity' => $entity,
         'tables' => $tables,

@@ -83,7 +83,7 @@ namespace Admin\Bundle\Controller {
         public static $defaultTables = [ // database table and field firewall
             // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
             'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
-            'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks'], 'actions' => ['deleted']],
+            'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
             'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
             'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
             'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
@@ -96,7 +96,9 @@ namespace Admin\Bundle\Controller {
         public static $defaultMiniTables = [
             'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
             'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
-            'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted']];
+            'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted'],
+            'file' => ['id', 'url', 'user', 'deleted']
+        ];
 
         public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
@@ -414,7 +416,7 @@ namespace Admin\Bundle\Controller {
             $vars['search'] = '';
             foreach ($searchRequest['tables'] as $table => $t) {
                 $tableParts = explode('-', $table);
-                $ext = implode('-', array_splice($tableParts, 1));
+                $ext = implode('-', array_slice($tableParts, 1));
                 $table = explode('-', $table)[0];
                 $aliasedRequest = [];
                 if (strlen($ext) > 0) {
@@ -517,7 +519,7 @@ namespace Admin\Bundle\Controller {
                         $tableName = 'ss_group';
                     }
                     $vars['results'][$table] = array_map(function ($e) use ($tableName, $table, $searchRequest) {
-                        return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 1 : 3);
+                        return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 2 : 3);
                     }, $vars['results'][$table]);
                 }
                 // TODO: return a newKey to pair up with some randomized value generated from the client, so we make sure we get all the right edit rows accounted for in-case it has changed while we were saving.
@@ -868,6 +870,9 @@ namespace Admin\Bundle\Controller {
 
             if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
                 if(isset($request->get('ss_group')['remove']) && $request->get('ss_group')['remove'] == 'true') {
+                    $g->setName($g->getName() . '-Deleted On ' . time());
+                    $orm->merge($g);
+                    $orm->flush();
                     return $this->redirect($this->generateUrl('groups'));
                 }
                 // if the ID was empty, update the results request with the new ID
@@ -893,44 +898,7 @@ namespace Admin\Bundle\Controller {
                         $orm->flush();
                     }
                 }
-                if(isset($request->get('ss_group')['deleted'])) {
-                    $g->setName($g->getName() . '-Deleted On ' . time());
-                    $orm->merge($g);
-                    $orm->flush();
-                }
             }
-            else {
-
-            }
-
-            // TODO: generalize this in a standardRemove function that specifies which associations to disassociate from and how to mark it removed
-            /*
-                // remove group from users
-                $invites = $orm->getRepository('StudySauceBundle:Invite')->findBy(['group' => $request->get('groupId')]);
-                foreach ($invites as $i => $in) {
-                    $orm->remove($in);
-                }
-                $coupons = $orm->getRepository('StudySauceBundle:Coupon')->findBy(['group' => $request->get('groupId')]);
-                foreach ($coupons as $i => $c) {
-                    /** @var Coupon $c
-                    $c->setGroup(null);
-                    $orm->merge($c);
-                }
-                if ($g->getUsers()->count() == 0) {
-                    $orm->remove($g);
-                } else {
-                    $g->setName($g->getName() . '-Deleted On ' . time());
-                    $g->setDeleted(true);
-                }
-                //foreach($g->getUsers()->toArray() as $i => $u) {
-                //    /** @var User $u
-                //    $u->removeGroup($g);
-                //    $g->removeUser($u);
-                //    $userManager->updateUser($u, false);
-                //}
-                $orm->flush();
-            }
-            */
 
             return $this->forward('AdminBundle:Admin:results', $searchRequest);
         }
@@ -1071,12 +1039,23 @@ for(var t in window.AdminController.__vars.allTables) {
 }
 window.AdminController.getAllFieldNames = function (tables) { return window.getAllFieldNames(tables); };
 
+var substr = function (str, start, length) {return str.substr(start, length);};
 var is_numeric = function (num) {return !isNaN(parseInt(num)) || !isNaN(parseFloat(num));};
 var strlen = function (str) {return (''+(str || '')).length;};
-var array_merge = function () {var args = []; for(var a = 0; a < arguments.length; a++) { args[args.length] = arguments[a]; }; return args.reduce(function (a, b) {return typeof a == 'object' ? $.extend(a, b) : $.merge(a, b);});};
+var array_merge = function () {
+    var isObject = typeof arguments[0] == 'object' && arguments[0] != null && arguments[0].constructor != Array;
+    var args = [isObject ? {} : []];
+    for(var a = 0; a < arguments.length; a++) {
+        args[args.length] = arguments[a];
+    };
+    return args.reduce(function (a, b) {
+        return isObject ? $.extend(a, b) : $.merge(a, b);
+    });
+};
 var trim = function (str) {return (str || '').trim();};
 var explode = function (del, str) {return (str || '').split(del);};
-var array_splice = function (arr, start, length) {return (arr || []).splice(start, length);};
+var array_slice = function (arr, start, length) { return (arr || []).slice(start, length); };
+var array_splice = function (arr, start, length) { var result = $.merge([], arr || []); result.splice(start, length); return result; };
 var array_search = function (item, arr) { var index = (arr || []).indexOf(item); return index == -1 ? false : index; };
 var count = function (arr) { return (arr || []).length; };
 var in_array = function (needle, arr) { return (arr || []).indexOf(needle) > -1; };

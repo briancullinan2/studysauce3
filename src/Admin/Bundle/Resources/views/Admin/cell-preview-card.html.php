@@ -25,7 +25,7 @@ foreach($card->getAnswers()->toArray() as $answer) {
         $answersUnique[count($answersUnique)] = $answer->getContent();
     }
 }
-if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
+if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
     $url = trim($matches[0]);
 }
 

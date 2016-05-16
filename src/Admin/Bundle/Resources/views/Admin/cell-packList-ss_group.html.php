@@ -5,16 +5,24 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
 /** @var Group $ss_group */
-$entityIds = [];
 
-$usersGroupsPacks = $ss_group->getUsersPacksGroupsRecursively();
-$users = $usersGroupsPacks[0];
-$packs = $usersGroupsPacks[1];
-$groups = $usersGroupsPacks[2];
+$subGroups = [];
+$countGroups = 0;
+$countUsers = 0;
+$countPacks = 0;
+foreach($results['allGroups'] as $g) {
+    /** @var Group $g */
+    if(!empty($g->getParent()) && isset($request['ss_group-id']) && ($g->getParent()->getId() == $request['ss_group-id'] || in_array($g->getParent()->getId(), $subGroups))) {
+        $subGroups[count($subGroups)] = $g->getId();
+        $countGroups += 1;
+        $countUsers += count($g->getUsers()->toArray());
+        $countPacks += count($g->getPacks()->toArray());
+    }
+}
 ?>
 
 <div>
-    <label><?php print (implode('', [count($groups) , ' subgroups'])); ?> / <?php print (count($packs)); ?> packs / <?php print (count($users)); ?> users</label>
+    <label><?php print ($countGroups); ?> subgroups / <?php print ($countPacks); ?> packs / <?php print ($countUsers); ?> users</label>
     <?php
     foreach ($ss_group->getSubgroups()->toArray() as $g) {
         /** @var Group $g */

@@ -24,7 +24,8 @@ $(document).ready(function () {
     });
 
     function rowImport(clipText) {
-        var tab = $(this),
+        var results = $(this).find('.card-list .results'),
+            request = request.data('request'),
             last = null;
 
         // split into rows
@@ -36,77 +37,53 @@ $(document).ready(function () {
             if(clipRows[i].length < 2)
                 continue;
 
-            var newRow = tab.find('.card-row.empty:not(.template):not(.removed):not(.changed)').first();
-            if(newRow.length == 0) {
-                // TODO: use template system instead
-                tab.find('[href="#add-card"]').first().trigger('click');
-                newRow = tab.find('.card-row.empty:not(.template):not(.removed):not(.changed)').first();
-            }
-
-            // list under currently focused row
-            if(last != null) {
-                last = newRow.addClass('changed').add(newRow.find('+ .expandable')).detach().insertAfter(last.last());
-            }
-            else {
-                last = newRow.addClass('changed').add(newRow.find('+ .expandable'));
-            }
-
+            var newRow = {};
             // set card type
+            var types = $('[name="responseType"] option').map(function () {return $(this).attr('value');}).toArray();
+            newRow['type'] = '';
             if(clipRows[i].length > 2) {
-                (function (i) {
-                    if (newRow.find('.type select option').filter(function () {
-                            return $(this).attr('value') == clipRows[i][0];
-                        }).length > 0) {
-                        newRow.find('.type select').val(clipRows[i][0]).trigger('change');
-                    }
-                    else if (clipRows[i][0].match(/multiple/ig) != null) {
-                        newRow.find('.type select').val('mc').trigger('change');
-                    }
-                    else if (clipRows[i][0].match(/false/ig) != null) {
-                        newRow.find('.type select').val('tf').trigger('change');
-                    }
-                    else if (clipRows[i][0].match(/blank|short/ig) != null) {
-                        newRow.find('.type select').val('sa exactly').trigger('change');
-                    }
-                    else {
-                        newRow.find('.type select').val('').trigger('change');
-                    }
-                })(i);
+                if (types.indexOf(clipRows[i][0])) {
+                    newRow['type'] = clipRows[i][0];
+                }
+                else if (clipRows[i][0].match(/multiple/ig) != null) {
+                    newRow['type'] = 'mc'
+                }
+                else if (clipRows[i][0].match(/false/ig) != null) {
+                    newRow['type'] = 'tf'
+                }
+                else if (clipRows[i][0].match(/blank|short/ig) != null) {
+                    newRow['type'] = 'sa';
+                }
             }
-            else {
-                newRow.find('.type select').val('').trigger('change');
-            }
-
-            setTypeClass.apply(newRow);
 
             // set correct answers
-            newRow.find('.correct.type-mc textarea').val(clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n")).trigger('change');
+            newRow['answers'] = clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n");
 
             // TODO: merge this with row template and just pass a model containing type, answers, correct, content
             if(clipRows[i].length == 2) {
-                newRow.find('.content textarea').val(clipRows[i][0]).trigger('change');
-                newRow.find('.correct textarea').val(clipRows[i][1]).trigger('change');
+                newRow['content'] = clipRows[i][0];
+                newRow['correct'] = clipRows[i][1];
             }
             else {
-                var tf = (clipRows[i][2].match(/true|false/i) || [''])[0].toLowerCase();
-                newRow.find('.correct.type-tf input').filter(tf == 'true'
-                    ? '[value="true"]'
-                    : (tf == 'false'
-                    ? '[value="false"]'
-                    : ':not(input)')).prop('checked', true);
-                (function (i) {
-                    newRow.find('.correct.type-mc .radios input').filter(function () {
-                        return $(this).val() == clipRows[i][2];
-                    }).prop('checked', true).trigger('change');
-                })(i);
-                newRow.find('.correct .correct:not(.type-mc) textarea').val(clipRows[i][2]);
-                newRow.find('.content textarea').val(clipRows[i][1]).trigger('change');
+                if(newRow['type'] = 'tf') {
+                    newRow['correct'] = (clipRows[i][2].match(/true|false/i) || [''])[0].toLowerCase() == true ? 'true' : 'false';
+                }
+                else {
+                    newRow['correct'] = clipRows[i][2];
+                }
+                newRow['content'] = clipRows[i][1];
             }
 
-            var isUrl, content;
-            if((isUrl = (/https:\/\/.*?(\s|\\n|$)/i).exec(content = newRow.find('.content textarea').val())) !== null) {
-                newRow.find('.content textarea').val(content.replace(isUrl[0], '').trim().replace(/^\\n|\\n$/i, '').trim()).trigger('change');
-                newRow.find('input[name="upload"]').val(isUrl[0].trim().replace(/^\\n|\\n$/i, '').trim());
+            newRow['table'] = 'pack';
+            var rowHtml = $(window.views.render('row', {entity: applyEntityObj(newRow), request: request}))
+                .removeClass('read-only').addClass('edit');
+
+            // list under currently focused row
+            if(last != null) {
+                last = rowHtml.insertAfter(last.last());
+            }
+            else {
+                last = rowHtml.insertAfter(results.find('> header.card'));
             }
         }
     }
@@ -185,13 +162,15 @@ $(document).ready(function () {
     // TODO: merge with row-card.html.php or cell-id-card.html.php
     function setTypeClass() {
         var row = $(this).closest('.card-row');
-        var data = gatherFields.apply(row, [['type']]);
         var results = row.parents('.results');
         var request = results.data('request');
-        window.views.render.apply(row, ['row-card', {card: applyEntityObj(data), request: request, table: 'card'}])
+        var data = gatherFields.apply(row, [getAllFieldNames(request.tables['card'])]);
+        data['table'] = 'card';
+        data['id'] = getRowId.apply(row);
+        window.views.render.apply(results, ['row-card', {card: applyEntityObj(data), request: request, tables: request.tables, table: 'card'}])
     }
 
-    body.on('change', '[id*="packs-"] .card-row select[name="type"]', setTypeClass);
+    body.on('change', '[id*="packs-"] .card-row select[name="responseType"]', setTypeClass);
 
     var autoSaveTimeout = 0;
 

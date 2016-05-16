@@ -49,10 +49,11 @@ if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
 
 foreach ($tables as $table => $t) {
     $tableParts = explode('-', $table);
-    $ext = implode('-', array_splice($tableParts, 1));
+    $ext = implode('-', array_slice($tableParts, 1));
     $table = explode('-', $table)[0];
     $aliasedRequest = (array)(new stdClass());
     if(strlen($ext) > 0) {
+        $aliasedRequest['tables'] = (array)(new stdClass());
         $ext = implode('', ['-' , $ext]);
         $aliasLen = strlen($table) + strlen($ext);
         foreach ($request as $r => $s) {

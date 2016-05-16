@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use Doctrine\Common\Collections\ArrayCollection;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
@@ -64,7 +65,7 @@ $view['slots']->start('body'); ?>
             <div class="membership">
                 <div class="group-list">
                     <?php
-                    $tiles = ['ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent'], 'actions' => ['deleted']]];
+                    $tiles = ['ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent', 'users'], 'actions' => ['deleted']]];
                     if (empty($entity)) {
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
                             'tables' => $tiles,
@@ -84,8 +85,11 @@ $view['slots']->start('body'); ?>
                         ];
                         $tableViews['Membership'] = (array)(new stdClass());
                         $tableViews['Membership']['tables'] = (array)(new stdClass());
-                        $tableViews['Membership']['tables']['ss_group-1'] = ['0' => 'id', '1' => 'title', 'expandMembers' => ['deleted'] /* search field but don't display a template */];
-                        $tableViews['Membership']['tables']['ss_group'] = ['0' => 'id', '1' => 'title', 'expandMembers' => ['parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
+                        $tableViews['Membership']['tables']['file'] = AdminController::$defaultMiniTables['file'];
+                        $tableViews['Membership']['tables']['pack'] = AdminController::$defaultMiniTables['pack'];
+                        $tableViews['Membership']['tables']['ss_user'] = AdminController::$defaultMiniTables['ss_user'];
+                        $tableViews['Membership']['tables']['ss_group-1'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'deleted'] /* search field but don't display a template */];
+                        $tableViews['Membership']['tables']['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
                         $tableViews['Membership']['classes'] = ['last-right-expand'];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
@@ -93,6 +97,9 @@ $view['slots']->start('body'); ?>
                             'ss_group-1footers' => false,
                             'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
                             'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
+                            'count-file' => -1,
+                            'count-ss_user' => -1,
+                            'count-pack' => -1,
                             'count-ss_group' => 0,
                             'ss_group-deleted' => $entity->getDeleted(),
                             'edit' => false,

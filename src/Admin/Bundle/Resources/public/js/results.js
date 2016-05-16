@@ -105,18 +105,22 @@ if (typeof window.views.render == 'undefined') {
 window.views.__defaultEntities = {};
 window.views.__defaultEntities['ss_group'] = {
     subgroups: $([]),
+    users: $([]),
+    groupPacks: $([]),
     invites: $([]),
     getId: function () {return this.id;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
-    getLogo: function () {return this.logo;},
+    getLogo: function () {return this.logo ? applyEntityObj(this.logo) : null;},
     getName: function () {return this.name;},
     getParent: function () {return this.parent ? applyEntityObj(this.parent) : null;},
     getSubgroups: function () {
-        return $(this.subgroups.map(function (c) {return applyEntityObj(c)}));
+        return $(this.subgroups.map(function (c) {return applyEntityObj(c);}));
     },
     getInvites: function () {
-        return $(this.invites.map(function (c) {return applyEntityObj(c)}));
-    }
+        return $(this.invites.map(function (c) {return applyEntityObj(c);}));
+    },
+    getUsers: function () {return $(this.users.map(function (u) { return applyEntityObj(u);}));},
+    getPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));}
 };
 window.views.__defaultEntities['invite'] = {
     group: null,
@@ -176,14 +180,19 @@ window.views.__defaultEntities['card'] = {
     },
     getContent: function () {return this.content},
     getIndex: function () {return this.index},
-    getResponseType: function () {return this.responseType},
+    getResponseType: function () {return (this.responseType || '').split(/\s+/ig)[0]},
     getResponseContent: function () {return this.responseContent}
 };
 window.views.__defaultEntities['answer'] = {
     getCorrect: function () {return this.correct},
     getDeleted: function () {return this.deleted},
     getValue: function () {return this.value},
-    getContent: function () {return this.content},
+    getContent: function () {return this.content}
+};
+window.views.__defaultEntities['file'] = {
+    getUrl: function () { return this.url },
+    getId: function () { return this.id },
+    getUser: function () { return this.user }
 };
 window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),
@@ -681,11 +690,14 @@ $(document).ready(function () {
         // merge updates using template system, same as results.html.php and rows.html.php
         if (typeof data == 'object') {
             for(var t in data.results) {
-                var tableName = t;
+                if(!data.results.hasOwnProperty(t)) {
+                    continue;
+                }
+                var tableName = t.split('-')[0];
                 if(t == 'allGroups') {
                     tableName = 'ss_group';
                 }
-                if(data.results.hasOwnProperty(t) && window.views.__defaultEntities.hasOwnProperty(tableName)) {
+                if(window.views.__defaultEntities.hasOwnProperty(tableName)) {
                     for(var o = 0; o < data.results[t].length; o++) {
                         data.results[t][o] = applyEntityObj(data.results[t][o]);
                     }

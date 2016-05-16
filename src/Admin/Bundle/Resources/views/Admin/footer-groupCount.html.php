@@ -1,20 +1,29 @@
 <?php
+use StudySauce\Bundle\Entity\Group;
+
+$subGroups = [];
+$countUsers = 0;
+$countPacks = 0;
+foreach($results['allGroups'] as $g) {
+    /** @var Group $g */
+    if(!empty($g->getParent()) && isset($request['ss_group-id']) && ($g->getParent()->getId() == $request['ss_group-id'] || in_array($g->getParent()->getId(), $subGroups))) {
+        $subGroups[count($subGroups)] = $g->getId();
+        $countUsers += count($g->getUsers()->toArray());
+        $countPacks += count($g->getPacks()->toArray());
+    }
+}
+
 if (empty($results['ss_group-1'])) { ?>
     <footer class="ss_group">
         <label>Total in this Group</label>
         <label>0</label>
         <label>0</label>
     </footer>
-<?php } else {
-    $userPacksGroups = $results['ss_group-1'][0]->getUsersPacksGroupsRecursively();
-    $users = $userPacksGroups[0];
-    $packs = $userPacksGroups[1];
-    $groups = $userPacksGroups[2];
-    ?>
+<?php } else { ?>
     <footer class="ss_group">
         <label>Total in this Group</label>
-        <label><?php print (count($users)); ?></label>
-        <label><?php print (count($packs)); ?></label>
+        <label><?php print ($countUsers); ?></label>
+        <label><?php print ($countPacks); ?></label>
     </footer>
-    <?php
+<?php
 }

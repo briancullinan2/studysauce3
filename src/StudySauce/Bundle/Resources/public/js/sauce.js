@@ -448,6 +448,7 @@ function gatherFields(fields, visibleOnly) {
         formFields = form.serializeArray();
     }
     else {
+        // must be a row, also include ID and tablename?
         for(var f in fields) {
             if (fields.hasOwnProperty(f)) {
                 var inputField = context.find(fieldMatch(fields[f]));
@@ -455,7 +456,7 @@ function gatherFields(fields, visibleOnly) {
                 if(inputField.is('[name^="' + fields[f] + '["]')) {
                     key = inputField.attr('name');
                 }
-                var value;
+                var value = null;
                 if (inputField.is('[type="checkbox"],[type="radio"]')) {
                     value = inputField.filter(':checked').val();
                 }
@@ -465,7 +466,7 @@ function gatherFields(fields, visibleOnly) {
                 else if (inputField.length > 0) {
                     value = inputField.val();
                 }
-                if(typeof value != 'undefined') {
+                if(value != null) {
                     formFields[formFields.length] = {name: key, value: value};
                 }
             }
