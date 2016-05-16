@@ -58,7 +58,7 @@ class Card
     /**
      * @ORM\Column(type="string", length=16, name="response_type")
      */
-    protected $responseType = ''; // default is SELF_ASSESSMENT
+    protected $responseType = ''; // default is flash-card
 
     /**
      * @ORM\Column(type="string", length=16, name="recurrence")

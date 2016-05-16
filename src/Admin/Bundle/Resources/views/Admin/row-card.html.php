@@ -9,27 +9,28 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var Card $card */
 
-$rowId = implode('', [$table , '-id-' , $card->getId()]);
+$subVars = [
+    'request' => $request,
+    'results' => $results
+];
 
-$expandable = isset($request['expandable']) && is_array($request['expandable'])
-    ? $request['expandable']
-    : [];
-?>
-<div class="<?php print ($table); ?>-row <?php print (empty($card->getResponseType()) || $card->getResponseType() == 'fc' ? '' : implode('', ['type-' , strtolower($card->getResponseType())])); ?> <?php
-print ($rowId); ?> <?php
-print (isset($request['edit']) && ($request['edit'] === true || is_array($request['edit']) && in_array($table, $request['edit']))
-    ? 'edit'
-    : (isset($request['read-only']) && ($request['read-only'] === false || is_array($request['read-only']) && !in_array($table, $request['read-only']))
-        ? ''
-        : 'read-only')); ?> <?php
-print (isset($expandable[$table]) ? 'expandable' : ''); ?> <?php
-print (!empty($classes) ? $classes : ''); ?>">
-    <?php print ($view->render('AdminBundle:Admin:cells.html.php', ['entity' => $card, 'tables' => $tables, 'table' => $table, 'allGroups' => $allGroups, 'request' => $request, 'results' => $results])); ?>
-    <label class="checkbox"><input type="checkbox" name="selected"/><i></i></label>
-</div>
-<?php if (isset($expandable[$table])) { ?>
-    <div class="expandable <?php
-    print (!empty($classes) ? $classes : ''); ?>">
-    <?php print ($view->render('AdminBundle:Admin:cells.html.php', ['entity' => $card, 'tables' => $expandable, 'table' => $table, 'allGroups' => $allGroups, 'request' => $request, 'results' => $results])); ?>
-    </div><?php
+$context = !empty($context) ? $context : jQuery($this);
+
+$row = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
+    'tableId' => $tableId,
+    'classes' => $classes,
+    'entity' => $card,
+    'table' => $table,
+    'tables' => $tables,
+    'request' => $request,
+    'results' => $results])));
+
+$actual = $row->filter('[class*="-row"]');
+if(!$actual->is(implode('', ['.type-' , $card->getResponseType()]))) {
+    $actual->attr('class', preg_replace('/\s*type-.*?(\s|$)/i', ' ', $actual->attr('class')));
+    if (!empty($card->getResponseType())) {
+        $actual->addClass(implode('', ['type-' , $card->getResponseType()]));
+    }
 }
+
+print($row);

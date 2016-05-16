@@ -80,13 +80,13 @@ $view['slots']->start('body'); ?>
                         'count-ss_group' => 0,
                         'count-pack' => 1,
                     ];
-                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
+                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     ?>
                     <div class="empty-members">
                         <div>Select name on the left to see group members</div>
                     </div>
                 </div>
-                <div class="card-list">
+                <form action="<?php print ($view['router']->generate('packs_create')); ?>" name="pack[cards]" class="card-list">
                     <?php
                     $newCards = true;
                     foreach($entity->getCards()->toArray() as $c) {
@@ -106,14 +106,13 @@ $view['slots']->start('body'); ?>
                         'edit' => empty($entity->getId()),
                         // search settings
                         'pack-id' => $entity->getId(),
-                        'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
                         // for new=true the template generates the -count number of empty rows, and no database query is performed
                         'count-pack' => -1,
                         'count-card' => $newCards ? 5 : 0,
                     ];
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
                     ?>
-                </div>
+                </form>
                 <?php
             }
             else {

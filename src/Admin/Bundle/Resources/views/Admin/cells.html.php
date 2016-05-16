@@ -1,5 +1,12 @@
 <?php
-foreach ($tables[$table] as $f => $fields) {
+if(isset($request['cells'][$tableId])) {
+    $cells = $request['cells'][$tableId];
+}
+else {
+    $cells = array_keys($tables[$table]);
+}
+foreach ($cells as $i => $f) {
+    $fields = $tables[$table][$f];
     $field = is_array($fields) ? $f : $fields;
     // skip search only fields
     if(is_numeric($field)) {
@@ -10,7 +17,6 @@ foreach ($tables[$table] as $f => $fields) {
     <?php
     if ($view->exists(implode('', ['AdminBundle:Admin:cell-' , $field , '-' , $table , '.html.php']))) {
         $specificCell = [
-            'groups' => $allGroups,
             'table' => $table,
             'request' => $request,
             'results' => $results];
@@ -19,7 +25,6 @@ foreach ($tables[$table] as $f => $fields) {
     } else if ($view->exists(implode('', ['AdminBundle:Admin:cell-' , $field , '.html.php']))) {
         print ($view->render(implode('', ['AdminBundle:Admin:cell-' , $field , '.html.php']), [
             'entity' => $entity,
-            'groups' => $allGroups,
             'table' => $table,
             'request' => $request,
             'results' => $results]));
@@ -29,7 +34,6 @@ foreach ($tables[$table] as $f => $fields) {
             'fields' => is_array($fields) ? $fields : [$fields],
             'field' => $field,
             'entity' => $entity,
-            'groups' => $allGroups,
             'table' => $table,
             'request' => $request,
             'results' => $results]));

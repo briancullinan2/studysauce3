@@ -7,7 +7,7 @@ use StudySauce\Bundle\Entity\Group;
         <option value="<?php print ($ss_group->getId()); ?>" <?php print (empty($ss_group->getParent()) ? 'selected="selected"' : ''); ?>>No parent</option>
         <?php
         $topGroups = [];
-        foreach($groups as $g) {
+        foreach($results['allGroups'] as $g) {
             /** @var Group $g */
             if(empty($g->getParent())) {
                 $topGroups[count($topGroups)] = $g;

@@ -155,7 +155,7 @@ $(document).ready(function () {
                     options = $.merge(options, field.data(i) || []);
                 }
             }
-            var fields = getAllFields(tables);
+            var fields = getAllFieldNames(tables);
             field.data('oldValue', field.val()).selectize({
                 persist: false,
                 delimiter: ' ',
@@ -385,7 +385,7 @@ $(document).ready(function () {
 
     function resetFieldToData() {
         var toField = $(this);
-        var searchFields = getAllFields(toField.data('tables')).slice(0, 3);
+        var searchFields = getAllFieldNames(toField.data('tables')).slice(0, 3);
         if(toField.is('.selectized')) {
             toField[0].selectize.setValue('', true);
             toField[0].selectize.renderCache = [];

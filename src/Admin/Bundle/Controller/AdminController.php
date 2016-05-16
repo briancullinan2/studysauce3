@@ -85,7 +85,7 @@ namespace Admin\Bundle\Controller {
             'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
             'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks'], 'actions' => ['deleted']],
             'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
-            'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers'], ['pack'], 'actions' => ['deleted']],
+            'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
             'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
             'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
             'file' => ['id' => ['id', 'url']]
@@ -395,6 +395,9 @@ namespace Admin\Bundle\Controller {
                         $t = self::$defaultTables[explode('-', $t)[0]];
                     }
                     $tblList[$table] = $t;
+                    if(!isset($searchRequest['cells'][$table])) {
+                        $searchRequest['cells'][$table] = array_keys($tblList[$table]);
+                    }
                 }
                 $searchRequest['tables'] = $tblList;
 
@@ -496,7 +499,7 @@ namespace Admin\Bundle\Controller {
                 $vars['results'][$table . $ext] = $query->getQuery()->getResult();
             }
 
-            $vars['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
+            $vars['results']['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
             $serialized = serialize($searchRequest);
             $searchRequest['requestKey'] = md5($serialized);
             $this->get('cache')->save($searchRequest['requestKey'], $serialized);
@@ -514,7 +517,7 @@ namespace Admin\Bundle\Controller {
                         $tableName = 'ss_group';
                     }
                     $vars['results'][$table] = array_map(function ($e) use ($tableName, $table, $searchRequest) {
-                        return self::toFirewalledEntityArray($e, $searchRequest['tables']);
+                        return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 1 : 3);
                     }, $vars['results'][$table]);
                 }
                 // TODO: return a newKey to pair up with some randomized value generated from the client, so we make sure we get all the right edit rows accounted for in-case it has changed while we were saving.
@@ -768,7 +771,7 @@ namespace Admin\Bundle\Controller {
                         $joinTable = array_keys(self::$allTables)[$tableIndex];
                         if($association['type'] == ClassMetadataInfo::ONE_TO_ONE || $association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
                             // create entities from array using same assignment functions as here
-                            $value = self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $e[$f], $orm);
+                            $value = empty($e[$f]) ? null : self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $e[$f], $orm);
                             // many to one, just lookup object and call set property normally
                             if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                                 call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
@@ -816,7 +819,7 @@ namespace Admin\Bundle\Controller {
                             $joinTable = array_keys(self::$allTables)[$tableIndex];
                             $value = self::applyFields($type->getName(), $joinTable, $fields, $value, $orm);
                         }
-                        // TODO: handle roles, properties and datetime data types
+                        // TODO: handle roles, properties and datetime data types, NULL to clear a field
                         else if (is_object($type) && $type->getName() == '\\DateTime') {
                             $value = new \DateTime($value);
                         }
@@ -1066,7 +1069,7 @@ for(var t in window.AdminController.__vars.allTables) {
         window.AdminController.__vars.allTables[t] = $.extend(window.AdminController.__vars.allTables[t], window.AdminController.TableMapping);
     }
 }
-window.AdminController.getAllFieldNames = function (tables) { return window.getAllFields(tables); };
+window.AdminController.getAllFieldNames = function (tables) { return window.getAllFieldNames(tables); };
 
 var is_numeric = function (num) {return !isNaN(parseInt(num)) || !isNaN(parseFloat(num));};
 var strlen = function (str) {return (''+(str || '')).length;};
@@ -1081,13 +1084,14 @@ var array_values = function (arr) { return (arr || []).slice(0); };
 var is_array = function (obj) { return typeof obj == 'array' || typeof obj == 'object'; }; // PHP and javascript don't make a distinction between arrays and objects syntax wise using [property], all php objects should be restful anyways
 var array_keys = function (obj) {var result=[]; for (var k in obj) { if (obj.hasOwnProperty(k)) { result[result.length] = k } } return result; };
 var implode = function (sep, arr) {return (arr || []).join(sep);};
-var preg_replace = function (needle, replacement, subject) {debugger; return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0]), replacement);};
+var preg_replace = function (needle, replacement, subject) { return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0]), replacement);};
+var preg_match = function (needle, subject) { return ((subject || '').match(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])) || []).length;};
 var ucfirst = function (str) {return (str || '').substr(0, 1).toLocaleUpperCase() + str.substr(1);};
 var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};
 var call_user_func_array = function (context, params) {return context[context[1]].apply(context[0], params);};
 var print = function (s) { window.views.__output += s };
 var strtolower = function(s) { return s.toLocaleLowerCase(); };
-var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s == false || s == null; };
+var empty = function(s) { return typeof s == 'undefined' || (typeof s == 'object' && s.constructor == Array && s.length == 0) || ('' + s).trim() == '' || s == false || s == null; };
 var json_encode = JSON.stringify;
 var method_exists = function (s,m) { return typeof s == 'object' && typeof s[m] == 'function'; };
 var isset = function (s) { return typeof s != 'undefined'; };

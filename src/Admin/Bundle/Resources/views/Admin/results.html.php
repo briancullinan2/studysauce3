@@ -14,7 +14,6 @@ $selected = $resultOutput->find('[class*="-row"].selected');
 $resultOutput->find('.view, .template, .template + .expandable:not([class*="-row"]), header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
 
 $subVars = [
-    'allGroups' => $allGroups,
     'request' => $request,
     'results' => $results
 ];
@@ -102,11 +101,20 @@ foreach ($tables as $table => $t) {
     foreach ($results[implode('', [$table , $ext])] as $entity) {
         $row = null;
         if ($view->exists(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']))) {
-            $rowVars = array_merge($subVars, ['classes' => $classes, 'table' => $table]);
+            $rowVars = array_merge($subVars, [
+                'classes' => $classes,
+                'table' => $table,
+                'context' => $context,
+                'tableId' => implode('', [$table , $ext])]);
             $rowVars[$table] = $entity;
             $row = jQuery($view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),                 $rowVars));
         } else {
-            $row = jQuery($view->render('AdminBundle:Admin:row.html.php',                                               array_merge($subVars, ['classes' => $classes, 'entity' => $entity, 'table' => $table])));
+            $row = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
+                'classes' => $classes,
+                'entity' => $entity,
+                'table' => $table,
+                'context' => $context,
+                'tableId' => implode('', [$table , $ext])])));
         }
         // TODO: update new row IDs, no insert if(isset($entity->newId))
         if(empty($last) || $last->length == 0) {
@@ -131,11 +139,18 @@ foreach ($tables as $table => $t) {
         for ($nc = 0; $nc < $newCount; $nc++) {
             $newRow = null;
             if ($view->exists(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']))) {
-                $rowVars = array_merge($subVars, ['classes' => $classes, 'table' => $table]);
+                $rowVars = array_merge($subVars, [
+                    'classes' => $classes,
+                    'table' => $table,
+                    'tableId' => implode('', [$table , $ext])]);
                 $rowVars[$table] = $entity;
                 $newRow = jQuery($view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),          $rowVars));
             } else {
-                $newRow = jQuery($view->render('AdminBundle:Admin:row.html.php',                                        array_merge($subVars, ['classes' => $classes, 'entity' => $entity, 'table' => $table])));
+                $newRow = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
+                    'classes' => $classes,
+                    'entity' => $entity,
+                    'table' => $table,
+                    'tableId' => implode('', [$table , $ext])])));
             }
             if(empty($last) || $last->length == 0) {
                 $resultOutput->prepend($newRow);

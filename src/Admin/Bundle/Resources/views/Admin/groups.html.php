@@ -43,7 +43,7 @@ $view['slots']->start('body'); ?>
                 <form action="<?php print ($view['router']->generate('save_group')); ?>" class="group-edit">
                     <?php
                     $tables = [
-                        'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => [], 'invite' => ['invites'], 'actions' => ['deleted']]
+                        'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => ['subgroups'], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
                     $isNew = empty($entity->getId());
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
@@ -52,6 +52,7 @@ $view['slots']->start('body'); ?>
                         'edit' => !$isNew ? false : ['ss_group'],
                         'read-only' => $isNew ? false : ['ss_group'],
                         'new' => $isNew,
+                        'parent-ss_group-id' => '!0',
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups'],

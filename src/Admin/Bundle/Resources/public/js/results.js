@@ -104,14 +104,34 @@ if (typeof window.views.render == 'undefined') {
 }
 window.views.__defaultEntities = {};
 window.views.__defaultEntities['ss_group'] = {
+    subgroups: $([]),
+    invites: $([]),
     getId: function () {return this.id;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
-    getLogo: function () {return this.logo;}
+    getLogo: function () {return this.logo;},
+    getName: function () {return this.name;},
+    getParent: function () {return this.parent ? applyEntityObj(this.parent) : null;},
+    getSubgroups: function () {
+        return $(this.subgroups.map(function (c) {return applyEntityObj(c)}));
+    },
+    getInvites: function () {
+        return $(this.invites.map(function (c) {return applyEntityObj(c)}));
+    }
+};
+window.views.__defaultEntities['invite'] = {
+    group: null,
+    getCode: function () {return this.code;},
+    getFirst: function () {return this.first;},
+    getLast: function () {return this.last;},
+    getEmail: function () {return this.email;},
+    getGroup: function () {return this.group ? applyEntityObj(this.group) : null;}
 };
 window.views.__defaultEntities['pack'] = {
     user: null,
     userPacks: $([]),
     cards: $([]),
+    getProperty: function (name) {return this.properties.hasOwnProperty(name) ? this.properties[name] : null;},
+    getStatus: function () {return this.status},
     getId: function () {return this.id;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getLogo: function () {return this.logo;},
@@ -143,15 +163,27 @@ window.views.__defaultEntities['user_pack'] = {
     getDownloaded: function () {return !(this.downloaded) ? null : new Date(this.downloaded);}
 };
 window.views.__defaultEntities['card'] = {
+    answers: $([]),
     getDeleted: function () {return this.deleted},
-    getId: function () {return this.id}
+    getId: function () {return this.id},
+    getCorrect: function () {return this.getAnswers().filter(function ($a) {return $a.getCorrect() && !$a.getDeleted();})[0];},
+    getAnswers: function () {return $(this.answers.map(function (up) {return applyEntityObj(up);}));},
+    getContent: function () {return this.content},
+    getIndex: function () {return this.index},
+    getResponseType: function () {return this.responseType},
+    getResponseContent: function () {return this.responseContent}
+};
+window.views.__defaultEntities['answer'] = {
+    getCorrect: function () {return this.correct},
+    getDeleted: function () {return this.deleted},
+    getValue: function () {return this.value},
 };
 window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),
     getId: function () {return this.id;},
     getEmailCanonical: function () {return this.email.toLowerCase();},
-    hasRole: function (role) { return window.views.user.roles.indexOf(role) > -1; },
-    getEmail: function () { return window.views.user.email; },
+    hasRole: function (role) { return this.roles.indexOf(role) > -1; },
+    getEmail: function () { return this.email; },
     getUserPack: function (pack) {
         for(var up = 0; up < this.userPacks.length; up++) {
             if(this.userPacks[up].pack.id == pack.id) {
@@ -199,6 +231,7 @@ function applyEntityObj(data) {
     obj = $.extend(obj, data);
     return obj;
 }
+window.applyEntityObj = applyEntityObj;
 
 $(document).ready(function () {
 
@@ -394,8 +427,9 @@ $(document).ready(function () {
         var results = $(this).parents('.results');
         var table = $(this).attr('href').substring(5);
         // TODO: fix this creating a blank through the template system
-        var newRow = window.views.render('row', {table: table});
-        newRow.insertBefore(results.find('.' + table + '-row').first());
+        var request = results.data('request');
+        var newRow = $(window.views.render('row', {entity: applyEntityObj({table: table}), tables: request.tables, table: table, request: request, tableId: table}));
+        newRow.removeClass('read-only').addClass('edit').insertBefore(results.find('.' + table + '-row').first());
     });
 
     body.on('click', '[class*="-row"] a[href^="#remove-"]', function (evt) {
@@ -521,6 +555,7 @@ $(document).ready(function () {
         loadingAnimation(saveButton);
 
         // get the parsed list of data
+        var hasSomethingToSave = false;
         for (var r = 0; r < tab.length; r++) {
             var tables = $(tab[r]).data('request').tables;
             for (var table in tables) {
@@ -528,7 +563,7 @@ $(document).ready(function () {
                     // get list of possible fields in form
                     var tmpTables = {};
                     tmpTables[table] = tables[table];
-                    var fields = getAllFields(tmpTables);
+                    var fields = getAllFieldNames(tmpTables);
                     var rows = tab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
                     for (var i = 0; i < rows.length; i++) {
                         if (typeof data[table] == 'undefined') {
@@ -548,10 +583,15 @@ $(document).ready(function () {
                         if (rows.length == 1 && data[table].length == 1) {
                             data[table] = data[table][0];
                         }
+                        hasSomethingToSave = true;
                     }
                     rows.removeClass('changed');
                 }
             }
+        }
+
+        if(!hasSomethingToSave) {
+            return;
         }
 
         $.ajax({
@@ -572,7 +612,7 @@ $(document).ready(function () {
         });
     }
 
-    function getAllFields(tables) {
+    function getAllFieldNames(tables) {
         var fields = [];
         for (var table in tables) {
             if (tables.hasOwnProperty(table)) {
@@ -598,7 +638,7 @@ $(document).ready(function () {
         }
         return fields;
     }
-    window.getAllFields = getAllFields;
+    window.getAllFieldNames = getAllFieldNames;
 
     window.standardSave = standardSave;
 
@@ -634,7 +674,11 @@ $(document).ready(function () {
         // merge updates using template system, same as results.html.php and rows.html.php
         if (typeof data == 'object') {
             for(var t in data.results) {
-                if(data.results.hasOwnProperty(t) && window.views.__defaultEntities.hasOwnProperty(t)) {
+                var tableName = t;
+                if(t == 'allGroups') {
+                    tableName = 'ss_group';
+                }
+                if(data.results.hasOwnProperty(t) && window.views.__defaultEntities.hasOwnProperty(tableName)) {
                     for(var o = 0; o < data.results[t].length; o++) {
                         data.results[t][o] = applyEntityObj(data.results[t][o]);
                     }

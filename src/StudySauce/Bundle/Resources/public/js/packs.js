@@ -186,13 +186,7 @@ $(document).ready(function () {
     function setTypeClass() {
         var row = $(this).closest('.card-row');
         var data = gatherFields.apply(row, [['type']]);
-
-        if(!row.is('.type-' + data.type)) {
-            row.attr('class', row.attr('class').replace(/\s*type-.*?(\s|$)/ig, ' '));
-            if (data.type != '' && data.type != null) {
-                row.addClass('type-' + data.type);
-            }
-        }
+        window.views.render.apply(row, ['row-card', applyEntityObj(data)])
     }
 
     body.on('change', '[id*="packs-"] .card-row select[name="type"]', setTypeClass);

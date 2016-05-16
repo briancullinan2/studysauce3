@@ -6,4 +6,5 @@ use StudySauce\Bundle\Entity\Pack;
 ?>
 <label class="input">
     <input type="text" name="name" value="<?php print ($view->escape($ss_group->getName())); ?>"/>
+    <input type="hidden" name="description" value="" />
 </label>

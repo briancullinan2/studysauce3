@@ -55,9 +55,9 @@
         <div class="<?php print ($field); ?>">
             <?php
             if ($view->exists($k)) {
-                print ($view->render($k, ['groups' => $allGroups, 'field' => $field]));
+                print ($view->render($k, ['field' => $field]));
             } else {
-                print ($view->render('AdminBundle:Admin:heading.html.php', ['groups' => $allGroups, 'field' => $field]));
+                print ($view->render('AdminBundle:Admin:heading.html.php', ['field' => $field]));
             }
             ?>
         </div>

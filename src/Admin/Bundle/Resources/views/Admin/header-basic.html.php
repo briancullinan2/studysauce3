@@ -10,7 +10,7 @@
         }
         ?>
         <label class="<?php print ($field); ?>">
-            <?php print ($view->render('AdminBundle:Admin:heading.html.php', ['groups' => $allGroups, 'field' => $field])); ?>
+            <?php print ($view->render('AdminBundle:Admin:heading.html.php', ['field' => $field])); ?>
         </label>
         <?php
     } ?>
