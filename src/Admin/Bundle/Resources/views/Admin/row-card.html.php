@@ -26,11 +26,11 @@ $row = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVa
     'results' => $results])));
 
 $actual = $row->filter('[class*="-row"]');
-if(!$actual->is(implode('', ['.type-' , $card->getResponseType()]))) {
+if(!$actual->is(implode('', ['.card-row.type-' , $card->getResponseType()]))) {
     $actual->attr('class', preg_replace('/\s*type-.*?(\s|$)/i', ' ', $actual->attr('class')));
     if (!empty($card->getResponseType())) {
         $actual->addClass(implode('', ['type-' , $card->getResponseType()]));
     }
 }
 
-print($row);
+print(jQuery('<div />')->append($actual->add($row->filter('[class*="row"] + .expandable')))->html());

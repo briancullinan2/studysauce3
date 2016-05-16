@@ -439,12 +439,12 @@ centerize.apply($('body').find('.centerized:visible'));
 function gatherFields(fields, visibleOnly) {
     var fieldMatch = function (f) {
         return '[name="' + f + '"], [name^="' + f + '-"], [name^="' + f + '["]';
-    }
+    };
     var context = $(this),
-        form;
+        form = context.closest('[class*="-row"],form').last().add('+ .expandable:not([class*="-row"])');
     var result = {};
     var formFields = [];
-    if ((form = context.closest('form')).length > 0) {
+    if (form.is('form')) {
         formFields = form.serializeArray();
     }
     else {

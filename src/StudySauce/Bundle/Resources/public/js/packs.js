@@ -186,7 +186,9 @@ $(document).ready(function () {
     function setTypeClass() {
         var row = $(this).closest('.card-row');
         var data = gatherFields.apply(row, [['type']]);
-        window.views.render.apply(row, ['row-card', applyEntityObj(data)])
+        var results = row.parents('.results');
+        var request = results.data('request');
+        window.views.render.apply(row, ['row-card', {card: applyEntityObj(data), request: request, table: 'card'}])
     }
 
     body.on('change', '[id*="packs-"] .card-row select[name="type"]', setTypeClass);
@@ -198,7 +200,10 @@ $(document).ready(function () {
             return;
         }
         var row = $(this).add($(this).next('.expandable'));
-        window.views.render.apply(row, ['cell_preview_card', []]);
+        var results = row.parents('.results');
+        var request = results.data('request');
+        var data = gatherFields.apply(row, [getAllFieldNames(request.tables['card'])]);
+        window.views.render.apply(row, ['cell_preview_card', {card: applyEntityObj($.extend({table: 'card'}, data))}]);
         centerize.apply(row.find('.centerized:visible'));
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
     }
@@ -220,7 +225,7 @@ $(document).ready(function () {
 
         for(var c  = 0; c < cardRows.length; c++) {
             var row = $(cardRows[c]);
-            var data = gatherFields.apply(row, [['type', 'content', 'answers', 'correct']]);
+            var data = gatherFields.apply(row, [['responseType', 'content', 'answers', 'correct']]);
 
             if(data.content == '' && data.correct == '' && (typeof data.answers == 'undefined' || data.answers == '')) {
                 row.removeClass('invalid').addClass('empty valid');

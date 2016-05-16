@@ -11,35 +11,22 @@ $preview = $row->find('.preview');
 // TODO: use applyFields and gatherFields here too?  at the row level?
 if($preview->length == 0) {
     return;
-    $type = $card->getResponseType();
-    $content = $card->getContent();
-    $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
-    $correct = !empty($card->getCorrect()) ? preg_replace('/\\\\n(\\\\r)?/i', "\n", $card->getCorrect()->getContent()) : '';
-    /** @var Answer[] $answers */
-    $answersUnique = [];
-    foreach($card->getAnswers()->toArray() as $answer) {
-        /** @var Answer $answer */
-        if(!$answer->getDeleted() && !in_array($answer->getContent(), $answersUnique)) {
-            $answersUnique[count($answersUnique)] = $answer->getContent();
-        }
-    }
-    if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
-        $url = trim($matches[0]);
+}
+
+$type = $card->getResponseType();
+$content = $card->getContent();
+$content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
+$correct = !empty($card->getCorrect()) ? preg_replace('/\\\\n(\\\\r)?/i', "\n", $card->getCorrect()->getContent()) : '';
+/** @var Answer[] $answers */
+$answersUnique = [];
+foreach($card->getAnswers()->toArray() as $answer) {
+    /** @var Answer $answer */
+    if(!$answer->getDeleted() && !in_array($answer->getContent(), $answersUnique)) {
+        $answersUnique[count($answersUnique)] = $answer->getContent();
     }
 }
-else {
-    $type = explode(' ', $row->find('select[name="type"]')->val())[0];
-    $url = trim($row->find('input[name="upload"]')->val());
-    $content = str_replace('\\n', "\n", $row->find('.content textarea')->val());
-    $answers = explode("\n", $row->find('.correct.type-mc:visible textarea')->val());
-    $answersUnique = [];
-    foreach($answers as $answer) {
-        if(!in_array($answer, $answersUnique)) {
-            $answersUnique[count($answersUnique)] = $answer;
-        }
-    }
-    $correct = $row->find('.input.correct:visible textarea, .input.correct:visible select, .radio.correct:visible input[type="radio"]:checked, .radios:visible input[type="radio"]:checked')->val();
-    $correct = str_replace('\\n', "\n", $correct);
+if (($hasUrl = preg_match('/https:\/\/.*/i', $content, $matches)) > 0) {
+    $url = trim($matches[0]);
 }
 
 $isImage = false;

@@ -166,8 +166,14 @@ window.views.__defaultEntities['card'] = {
     answers: $([]),
     getDeleted: function () {return this.deleted},
     getId: function () {return this.id},
-    getCorrect: function () {return this.getAnswers().filter(function ($a) {return $a.getCorrect() && !$a.getDeleted();})[0];},
-    getAnswers: function () {return $(this.answers.map(function (up) {return applyEntityObj(up);}));},
+    getCorrect: function () {var card = this; return this.getAnswers().filter(function (i, a) {return (a.getCorrect() || a.getValue() == card.correct) && !a.getDeleted();})[0];},
+    getAnswers: function () {
+        // look up answers
+        if(typeof this.answers == 'string' || typeof this.answers == 'undefined') {
+            this.answers = this.answers.split(/\s*\r?\n\s*/ig).map(function (a) {return {table: 'answer', value: a, content: a};});
+        }
+        return $(this.answers.map(function (up) {return applyEntityObj(up);}));
+    },
     getContent: function () {return this.content},
     getIndex: function () {return this.index},
     getResponseType: function () {return this.responseType},
@@ -177,6 +183,7 @@ window.views.__defaultEntities['answer'] = {
     getCorrect: function () {return this.correct},
     getDeleted: function () {return this.deleted},
     getValue: function () {return this.value},
+    getContent: function () {return this.content},
 };
 window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),

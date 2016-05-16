@@ -1185,6 +1185,7 @@ class HtmlPageCrawler extends Crawler
      * @param null|\DOMNodeList|array|\DOMNode|Crawler $node A node
      *
      * @api
+     * @return $this|void
      */
     public function add($node)
     {
@@ -1195,6 +1196,8 @@ class HtmlPageCrawler extends Crawler
         } else {
             parent::add($node);
         }
+
+        return $this;
     }
 
     /**
