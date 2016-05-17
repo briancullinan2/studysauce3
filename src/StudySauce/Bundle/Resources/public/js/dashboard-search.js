@@ -387,12 +387,11 @@ $(document).ready(function () {
         var toField = $(this);
         var searchFields = getAllFieldNames(toField.data('tables')).slice(0, 3);
         if(toField.is('.selectized')) {
-            toField[0].selectize.setValue('', true);
+            toField[0].selectize.setValue('');
             toField[0].selectize.renderCache = [];
             toField[0].selectize.clearOptions();
             toField[0].selectize.settings.searchField = searchFields;
             toField[0].selectize.addOption(getAllOptions.apply(toField));
-            toField.trigger('change');
         }
     }
 

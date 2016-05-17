@@ -525,10 +525,10 @@ $(document).ready(function () {
 
     function getTab(readonly) {
         if (readonly) {
-            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit, [class*="-row"].read-only)');
+            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit), .results:has([class*="-row"].read-only)');
         }
         else {
-            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit, [class*="-row"].read-only)');
+            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit), .results:has([class*="-row"].read-only)');
         }
     }
 
@@ -603,6 +603,8 @@ $(document).ready(function () {
                         if (rows.length == 1 && data[table].length == 1) {
                             data[table] = data[table][0];
                         }
+                    }
+                    if(typeof data[table] != 'undefined') {
                         hasSomethingToSave = true;
                     }
                     rows.removeClass('changed');
