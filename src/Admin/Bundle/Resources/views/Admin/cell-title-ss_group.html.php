@@ -8,12 +8,19 @@ use StudySauce\Bundle\Entity\User;
 $subGroups = [];
 $countUsers = count($ss_group->getUsers()->toArray());
 $countPacks = count($ss_group->getPacks()->toArray());
-foreach($results['allGroups'] as $g) {
-    /** @var Group $g */
-    if(!empty($g->getParent()) && ($g->getParent()->getId() == $ss_group->getId() || in_array($g->getParent()->getId(), $subGroups))) {
-        $subGroups[count($subGroups)] = $g->getId();
-        $countUsers += count($g->getUsers()->toArray());
-        $countPacks += count($g->getPacks()->toArray());
+$added = true;
+while($added) {
+    $added = false;
+    foreach($results['allGroups'] as $g) {
+        /** @var Group $g */
+        if(!empty($g->getParent())
+            && ($g->getParent()->getId() == $ss_group->getId() || in_array($g->getParent()->getId(), $subGroups))
+            && !in_array($g->getId(), $subGroups)) {
+            $subGroups[count($subGroups)] = $g->getId();
+            $countUsers += count($g->getUsers()->toArray());
+            $countPacks += count($g->getPacks()->toArray());
+            $added = true;
+        }
     }
 }
 

@@ -15,7 +15,7 @@ foreach($pack->getGroups()->toArray() as $g) {
     if(!$g->getDeleted()) {
         $groups[count($groups)] = $g;
         $groupIds[count($groupIds)] = $g->getId();
-        $groupUsers += $g->getUsers()->count();
+        $groupUsers += count($g->getUsers()->toArray());
     }
 }
 /** @var User[] $users */
@@ -49,12 +49,12 @@ foreach($pack->getCards()->toArray() as $c) {
     <?php
     foreach ($groups as $p) {
         /** @var Group $p */
-        if ($p->getUsers()->count() == 0) {
+        if (count($p->getUsers()->toArray()) == 0) {
             continue;
         }
         ?>
         <a href="<?php print ($view['router']->generate('groups_edit', ['group' => $p->getId()])); ?>" class="pack-list"><?php print ($p->getName()); ?>
-            <span><?php print ($p->getUsers()->count()); ?></span></a>
+            <span><?php print (count($p->getUsers()->toArray())); ?></span></a>
     <?php }
     foreach ($diffUsers as $g) {
         /** @var User $g */

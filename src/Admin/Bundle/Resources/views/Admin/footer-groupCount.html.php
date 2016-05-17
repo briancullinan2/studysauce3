@@ -4,12 +4,19 @@ use StudySauce\Bundle\Entity\Group;
 $subGroups = [];
 $countUsers = 0;
 $countPacks = 0;
-foreach($results['allGroups'] as $g) {
-    /** @var Group $g */
-    if(!empty($g->getParent()) && isset($request['ss_group-id']) && ($g->getParent()->getId() == $request['ss_group-id'] || in_array($g->getParent()->getId(), $subGroups))) {
-        $subGroups[count($subGroups)] = $g->getId();
-        $countUsers += count($g->getUsers()->toArray());
-        $countPacks += count($g->getPacks()->toArray());
+$added = true;
+while($added) {
+    $added = false;
+    foreach($results['allGroups'] as $g) {
+        /** @var Group $g */
+        if(!empty($g->getParent()) && isset($request['ss_group-id'])
+            && ($g->getParent()->getId() == $request['ss_group-id'] || in_array($g->getParent()->getId(), $subGroups))
+            && !in_array($g->getId(), $subGroups)) {
+            $subGroups[count($subGroups)] = $g->getId();
+            $countUsers += count($g->getUsers()->toArray());
+            $countPacks += count($g->getPacks()->toArray());
+            $added = true;
+        }
     }
 }
 

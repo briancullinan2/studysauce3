@@ -11,7 +11,7 @@ $resultOutput = $context->filter('.results');
 
 $selected = $resultOutput->find('[class*="-row"].selected');
 
-$resultOutput->find('.view, .template, .template + .expandable:not([class*="-row"]), header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
+$resultOutput->children('.view, .template, .template + .expandable:not([class*="-row"]), header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
 
 $subVars = [
     'request' => $request,

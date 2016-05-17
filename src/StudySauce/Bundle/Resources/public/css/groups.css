@@ -105,6 +105,38 @@
     position:relative;
 }
 
+#groups-group0 .membership {
+    position: relative;
+}
+
+#groups-group0 .membership > .group-list,
+#groups-group0 .membership > .list-packs {
+    opacity: 0.2;
+    position: relative;
+    z-index: -1;
+}
+
+#groups-group0 .membership > .empty-members {
+    opacity: 0.2;
+    z-index: -1;
+}
+
+#groups-group0 .membership:before {
+    content: "Save new group above to assign membership.";
+    display:block;
+    width:400px;
+    position:absolute;
+    top:25%;
+    left:50%;
+    color:#BBB;
+    font-size:32px;
+    margin-left:-200px;
+    z-index: 10;
+    font-weight: bold;
+    text-align:center;
+    line-height:140%;
+}
+
 .group-edit .ss_group-row > label.checkbox:nth-last-child(1),
 .list-packs .pack-row > label.checkbox:nth-last-child(1) {
     display:none;

@@ -122,7 +122,7 @@ if (2 != $template->length) {
 }
 
 //$packTitle = !empty($card->getPack()) ? $card->getPack()->getTitle() : '';
-//$cardCount = !empty($card->getPack()) ? ($card->getIndex() + 1 . ' of ' . $card->getPack()->getCards()->count()) : '1 or 10';
+//$cardCount = !empty($card->getPack()) ? ($card->getIndex() + 1 . ' of ' . count($card->getPack()->getCards()->toArray())) : '1 or 10';
 
 // replace with image
 if($isImage && isset($url)) {

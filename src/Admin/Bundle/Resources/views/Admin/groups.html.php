@@ -15,29 +15,42 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 /** @var $view TimedPhpEngine */
 /** @var Group $entity */
 
-$view->extend('StudySauceBundle:Shared:dashboard.html.php');
+$context = !empty($context) ? $context : jQuery($this);
+$tab = $context->filter('.panel-pane');
 
-$view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(['@results_css'], [], ['output' => 'bundles/admin/css/*.css']) as $url) { ?>
-    <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
-<?php }
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/groups.css'], [], ['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
-    <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
-<?php }
-$view['slots']->stop();
+$isNew = !empty($entity) && empty($entity->getId());
 
-$view['slots']->start('javascripts');
-foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/results.js'], [], ['output' => 'bundles/admin/js/*.js']) as $url) { ?>
-    <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
-<?php }
-foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/groups.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
-    <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
-<?php }
-$view['slots']->stop();
+if($tab->length == 0) {
+
+    $view->extend('StudySauceBundle:Shared:dashboard.html.php');
+
+    $view['slots']->start('stylesheets');
+    foreach ($view['assetic']->stylesheets(['@results_css'], [], ['output' => 'bundles/admin/css/*.css']) as $url) { ?>
+        <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
+    <?php }
+    foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/groups.css'], [], ['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
+        <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
+    <?php }
+    $view['slots']->stop();
+
+    $view['slots']->start('javascripts');
+    foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/results.js'], [], ['output' => 'bundles/admin/js/*.js']) as $url) { ?>
+        <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
+    <?php }
+    foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/groups.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
+        <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
+    <?php }
+    $view['slots']->stop();
+
+}
+
+if($tab->length > 0) {
+    $tab->attr('id', implode('', ['groups-group' , $entity->getId()]));
+}
 
 $view['slots']->start('body'); ?>
     <div class="panel-pane <?php
-        print (!empty($entity) && $entity->getSubgroups()->count() > 0 ? ' has-subgroups' : ''); ?>"
+        print (!empty($entity) && count($entity->getSubgroups()->toArray()) > 0 ? ' has-subgroups' : ''); ?>"
         id="groups<?php print ($entity !== null ? implode('', ['-group' , intval($entity->getId())]) : ''); ?>">
         <div class="pane-content">
             <?php if ($entity !== null) { ?>
@@ -46,8 +59,7 @@ $view['slots']->start('body'); ?>
                     $tables = [
                         'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => ['subgroups'], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
-                    $isNew = empty($entity->getId());
-                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                    $request = [
                         'count-ss_group' => 1,
                         'ss_group-deleted' => $entity->getDeleted(),
                         'edit' => !$isNew ? false : ['ss_group'],
@@ -58,7 +70,13 @@ $view['slots']->start('body'); ?>
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups'],
                         'footers' => ['ss_group' => 'groupGroups']
-                    ])));
+                    ];
+                    if($tab->length == 0) {
+                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+                    }
+                    else {
+                        $tab->find('.group-edit')->data('request', $request)->attr('data-request', json_encode($request));
+                    }
                     ?>
                 </form>
             <?php } ?>
@@ -67,14 +85,15 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tiles = ['ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent', 'users'], 'actions' => ['deleted']]];
                     if (empty($entity)) {
-                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                        $request = [
                             'tables' => $tiles,
                             'parent-ss_group-id' => 'NULL',
                             'count-ss_group' => 0,
                             'classes' => ['tiles'],
                             'headers' => ['ss_group' => 'newGroup'],
                             'footers' => ['ss_group' => 'newGroup']
-                        ])));
+                        ];
+
                     } else {
                         // TODO: check view setting
                         $tableViews = (array)(new stdClass());
@@ -92,7 +111,7 @@ $view['slots']->start('body'); ?>
                         $tableViews['Membership']['tables']['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
                         $tableViews['Membership']['classes'] = ['last-right-expand'];
                         $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
-                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', array_merge($tableView, [
+                        $request = array_merge($tableView, [
                             'ss_group-1headers' => ['ss_group' => 'subGroups'],
                             'ss_group-1footers' => false,
                             'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
@@ -100,14 +119,21 @@ $view['slots']->start('body'); ?>
                             'count-file' => -1,
                             'count-ss_user' => -1,
                             'count-pack' => -1,
-                            'count-ss_group' => 0,
+                            'new' => $isNew,
+                            'count-ss_group' => $isNew ? -1 : 0,
                             'ss_group-deleted' => $entity->getDeleted(),
                             'edit' => false,
                             'read-only' => false,
                             'headers' => false,
                             'footers' => ['ss_group' => 'groupCount'],
                             'views' => $tableViews
-                        ]))));
+                        ]);
+                    }
+                    if($tab->length == 0) {
+                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+                    }
+                    else {
+                        $tab->find('.group-list')->data('request', $request)->attr('data-request', json_encode($request));
                     } ?>
                 </div>
                 <?php if (!empty($entity)) { ?>
@@ -115,8 +141,7 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tables = ['ss_group' => ['id', 'deleted'], 'ss_user' => ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'], 'user_pack' => ['user', 'pack', 'removed', 'downloaded'], 'card' => ['id', 'deleted']];
                     $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['group', 'groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
-                    $isNew = empty($entity->getId());
-                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', [
+                    $request = [
                         'count-pack' => $isNew ? -1 : 0,
                         'count-ss_group' => 1,
                         'count-card' => -1,
@@ -130,8 +155,13 @@ $view['slots']->start('body'); ?>
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupPacks'],
                         'footers' => ['pack' => 'groupPacks']
-                    ])));
-                    ?>
+                    ];
+                    if($tab->length == 0) {
+                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+                    }
+                    else {
+                        $tab->find('.list-packs')->data('request', $request)->attr('data-request', json_encode($request));
+                    } ?>
                 </div>
                 <div class="empty-members">
                     <div>Select name on the left to see group members</div>

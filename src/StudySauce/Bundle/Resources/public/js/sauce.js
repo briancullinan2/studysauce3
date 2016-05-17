@@ -674,7 +674,7 @@ if(typeof window.jqAjax == 'undefined') {
                     }
                 }
             }
-            if (typeof success != 'undefined')
+            else if (typeof success != 'undefined')
                 success(data, textStatus, jqXHR);
         };
         settings.error = function ( jqXHR, textStatus, errorThrown) {

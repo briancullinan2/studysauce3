@@ -70,27 +70,23 @@ $(document).ready(function () {
     });
 
     // TODO: refresh all intermediate group panels also
-    body.on('resulted', '[id^="groups-"] .results', function () {
-        var tab = $(this);
-
-        if (tab.closest('.panel-pane').is('#groups-group0')) {
-            var id = getTabId.apply(tab);
-            tab.closest('.panel-pane').attr('id', 'groups-group' + id);
+    body.on('resulted', '[id^="groups-"] .results', function (evt) {
+        var results = $(this);
+        var tab = results.closest('.panel-pane');
+        if (tab.is('#groups-group0')) {
+            var id = getTabId.apply(results);
+            window.views.render.apply(tab, ['groups', {entity: evt['results']['results']['ss_group'][0]}]);
+            loadResults.apply(tab.find('.results').not(results));
             window.activateMenu(Routing.generate('groups_edit', {group: id}));
-            // TODO: make this a part of some sort of WPF style property updating notification
-            // update id in results
-            var results = tab.closest('.panel-pane').find('.group-list .results').data('request');
-            results['parent-ss_group-id'] = id;
-            results['requestKey'] = null;
         }
 
         var loaded = body.find('#groups');
         var parentId = tab.find('.ss_group-row .parent select').val();
-        if(tab.parents('.panel-pane').attr('id') != 'groups-group' + parentId) {
+        if(tab.attr('id') != 'groups-group' + parentId) {
             loaded = loaded.add(body.find('#' + 'groups-group' + parentId));
         }
         loaded.off('show.resulted').on('show.resulted', function () {
-            loadResults.apply(tab.find('.results'));
+            loadResults.apply($(this).find('.results'));
         });
     });
 

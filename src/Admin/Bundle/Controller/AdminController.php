@@ -1,28 +1,5 @@
 <?php
 
-namespace  {
-
-    use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
-    use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
-    use Wa72\HtmlPageDom\HtmlPage;
-    use Wa72\HtmlPageDom\HtmlPageCrawler;
-
-    if (!function_exists('jQuery')) {
-        /**
-         * @param $context
-         * @return HtmlPageCrawler
-         */
-        function jQuery($context)
-        {
-            if ($context instanceof PhpEngine) {
-                return HtmlPageCrawler::create('<div/>')->find('div');
-            }
-            return HtmlPageCrawler::create($context);
-        }
-    }
-
-}
-
 namespace Admin\Bundle\Controller {
 
     use Doctrine\Common\Collections\Collection;
@@ -869,7 +846,7 @@ namespace Admin\Bundle\Controller {
             $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
 
             if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
-                if(isset($request->get('ss_group')['remove']) && $request->get('ss_group')['remove'] == 'true') {
+                if(isset($request->get('ss_group')['deleted']) && $request->get('ss_group')['deleted'] == '1') {
                     $g->setName($g->getName() . '-Deleted On ' . time());
                     $orm->merge($g);
                     $orm->flush();
@@ -1052,6 +1029,7 @@ var array_merge = function () {
         return isObject ? $.extend(a, b) : $.merge(a, b);
     });
 };
+var intval = function (str) {var result = parseInt(str); return isNaN(result) ? 0 : result;};
 var trim = function (str) {return (str || '').trim();};
 var explode = function (del, str) {return (str || '').split(del);};
 var array_slice = function (arr, start, length) { return (arr || []).slice(start, length); };

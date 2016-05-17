@@ -40,6 +40,9 @@ window.views.__globalVars.app.getUser = function () {
     user = $.extend(user, window.views.__defaultEntities['ss_user']);
     return user;
 };
+window.views.__globalVars.app.getRequest = function () {
+    return {get: function (name) { return getQueryObject(window.location.href)[name];}}
+};
 if(typeof window.views.exists == 'undefined') {
     window.views.exists = function (name) {
         name = name.replace(/.*?:.*?:|\.html\.php/ig, '').replace(/[^a-z0-9]/ig, '_');
@@ -120,7 +123,8 @@ window.views.__defaultEntities['ss_group'] = {
         return $(this.invites.map(function (c) {return applyEntityObj(c);}));
     },
     getUsers: function () {return $(this.users.map(function (u) { return applyEntityObj(u);}));},
-    getPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));}
+    getPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));},
+    getDeleted: function () {return this.deleted}
 };
 window.views.__defaultEntities['invite'] = {
     group: null,
@@ -711,7 +715,8 @@ $(document).ready(function () {
         }
 
         resetHeader();
-        admin.trigger('resulted');
+        var event = $.Event('resulted', {results: data});
+        admin.trigger(event);
         centerize.apply(admin.find('.centerized'));
     }
 
