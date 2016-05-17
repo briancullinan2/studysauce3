@@ -64,7 +64,7 @@ namespace Admin\Bundle\Controller {
             'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
             'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
             'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
-            'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
+            'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded'],
             'file' => ['id' => ['id', 'url']]
             // TODO: this really generalized template
             //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
@@ -656,6 +656,9 @@ namespace Admin\Bundle\Controller {
             if(!empty($url = $request->get('redirect'))) {
                 return $this->redirect($url);
             }
+
+            $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+            return $this->forward('AdminBundle:Admin:results', $searchRequest);
         }
 
         /**
@@ -726,15 +729,32 @@ namespace Admin\Bundle\Controller {
             }
             else if(is_array($e) && empty($e['id'])) {
                 $entity = new $class;
+                $entity->isNew = true;
             }
             else {
-                $criteria = Criteria::create();
+                $query = $orm->getRepository($class)->createQueryBuilder($tableName);;
                 foreach(self::$defaultTables[$tableName]['id'] as $f) {
-                    if(!is_array($e) || isset($e[$f])) {
-                        $criteria = $criteria->orWhere(Criteria::expr()->eq($f, '' . (is_array($e) ? $e[$f] : $e)));
+                    // select other parts of the ID to help with adding and removing remove lists by ID
+                    $other = array_values(array_filter(self::$allTables[$tableName]->identifier, function ($f) use ($e) {return !isset($e[$f]);}));
+                    if(!is_array($e) || isset($e[$f]) || count($other)) {
+                        // TODO: is this an edge case?
+                        if(is_array($e) && count($other)) {
+                            $query = $query->andWhere($tableName . '.' . $other[0] . '=:' . $other[0])
+                                ->setParameter($other[0], $e['id']);
+                            $e[$other[0]] = $e['id'];
+                            unset($e['id']);
+                        }
+                        else if(in_array($f, self::$allTables[$tableName]->identifier)) {
+                            $query = $query->andWhere($tableName . '.' . $f . '=:' . $f)
+                                ->setParameter($f, is_array($e) ? $e[$f] : $e);
+                        }
+                        else {
+                            $query = $query->orWhere($tableName . '.' . $f . '=:' . $f)
+                                ->setParameter($f, is_array($e) ? $e[$f] : $e);
+                        }
                     }
                 }
-                $entity = $orm->getRepository($class)->matching($criteria->setMaxResults(1))->first();
+                $entity = $query->getQuery()->setMaxResults(1)->getOneOrNullResult();
             }
             if(empty($entity)) {
                 throw new \Exception('Item not found!');
@@ -769,10 +789,12 @@ namespace Admin\Bundle\Controller {
                                 $fields = self::$defaultTables[$joinTable]; //[$joinTable => array_keys($subE)];
                                 $isAdding = true;
                                 if(isset($association['mappedBy'])) {
-                                    // set to entity or set to null if removing a many-to-one
+                                    // TODO: set to entity or set to null if removing a many-to-one
                                     $isAdding = !isset($subE['remove']) || $subE['remove'] !== 'true';
-                                    $subE = array_merge([$association['mappedBy'] => $isAdding || $association['type'] != ClassMetadataInfo::ONE_TO_MANY ? [$entity] : null, 'remove' => $subE['remove']], $subE);
-                                    $fields = array_merge($fields, [$association['mappedBy']]);
+                                    if($association['type'] == ClassMetadataInfo::ONE_TO_MANY) {
+                                        $subE = array_merge([$association['mappedBy'] => $entity], $subE);
+                                        $fields = array_merge($fields, [$association['mappedBy']]);
+                                    }
                                 }
                                 if(isset($e['remove']) && $e['remove'] === 'true') {
                                     $isAdding = false;
@@ -781,11 +803,12 @@ namespace Admin\Bundle\Controller {
                                 $childEntity = self::applyFields($association['targetEntity'], $joinTable, $fields, $subE, $orm);
                                 if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
                                     call_user_func_array([$entity, $method], [$childEntity]);
-                                    if (empty($childEntity->getId())) {
+                                    if (!empty($childEntity->isNew)) {
                                         $orm->persist($childEntity);
                                     } else {
                                         $orm->merge($childEntity);
                                     }
+                                    $orm->flush();
                                 }
                             }
                         }
@@ -1033,7 +1056,7 @@ var intval = function (str) {var result = parseInt(str); return isNaN(result) ? 
 var trim = function (str) {return (str || '').trim();};
 var explode = function (del, str) {return (str || '').split(del);};
 var array_slice = function (arr, start, length) { return (arr || []).slice(start, length); };
-var array_splice = function (arr, start, length) { var result = $.merge([], arr || []); result.splice(start, length); return result; };
+var array_splice = function (arr, start, length) { return arr.splice(start, length); };
 var array_search = function (item, arr) { var index = (arr || []).indexOf(item); return index == -1 ? false : index; };
 var count = function (arr) { return (arr || []).length; };
 var in_array = function (needle, arr) { return (arr || []).indexOf(needle) > -1; };

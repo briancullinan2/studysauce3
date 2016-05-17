@@ -142,41 +142,6 @@ foreach ($tableNames as $t) {
         ->attr(implode('', ['data-' , $t]), json_encode($types));
 }
 
-/*
- * TODO: merge this with template scripts if we need inline version
-function updateRows (toField, value, item) {
-    isSettingSelectize = true;
-    var tableName = value.split('-')[0];
-    var existing = (toField.data('entities') || []);
-    var existingEntities = toField.data(tableName) || [];
-    var oldValue = toField.val().split(' ');
-    var valueField = toField[0].selectize.settings.valueField;
-        var entity;
-        if((entity = existingEntities.filter(function (e) {return e[valueField] == item[valueField]})).length > 0) {
-            entity[0].remove = item.remove;
-        }
-        else {
-            existingEntities[existingEntities.length] = item;
-        }
-        if (item.remove) {
-            existing = existing.filter(function (i) {return i != item[valueField]});
-            oldValue = oldValue.filter(function (i) {return i != item[valueField]});
-        }
-        else {
-            if(existing.indexOf(item[valueField]) == -1) {
-                existing[existing.length] = item[valueField];
-            }
-            if(oldValue.indexOf(item[valueField]) == -1) {
-                oldValue[oldValue.length] = item[valueField];
-            }
-        }
-        toField.data('oldValue', oldValue.join(' '));
-        toField.data('entities', existing);
-        toField.data(tableName, existingEntities);
-        isSettingSelectize = false;
-    }
-*/
-
 print ($context->html());
 
 

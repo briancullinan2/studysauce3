@@ -91,25 +91,6 @@ class PacksController extends Controller
                 }
             }
         }
-        // TODO: secure user access using ACLs, which admins have access to which users?
-        foreach ($request->get('ss_user') ?: [] as $u) {
-            /** @var UserPack $up */
-            if (!empty($up = $newPack->getUserPackById($u['id']))) {
-                $up->setRemoved(isset($u['remove']) && $u['remove'] == 'true');
-                $orm->merge($up);
-            }
-            else {
-                $up = new UserPack();
-                /** @var User $upUser */
-                $upUser = $orm->getRepository('StudySauceBundle:User')->findOneBy(['id' => $u['id']]);
-                $up->setUser($upUser);
-                $upUser->addUserPack($up);
-                $up->setPack($newPack);
-                $up->setRemoved(isset($u['remove']) && $u['remove'] == 'true');
-                $newPack->addUserPack($up);
-                $orm->persist($up);
-            }
-        }
 
         // process cards
         // TODO: break this up

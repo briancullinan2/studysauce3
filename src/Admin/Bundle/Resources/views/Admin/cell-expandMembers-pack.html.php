@@ -63,12 +63,11 @@ foreach($users as $u) {
 }
 
 ?>
-<form action="<?php print (!empty($group)
-    ? $view['router']->generate('save_group', ['ss_group' => ['id' => $group]])
-    : $view['router']->generate('packs_create', ['pack' => ['id' => $pack->getId()]])); ?>">
+<form action="<?php print ($view['router']->generate('command_save', ['pack' => ['id' => $pack->getId()], 'tables' => ['pack' => ['id', 'userPacks'], 'user_pack' => ['user', 'pack'], 'ss_user' => ['id']]])); ?>">
     <?php print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
         'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
         'entities' => $users,
         'entityIds' => $ids,
+        'fieldName' => 'pack[userPacks]',
         'removedEntities' => $removed])); ?>
 </form>

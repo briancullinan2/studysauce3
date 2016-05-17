@@ -425,9 +425,25 @@ $(document).ready(function () {
         }, 100);
     });
 
+    /*
     body.on('change', 'input[data-confirm], select:has(option[data-confirm])', function () {
-       // TODO: reset to oldValue, show confirmation dialog, then set to new value
+        // TODO: reset to oldValue, show confirmation dialog, then set to new value
+        var that = $(this);
+        var confirmDialog = '#general-dialog';
+        var shouldConfirm = that.is('[data-confirm]'); // confirm everything except individual select options
+        if(that.is('select')) {
+            for(var o = 0; o < that.find('option[data-confirm]').length; o++) {
+                if(that.val() == $(options[o]).attr('value')) {
+                    shouldConfirm = true;
+                    break;
+                }
+            }
+        }
+        that.val(that.data('oldValue'));
+        $('#general-dialog').modal({show: true, backdrop: true})
+            .find('.modal-body').html('Are you sure you want to set ');
     });
+    */
 
     body.on('click', 'a[data-confirm][data-toggle="modal"]', function (evt) {
         evt.preventDefault();

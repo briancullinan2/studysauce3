@@ -20,7 +20,7 @@ foreach($results['pack'] as $p) {
        data-entities="<?php print ($view->escape(json_encode($entityIds))); ?>"
        data-action="<?php print ($view['router']->generate('save_group', [
            'ss_group' => ['id' => $request['ss_group-id']],
-           'tables' => ['ss_group' => ['groupPacks']]
+           'tables' => ['ss_group' => ['id', 'groupPacks']]
        ])); ?>" class="big-add">Add
         <span>+</span> new pack</a>
 </header>

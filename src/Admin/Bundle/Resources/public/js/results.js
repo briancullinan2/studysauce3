@@ -550,6 +550,7 @@ $(document).ready(function () {
         var field = $(this);
         var tab = getTab.apply(field);
         var fieldTab = field.closest('.results').first();
+        tab = tab.add(fieldTab);
         var data = $.extend(save || {}, {requestKey: getDataRequest.apply(fieldTab).requestKey});
         var actionItem = field.closest('[action], [data-action]');
         if (actionItem.length == 0) {
@@ -613,6 +614,7 @@ $(document).ready(function () {
         }
 
         if(!hasSomethingToSave) {
+            isLoading = false;
             return;
         }
 

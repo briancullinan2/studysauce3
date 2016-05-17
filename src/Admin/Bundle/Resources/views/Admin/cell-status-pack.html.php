@@ -11,7 +11,7 @@ $view['slots']->start('cell_status_pack'); ?>
         <label class="input status">
             <select name="status">
                 <option value="UNPUBLISHED">Unpublished</option>
-                <option value="GROUP">Published</option>
+                <option value="GROUP" data-confirm="#pack-publish">Published</option>
                 <?php
                 // TODO: if user changes, we need to force the whole template to rebuild
                 if ($app->getUser()->hasRole('ROLE_ADMIN') && $app->getUser()->getEmail() == 'brian@studysauce.com') { ?>

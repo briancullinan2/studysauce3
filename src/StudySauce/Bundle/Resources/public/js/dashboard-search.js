@@ -141,6 +141,9 @@ $(document).ready(function () {
          });
          });
          */
+        body.find('input[data-confirm], select:has(option[data-confirm])').each(function () {
+            $(this).data('oldValue', $(this).val());
+        });
 
         var that = body.find('input[type="text"][data-tables]:not(.selectized):not(.selectizing)');
         that.addClass('selectizing').each(function () {
@@ -258,7 +261,7 @@ $(document).ready(function () {
 
     var isSettingSelectize = false;
 
-    function handleSelectize (value, item) {
+    function handleSelectize (value, item, removed) {
         var entityField = $(this);
         if(entityField.data('confirm') === false) { // probably means this handling logic is implemented elsewhere
             return;
@@ -270,23 +273,27 @@ $(document).ready(function () {
         isSettingSelectize = true;
 
         // do a few extra things to help list in dialog stay open after clicking
+        item.removed = removed;
         var dialog;
+        var existing = (entityField.data('entities') || []);
+
+        var obj = $.extend({}, item);
+        obj.removed = existing.indexOf(value) > -1;
+        entityField[0].selectize.setValue('', true);
+        // TODO: item._tableValue = '' would make it disappear from the list, then reappear could take place when checkbox is unchecked
+        // reset drop down field
+        setTimeout(function () {
+            entityField[0].selectize.renderCache = [];
+            entityField[0].selectize.$control_input.blur();
+            entityField[0].selectize.$control_input.trigger('click');
+        }, 50);
+
         if ((dialog = entityField.parents('#add-entity')).length > 0) {
-            var existing = (entityField.data('entities') || []);
-            var obj = $.extend({}, item);
-            obj.removed = existing.indexOf(value) > -1;
-            entityField[0].selectize.setValue('');
-            // TODO: item._tableValue = '' would make it disappear from the list, then reappear could take place when checkbox is unchecked
-            // reset drop down field
-            setTimeout(function () {
-                entityField[0].selectize.renderCache = [];
-                entityField[0].selectize.$control_input.blur();
-                entityField[0].selectize.$control_input.trigger('click');
-            }, 50);
             window.views.render.apply(entityField.parents('.entity-search').parent(), ['cell-collection', {
                 tables: $.extend({}, entityField.data('tables')),
                 entities: [obj],
-                entityIds: entityField.data('entities').slice(0)
+                entityIds: entityField.data('entities').slice(0),
+                removedEntities: obj.removed ? [obj] : []
             }]);
             // synchronize with other fields in the dialog for consistency
             dialog.find('.input input.selectized').not(entityField).data('entities', entityField.data('entities'));
@@ -297,6 +304,57 @@ $(document).ready(function () {
         }
         else {
             // TODO: set confirmation message
+            var oldEntities = $.merge([], existing);
+            var current = entityField[0].selectize.getValue().split(' ');
+            var oldValue = entityField.data('oldValue'),
+                newEntities = null, newValue, valI;
+
+            if((valI = existing.indexOf(value)) > -1 && removed) {
+                newEntities = $.merge([], existing);
+                newEntities.splice(valI, 1);
+                newValue = current.filter(function (i) {return i != value;});
+            } else if (valI == -1 && !removed) {
+                newEntities = $.merge([value], existing);
+                newValue = current.indexOf(value) == -1 ? $.merge([value], current) : current;
+            }
+            entityField[0].selectize.setValue(oldValue, true);
+
+            if(newEntities == null) {
+                isSettingSelectize = false;
+                return;
+            }
+
+            showEntityDialog.apply(entityField, [entityField, oldEntities, newEntities]);
+
+            body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+                isSettingSelectize = true;
+                window.views.render.apply(entityField.parents('.entity-search').parent(), ['cell-collection', {
+                    tables: $.extend({}, entityField.data('tables')),
+                    entities: [obj],
+                    entityIds: newEntities.slice(0),
+                    removedEntities: obj.removed ? [obj] : []
+                }]);
+                entityField[0].selectize.setValue(newValue, true);
+                var tables = entityField.data('tables'),
+                // filter out the removed and add the new to the field value
+                // TODO: fix this for inline version var newValue = $.merge(toField.val().split(' ').filter(function (e) {return removeItems.indexOf(e) == -1;}), addItems);
+                    updates = {};
+                for(var tableName in tables) {
+                    if (tables.hasOwnProperty(tableName)) {
+                        var options = entityField.data(tableName);
+                        for(var o = 0; o < options.length; o++) {
+                            var g = options[o];
+                            assignSubKey(updates, decodeURIComponent(entityField.attr('name') || tableName) + '[' + o + ']', {
+                                id: g['_tableValue'].substr(tableName.length + 1),
+                                remove: g['removed']
+                            });
+                        }
+                        entityField.data(tableName, options.slice(0));
+                    }
+                }
+                standardSave.apply(entityField, [updates]);
+                isSettingSelectize = false;
+            });
         }
 
         isSettingSelectize = false;
@@ -308,7 +366,12 @@ $(document).ready(function () {
         var check = $(this).parents('label').find('input[type="checkbox"]');
         var id = check.attr('name').split('[')[0] + '-' + parseInt(check.val());
         var item = field[0].selectize.options[id];
-        handleSelectize.apply(field[0], [id, item]);
+        //var existing = field.data('entities');
+        //field.data('entities', existing.indexOf(item._tableValue) > -1
+        //    ? existing.filter(function (e) {return e != item._tableValue;})
+        //    : $.merge([item._tableValue] , existing));
+        item.removed = $(this).is('[href="#subtract-entity"]');
+        handleSelectize.apply(field[0], [id, item, $(this).is('[href="#subtract-entity"]')]);
     });
 
     function copyToDialog(dialogName) {
@@ -338,10 +401,22 @@ $(document).ready(function () {
     body.on('click', '#add-entity a[href="#submit-entities"]', function () {
         var dialog = $('#add-entity');
         // create a confirmation message
+        var fromField = dialog.find('input.selectized');
         var toField = dialog.prop('field');
         var oldEntities = toField.data('entities');
         var newEntities = dialog.find('input.selectized').first().data('entities');
+
+        showEntityDialog.apply(fromField, [toField, oldEntities, newEntities]);
+        // confirmation dialog
+        body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
+            copyFromDialog.apply(toField);
+        });
+
+    });
+
+    function showEntityDialog(toField, oldEntities, newEntities) {
         var tables = toField.data('tables');
+        var fromField = $(this).filter('input.selectized');
 
         // get entities differences
         var addItems = newEntities.filter(function (e) {return oldEntities.indexOf(e) == -1});
@@ -349,13 +424,11 @@ $(document).ready(function () {
 
         // show confirmation dialog
         var message = (addItems.length > 0 ? (' add ' + addItems.map(function (e) {
-                var field = dialog.find('input[name="' + e.split('-')[0] + '"]');
-                var option = field[0].selectize.options[e];
+                var option = fromField.filter('[data-' + e.split('-')[0] + ']').data(e.split('-')[0]).filter(function (o) {return o._tableValue == e;})[0];
                 return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '')
             + (addItems.length > 0 && removeItems.length > 0 ? ' and ' : '')
             + (removeItems.length > 0 ? (' remove ' + removeItems.map(function (e) {
-                var field = dialog.find('input[name="' + e.split('-')[0] + '"]');
-                var option = field[0].selectize.options[e];
+                var option = fromField.filter('[data-' + e.split('-')[0] + ']').data(e.split('-')[0]).filter(function (o) {return o._tableValue == e;})[0];
                 return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '');
 
         // TODO: on pack entities show publish-confirm dialog
@@ -374,14 +447,9 @@ $(document).ready(function () {
             //}
         }
 
-        // confirmation dialog
-        body.off('click.modify_entities_confirm').one('click.modify_entities_confirm', '#general-dialog a[href="#submit"]', function () {
-            copyFromDialog.apply(toField);
-        });
-
         $('#general-dialog').modal({show: true, backdrop: true})
             .find('.modal-body').html('<p>Are you sure you want to ' + message.trim() + '?');
-    });
+    }
 
     function resetFieldToData() {
         var toField = $(this);
@@ -443,7 +511,7 @@ $(document).ready(function () {
                 for(var o = 0; o < options.length; o++) {
                     var g = options[o];
                     assignSubKey(updates, decodeURIComponent(toField.attr('name') || tableName) + '[' + o + ']', {
-                        id: g[fromField[0].selectize.settings.valueField].substr(tableName.length + 1),
+                        id: g['_tableValue'].substr(tableName.length + 1),
                         remove: g['removed']
                     });
                 }

@@ -25,7 +25,9 @@ $(document).ready(function () {
 
     function showPublishDialog(packId, packName, publish) {
         var field = $(this);
-        var dialog = $('#pack-publish').modal({show: true, backdrop: true});
+        if ((dialog = $('#pack-publish')).modal({show: true, backdrop: true}).length == 0) {
+            dialog = $(window.views.render.apply(body, ['pack-publish', {}])).appendTo(body);
+        }
 
         var allowTimes = [];
         for (var xh = 0; xh <= 23; xh++) {

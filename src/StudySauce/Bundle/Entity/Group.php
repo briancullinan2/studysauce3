@@ -400,6 +400,7 @@ class Group extends BaseGroup implements GroupInterface
     {
         if(!in_array($groupPack, $this->groupPacks->toArray())) {
             $this->groupPacks[] = $groupPack;
+            $groupPack->addGroup($this);
         }
 
         return $this;

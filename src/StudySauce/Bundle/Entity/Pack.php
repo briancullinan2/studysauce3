@@ -724,24 +724,25 @@ class Pack
     /**
      * Add userPacks
      *
-     * @param \StudySauce\Bundle\Entity\UserPack $userPacks
+     * @param \StudySauce\Bundle\Entity\UserPack $userPack
      * @return Pack
      */
-    public function addUserPack(\StudySauce\Bundle\Entity\UserPack $userPacks)
+    public function addUserPack(\StudySauce\Bundle\Entity\UserPack $userPack)
     {
-        $this->userPacks[] = $userPacks;
-
+        $this->userPacks[] = $userPack;
+        $userPack->setRemoved(false);
         return $this;
     }
 
     /**
      * Remove userPacks
      *
-     * @param \StudySauce\Bundle\Entity\UserPack $userPacks
+     * @param \StudySauce\Bundle\Entity\UserPack $userPack
      */
-    public function removeUserPack(\StudySauce\Bundle\Entity\UserPack $userPacks)
+    public function removeUserPack(\StudySauce\Bundle\Entity\UserPack $userPack)
     {
-        $this->userPacks->removeElement($userPacks);
+        $userPack->setRemoved(true);
+        //$this->userPacks->removeElement($userPacks);
     }
 
     /**
