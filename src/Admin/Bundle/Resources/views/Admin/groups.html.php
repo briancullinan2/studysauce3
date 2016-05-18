@@ -83,12 +83,19 @@ $view['slots']->start('body'); ?>
             <div class="membership">
                 <div class="group-list">
                     <?php
-                    $tiles = ['ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr'], 'packList' => ['groupPacks', 'parent', 'users'], 'actions' => ['deleted']]];
+                    $tiles = [
+                        'file' => ['id', 'url'],
+                        'ss_user' => ['id'],
+                        'pack' => ['id', 'status', 'logo'],
+                        'ss_group' => ['idTiles' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'packs', 'subgroups'], 'actions' => ['deleted']]];
                     if (empty($entity)) {
                         $request = [
                             'tables' => $tiles,
                             'parent-ss_group-id' => 'NULL',
                             'count-ss_group' => 0,
+                            'count-pack' => -1,
+                            'count-ss_user' => -1,
+                            'count-file' => -1,
                             'classes' => ['tiles'],
                             'headers' => ['ss_group' => 'newGroup'],
                             'footers' => ['ss_group' => 'newGroup']

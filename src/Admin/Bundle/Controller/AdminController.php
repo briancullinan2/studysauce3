@@ -41,7 +41,7 @@ class AdminController extends Controller
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
-        'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
+        'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks', 'users', 'subgroups'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
         'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
@@ -526,7 +526,7 @@ class AdminController extends Controller
                 $association = self::$allTables[$tableName]->getAssociationMappings()[$f];
                 $tableIndex = array_search($association['targetEntity'], self::$allTableClasses);
                 $joinTable = array_keys(self::$allTables)[$tableIndex];
-                if (isset($tables[$joinTable]) && !empty($value)) {
+                if (isset($tables[$joinTable]) && !empty($value) && $levels > 0) {
                     if ($value instanceof Collection) {
                         if (!isset($obj[$f])) {
                             $obj[$f] = [];
@@ -781,17 +781,28 @@ class AdminController extends Controller
             }
             // TODO: generalize this recursive stuff, maybe if parent_path can be used to lookup all entities and perform the same action on each
             if(isset($request->get('ss_group')['groupPacks'])) {
-                foreach($g->getUsersPacksGroupsRecursively()[2] as $subGroup) {
-                    /** @var Group $subGroup */
-                    $entity = self::applyFields(AdminController::$allTables['ss_group']->name, 'ss_group', ['groupPacks'], array_merge($request->get('ss_group'), ['id' => $subGroup->getId()]), $orm);
+                $subGroups = [$g->getId()];
+                $added = true;
+                while($added) {
+                    $added = false;
+                    foreach($g->getSubgroups()->toArray() as $subGroup) {
+                        /** @var Group $subGroup */
+                        if(!empty($subGroup->getParent())
+                            && in_array($subGroup->getParent()->getId(), $subGroups)
+                            && !in_array($subGroup->getId(), $subGroups)) {
+                            $subGroups[count($subGroups)] = $subGroup->getId();
+                            $entity = self::applyFields(AdminController::$allTables['ss_group']->name, 'ss_group', ['groupPacks'], array_merge($request->get('ss_group'), ['id' => $subGroup->getId()]), $orm);
 
-                    if(empty($entity->getId())) {
-                        $orm->persist($entity);
+                            if(empty($entity->getId())) {
+                                $orm->persist($entity);
+                            }
+                            else {
+                                $orm->merge($entity);
+                            }
+                            $orm->flush();
+                            $added = true;
+                        }
                     }
-                    else {
-                        $orm->merge($entity);
-                    }
-                    $orm->flush();
                 }
             }
         }
@@ -965,7 +976,7 @@ var preg_replace = function (needle, replacement, subject) { return (subject || 
 var preg_match = function (needle, subject) { return ((subject || '').match(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])) || []).length;};
 var ucfirst = function (str) {return (str || '').substr(0, 1).toLocaleUpperCase() + str.substr(1);};
 var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};
-var call_user_func_array = function (context, params) {return context[context[1]].apply(context[0], params);};
+var call_user_func_array = function (context, params) {return context[0][context[1]].apply(context[0], params);};
 var print = function (s) { window.views.__output += s };
 var strtolower = function(s) { return s.toLocaleLowerCase(); };
 var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s == false || s == null || (typeof s == 'object' && s.constructor == Array && s.length == 0) ; };

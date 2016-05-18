@@ -6,7 +6,7 @@ use StudySauce\Bundle\Entity\User;
 
 /** @var Group $ss_group */
 
-$subGroups = [];
+$subGroups = [$ss_group->getId()];
 $countGroups = 0;
 $countUsers = 0;
 $countPacks = 0;
@@ -16,7 +16,7 @@ while($added) {
     foreach($results['allGroups'] as $g) {
         /** @var Group $g */
         if(!empty($g->getParent())
-            && ($g->getParent()->getId() == $ss_group->getId() || in_array($g->getParent()->getId(), $subGroups))
+            && in_array($g->getParent()->getId(), $subGroups)
             && !in_array($g->getId(), $subGroups)) {
             $subGroups[count($subGroups)] = $g->getId();
             $countGroups += 1;
