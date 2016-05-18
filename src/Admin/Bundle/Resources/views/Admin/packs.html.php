@@ -86,7 +86,7 @@ $view['slots']->start('body'); ?>
                         <div>Select name on the left to see group members</div>
                     </div>
                 </div>
-                <form action="<?php print ($view['router']->generate('packs_create')); ?>" name="pack[cards]" class="card-list">
+                <form action="<?php print ($view['router']->generate('packs_create', ['pack' => ['id' => $entity->getId()]])); ?>" class="card-list">
                     <?php
                     $newCards = true;
                     foreach($entity->getCards()->toArray() as $c) {

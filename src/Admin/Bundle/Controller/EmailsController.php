@@ -276,7 +276,7 @@ class EmailsController extends \StudySauce\Bundle\Controller\EmailsController
             $user = $objects['user'];
             /** @var \Swift_Message $message */
             $message = Swift_Message::newInstance()
-                ->setFrom('admin@studysauce.com')
+                ->setFrom('brian@studysauce.com')
                 ->setTo($user->getEmail())
                 ->setBody($this->render($fullName, $objects)->getContent(), 'text/html');
             $headers = $message->getHeaders();

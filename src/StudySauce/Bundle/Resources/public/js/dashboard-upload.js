@@ -20,8 +20,10 @@ $(document).ready(function () {
     });
 
     body.on('click', 'a[data-target="#upload-file"], a[href="#upload-file"]', function () {
-        var dialog = $('#upload-file');
-
+        var dialog;
+        if ((dialog = $('#upload-file')).length == 0) {
+            dialog = $(window.views.render.apply(body, ['upload-file', {}])).appendTo(body);
+        }
         // update field next to upload link
         var row = $(this).parents('[class*="-row"]');
         body.one('click.upload', 'a[href="#submit-upload"]', function () {

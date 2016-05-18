@@ -1,4 +1,4 @@
-<?php $view->extend('AdminBundle:Admin:dialog.html.php');
+<?php $view->extend('AdminBundle:Admin:dialog.html.php', ['id' => 'upload-file']);
 
 $view['slots']->start('modal-header'); ?>
 <h3>Upload an image</h3>

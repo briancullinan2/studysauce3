@@ -335,11 +335,11 @@ $(document).ready(function () {
     // TODO: generalize and move this to dashboard using some sort of property binding API, data-target, data-toggle for selects toggles class of closest matching target?
     // TODO: data-toggle="modal" on option brings up dialog for confirmation
 
-    body.on('change confirm', '[id^="packs-"] .status select', function (evt) {
+    body.on('change change.confirm', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');
         var select = $(this);
 
-        if($(this).val() == 'GROUP' && evt.type != 'confirm') {
+        if($(this).val() == 'GROUP' && evt.namespace == 'confirm') {
             select.val(select.data('oldValue'));
             evt.preventDefault();
             showPublishDialog.apply(select, [getRowId.apply(row), row.find('.name input').val(), select.data('publish')]);

@@ -245,6 +245,7 @@ Date.prototype.format = function (format) {
     }
     return moment(this).formatPHP(format);
 };
+Function.prototype.class = function () {return this.name};
 
 function applyEntityObj(data) {
     var obj = $.extend({}, window.views.__defaultEntities[data['table']]);
@@ -508,12 +509,27 @@ $(document).ready(function () {
 
     var validationTimeout = null;
     body.on('change keyup keydown', '.results [class*="-row"] input, .results [class*="-row"] select, .results [class*="-row"] textarea', function (evt) {
+        var that = $(evt.target);
         // do not autosave from selectize because the input underneath will change
-        if ($(evt.target).parents('.selectize-input').length > 0) {
+        if (that.parents('.selectize-input').length > 0) {
             return;
         }
+
+        if(evt.type == 'change' && that.is('[data-confirm],select:has(option[data-confirm])')) {
+            var oldValue = that.data('oldValue');
+            // make sure some other trigger doesn't reset it
+            if(that.val() != oldValue) {
+                that.trigger('change.confirm');
+            }
+            else {
+                that.parents('[class*="-row"]').addClass('changed');
+            }
+        }
+        else {
+            that.parents('[class*="-row"]').addClass('changed');
+        }
+
         var tab = getTab.apply(this);
-        $(this).parents('[class*="-row"]').addClass('changed');
 
         if (validationTimeout != null) {
             clearTimeout(validationTimeout);
@@ -551,14 +567,11 @@ $(document).ready(function () {
         var tab = getTab.apply(field);
         var fieldTab = field.closest('.results').first();
         tab = tab.add(fieldTab);
-        var data = $.extend(save || {}, {requestKey: getDataRequest.apply(fieldTab).requestKey});
         var actionItem = field.closest('[action], [data-action]');
         if (actionItem.length == 0) {
             actionItem = fieldTab.find('[action], [data-action]')
         }
         var saveUrl = actionItem.data('action') || actionItem.attr('action');
-        data = $.extend(true, data, getQueryObject(saveUrl));
-        saveUrl = saveUrl.replace(/\?.*/ig, '');
 
         var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]');
 
@@ -571,14 +584,15 @@ $(document).ready(function () {
             return;
         }
 
-        // loading animation from CTA or activating field
-        isLoading = true;
-        loadingAnimation(saveButton);
-
         // get the parsed list of data
         var hasSomethingToSave = false;
+        var data = {};
         for (var r = 0; r < tab.length; r++) {
-            var tables = $(tab[r]).data('request').tables;
+            var subTab = $(tab[r]);
+            var subAction = subTab.closest('[action], [data-action]');
+            var tables = subTab.data('request').tables;
+            var name = subAction.attr('name');
+            var subUrl = subAction.data('action') || subAction.attr('action');
             for (var table in tables) {
                 if (tables.hasOwnProperty(table)) {
                     // get list of possible fields in form
@@ -595,12 +609,15 @@ $(document).ready(function () {
                         }
                         var row = $(rows[i]);
                         var rowId = getRowId.apply(row);
+                        var newVal = {};
                         if ($(this).is('.removed') || $(this).is('.empty')) {
-                            data[table][data[table].length] = {id: rowId, remove: true};
+                            newVal = {id: rowId, remove: true};
                         }
                         else {
-                            data[table][data[table].length] = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
+                            newVal = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
                         }
+                        newVal = $.extend(true, newVal, getQueryObject(subUrl));
+                        data[table][data[table].length] = newVal;
                         if (rows.length == 1 && data[table].length == 1) {
                             data[table] = data[table][0];
                         }
@@ -609,14 +626,28 @@ $(document).ready(function () {
                         hasSomethingToSave = true;
                     }
                     rows.removeClass('changed');
+                    if(typeof name != 'undefined') {
+                        var subData = data[table];
+                        delete data[table];
+                        assignSubKey(data, name, subData);
+                    }
                 }
+
             }
         }
 
         if(!hasSomethingToSave) {
-            isLoading = false;
             return;
         }
+
+        data = $.extend(true, data, save || {});
+        data = $.extend(true, data, getQueryObject(saveUrl));
+        data = $.extend(data, {requestKey: getDataRequest.apply(fieldTab).requestKey});
+        saveUrl = saveUrl.replace(/\?.*/ig, '');
+
+        // loading animation from CTA or activating field
+        isLoading = true;
+        loadingAnimation(saveButton);
 
         $.ajax({
             url: saveUrl,

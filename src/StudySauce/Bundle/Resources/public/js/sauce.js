@@ -28,6 +28,7 @@ function getQueryObject(url) {
 }
 
 function assignSubKey(obj, key, value) {
+    var orig = obj;
     var keys = key.split(/\]?\[/ig);
     for(var k = 0; k < keys.length; k++) {
         var subKey = keys[k];
@@ -35,13 +36,19 @@ function assignSubKey(obj, key, value) {
             subKey = subKey.substr(0, subKey.length-1);
         }
         if (k == keys.length - 1) {
-            obj[subKey] = value;
+            if(typeof obj[subKey] == 'object' && obj[subKey] != null) {
+                obj[subKey] = obj[subKey].constructor == Array ? $.merge(obj[subKey], value) : $.extend(true, obj[subKey], value);
+            }
+            else {
+                obj[subKey] = value;
+            }
         }
-        else if (typeof obj[subKey] == 'undefined') {
+        else if (typeof obj[subKey] == 'undefined' || obj[subKey] == null) {
             obj[subKey] = {};
         }
         obj = obj[subKey];
     }
+    return orig;
 }
 
 function setSelectionRange(input, selectionStart, selectionEnd) {

@@ -61,37 +61,6 @@ class PacksController extends Controller
         // process pack settings
         list($newPack) = AdminController::standardSave($request, $this->container);
 
-        if(!empty($request->get('properties')) && !empty($request->get('properties')['keyboard'])) {
-            $newPack->setProperty('keyboard', $request->get('properties')['keyboard']);
-        }
-
-        if (!empty($publish = $request->get('publish'))) {
-            $newPack->setProperty('schedule', new \DateTime($publish['schedule']));
-            $newPack->setProperty('email', isset($publish['email']) && $publish['email'] == 'true');
-            $newPack->setProperty('alert', isset($publish['alert']) && $publish['alert'] == 'true');
-        }
-        foreach ($request->get('ss_group') ?: [] as $group) {
-            /** @var Group $g */
-            if (!empty($g = $groups->filter(function (Group $g) use ($group) {
-                    return $group['id'] == $g->getId();})->first()) && !$newPack->hasGroup($g->getName()) && (!isset($group['remove']) || $group['remove'] != 'true')) {
-                $newPack->addGroup($g);
-            }
-            else if (!empty($g) && $newPack->hasGroup($g->getName()) && isset($group['remove']) && $group['remove'] == 'true') {
-                $newPack->removeGroup($g);
-                if($newPack->getGroup() == $g) {
-                    $newPack->setGroup(null);
-                }
-                foreach($g->getUsers()->toArray() as $ug) {
-                    /** @var User $ug */
-                    $up = $ug->getUserPack($newPack);
-                    if(!empty($up)) {
-                        $up->setRemoved(true);
-                        $orm->merge($up);
-                    }
-                }
-            }
-        }
-
         // process cards
         // TODO: break this up
         foreach ($request->get('card') ?: [] as $c) {

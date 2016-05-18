@@ -1,4 +1,4 @@
-<?php $view->extend('AdminBundle:Admin:dialog.html.php');
+<?php $view->extend('AdminBundle:Admin:dialog.html.php', ['id' => 'pack-publish']);
 
 $view['slots']->start('modal-body'); ?>
 <label class="radio">

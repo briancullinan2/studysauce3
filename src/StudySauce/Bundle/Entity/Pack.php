@@ -138,8 +138,13 @@ class Pack
      */
     public function getProperty($prop)
     {
-        if(isset($this->properties[$prop]))
+        if(isset($this->properties[$prop])) {
+            if($prop == 'schedule' && is_string($this->properties[$prop])) {
+                return new \DateTime($this->properties[$prop]);
+            }
+
             return $this->properties[$prop];
+        }
         return null;
     }
 
@@ -285,7 +290,9 @@ class Pack
      */
     public function setProperties($properties)
     {
-        $this->properties = $properties;
+        foreach($properties as $k => $v) {
+            $this->setProperty($k, $v);
+        }
 
         return $this;
     }

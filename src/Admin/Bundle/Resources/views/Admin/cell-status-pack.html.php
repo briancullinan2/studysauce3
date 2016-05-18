@@ -35,9 +35,10 @@ if ($select->length == 0) {
     $select = $row->append($view['slots']->get('cell_status_pack'))->find('select');
     // TODO: this could be some sort of binding API
     $value = $pack->getStatus();
+    $schedule = $pack->getProperty('schedule');
     $publish = [
-        'schedule' => !empty($pack->getProperty('schedule'))
-            ? $pack->getProperty('schedule')->format('r')
+        'schedule' => !empty($schedule)
+            ? (is_a($schedule, Date::class) ? $schedule->format('r') : $schedule)
             : '',
         'email' => $pack->getProperty('email'),
         'alert' => $pack->getProperty('alert'),
@@ -59,7 +60,7 @@ $select->parents('.status')->attr('class', implode('', ['status ' , strtolower($
 // set schedule data
 $select->find('option[value="GROUP"]')->text($schedule > new Date()
     ? implode('', ['Pending (', $schedule->format('m/d/Y H:m'), ')'])
-    : (!empty($schedule) ? 'Published' : 'Publish'));
+    : (!empty($schedule) && $value == 'GROUP' ? 'Published' : 'Publish...'));
 
 
 print ($row->html());

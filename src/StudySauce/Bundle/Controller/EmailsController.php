@@ -41,7 +41,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Welcome to Study Sauce')
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-partner.html.php', [
                         'name' => $user,
@@ -68,7 +68,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject((!empty($group) ? ($group->getName() . ' + ') : '') . 'Study Sauce welcomes you!')
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-parent.html.php', [
                 'link' => false,
@@ -98,7 +98,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Welcome to Study Sauce')
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-student.html.php', [
                         'name' => $user,
@@ -294,7 +294,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Thank you for your purchase!')
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:invoice.html.php', [
                         'user' => $user,
@@ -326,7 +326,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Get the most out of your Study Sauce account')
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:welcome-reminder.html.php', [
                         'user' => $user,
@@ -411,7 +411,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('You have a notification for ' . implode(', ', $classes))
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:deadline-reminder.html.php', [
                         'reminders' => $reminderOutput,
@@ -439,7 +439,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Student completion ' . $deadline->getDaysUntilDue())
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:adviser-completion.html.php', [
                 'incomplete' => $incomplete,
@@ -574,7 +574,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Your Study Sauce password has been reset.')
-            ->setFrom('admin@studysauce.com')
+            ->setFrom('brian@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:reset-password.html.php', [
                         'user' => $user,
@@ -605,7 +605,7 @@ class EmailsController extends Controller
         $message = Swift_Message::newInstance()
             ->setSubject('Contact Us: From ' . $name)
             ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
-            ->setTo('admin@studysauce.com')
+            ->setTo('brian@studysauce.com')
             ->setBody($this->renderView('StudySauceBundle:Emails:contact-message.html.php', [
                         'link' => '&nbsp;',
                         'user' => $user,
@@ -1006,7 +1006,7 @@ class EmailsController extends Controller
         $message = Swift_Message::newInstance()
             ->setSubject($subject)
             ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
-            ->setTo('admin@studysauce.com')
+            ->setTo('brian@studysauce.com')
             ->setBody($this->renderView('StudySauceBundle:Emails:administrator.html.php', [
                         'link' => '&nbsp;',
                         'user' => $user,

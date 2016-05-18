@@ -26,7 +26,7 @@ $(document).ready(function () {
     function showPublishDialog(packId, packName, publish) {
         var field = $(this);
         if ((dialog = $('#pack-publish')).modal({show: true, backdrop: true}).length == 0) {
-            dialog = $(window.views.render.apply(body, ['pack-publish', {}])).appendTo(body);
+            dialog = $(window.views.render.apply(body, ['pack-publish', {}])).appendTo(body).modal({show: true, backdrop: true});
         }
 
         var allowTimes = [];
@@ -63,8 +63,8 @@ $(document).ready(function () {
 
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
                 field.data('publish', publish);
-                field.filter('select').val('GROUP').trigger('confirm');
-                standardSave.apply(field, [{packId: packId.replace('pack-', ''), publish: publish}]);
+                field.filter('select').val('GROUP').data('oldValue', 'GROUP').trigger('change');
+                standardSave.apply(field, [assignSubKey({packId: packId.replace('pack-', '')}, 'pack[properties]', publish)]);
             });
         });
     }
