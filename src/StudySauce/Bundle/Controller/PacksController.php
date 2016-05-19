@@ -51,135 +51,25 @@ class PacksController extends Controller
 
     public function createAction(Request $request)
     {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
-        /** @var User $user */
-        $user = $this->getUser();
-
         /** @var Pack $newPack */
+        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+
         // process pack settings
         list($newPack) = AdminController::standardSave($request, $this->container);
 
-        // process cards
-        // TODO: break this up
-        foreach ($request->get('card') ?: [] as $c) {
-            /** @var Card $newCard */
-            $newCard = $newPack->getCards()->filter(function (Card $x) use ($c) {
-                return $c['id'] == $x->getId() && !empty($x->getId());
-            })->first();
-            // remove cards
-            if (!empty($c['remove']) && $c['remove']) {
-                if (empty($newCard)) {
-                    continue;
-                }
-                if ($newCard->getResponses()->count() == 0) {
-                    foreach ($newCard->getAnswers()->toArray() as $a) {
-                        /** @var Answer $a */
-                        $orm->remove($a);
-                        $newCard->removeAnswer($a);
-                    }
-                    $orm->remove($newCard);
-                    $newPack->removeCard($newCard);
-                } else {
-                    $newCard->setDeleted(true);
-                    $orm->merge($newCard);
-                }
-                continue;
-            }
-            else if (empty($newCard)) {
-                $newCard = new Card();
-                $newCard->setPack($newPack);
-                $newPack->addCard($newCard);
-            }
-            if(isset($c['upload'])) {
-                $c['content'] = $c['upload'] . '\n' . $c['content'];
-            }
-            $newCard->setContent($c['content']);
-            if (isset($c['type'])) {
-                if ($c['type'] == 'sa exactly' || $c['type'] == 'sa contains') {
-                    $newCard->setResponseType('sa');
-                }
-                else {
-                    $newCard->setResponseType($c['type']);
-                }
-            }
-            if (empty($newCard->getId())) {
-                $orm->persist($newCard);
-            } else {
-                $orm->merge($newCard);
-            }
-
-            if (!isset($c['answers']) && isset($c['correct'])) {
-                $c['answers'] = $c['correct'];
-            }
-            $answers = explode("\n", isset($c['answers']) ? $c['answers'] : '');
-            $answerValues = [];
-            foreach ($answers as $a) {
-                if (trim($a) == '')
-                    continue;
-                $newAnswer = $newCard->getAnswers()->filter(function (Answer $x) use ($a) {
-                    return trim(trim($a), '$^') == trim(trim($x->getValue()), '$^');
-                })->first();
-                if (empty($newAnswer)) {
-                    $newAnswer = new Answer();
-                    $newAnswer->setCard($newCard);
-                    $newCard->addAnswer($newAnswer);
-                }
-                $answerValues[] = $newAnswer;
-                $newAnswer->setContent(str_replace('|', ' or ', trim($a)));
-                $newAnswer->setResponse(trim($a));
-                $newAnswer->setValue(trim($a));
-                if (!empty($c['correct'])) {
-                    if (strtolower(trim($a)) == strtolower(trim($c['correct']))) {
-                        $newAnswer->setCorrect(true);
-                    }
-                    else if (strpos($c['type'], 'contains') > -1) {
-                        $newAnswer->setCorrect(true);
-                    }
-                    else if (strpos($c['type'], 'exactly') > -1) {
-                        $newAnswer->setCorrect(true);
-                        $newAnswer->setValue('^' . trim($a) . '$');
-                    }
-                    else {
-                        $newAnswer->setCorrect(false);
-                    }
-                }
-                if (empty($newAnswer->getId())) {
-                    $orm->persist($newAnswer);
-                } else {
-                    $orm->merge($newAnswer);
-                }
-            }
-
-            // remove missing answers
-            foreach ($newCard->getAnswers()->toArray() as $a) {
-                /** @var Answer $a */
-                if (!in_array($a->getValue(), array_map(function (Answer $x) {
-                    return $x->getValue();
-                }, $answerValues))
-                ) {
-                    if ($a->getResponses()->count() == 0) {
-                        $newCard->removeAnswer($a);
-                        $orm->remove($a);
-                    } else {
-                        $a->setDeleted(true);
-                        $orm->merge($a);
-                    }
-                }
+        // TODO: saving returns the same things you sent to it, so this could go away because the tab with re-render and then refresh
+        // TODO: forward to index which only sets up queries needed for page.
+        if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
+            if (isset($request->get('ss_group')['id']) && empty($request->get('ss_group')['id'])) {
+                $searchRequest['edit'] = false;
+                $searchRequest['read-only'] = ['pack'];
+                $searchRequest['new'] = false;
+                $searchRequest['pack-id'] = $newPack->getId();
+                $searchRequest['requestKey'] = null;
             }
         }
-        $orm->flush();
 
-        // TODO: $shouldNewCards = $newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() == 0;
-        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
-        return $this->forward('AdminBundle:Admin:results', array_merge($searchRequest, [
-            'edit' => false,
-            'read-only' => ['pack'],
-            'new' => false,
-            'pack-id' => $newPack->getId(),
-            'requestKey' => null,
-        ]));
+        return $this->forward('AdminBundle:Admin:results', $searchRequest);
     }
 
     /**

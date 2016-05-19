@@ -41,12 +41,13 @@ class AdminController extends Controller
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
-        'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent', 'invites', 'packs' => ['packs', 'groupPacks', 'users', 'subgroups'], 'actions' => ['deleted']],
+        'ss_group' => ['id' => ['id', 'name'], 'name' => ['logo', 'userCountStr', 'descriptionStr'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
         'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded'],
-        'file' => ['id' => ['id', 'url']]
+        'file' => ['id' => ['id', 'url']],
+        'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content']
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
@@ -187,10 +188,9 @@ class AdminController extends Controller
 
                     // only search joins on first connection
                     if ($table == $tableName) {
-                        // remove table prefix from matching field
-                        $joinRequest = [];
+                        // remove table prefix from matching field, match fields line parent-ss_group-id
+                        $joinRequest = array_merge([], $request);
                         foreach ($request as $j => $r) {
-                            $joinRequest[$j] = $r;
                             if (substr($j, 0, strlen($field) + 1) == $field . '-' && strpos($j, '-', strlen($field) + 1) !== false) {
                                 $joinRequest[substr($j, strlen($field) + 1)] = $r;
                             }
@@ -631,7 +631,7 @@ class AdminController extends Controller
             $query = $orm->getRepository($class)->createQueryBuilder($tableName);;
             foreach(self::$defaultTables[$tableName]['id'] as $f) {
                 // select other parts of the ID to help with adding and removing remove lists by ID
-                $other = array_values(array_filter(self::$allTables[$tableName]->identifier, function ($f) use ($e) {return !isset($e[$f]);}));
+                $other = array_values(array_filter(self::$defaultTables[$tableName]['id'], function ($f) use ($e) {return !isset($e[$f]);}));
                 if(!is_array($e) || isset($e[$f]) || count($other)) {
                     // TODO: is this an edge case?
                     if(is_array($e) && count($other)) {
@@ -645,7 +645,7 @@ class AdminController extends Controller
                             ->setParameter($f, is_array($e) ? $e[$f] : $e);
                     }
                     else {
-                        $query = $query->orWhere($tableName . '.' . $f . '=:' . $f)
+                        $query = $query->andWhere($tableName . '.' . $f . '=:' . $f)
                             ->setParameter($f, is_array($e) ? $e[$f] : $e);
                     }
                 }
@@ -684,6 +684,9 @@ class AdminController extends Controller
                             // automatically do inverse mapping
                             $fields = self::$defaultTables[$joinTable]; //[$joinTable => array_keys($subE)];
                             $isAdding = true;
+                            if(!is_array($subE)) {
+                                $subE = ['id' => $subE];
+                            }
                             if(isset($association['mappedBy'])) {
                                 // TODO: set to entity or set to null if removing a many-to-one
                                 $isAdding = !isset($subE['remove']) || $subE['remove'] !== 'true';
@@ -791,6 +794,7 @@ class AdminController extends Controller
                             && in_array($subGroup->getParent()->getId(), $subGroups)
                             && !in_array($subGroup->getId(), $subGroups)) {
                             $subGroups[count($subGroups)] = $subGroup->getId();
+
                             $entity = self::applyFields(AdminController::$allTables['ss_group']->name, 'ss_group', ['groupPacks'], array_merge($request->get('ss_group'), ['id' => $subGroup->getId()]), $orm);
 
                             if(empty($entity->getId())) {

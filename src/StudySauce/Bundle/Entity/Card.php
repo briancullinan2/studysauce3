@@ -74,6 +74,7 @@ class Card
     /**
      * @ORM\OneToMany(targetEntity="Answer", mappedBy="card")
      * @ORM\OrderBy({"created" = "DESC"})
+     * @var Answer[] $answers
      */
     protected $answers;
 
@@ -104,6 +105,27 @@ class Card
     public function getCorrect()
     {
         return $this->getAnswers()->filter(function (Answer $a) {return $a->getCorrect() == 1 && !$a->getDeleted();})->first();
+    }
+
+    public function setCorrect($correct) {
+        foreach($this->answers as $c) {
+            if($c == $correct || trim(trim(trim($c->getValue()), '^$')) == $correct) {
+                $c->setCorrect(true);
+            }
+            else {
+                $c->setCorrect(false);
+            }
+        }
+    }
+
+    public function setUpload($newUrl) {
+        $content = $this->content;
+        $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
+        if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
+            $url = trim($matches[0]);
+            $content = preg_replace('/\\s*\\n\\r?/i', '\\n', trim(str_replace($url, '', $content)));
+        }
+        $this->content = (!empty($newUrl) ? ($newUrl . '\n') : '') . $content;
     }
 
     /**
@@ -247,7 +269,7 @@ class Card
      */
     public function setResponseType($responseType)
     {
-        $this->responseType = $responseType;
+        $this->responseType = explode(' ', $responseType)[0];
 
         return $this;
     }
@@ -357,8 +379,9 @@ class Card
      */
     public function addAnswer(\StudySauce\Bundle\Entity\Answer $answers)
     {
-        $this->answers[] = $answers;
-
+        if(!$this->answers->contains($answers)) {
+            $this->answers[] = $answers;
+        }
         return $this;
     }
 
@@ -380,6 +403,69 @@ class Card
     public function getAnswers()
     {
         return $this->answers;
+    }
+
+    public function setAnswers() {
+
+
+        if (!isset($c['answers']) && isset($c['correct'])) {
+            $c['answers'] = $c['correct'];
+        }
+        $answers = explode("\n", isset($c['answers']) ? $c['answers'] : '');
+        $answerValues = [];
+        foreach ($answers as $a) {
+            if (trim($a) == '')
+                continue;
+            $newAnswer = $newCard->getAnswers()->filter(function (Answer $x) use ($a) {
+                return trim(trim($a), '$^') == trim(trim($x->getValue()), '$^');
+            })->first();
+            if (empty($newAnswer)) {
+                $newAnswer = new Answer();
+                $newAnswer->setCard($newCard);
+                $newCard->addAnswer($newAnswer);
+            }
+            $answerValues[] = $newAnswer;
+            $newAnswer->setContent(str_replace('|', ' or ', trim($a)));
+            $newAnswer->setResponse(trim($a));
+            $newAnswer->setValue(trim($a));
+            if (!empty($c['correct'])) {
+                if (strtolower(trim($a)) == strtolower(trim($c['correct']))) {
+                    $newAnswer->setCorrect(true);
+                }
+                else if (strpos($c['type'], 'contains') > -1) {
+                    $newAnswer->setCorrect(true);
+                }
+                else if (strpos($c['type'], 'exactly') > -1) {
+                    $newAnswer->setCorrect(true);
+                    $newAnswer->setValue('^' . trim($a) . '$');
+                }
+                else {
+                    $newAnswer->setCorrect(false);
+                }
+            }
+            if (empty($newAnswer->getId())) {
+                $orm->persist($newAnswer);
+            } else {
+                $orm->merge($newAnswer);
+            }
+        }
+
+        // remove missing answers
+        foreach ($newCard->getAnswers()->toArray() as $a) {
+            /** @var Answer $a */
+            if (!in_array($a->getValue(), array_map(function (Answer $x) {
+                return $x->getValue();
+            }, $answerValues))
+            ) {
+                if ($a->getResponses()->count() == 0) {
+                    $newCard->removeAnswer($a);
+                    $orm->remove($a);
+                } else {
+                    $a->setDeleted(true);
+                    $orm->merge($a);
+                }
+            }
+        }
     }
 
     /**

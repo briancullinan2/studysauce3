@@ -57,7 +57,7 @@ $view['slots']->start('body'); ?>
                 <form action="<?php print ($view['router']->generate('save_group')); ?>" class="group-edit">
                     <?php
                     $tables = [
-                        'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => ['subgroups'], 'invite' => ['invites'], 'actions' => ['deleted']]
+                        'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => ['subgroups', 'parent'], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
                     $request = [
                         'count-ss_group' => 1,
@@ -65,7 +65,11 @@ $view['slots']->start('body'); ?>
                         'edit' => !$isNew ? false : ['ss_group'],
                         'read-only' => $isNew ? false : ['ss_group'],
                         'new' => $isNew,
-                        'parent-ss_group-id' => '!0',
+                        // TODO: only search on joins when the prefix is correct?  instead of having to exclude these
+                        'parent-ss_group-deleted' => null,
+                        'subgroups-ss_group-deleted' => null,
+                        'parent-ss_group-id' => null,
+                        'subgroups-ss_group-id' => null,
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups'],

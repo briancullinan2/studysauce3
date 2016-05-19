@@ -473,6 +473,9 @@ function gatherFields(fields, visibleOnly) {
                 else if (inputField.length > 0) {
                     value = inputField.val();
                 }
+                if(inputField.is('[data-delimiter]')) {
+                    value = value.split(new RegExp(inputField.data('delimiter'), 'ig'));
+                }
                 if(value != null) {
                     formFields[formFields.length] = {name: key, value: value};
                 }

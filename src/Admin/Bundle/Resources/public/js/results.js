@@ -177,10 +177,10 @@ window.views.__defaultEntities['card'] = {
     getCorrect: function () {var card = this; return this.getAnswers().filter(function (i, a) {return (a.getCorrect() || a.getValue() == card.correct) && !a.getDeleted();})[0];},
     getAnswers: function () {
         // look up answers
-        if(typeof this.answers == 'string' || typeof this.answers == 'undefined') {
+        if(typeof this.answers == 'string') {
             this.answers = this.answers.split(/\s*\r?\n\s*/ig).map(function (a) {return {table: 'answer', value: a, content: a};});
         }
-        return $(this.answers.map(function (up) {return applyEntityObj(up);}));
+        return $(this.answers.map(function (up) {return typeof up == 'string' ? applyEntityObj({table: 'answer', value: up, content: up}) : applyEntityObj(up);}));
     },
     getContent: function () {return this.content},
     getIndex: function () {return this.index},

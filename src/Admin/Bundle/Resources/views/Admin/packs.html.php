@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use Doctrine\Common\Collections\ArrayCollection;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
@@ -43,7 +44,13 @@ $view['slots']->start('body'); ?>
                 <form action="<?php print ($view['router']->generate('packs_create')); ?>" class="pack-edit">
                     <?php
                     $tables = (array)(new stdClass());
-                    $tables['pack'] = ['idEdit' => ['modified', 'created', 'id', 'logo'], 'name' => ['title','userCountStr','cardCountStr'], '1' => 'status', '2' => ['group','groups', 'user','userPacks.user'], '3' => 'properties', '4' => 'actions'];
+                    $tables['pack'] = [
+                        'idEdit' => ['modified', 'created', 'id', 'logo'],
+                        'name' => ['title','userCountStr','cardCountStr'],
+                        '1' => 'status',
+                        '2' => ['group','groups', 'user','userPacks.user'],
+                        '3' => 'properties', '4' => 'actions'];
+                    $tables['card'] = AdminController::$defaultTables['card'];
                     $request = [
                         // view settings
                         'tables' => $tables,
@@ -56,6 +63,7 @@ $view['slots']->start('body'); ?>
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
                         // for new=true the template generates the -count number of empty rows, and no database query is performed
                         'count-pack' => 1,
+                        'count-card' => -1
                     ];
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     ?>
@@ -63,8 +71,10 @@ $view['slots']->start('body'); ?>
                 <div class="group-list">
                     <?php
                     $tables = (array)(new stdClass());
+                    $tables['file'] = AdminController::$defaultMiniTables['file'];
+                    $tables['ss_user'] = AdminController::$defaultMiniTables['ss_user'];
                     $tables['pack'] = ['0' => 'id', '1' => 'title', 'expandMembers' => [], '2' => ['status'] /* search field but don't display a template */];
-                    $tables['ss_group'] = ['0' => 'id', '1' => 'title', 'expandMembers' => ['packs', 'groupPacks'], 'actions' => ['deleted'] /* search field but don't display a template */];
+                    $tables['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
                     $request = [
                         // view settings
                         'tables' => $tables,
@@ -76,9 +86,12 @@ $view['slots']->start('body'); ?>
                         // search settings
                         'pack-id' => empty($entity->getId()) ? '0' : $entity->getId(),
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
+                        'parent-ss_group-deleted' => null,
                         'ss_group-deleted' => false,
                         'count-ss_group' => 0,
                         'count-pack' => 1,
+                        'count-ss_user' => -1,
+                        'count-file' => -1,
                     ];
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     ?>
@@ -98,7 +111,7 @@ $view['slots']->start('body'); ?>
                     }
                     $tables = [
                         // view settings
-                        'tables' => ['pack', 'card'],
+                        'tables' => ['pack', 'card', 'answer'],
                         'expandable' => ['card' => ['preview']],
                         'headers' => ['card' => 'packCards'],
                         'footers' => ['card' => 'packCards'],
@@ -108,6 +121,7 @@ $view['slots']->start('body'); ?>
                         'pack-id' => $entity->getId(),
                         // for new=true the template generates the -count number of empty rows, and no database query is performed
                         'count-pack' => -1,
+                        'count-answer' => -1,
                         'count-card' => $newCards ? 5 : 0,
                     ];
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
