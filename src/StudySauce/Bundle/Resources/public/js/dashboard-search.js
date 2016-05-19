@@ -424,11 +424,11 @@ $(document).ready(function () {
 
         // show confirmation dialog
         var message = (addItems.length > 0 ? (' add ' + addItems.map(function (e) {
-                var option = fromField.filter('[data-' + e.split('-')[0] + ']').data(e.split('-')[0]).filter(function (o) {return o._tableValue == e;})[0];
+                var option = fromField.filter('[data-' + e.split('-')[0] + ']')[0].selectize.options[e];
                 return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '')
             + (addItems.length > 0 && removeItems.length > 0 ? ' and ' : '')
             + (removeItems.length > 0 ? (' remove ' + removeItems.map(function (e) {
-                var option = fromField.filter('[data-' + e.split('-')[0] + ']').data(e.split('-')[0]).filter(function (o) {return o._tableValue == e;})[0];
+                var option = fromField.filter('[data-' + e.split('-')[0] + ']')[0].selectize.options[e];
                 return option[tables[option['table']][0]] + ' ' + option[tables[option['table']][1]];}).join(', ')) : '');
 
         // TODO: on pack entities show publish-confirm dialog
