@@ -623,7 +623,7 @@ $(document).ready(function () {
                             data[table] = data[table][0];
                         }
                     }
-                    if(typeof data[table] != 'undefined') {
+                    if(typeof data[table] != 'undefined' || typeof save[table] != 'undefined') {
                         hasSomethingToSave = true;
                     }
                     rows.removeClass('changed');
