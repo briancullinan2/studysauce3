@@ -150,7 +150,11 @@ $view['slots']->start('body'); ?>
                 <?php if (!empty($entity)) { ?>
                 <div class="list-packs">
                     <?php
-                    $tables = ['ss_group' => ['id', 'deleted'], 'ss_user' => ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'], 'user_pack' => ['user', 'pack', 'removed', 'downloaded'], 'card' => ['id', 'deleted']];
+                    $tables = (array)(new stdClass());
+                    $tables['ss_group'] = ['id', 'deleted'];
+                    $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'];
+                    $tables['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
+                    $tables['card'] = ['id', 'deleted'];
                     $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['group', 'groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                     $request = [
                         'count-pack' => $isNew ? -1 : 0,
