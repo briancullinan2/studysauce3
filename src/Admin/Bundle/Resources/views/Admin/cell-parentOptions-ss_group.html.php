@@ -7,12 +7,18 @@ foreach ($groups as $g) {
     /** @var Group $g */
     ?>
     <option
-        value="<?php print ($g->getId()); ?>" <?php print ($g == $ss_group->getParent() ? 'selected="selected"' : ''); ?>><?php print ($view->escape($g->getName())); ?></option>
+        value="<?php print ($g->getId()); ?>" <?php print (!empty($ss_group->getParent()) && $g->getId() == $ss_group->getParent()->getId() ? 'selected="selected"' : ''); ?>><?php print ($view->escape($g->getName())); ?></option>
     <?php
-    $subGroups = $g->getSubgroups()->toArray();
-    if ($subGroups > 0) { ?>
+    $topGroups = [];
+    foreach($results['allGroups'] as $sub) {
+        /** @var Group $sub */
+        if(!empty($sub->getParent()) && $sub->getParent()->getId() == $g->getId()) {
+            $topGroups[count($topGroups)] = $sub;
+        }
+    }
+    if (count($topGroups) > 0) { ?>
         <optgroup label="<?php print ($view->escape($g->getName())); ?> Group">
-            <?php print ($view->render('AdminBundle:Admin:cell-parentOptions-ss_group.html.php', ['groups' => $subGroups, 'ss_group' => $ss_group])); ?>
+            <?php print ($view->render('AdminBundle:Admin:cell-parentOptions-ss_group.html.php', ['groups' => $topGroups, 'ss_group' => $ss_group, 'results' => $results])); ?>
         </optgroup>
         <?php
     }

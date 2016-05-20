@@ -25,7 +25,7 @@ class Group extends BaseGroup implements GroupInterface
     /**
      * @ORM\Column(type="string", length=256, name="description")
      */
-    protected $description;
+    protected $description = '';
 
     /**
      * @ORM\Column(type="datetime", name="created")

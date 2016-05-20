@@ -44,7 +44,7 @@ class AdminController extends Controller
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo', 'userCountStr', 'descriptionStr'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
-        'invite' => ['id' => ['id', 'code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
+        'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded'],
         'file' => ['id' => ['id', 'url']],
         'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content']
@@ -692,7 +692,7 @@ class AdminController extends Controller
                             call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
                             if (!empty($value->newId)) {
                                 $orm->persist($value);
-                            } else {
+                            } else if(!empty($value)) {
                                 $orm->merge($value);
                             }
                         }
@@ -732,7 +732,7 @@ class AdminController extends Controller
                                 call_user_func_array([$entity, $method], [$childEntity]);
                                 if (!empty($childEntity->newId)) {
                                     $orm->persist($childEntity);
-                                } else {
+                                } else if(!empty($value)) {
                                     $orm->merge($childEntity);
                                 }
                             }
@@ -754,7 +754,7 @@ class AdminController extends Controller
                         call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
                         if (!empty($value->newId)) {
                             $orm->persist($value);
-                        } else {
+                        } else if(!empty($value)) {
                             $orm->merge($value);
                         }
                     }
@@ -764,7 +764,7 @@ class AdminController extends Controller
                         call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
                     }
                     else {
-                        call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
                     }
                 }
             }

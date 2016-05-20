@@ -13,6 +13,6 @@ use StudySauce\Bundle\Entity\Group;
                 $topGroups[count($topGroups)] = $g;
             }
         }
-        print ($view->render('AdminBundle:Admin:cell-parentOptions-ss_group.html.php', ['groups' => $topGroups, 'ss_group' => $ss_group])); ?>
+        print ($view->render('AdminBundle:Admin:cell-parentOptions-ss_group.html.php', ['groups' => $topGroups, 'ss_group' => $ss_group, 'results' => $results])); ?>
     </select>
 </label>
