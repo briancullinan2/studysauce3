@@ -65,7 +65,7 @@ $view['slots']->start('body'); ?>
                         '1' => 'status',
                         '2' => ['group','groups', 'user','userPacks.user'],
                         '3' => 'properties',
-                        '4' => 'actions'];
+                        'actions' => ['cards']];
                     $tables['card'] = AdminController::$defaultTables['card'];
                     $request = [
                         // view settings

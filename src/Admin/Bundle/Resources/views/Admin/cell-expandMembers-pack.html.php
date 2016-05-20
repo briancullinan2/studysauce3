@@ -38,7 +38,7 @@ else if (isset($results['ss_group'])) {
         $include = false;
         foreach($u->getGroups()->toArray() as $g) {
             /** @var Group $g */
-            if(in_array($g, $results['ss_group'])) {
+            if(!in_array($g, $results['ss_group'])) {
                 $include = true;
                 break;
             }

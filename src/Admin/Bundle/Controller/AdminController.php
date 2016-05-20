@@ -700,7 +700,7 @@ class AdminController extends Controller
                     // one to many, look for add function instead, remove ending s from field name like addGroupPack
                     else {
                         $entities = $e[$f];
-                        if(!isset($entities[0])) {
+                        if(!is_array($entities) || !isset($entities[0])) {
                             $entities = [$entities];
                         }
 

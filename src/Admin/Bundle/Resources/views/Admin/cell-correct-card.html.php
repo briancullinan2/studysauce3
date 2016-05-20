@@ -17,6 +17,8 @@ if(empty($answers)) {
     $answers = [''];
 }
 
+$view['slots']->start('all-answers');
+
 ?>
 <label class="input correct">
     <textarea name="correct" placeholder="Answer"><?php print ($view->escape(!empty($card->getCorrect()) ? $view->escape($card->getCorrect()->getValue()) : trim($card->getResponseContent()))); ?></textarea>
@@ -28,7 +30,7 @@ if(empty($answers)) {
         <?php } ?>
     </div>
     <label class="input">
-        <textarea name="answers" data-delimiter="\s*\n\s*|\s*\\n\s*" placeholder="Answers"><?php print (implode("\n", $answers)); ?></textarea>
+        <textarea name="answers" placeholder="Answers"><?php print (implode("\n", $answers)); ?></textarea>
     </label>
 </div>
 <label class="radio correct type-tf">
@@ -44,3 +46,14 @@ if(empty($answers)) {
 <label class="input correct type-sa">
     <textarea name="correct" placeholder="Answer"><?php print ($view->escape(!empty($card->getCorrect()) ? trim($card->getCorrect()->getValue(), '$^') : '')); ?></textarea>
 </label>
+<?php
+
+$view['slots']->stop();
+
+$context = !empty($context) ? $context : jQuery($this);
+if($context->find('.answers')->length == 0) {
+    $context->append($row = jQuery($view['slots']->get('all-answers')));
+    $row->find('textarea[name="answers"]')->data('delimiter', '\\s*\\n\\s*|\\s*\\\\n\\s*')->attr('data-delimiter', '\\s*\\n\\s*|\\s*\\\\n\\s*');
+}
+
+print ($context->html());
