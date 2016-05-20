@@ -15,8 +15,6 @@ $subVars = [
     'results' => $results
 ];
 
-$context = !empty($context) ? $context : jQuery($this);
-
 $rowHtml = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
     'tableId' => $tableId,
     'classes' => $classes,

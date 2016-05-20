@@ -138,6 +138,8 @@ window.views.__defaultEntities['pack'] = {
     user: null,
     userPacks: $([]),
     cards: $([]),
+    properties: {},
+    getDeleted: function () {return this.status == 'DELETED';},
     getProperty: function (name) {return this.properties.hasOwnProperty(name) ? this.properties[name] : null;},
     getStatus: function () {return this.status},
     getId: function () {return this.id;},
@@ -174,7 +176,11 @@ window.views.__defaultEntities['card'] = {
     answers: $([]),
     getDeleted: function () {return this.deleted},
     getId: function () {return this.id},
-    getCorrect: function () {var card = this; return this.getAnswers().filter(function (i, a) {return (a.getCorrect() || a.getValue() == card.correct) && !a.getDeleted();})[0];},
+    getCorrect: function () {
+        var card = this;
+        return this.getAnswers().filter(function (i, a) {
+            return (a.getCorrect() || a.getValue() == card.correct || card.getResponseType() == 'tf' && ((a.getValue().match(/true|false/i) || [])[0] || '').toLowerCase() == card.correct) && !a.getDeleted();})[0];
+    },
     getAnswers: function () {
         // look up answers
         if(typeof this.answers == 'string') {
@@ -536,7 +542,7 @@ $(document).ready(function () {
             clearTimeout(validationTimeout);
         }
         validationTimeout = setTimeout(function () {
-            tab.trigger('validate');
+            that.trigger('validate');
         }, 100);
     });
 
@@ -600,7 +606,7 @@ $(document).ready(function () {
                     var tmpTables = {};
                     tmpTables[table] = tables[table];
                     var fields = getAllFieldNames(tmpTables);
-                    var rows = tab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
+                    var rows = subTab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
                     for (var i = 0; i < rows.length; i++) {
                         if (typeof data[table] == 'undefined') {
                             data[table] = [];
@@ -611,11 +617,14 @@ $(document).ready(function () {
                         var row = $(rows[i]);
                         var rowId = getRowId.apply(row);
                         var newVal = {};
-                        if ($(this).is('.removed') || $(this).is('.empty')) {
+                        if (row.is('.removed') || row.is('.empty')) {
                             newVal = {id: rowId, remove: true};
                         }
                         else {
                             newVal = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
+                            if(row.is('[class*="new-id-"]')) {
+                                newVal['newId'] = (/new-id-([a-z0-9]*)(\s|$)/ig).exec(row.attr('class'))[1];
+                            }
                         }
                         newVal = $.extend(true, newVal, getQueryObject(subUrl));
                         data[table][data[table].length] = newVal;

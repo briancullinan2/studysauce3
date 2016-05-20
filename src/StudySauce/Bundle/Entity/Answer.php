@@ -146,6 +146,12 @@ class Answer
     public function setValue($value)
     {
         $this->value = $value;
+        if(empty($this->content)) {
+            $this->content = str_replace('|', ' or ', rtrim(ltrim($value, '^'), '$'));
+        }
+        if(empty($this->response)) {
+            $this->response = str_replace('|', ' or ', rtrim(ltrim($value, '^'), '$'));
+        }
 
         return $this;
     }

@@ -59,8 +59,8 @@ class PacksController extends Controller
 
         // TODO: saving returns the same things you sent to it, so this could go away because the tab with re-render and then refresh
         // TODO: forward to index which only sets up queries needed for page.
-        if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
-            if (isset($request->get('ss_group')['id']) && empty($request->get('ss_group')['id'])) {
+        if (!empty($request->get('pack')) && is_array($request->get('pack'))) {
+            if (isset($request->get('pack')['id']) && empty($request->get('pack')['id'])) {
                 $searchRequest['edit'] = false;
                 $searchRequest['read-only'] = ['pack'];
                 $searchRequest['new'] = false;

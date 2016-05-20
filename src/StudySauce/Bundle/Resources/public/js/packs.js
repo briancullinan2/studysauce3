@@ -25,12 +25,13 @@ $(document).ready(function () {
 
     function rowImport(clipText) {
         var results = $(this).find('.card-list .results'),
-            request = request.data('request'),
+            request = results.data('request'),
             last = null;
 
         // split into rows
         var clipRows = Papa.parse(clipText).data;
 
+        var newRows = [];
         // write out in a table
         for (var i=0; i<clipRows.length; i++) {
             // skip partial rows
@@ -39,33 +40,29 @@ $(document).ready(function () {
 
             var newRow = {};
             // set card type
-            var types = $('[name="responseType"] option').map(function () {return $(this).attr('value');}).toArray();
-            newRow['type'] = '';
+            newRow['responseType'] = '';
             if(clipRows[i].length > 2) {
-                if (types.indexOf(clipRows[i][0])) {
-                    newRow['type'] = clipRows[i][0];
-                }
-                else if (clipRows[i][0].match(/multiple/ig) != null) {
-                    newRow['type'] = 'mc'
+                if (clipRows[i][0].match(/multiple/ig) != null) {
+                    newRow['responseType'] = 'mc'
                 }
                 else if (clipRows[i][0].match(/false/ig) != null) {
-                    newRow['type'] = 'tf'
+                    newRow['responseType'] = 'tf'
                 }
                 else if (clipRows[i][0].match(/blank|short/ig) != null) {
-                    newRow['type'] = 'sa';
+                    newRow['responseType'] = 'sa';
                 }
             }
 
             // set correct answers
             newRow['answers'] = clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n");
 
-            // TODO: merge this with row template and just pass a model containing type, answers, correct, content
+            // merge this with row template and just pass a model containing type, answers, correct, content
             if(clipRows[i].length == 2) {
                 newRow['content'] = clipRows[i][0];
                 newRow['correct'] = clipRows[i][1];
             }
             else {
-                if(newRow['type'] = 'tf') {
+                if(newRow['responseType'] == 'tf') {
                     newRow['correct'] = (clipRows[i][2].match(/true|false/i) || [''])[0].toLowerCase() == true ? 'true' : 'false';
                 }
                 else {
@@ -74,8 +71,8 @@ $(document).ready(function () {
                 newRow['content'] = clipRows[i][1];
             }
 
-            newRow['table'] = 'pack';
-            var rowHtml = $(window.views.render('row', {entity: applyEntityObj(newRow), request: request}))
+            newRow['table'] = 'card';
+            var rowHtml = $(window.views.render('row-card', {card: applyEntityObj(newRow), table: 'card', tableId: 'card', tables: request.tables, request: request}))
                 .removeClass('read-only').addClass('edit');
 
             // list under currently focused row
@@ -85,7 +82,15 @@ $(document).ready(function () {
             else {
                 last = rowHtml.insertAfter(results.find('> header.card'));
             }
+            newRows = $(newRows).add(newRow);
+
+            // remove empties
+            results.find('.card-row.empty, .card-row.empty + .expandable:not([class*="-row"])').remove();
+
+            resizeTextAreas.apply(last);
         }
+        newRows.addClass('changed');
+        results.trigger('validate');
     }
 
     function resizeTextAreas() {
@@ -200,13 +205,13 @@ $(document).ready(function () {
 
         var tab = getTab.apply(this);
         var packRows = tab.find('.pack-row:not(.template),.pack-row:not(.valid):not(.template)'); // <-- this is critical for autosave to work
-        var cardRows = tab.find('.card-row:not(.removed):not(.template)');
+        var cardRows = $(this).closest('.card-row:not(.removed)').add($(this).find('.card-row:not(.removed)'));
 
         for(var c  = 0; c < cardRows.length; c++) {
             var row = $(cardRows[c]);
             var data = gatherFields.apply(row, [['responseType', 'content', 'answers', 'correct']]);
 
-            if(data.content == '' && data.correct == '' && (typeof data.answers == 'undefined' || data.answers == '')) {
+            if(data.content == '' && (typeof data.correct == 'undefined' || data.correct == '') && (typeof data.answers == 'undefined' || data.answers == '')) {
                 row.removeClass('invalid').addClass('empty valid');
             }
             else if (data.content == '' || data.correct == '' || data.answers == '') {
@@ -286,12 +291,14 @@ $(document).ready(function () {
         }
     }
 
-    body.on('resulted', '[id^="packs-"] .results', function () {
-        var tab = $(this);
+    body.on('resulted', '[id^="packs-"] .results', function (evt) {
+        var results = $(this);
+        var tab = results.closest('.panel-pane');
         autoSaveTimeout = null;
-        if (tab.closest('.panel-pane').is('#packs-pack0')) {
-            var id = getTabId.apply(tab);
-            tab.closest('.panel-pane').attr('id', 'packs-pack' + id);
+        if (tab.is('#packs-pack0')) {
+            window.views.render.apply(tab, ['packs', {entity: evt['results']['results']['pack'][0]}]);
+            loadResults.apply(tab.find('.results').not(results));
+            var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));
         }
         var loaded = body.find('#groups');

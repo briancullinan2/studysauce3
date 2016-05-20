@@ -6,7 +6,7 @@ $(document).ready(function () {
     // TODO: move this to template system and use validation
     function groupsFunc() {
         var tab = getTab.apply(this);
-        var groupRow = tab.find('.ss_group-row');
+        var groupRow = $(this).closest('.ss_group-row').add($(this).find('.ss_group-row'));
         if(groupRow.length > 0 && groupRow.find('.name input').val().trim() == '') {
             groupRow.removeClass('valid empty').addClass('invalid');
             tab.find('.highlighted-link a[href^="#save-"]').attr('disabled', 'disabled');
@@ -74,9 +74,9 @@ $(document).ready(function () {
         var results = $(this);
         var tab = results.closest('.panel-pane');
         if (tab.is('#groups-group0')) {
-            var id = getTabId.apply(results);
             window.views.render.apply(tab, ['groups', {entity: evt['results']['results']['ss_group'][0]}]);
             loadResults.apply(tab.find('.results').not(results));
+            var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('groups_edit', {group: id}));
         }
 

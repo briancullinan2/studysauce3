@@ -67,6 +67,17 @@ class AdminController extends Controller
         return $entity = new $class();
     }
 
+    static function makeID()
+    {
+        $text = "";
+        $possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for($i=0; $i < 8; $i++)
+            $text .= $possible[rand(0, strlen($possible) - 1)];
+
+        return $text;
+    }
+
     private static function getJoinTable($u)
     {
         if(is_array($u) && isset($u['table'])) {
@@ -501,6 +512,9 @@ class AdminController extends Controller
         }
         else {
             $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . (method_exists($e, 'getId') ? $e->getId() : '')];
+            if(isset($e->newId)) {
+                $obj['newId'] = $e->newId;
+            }
         }
         foreach ($fields as $f) {
             if (is_array($e)) {
@@ -625,35 +639,44 @@ class AdminController extends Controller
         }
         else if(is_array($e) && empty($e['id'])) {
             $entity = new $class;
-            $entity->isNew = true;
+            $entity->newId = isset($e['newId']) ? $e['newId'] : ' ';
         }
         else {
-            $query = $orm->getRepository($class)->createQueryBuilder($tableName);;
+            $hasId = true;
+            $query = $orm->getRepository($class)->createQueryBuilder($tableName);
             foreach(self::$defaultTables[$tableName]['id'] as $f) {
                 // select other parts of the ID to help with adding and removing remove lists by ID
                 $other = array_values(array_filter(self::$defaultTables[$tableName]['id'], function ($f) use ($e) {return !isset($e[$f]);}));
-                if(!is_array($e) || isset($e[$f]) || count($other)) {
-                    // TODO: is this an edge case?
-                    if(is_array($e) && count($other)) {
-                        $query = $query->andWhere($tableName . '.' . $other[0] . '=:' . $other[0])
-                            ->setParameter($other[0], $e['id']);
-                        $e[$other[0]] = $e['id'];
-                        unset($e['id']);
-                    }
-                    else if(in_array($f, self::$allTables[$tableName]->identifier)) {
-                        $query = $query->andWhere($tableName . '.' . $f . '=:' . $f)
-                            ->setParameter($f, is_array($e) ? $e[$f] : $e);
-                    }
-                    else {
-                        $query = $query->andWhere($tableName . '.' . $f . '=:' . $f)
-                            ->setParameter($f, is_array($e) ? $e[$f] : $e);
-                    }
+                // TODO: is this an edge case?
+                if (is_array($e) && count($other)) {
+                    $query = $query->andWhere($tableName . '.' . $other[0] . '=:' . $other[0])
+                        ->setParameter($other[0], $e['id']);
+                    $e[$other[0]] = $e['id'];
+                    unset($e['id']);
+                }
+                else if (in_array($f, self::$allTables[$tableName]->identifier)) {
+                    $query = $query->andWhere($tableName . '.' . $f . '=:' . $f)
+                        ->setParameter($f, is_array($e) ? $e[$f] : $e);
+                }
+                else if (isset($e[$f]) && (!is_object($e[$f]) || !isset($e[$f]->newId))) {
+                    $query = $query->andWhere($tableName . '.' . $f . '=:' . $f)
+                        ->setParameter($f, is_array($e) ? $e[$f] : $e);
+                }
+                else {
+                    $hasId = false;
+                    break;
                 }
             }
-            $entity = $query->getQuery()->setMaxResults(1)->getOneOrNullResult();
-        }
-        if(empty($entity)) {
-            throw new \Exception('Item not found!');
+            if($hasId) {
+                $entity = $query->getQuery()->setMaxResults(1)->getOneOrNullResult();
+                if(empty($entity)) {
+                    throw new \Exception('Item not found!');
+                }
+            }
+            else {
+                $entity = new $class;
+                $entity->newId = isset($e['newId']) ? $e['newId'] : ' ';
+            }
         }
 
         foreach($allFields as $f) {
@@ -681,6 +704,9 @@ class AdminController extends Controller
 
                         // if dealing with multiple entities, perform actions for each
                         foreach($entities as $subE) {
+                            if(empty($subE)) {
+                                continue;
+                            }
                             // automatically do inverse mapping
                             $fields = self::$defaultTables[$joinTable]; //[$joinTable => array_keys($subE)];
                             $isAdding = true;
@@ -702,12 +728,11 @@ class AdminController extends Controller
                             $childEntity = self::applyFields($association['targetEntity'], $joinTable, $fields, $subE, $orm);
                             if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
                                 call_user_func_array([$entity, $method], [$childEntity]);
-                                if (!empty($childEntity->isNew)) {
+                                if (!empty($childEntity->newId)) {
                                     $orm->persist($childEntity);
                                 } else {
                                     $orm->merge($childEntity);
                                 }
-                                $orm->flush();
                             }
                         }
                     }
@@ -715,7 +740,7 @@ class AdminController extends Controller
                 else if(($rp = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                     $type = $rp->getClass();
                     $value = $e[$f];
-                    if(is_object($type) && $type->getNamespaceName() == 'StudySauce\\Bundle\\Entity') {
+                    if(is_object($type) && $type->getNamespaceName() == 'StudySauce\\Bundle\\Entity' && !empty($value)) {
                         $tableIndex = array_search($type->getName(), self::$allTableClasses);
                         $joinTable = array_keys(self::$allTables)[$tableIndex];
                         $value = self::applyFields($type->getName(), $joinTable, $fields, $value, $orm);
@@ -724,7 +749,7 @@ class AdminController extends Controller
                     else if (is_object($type) && $type->getName() == '\\DateTime') {
                         $value = new \DateTime($value);
                     }
-                    call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
+                    call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
                 }
             }
         }
@@ -932,6 +957,16 @@ window.views[\'' . $functionName . '\'] = ( function ' . $functionName . ' (__va
 // TODO port entities here
 window.AdminController = {};
 window.AdminController.toFirewalledEntityArray = function (e) { return e; };
+window.AdminController.makeID = function ()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 8; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+};
 window.AdminController.__vars = {};
 window.AdminController.__vars.radioCounter = 100000000;
 window.AdminController.__vars.defaultMiniTables = JSON.parse('$miniTables');

@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
@@ -10,11 +11,15 @@ $context = !empty($context) ? $context : jQuery($this);
 
 $rowId = implode('', [$table , '-id-']);
 if(method_exists($entity, 'getId')) {
-    $rowId = implode('', [$rowId , $entity->getId()]);
+    $rowId = implode('', [$rowId , $entity->getId(), empty($entity->getId()) ? implode('', [' new-id-', AdminController::makeID()]) : '']);
 }
 
-$row = $context->find(implode('', ['.', $rowId]));
-
+if(isset($entity->newId)) {
+    $row = $context->find(implode('', ['.', $rowId, ',.new-id-', $entity->newId]));
+}
+else {
+    $row = $context->find(implode('', ['.', $rowId]));
+}
 $expandable = isset($request['expandable']) && is_array($request['expandable'])
     ? $request['expandable']
     : [];
@@ -57,4 +62,8 @@ $view['slots']->stop();
 
 if($row->length == 0 || !$row->is('.edit')) {
     print ($view['slots']->get('result-row'));
+}
+else if(isset($entity->newId)) {
+    // update newId?
+    $row->removeClass(implode('', [$table , '-id-']))->removeClass(implode('', ['new-id-', $entity->newId]))->addClass($rowId);
 }

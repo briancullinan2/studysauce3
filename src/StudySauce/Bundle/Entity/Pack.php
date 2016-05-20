@@ -118,7 +118,7 @@ class Pack
                 : '');
     }
 
-    public function setLogo(File $logo) {
+    public function setLogo(File $logo = null) {
         $this->setProperty('logo', !empty($logo) ? $logo->getUrl() : null);
     }
 
@@ -129,7 +129,6 @@ class Pack
     public function setProperty($prop, $value)
     {
         $this->properties[$prop] = $value;
-        $this->setProperties($this->properties);
     }
 
     /**
