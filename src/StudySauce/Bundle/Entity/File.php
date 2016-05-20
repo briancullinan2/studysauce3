@@ -33,12 +33,12 @@ class File
     /**
      * @ORM\Column(type="string", length=256, name="filename")
      */
-    protected $filename;
+    protected $filename = '';
 
     /**
      * @ORM\Column(type="string", length=256, name="upload_id")
      */
-    protected $uploadId;
+    protected $uploadId = '';
 
     /**
      * @ORM\Column(type="string", length=256, name="url", nullable=true)
@@ -48,7 +48,7 @@ class File
     /**
      * @ORM\Column(type="array", name="parts", nullable=true)
      */
-    protected $parts;
+    protected $parts = [];
 
     /**
      * @ORM\Column(type="datetime", name="created")
@@ -210,6 +210,9 @@ class File
      */
     public function getFilename()
     {
+        if(empty($this->filename)) {
+            return basename($this->url);
+        }
         return $this->filename;
     }
 

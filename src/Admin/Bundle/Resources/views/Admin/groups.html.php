@@ -51,9 +51,11 @@ $view['slots']->start('body'); ?>
                 <form action="<?php print ($view['router']->generate('save_group')); ?>" class="group-edit">
                     <?php
                     $tables = [
+                        'file' => AdminController::$defaultMiniTables['file'],
                         'ss_group' => ['idEdit' => ['created', 'id', 'logo'], 'name' => ['name', 'description'], 'parent' => ['subgroups', 'parent'], 'invite' => ['invites'], 'actions' => ['deleted']]
                     ];
                     $request = [
+                        'count-file' => -1,
                         'count-ss_group' => 1,
                         'ss_group-deleted' => $entity->getDeleted(),
                         'edit' => !$isNew ? false : ['ss_group'],

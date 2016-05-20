@@ -46,7 +46,7 @@ class AdminController extends Controller
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded'],
-        'file' => ['id' => ['id', 'url']],
+        'file' => ['id' => ['url']],
         'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content']
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
@@ -686,7 +686,11 @@ class AdminController extends Controller
                     $joinTable = array_keys(self::$allTables)[$tableIndex];
                     if($association['type'] == ClassMetadataInfo::ONE_TO_ONE || $association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
                         // create entities from array using same assignment functions as here
-                        $value = empty($e[$f]) ? null : self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $e[$f], $orm);
+                        $value = $e[$f];
+                        if(!is_array($value)) {
+                            $value = ['id' => $value];
+                        }
+                        $value = empty($e[$f]) ? null : self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $value, $orm);
                         // many to one, just lookup object and call set property normally
                         if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                             call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);

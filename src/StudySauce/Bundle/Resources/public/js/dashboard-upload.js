@@ -25,11 +25,13 @@ $(document).ready(function () {
             dialog = $(window.views.render.apply(body, ['upload-file', {}])).appendTo(body);
         }
         // update field next to upload link
-        var row = $(this).parents('[class*="-row"]');
+        // TODO: only 1 image per cell?
+        var cell = $(this).parents('[class*="-row"] > *');
+
         body.one('click.upload', 'a[href="#submit-upload"]', function () {
             var url = dialog.find('img').attr('src');
             // TODO user some sort of data binding api to update this part
-            row.addClass('changed').find('input[name="upload"]').val(url).trigger('change').siblings('img').attr('src', url).removeClass('default').load(function () {
+            cell.addClass('changed').find('input[type="hidden"]').val(url).trigger('change').siblings('img').attr('src', url).removeClass('default').load(function () {
                 if($(this).is('.centerized')) {
                     centerize.apply(this);
                 }
