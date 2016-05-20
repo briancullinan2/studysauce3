@@ -28,7 +28,7 @@ if(empty($answers)) {
         <?php } ?>
     </div>
     <label class="input">
-        <textarea name="answers" data-delimiter="\s*\n\s*|\s*\\n\s*" placeholder="Answers"><?php print (implode("\n", $answers)); ?></textarea>
+        <textarea name="answers" data-delimiter="\\s*\\\\n\\s*|\\s*\\n\\s*" placeholder="Answers"><?php print (implode("\n", $answers)); ?></textarea>
     </label>
 </div>
 <label class="radio correct type-tf">

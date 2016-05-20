@@ -107,14 +107,24 @@ class Card
         return $this->getAnswers()->filter(function (Answer $a) {return $a->getCorrect() == 1 && !$a->getDeleted();})->first();
     }
 
-    public function setCorrect($correct) {
+    /**
+     * @param Answer $correct
+     */
+    public function setCorrect(Answer $correct = null) {
+        $contains = false;
         foreach($this->answers as $c) {
-            if($c == $correct || trim(trim(trim($c->getValue()), '^$')) == $correct) {
+            if($c == $correct) {
+                $contains = true;
                 $c->setCorrect(true);
             }
             else {
                 $c->setCorrect(false);
             }
+        }
+        if(!$contains) {
+            $this->answers->add($correct);
+            $correct->setCard($this);
+            $correct->setCorrect(true);
         }
     }
 
@@ -403,69 +413,6 @@ class Card
     public function getAnswers()
     {
         return $this->answers;
-    }
-
-    public function setAnswers() {
-
-
-        if (!isset($c['answers']) && isset($c['correct'])) {
-            $c['answers'] = $c['correct'];
-        }
-        $answers = explode("\n", isset($c['answers']) ? $c['answers'] : '');
-        $answerValues = [];
-        foreach ($answers as $a) {
-            if (trim($a) == '')
-                continue;
-            $newAnswer = $newCard->getAnswers()->filter(function (Answer $x) use ($a) {
-                return trim(trim($a), '$^') == trim(trim($x->getValue()), '$^');
-            })->first();
-            if (empty($newAnswer)) {
-                $newAnswer = new Answer();
-                $newAnswer->setCard($newCard);
-                $newCard->addAnswer($newAnswer);
-            }
-            $answerValues[] = $newAnswer;
-            $newAnswer->setContent(str_replace('|', ' or ', trim($a)));
-            $newAnswer->setResponse(trim($a));
-            $newAnswer->setValue(trim($a));
-            if (!empty($c['correct'])) {
-                if (strtolower(trim($a)) == strtolower(trim($c['correct']))) {
-                    $newAnswer->setCorrect(true);
-                }
-                else if (strpos($c['type'], 'contains') > -1) {
-                    $newAnswer->setCorrect(true);
-                }
-                else if (strpos($c['type'], 'exactly') > -1) {
-                    $newAnswer->setCorrect(true);
-                    $newAnswer->setValue('^' . trim($a) . '$');
-                }
-                else {
-                    $newAnswer->setCorrect(false);
-                }
-            }
-            if (empty($newAnswer->getId())) {
-                $orm->persist($newAnswer);
-            } else {
-                $orm->merge($newAnswer);
-            }
-        }
-
-        // remove missing answers
-        foreach ($newCard->getAnswers()->toArray() as $a) {
-            /** @var Answer $a */
-            if (!in_array($a->getValue(), array_map(function (Answer $x) {
-                return $x->getValue();
-            }, $answerValues))
-            ) {
-                if ($a->getResponses()->count() == 0) {
-                    $newCard->removeAnswer($a);
-                    $orm->remove($a);
-                } else {
-                    $a->setDeleted(true);
-                    $orm->merge($a);
-                }
-            }
-        }
     }
 
     /**

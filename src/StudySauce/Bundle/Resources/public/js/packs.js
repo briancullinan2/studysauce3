@@ -31,7 +31,7 @@ $(document).ready(function () {
         // split into rows
         var clipRows = Papa.parse(clipText).data;
 
-        var newRows = [];
+        var newRows = $([]);
         // write out in a table
         for (var i=0; i<clipRows.length; i++) {
             // skip partial rows
@@ -82,15 +82,21 @@ $(document).ready(function () {
             else {
                 last = rowHtml.insertAfter(results.find('> header.card'));
             }
-            newRows = $(newRows).add(newRow);
+            newRows = newRows.add(last);
 
-            // remove empties
-            results.find('.card-row.empty, .card-row.empty + .expandable:not([class*="-row"])').remove();
-
-            resizeTextAreas.apply(last);
         }
+
+        // remove empties
+        results.find('.card-row.empty, .card-row.empty + .expandable:not([class*="-row"])').remove();
+
+        resizeTextAreas.apply(newRows);
         newRows.addClass('changed');
         results.trigger('validate');
+        if(results.find('.card-row:visible').length == 0) {
+            for(var n = 0; n < 5; n++) {
+                addResultRow.apply(results, ['card']);
+            }
+        }
     }
 
     function resizeTextAreas() {

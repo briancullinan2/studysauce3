@@ -47,6 +47,9 @@ if($tab->length == 0) {
 
 if($tab->length > 0) {
     $tab->attr('id', implode('', ['packs-pack' , $entity->getId()]));
+    $tab->find('.card-list')
+        ->attr('action', $view['router']->generate('packs_create', ['pack' => ['id' => $entity->getId()]]))
+        ->removeAttr('name');
 }
 
 $view['slots']->start('body'); ?>
@@ -125,7 +128,7 @@ $view['slots']->start('body'); ?>
                         <div>Select name on the left to see group members</div>
                     </div>
                 </div>
-                <form action="<?php print ($view['router']->generate('packs_create', ['pack' => ['id' => $entity->getId()]])); ?>" class="card-list">
+                <form action="<?php print ($view['router']->generate('packs_create', ['pack' => ['id' => $entity->getId()]])); ?>" <?php print (empty($entity->getId()) ? 'name="pack[cards]"' : ''); ?> class="card-list">
                     <?php
                     $newCards = true;
                     foreach($entity->getCards()->toArray() as $c) {

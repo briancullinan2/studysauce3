@@ -450,14 +450,18 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '.results a[href^="#add-"]', function (evt) {
-        evt.preventDefault();
-        var results = $(this).parents('.results');
-        var table = $(this).attr('href').substring(5);
+    function addResultRow(table) {
+        var results = $(this).closest('.results');
         // TODO: fix this creating a blank through the template system
         var request = results.data('request');
         var newRow = $(window.views.render('row', {entity: applyEntityObj({table: table}), tables: request.tables, table: table, request: request, tableId: table}));
         newRow.removeClass('read-only').addClass('edit').insertBefore(results.find('.' + table + '-row').first());
+    }
+    window.addResultRow = addResultRow;
+
+    body.on('click', '.results a[href^="#add-"]', function (evt) {
+        evt.preventDefault();
+        addResultRow.apply(this, [$(this).attr('href').substring(5)]);
     });
 
     body.on('click', '[class*="-row"] a[href^="#remove-"]', function (evt) {
@@ -600,6 +604,7 @@ $(document).ready(function () {
             var tables = subTab.data('request').tables;
             var name = subAction.attr('name');
             var subUrl = subAction.data('action') || subAction.attr('action');
+            var subData = {};
             for (var table in tables) {
                 if (tables.hasOwnProperty(table)) {
                     // get list of possible fields in form
@@ -608,16 +613,13 @@ $(document).ready(function () {
                     var fields = getAllFieldNames(tmpTables);
                     var rows = subTab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
                     for (var i = 0; i < rows.length; i++) {
-                        if (typeof data[table] == 'undefined') {
-                            data[table] = [];
-                        }
-                        if (data[table].constructor !== Array) {
-                            data[table] = [data[table]];
-                        }
                         var row = $(rows[i]);
                         var rowId = getRowId.apply(row);
                         var newVal = {};
                         if (row.is('.removed') || row.is('.empty')) {
+                            if(rowId == '' || rowId == null) {
+                                continue;
+                            }
                             newVal = {id: rowId, remove: true};
                         }
                         else {
@@ -627,20 +629,27 @@ $(document).ready(function () {
                             }
                         }
                         newVal = $.extend(true, newVal, getQueryObject(subUrl));
-                        data[table][data[table].length] = newVal;
-                        if (rows.length == 1 && data[table].length == 1) {
-                            data[table] = data[table][0];
+                        if (typeof subData[table] == 'undefined') {
+                            subData[table] = [];
+                        }
+                        if (subData[table].constructor !== Array) {
+                            subData[table] = [subData[table]];
+                        }
+                        subData[table][subData[table].length] = newVal;
+                        if (rows.length == 1 && subData[table].length == 1) {
+                            subData[table] = subData[table][0];
                         }
                     }
-                    if(typeof data[table] != 'undefined' || typeof save[table] != 'undefined') {
+                    if(typeof subData[table] != 'undefined' || typeof save[table] != 'undefined') {
                         hasSomethingToSave = true;
                     }
-                    rows.removeClass('changed');
-                    if(typeof name != 'undefined') {
-                        var subData = data[table];
-                        delete data[table];
-                        assignSubKey(data, name, subData);
+                    if(typeof name != 'undefined' && typeof subData[table] != 'undefined') {
+                        assignSubKey(data, name, subData[table]);
                     }
+                    else if (typeof subData[table] != 'undefined') {
+                        data[table] = subData[table];
+                    }
+                    rows.removeClass('changed');
                 }
 
             }

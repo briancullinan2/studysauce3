@@ -648,7 +648,7 @@ class AdminController extends Controller
                 // select other parts of the ID to help with adding and removing remove lists by ID
                 $other = array_values(array_filter(self::$defaultTables[$tableName]['id'], function ($f) use ($e) {return !isset($e[$f]);}));
                 // TODO: is this an edge case?
-                if (is_array($e) && count($other)) {
+                if (is_array($e) && count($other) && isset($e['id'])) {
                     $query = $query->andWhere($tableName . '.' . $other[0] . '=:' . $other[0])
                         ->setParameter($other[0], $e['id']);
                     $e[$other[0]] = $e['id'];
@@ -708,7 +708,7 @@ class AdminController extends Controller
                                 continue;
                             }
                             // automatically do inverse mapping
-                            $fields = self::$defaultTables[$joinTable]; //[$joinTable => array_keys($subE)];
+                            $joinFields = self::$defaultTables[$joinTable]; //[$joinTable => array_keys($subE)];
                             $isAdding = true;
                             if(!is_array($subE)) {
                                 $subE = ['id' => $subE];
@@ -716,16 +716,16 @@ class AdminController extends Controller
                             if(isset($association['mappedBy'])) {
                                 // TODO: set to entity or set to null if removing a many-to-one
                                 $isAdding = !isset($subE['remove']) || $subE['remove'] !== 'true';
-                                if($association['type'] == ClassMetadataInfo::ONE_TO_MANY) {
+                                if($association['type'] == ClassMetadataInfo::ONE_TO_MANY || $association['type'] == ClassMetadataInfo::ONE_TO_ONE) {
                                     $subE = array_merge([$association['mappedBy'] => $entity], $subE);
-                                    $fields = array_merge($fields, [$association['mappedBy']]);
+                                    $joinFields = array_merge($joinFields, [$association['mappedBy']]);
                                 }
                             }
+                            // TODO: add entity[clear] = 'true' to clear lists to support deleting and disassociating, maybe has to submit has of all IDs for safety?
+                            $childEntity = self::applyFields($association['targetEntity'], $joinTable, $joinFields, $subE, $orm);
                             if(isset($e['remove']) && $e['remove'] === 'true') {
                                 $isAdding = false;
                             }
-                            // TODO: add entity[clear] = 'true' to clear lists to support deleting and disassociating, maybe has to submit has of all IDs for safety?
-                            $childEntity = self::applyFields($association['targetEntity'], $joinTable, $fields, $subE, $orm);
                             if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
                                 call_user_func_array([$entity, $method], [$childEntity]);
                                 if (!empty($childEntity->newId)) {
@@ -741,15 +741,29 @@ class AdminController extends Controller
                     $type = $rp->getClass();
                     $value = $e[$f];
                     if(is_object($type) && $type->getNamespaceName() == 'StudySauce\\Bundle\\Entity' && !empty($value)) {
+                        // TODO: this might not work because it should have to use association mappings above
                         $tableIndex = array_search($type->getName(), self::$allTableClasses);
                         $joinTable = array_keys(self::$allTables)[$tableIndex];
-                        $value = self::applyFields($type->getName(), $joinTable, $fields, $value, $orm);
+                        if(!is_array($value)) {
+                            $value = ['id' => $value];
+                        }
+                        $joinFields = self::$defaultTables[$joinTable];
+                        $value = self::applyFields($type->getName(), $joinTable, $joinFields, $value, $orm);
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
+                        if (!empty($value->newId)) {
+                            $orm->persist($value);
+                        } else {
+                            $orm->merge($value);
+                        }
                     }
                     // TODO: handle roles, properties and datetime data types, NULL to clear a field
                     else if (is_object($type) && $type->getName() == '\\DateTime') {
                         $value = new \DateTime($value);
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
                     }
-                    call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
+                    else {
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
+                    }
                 }
             }
         }
