@@ -26,18 +26,12 @@ if($tab->length == 0) {
     $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
     $view['slots']->start('stylesheets');
-    foreach ($view['assetic']->stylesheets(['@results_css'], [], ['output' => 'bundles/admin/css/*.css']) as $url) { ?>
-        <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
-    <?php }
     foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/packs.css'], [], ['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
         <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
     <?php }
     $view['slots']->stop();
 
     $view['slots']->start('javascripts');
-    foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/results.js'], [], ['output' => 'bundles/admin/js/*.js']) as $url) { ?>
-        <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
-    <?php }
     foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
         <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
     <?php } ?>

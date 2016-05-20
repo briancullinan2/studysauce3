@@ -24,6 +24,7 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/css/fonts.css',
                 '@StudySauceBundle/Resources/public/css/sauce.css',
                 '@StudySauceBundle/Resources/public/css/dialog.css',
+                '@results_css',
             ],
             'filters' => [],
             'options' => [
@@ -62,6 +63,7 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/dashboard-publish.js',
                 '@StudySauceBundle/Resources/public/js/dashboard-player.js',
                 '@StudySauceBundle/Resources/public/js/dashboard-upload.js',
+                '@AdminBundle/Resources/public/js/results.js'
             ],
             'filters' => [],
             'options' => [
