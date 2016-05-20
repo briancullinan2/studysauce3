@@ -669,11 +669,8 @@ class AdminController extends Controller
             }
             if($hasId) {
                 $entity = $query->getQuery()->setMaxResults(1)->getOneOrNullResult();
-                if(empty($entity)) {
-                    throw new \Exception('Item not found!');
-                }
             }
-            else {
+            if(empty($entity)) {
                 $entity = new $class;
                 $entity->newId = isset($e['newId']) ? $e['newId'] : ' ';
             }
@@ -693,6 +690,11 @@ class AdminController extends Controller
                         // many to one, just lookup object and call set property normally
                         if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                             call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
+                            if (!empty($value->newId)) {
+                                $orm->persist($value);
+                            } else {
+                                $orm->merge($value);
+                            }
                         }
                     }
                     // one to many, look for add function instead, remove ending s from field name like addGroupPack
@@ -716,7 +718,7 @@ class AdminController extends Controller
                             if(isset($association['mappedBy'])) {
                                 // TODO: set to entity or set to null if removing a many-to-one
                                 $isAdding = !isset($subE['remove']) || $subE['remove'] !== 'true';
-                                if($association['type'] == ClassMetadataInfo::ONE_TO_MANY || $association['type'] == ClassMetadataInfo::ONE_TO_ONE) {
+                                if($association['type'] == ClassMetadataInfo::ONE_TO_MANY) {
                                     $subE = array_merge([$association['mappedBy'] => $entity], $subE);
                                     $joinFields = array_merge($joinFields, [$association['mappedBy']]);
                                 }
