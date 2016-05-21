@@ -60,9 +60,12 @@ $(document).ready(function () {
                     results: {allGroups: toTemplate.data('allGroups')},
                     request: toRequest}]);
                 $(newGroupRow).insertAfter(toTemplate.find('header.pack'));
+                getTab.apply(this).closest('form').attr('action', Routing.generate('packs_create', {groups: {id: groupId}}));
                 if(row.find('[class*="id"] img:not(.default)').length > 0) {
+                    var src = row.find('[class*="id"] img').attr('src');
+                    $(this).find('.pack-row:not(.template) [class*="id"] input').val(src);
                     $(this).find('.pack-row:not(.template) [class*="id"] img')
-                        .attr('src', row.find('[class*="id"] img').attr('src')).removeClass('default');
+                        .attr('src', src).removeClass('default');
                 }
             });
         });

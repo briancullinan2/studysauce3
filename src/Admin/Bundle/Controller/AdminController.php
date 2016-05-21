@@ -491,7 +491,8 @@ class AdminController extends Controller
             }, $vars['results'][$table]);
         }
         if (in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
-            $vars['results'] = ['resultsJSON'];
+            $vars['results'] = $vars['resultsJSON'];
+            unset($vars['resultsJSON']);
             return new JsonResponse($vars);
         }
 
@@ -748,7 +749,7 @@ class AdminController extends Controller
                 else if(($rp = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                     $type = $rp->getClass();
                     $value = $e[$f];
-                    if(is_object($type) && $type->getNamespaceName() == 'StudySauce\\Bundle\\Entity' && !empty($value)) {
+                    if(is_object($type) && $type->getNamespaceName() == 'StudySauce\\Bundle\\Entity') {
                         // TODO: this might not work because it should have to use association mappings above
                         $tableIndex = array_search($type->getName(), self::$allTableClasses);
                         $joinTable = array_keys(self::$allTables)[$tableIndex];

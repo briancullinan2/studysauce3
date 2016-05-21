@@ -544,6 +544,7 @@ class Pack
     {
         if(!$this->groups->contains($group)) {
             $this->groups[] = $group;
+            $group->addGroupPack($this);
         }
 
         return $this;
@@ -558,6 +559,7 @@ class Pack
     public function removeGroup(Group $group)
     {
         $this->groups->removeElement($group);
+        $group->removePack($this);
         if($this->group == $group) {
             $this->group = null;
         }
