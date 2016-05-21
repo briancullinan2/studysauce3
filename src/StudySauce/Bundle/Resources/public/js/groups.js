@@ -32,44 +32,44 @@ $(document).ready(function () {
         var groupId = getTabId.apply(row);
         body.one('show', '#groups-group0', function () {
             $(this).find('.ss_group-row:not(.template) .parent select').val(groupId);
-            if(row.find('.id img:not(.default)').length > 0) {
-                $(this).find('.ss_group-row:not(.template) .id img').attr('src', row.find('.id img').attr('src')).removeClass('default');
+            if(row.find('[class*="id"] img:not(.default)').length > 0) {
+                $(this).find('.ss_group-row:not(.template) [class*="id"] img')
+                    .attr('src', row.find('[class*="id"] img').attr('src')).removeClass('default');
             }
         });
     });
 
     // TODO: use template system to update values
-    body.on('click', '[id^="groups-"] a[href^="/packs/0"]', function () {
-        var row = $(this).parents('.results').find('.ss_group-row:not(.template)');
+    body.on('click', '[id^="groups-"] [data-target="#create-entity"]', function () {
+        var results = getTab.apply(this);
+        var request = results.data('request');
+        var row = results.find('.ss_group-row:not(.template)');
         var groupId = getTabId.apply(this);
-        body.one('show', '#packs-pack0', function () {
-            $(this).find('.pack-row:not(.template) .groups label > input').val('ss_group-' + groupId);
-            if($(this).find('.pack-row .groups label > input.selectized').length > 0) {
-                var userCount = 0;
-                row.parents('pack-row').each(function () {
-                    userCount += parseInt($(this).find('.count label:first-of-type span').text());
-                });
-                var option = {
-                    remove:false,
+        var group = gatherFields.apply(row, [getAllFieldNames({ss_group: request['tables']['ss_group']})]);
+        body.one('click.create_new', '#create-entity a[href^="/packs/0"]', function () {
+            body.one('show', '#packs-pack0', function () {
+                // TODO: render new group row and add to group list behind save, add group to path
+                var toTemplate = $(this).find('.group-list .results');
+                var toRequest = toTemplate.data('request');
+                group['table'] = 'ss_group';
+                group['id'] = groupId;
+                var newGroupRow = window.views.render.apply(toTemplate, ['row', {
+                    entity: applyEntityObj(group),
                     table: 'ss_group',
-                    value: 'ss_group-' + groupId,
-                    text: row.find('.name input').val(),
-                    0: '(' + userCount + ' users)'
-                };
-                var groupsField = $(this).find('.pack-row .groups label > input.selectized');
-                groupsField.data('confirm', false);
-                groupsField[0].selectize.addOption(option);
-                groupsField.data('entities', ['ss_group-' + groupId]).data('ss_group', [option]);
-                groupsField[0].selectize.setValue('ss_group-' + groupId);
-                groupsField.data('confirm', true);
-            }
-            if(row.find('.id img:not(.default)').length > 0) {
-                $(this).find('.pack-row:not(.template) .id img').attr('src', row.find('.id img').attr('src')).removeClass('default');
-            }
+                    tables: toRequest['tables'],
+                    results: {allGroups: toTemplate.data('allGroups')},
+                    request: toRequest}]);
+                $(newGroupRow).insertAfter(toTemplate.find('header.pack'));
+                if(row.find('[class*="id"] img:not(.default)').length > 0) {
+                    $(this).find('.pack-row:not(.template) [class*="id"] img')
+                        .attr('src', row.find('[class*="id"] img').attr('src')).removeClass('default');
+                }
+            });
         });
     });
 
     // TODO: refresh all intermediate group panels also
+
     body.on('resulted', '[id^="groups-"] .results', function (evt) {
         var results = $(this);
         var tab = results.closest('.panel-pane');

@@ -113,7 +113,7 @@ window.views.__defaultEntities['ss_group'] = {
     invites: $([]),
     getId: function () {return this.id;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
-    getLogo: function () {return this.logo ? applyEntityObj(this.logo) : null;},
+    getLogo: function () {return this.logo ? (typeof this.logo == 'string' ? applyEntityObj({table:'file', url: this.logo}) : applyEntityObj(this.logo)) : null;},
     getName: function () {return this.name;},
     getParent: function () {return this.parent ? applyEntityObj(this.parent) : null;},
     getSubgroups: function () {
@@ -374,6 +374,11 @@ $(document).ready(function () {
         if (!$(this).is('.results-loaded')) {
             $(this).addClass('results-loaded');
             $(this).find('.results header .search .checkbox').draggable();
+            //$(this).find('.results').each(function () {
+            //    var results = $(this).data('results');
+                //var request = $(this).data('request');
+            //    loadContent.apply(this, [results]);
+            //});
         }
         resetHeader();
     });

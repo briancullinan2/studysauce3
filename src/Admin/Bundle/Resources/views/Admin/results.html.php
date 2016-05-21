@@ -18,14 +18,23 @@ $subVars = [
     'results' => $results
 ];
 
+$isFresh = false;
 if($resultOutput->length == 0) {
+    $isFresh = true;
     $resultOutput = $context->append('<div class="results"></div>')->find('.results');
 }
 $resultOutput->data('request', $request)->attr('data-request', json_encode($request))
     ->addClass(isset($request['classes']) && is_array($request['classes'])
         ? implode(' ', $request['classes'])
         : '');
-
+if(isset($resultsJSON)) {
+    $resultOutput->data('allGroups', $resultsJSON['allGroups'])->attr('data-results', json_encode($resultsJSON['allGroups']));
+}
+// TODO: refresh data before show view?
+//if($isFresh) {
+//    print ($context->html());
+//    return;
+//}
 
 // TODO: bring back search header for list format
 //if (!isset($request['headers'])) {

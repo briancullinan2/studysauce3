@@ -477,21 +477,21 @@ class AdminController extends Controller
         $vars['request'] = $searchRequest;
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
-        if (in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
-            // convert db entity to flat object
-            foreach (array_merge(array_keys($searchRequest['tables']), ['allGroups']) as $table) {
-                if (!isset($vars['results'][$table])) {
-                    continue;
-                }
-                $tableName = explode('-', $table)[0];
-                if ($table == 'allGroups') {
-                    $tableName = 'ss_group';
-                }
-                $vars['results'][$table] = array_map(function ($e) use ($tableName, $table, $searchRequest) {
-                    return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 2 : 3);
-                }, $vars['results'][$table]);
+        // convert db entity to flat object
+        foreach (array_merge(array_keys($searchRequest['tables']), ['allGroups']) as $table) {
+            if (!isset($vars['results'][$table])) {
+                continue;
             }
-            // TODO: return a newKey to pair up with some randomized value generated from the client, so we make sure we get all the right edit rows accounted for in-case it has changed while we were saving.
+            $tableName = explode('-', $table)[0];
+            if ($table == 'allGroups') {
+                $tableName = 'ss_group';
+            }
+            $vars['resultsJSON'][$table] = array_map(function ($e) use ($tableName, $table, $searchRequest) {
+                return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 2 : 3);
+            }, $vars['results'][$table]);
+        }
+        if (in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {
+            $vars['results'] = ['resultsJSON'];
             return new JsonResponse($vars);
         }
 
@@ -512,6 +512,8 @@ class AdminController extends Controller
         }
         else {
             $obj = ['table' => $tableName, '_tableValue' => $tableName . '-' . (method_exists($e, 'getId') ? $e->getId() : '')];
+            // return a newKey to pair up with some randomized value generated from the client,
+            // so we make sure we get all the right edit rows accounted for in-case it has changed while we were saving.
             if(isset($e->newId)) {
                 $obj['newId'] = $e->newId;
             }

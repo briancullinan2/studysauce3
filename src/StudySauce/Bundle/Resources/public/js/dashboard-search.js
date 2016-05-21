@@ -527,6 +527,12 @@ $(document).ready(function () {
         standardSave.apply(toField, [updates]);
     }
 
+    body.on('hidden.bs.modal', '#create-entity', function () {
+        setTimeout(function () {
+            body.off('click.create_new');
+        }, 100);
+    });
+
     body.on('click', '[data-target="#create-entity"], [data-target="#add-entity"]', function () {
         var field, dialog;
         if((dialog = $(this).parents('#create-entity')).length > 0) {
