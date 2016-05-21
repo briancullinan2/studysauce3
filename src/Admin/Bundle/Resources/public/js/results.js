@@ -385,7 +385,8 @@ $(document).ready(function () {
 
     function getDataRequest() {
         var admin = $(this).closest('.results');
-        var result = {requestKey: admin.data('request').requestKey};
+        var request = admin.data('request');
+        var result = typeof request.requestKey == 'undefined' ? request : {requestKey: request.requestKey};
         var dataTables = result['tables'];
         var tables = {};
         if (admin.find('.class-names').length > 0) {

@@ -75,7 +75,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
-                        $tab->find('.group-edit')->data('request', $request)->attr('data-request', json_encode($request));
+                        $tab->find('.group-edit .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
                 </form>
@@ -140,7 +140,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
-                        $tab->find('.group-list')->data('request', $request)->attr('data-request', json_encode($request));
+                        $tab->find('.group-list .results')->data('request', $request)->attr('data-request', json_encode($request));
                     } ?>
                 </div>
                 <?php if (!empty($entity)) { ?>
@@ -171,7 +171,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
-                        $tab->find('.list-packs')->data('request', $request)->attr('data-request', json_encode($request));
+                        $tab->find('.list-packs .results')->data('request', $request)->attr('data-request', json_encode($request));
                     } ?>
                 </div>
                 <div class="empty-members">

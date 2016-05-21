@@ -79,7 +79,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
-                        $tab->find('.pack-edit')->data('request', $request)->attr('data-request', json_encode($request));
+                        $tab->find('.pack-edit .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
                 </form>
@@ -89,7 +89,7 @@ $view['slots']->start('body'); ?>
                     $tables['file'] = AdminController::$defaultMiniTables['file'];
                     $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'];
                     $tables['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
-                    $tables['pack'] = ['0' => 'id', '1' => 'title', 'expandMembers' => ['users', 'userPacks'], '2' => ['status'] /* search field but don't display a template */];
+                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo'], 'expandMembers' => ['users', 'userPacks'], '2' => ['status'] /* search field but don't display a template */];
                     $tables['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
                     $request = [
                         // view settings
@@ -115,7 +115,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
-                        $tab->find('.group-list')->data('request', $request)->attr('data-request', json_encode($request));
+                        $tab->find('.group-list .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
                     <div class="empty-members">
@@ -151,7 +151,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
-                        $tab->find('.card-list')->data('request', $request)->attr('data-request', json_encode($request));
+                        $tab->find('.card-list .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
                 </form>
