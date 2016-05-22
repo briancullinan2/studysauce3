@@ -51,12 +51,54 @@ class PacksController extends Controller
 
     public function createAction(Request $request)
     {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+
         /** @var Pack $newPack */
         $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
 
         // process pack settings
         list($newPack) = AdminController::standardSave($request, $this->container);
 
+        $allGroups = $orm->getRepository('StudySauceBundle:Group')->findAll();
+
+        // TODO: this is almost a copy of AdminController:groupSave and should be generalized
+        // TODO: ? with a fitting child recursion level property on saving, or the UI should just be away of
+        // TODO: ? groups at all times and notifies the user how many groups will be removed ?
+        $packRequest = $request->get('pack');
+        if(empty($packRequest['id'])) {
+            $packRequest['id'] = $newPack->getId();
+        }
+
+        if(isset($packRequest['groups'])) {
+            if(!isset($packRequest['groups'][0])) {
+                $packRequest['groups'] = [$packRequest['groups']];
+            }
+            $subGroups = array_map(function ($g) {return $g['id'];}, $packRequest['groups']);
+            $added = true;
+            while($added) {
+                $added = false;
+                foreach($allGroups as $subGroup) {
+                    /** @var Group $subGroup */
+                    if(!empty($subGroup->getParent())
+                        && in_array($subGroup->getParent()->getId(), $subGroups)
+                        && !in_array($subGroup->getId(), $subGroups)) {
+                        $subGroups[count($subGroups)] = $subGroup->getId();
+
+                        $entity = AdminController::applyFields(AdminController::$allTables['pack']->name, 'pack', ['groups'], array_merge($packRequest, ['groups' => array_merge($packRequest['groups'][0], ['id' => $subGroup->getId()])]), $orm);
+
+                        if(empty($entity->getId())) {
+                            $orm->persist($entity);
+                        }
+                        else {
+                            $orm->merge($entity);
+                        }
+                        $orm->flush();
+                        $added = true;
+                    }
+                }
+            }
+        }
         // TODO: saving returns the same things you sent to it, so this could go away because the tab with re-render and then refresh
         // TODO: forward to index which only sets up queries needed for page.
         if (!empty($request->get('pack')) && is_array($request->get('pack'))) {

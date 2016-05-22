@@ -41,6 +41,8 @@ if($tab->length == 0) {
 
 if($tab->length > 0) {
     $tab->attr('id', implode('', ['packs-pack' , $entity->getId()]));
+    $tab->find('.pack-edit')
+        ->attr('action', $view['router']->generate('packs_create'));
     $tab->find('.card-list')
         ->attr('action', $view['router']->generate('packs_create', ['pack' => ['id' => $entity->getId()]]))
         ->removeAttr('name');

@@ -48,7 +48,8 @@ $(document).ready(function () {
         var group = gatherFields.apply(row, [getAllFieldNames({ss_group: request['tables']['ss_group']})]);
         body.one('click.create_new', '#create-entity a[href^="/packs/0"]', function () {
             body.one('show', '#packs-pack0', function () {
-                // TODO: render new group row and add to group list behind save, add group to path
+                // TODO: add a sub groups to UI
+                // render new group row and add to group list behind save
                 var toTemplate = $(this).find('.group-list .results');
                 var toRequest = toTemplate.data('request');
                 group['table'] = 'ss_group';
@@ -60,6 +61,7 @@ $(document).ready(function () {
                     results: {allGroups: toTemplate.data('allGroups')},
                     request: toRequest}]);
                 $(newGroupRow).insertAfter(toTemplate.find('header.pack'));
+                // add group to path
                 getTab.apply(this).closest('form').attr('action', Routing.generate('packs_create', {groups: {id: groupId}}));
                 if(row.find('[class*="id"] img:not(.default)').length > 0) {
                     var src = row.find('[class*="id"] img').attr('src');
