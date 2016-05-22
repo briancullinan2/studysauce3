@@ -303,6 +303,7 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         if (tab.is('#packs-pack0') && typeof evt['results']['results']['pack'][0] != 'undefined') {
             window.views.render.apply(tab, ['packs', {entity: evt['results']['results']['pack'][0]}]);
+            results.data('request', $.extend({requestKey: evt['results'].requestKey}, results.data('request')));
             loadResults.apply(tab.find('.results').not(results));
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));

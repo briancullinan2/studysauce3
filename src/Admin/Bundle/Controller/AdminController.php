@@ -690,10 +690,20 @@ class AdminController extends Controller
                     if($association['type'] == ClassMetadataInfo::ONE_TO_ONE || $association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
                         // create entities from array using same assignment functions as here
                         $value = $e[$f];
-                        if(!is_array($value)) {
-                            $value = ['id' => $value];
+                        if(!empty($e[$f])) {
+                            if(is_object($value) && (new ReflectionClass($value))->getNamespaceName() == 'StudySauce\\Bundle\\Entity') {
+                                // nothing needed to do because it already the entity we are looking for
+                            }
+                            else {
+                                if(!is_array($value)) {
+                                    $value = ['id' => $value];
+                                }
+                                $value = self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $value, $orm);
+                            }
                         }
-                        $value = empty($e[$f]) ? null : self::applyFields($association['targetEntity'], $joinTable, self::$defaultTables[$joinTable], $value, $orm);
+                        else {
+                            $value = null;
+                        }
                         // many to one, just lookup object and call set property normally
                         if(($type = self::parameterType('set' . ucfirst($f), $entity)) !== false) {
                             call_user_func_array([$entity, 'set' . ucfirst($f)], [$value]);
