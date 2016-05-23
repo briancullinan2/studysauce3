@@ -683,7 +683,7 @@ $(document).ready(function () {
                 fieldTab.find('.squiggle').stop().remove();
                 isLoading = false;
                 // copy rows and select
-                loadContent.apply(fieldTab.first(), [data]);
+                loadContent.apply(fieldTab.first(), [data, 'saved']);
             },
             error: function () {
                 isLoading = false;
@@ -748,7 +748,7 @@ $(document).ready(function () {
 
     window.getRowId = getRowId;
 
-    function loadContent(data) {
+    function loadContent(data, namespace) {
         var admin = $(this).closest('.results').first();
 
         // merge updates using template system, same as results.html.php and rows.html.php
@@ -775,7 +775,7 @@ $(document).ready(function () {
         }
 
         resetHeader();
-        var event = $.Event('resulted', {results: data});
+        var event = $.Event('resulted' + (typeof namespace == 'string' ? ('.' + namespace) : '.refresh'), {results: data});
         admin.trigger(event);
         centerize.apply(admin.find('.centerized'));
     }
@@ -797,7 +797,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: getDataRequest.apply(that),
                     success: function (data) {
-                        loadContent.apply(that, [data]);
+                        loadContent.apply(that, [data, 'refresh']);
                     }
                 });
             }, 100);

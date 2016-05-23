@@ -74,36 +74,29 @@ $(document).ready(function () {
     });
 
     // TODO: refresh all intermediate group panels also
-
-    body.on('resulted', '[id^="groups-"] .results', function (evt) {
+    body.on('resulted.saved', '[id^="groups-"] .results', function (evt) {
         var results = $(this);
         var tab = results.closest('.panel-pane');
         if (tab.is('#groups-group0')) {
             window.views.render.apply(tab, ['groups', {entity: evt['results']['results']['ss_group'][0]}]);
             results.data('request', $.extend({requestKey: evt['results'].requestKey}, results.data('request')));
-            loadResults.apply(tab.find('.results').not(results));
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('groups_edit', {group: id}));
         }
-
-        var loaded = body.find('#groups');
-        var parentId = tab.find('.ss_group-row .parent select').val();
-        if(tab.attr('id') != 'groups-group' + parentId) {
-            loaded = loaded.add(body.find('#' + 'groups-group' + parentId));
-        }
+        loadResults.apply(tab.find('.results').not(results));
+        var loaded = body.find('[id^="groups"]:not(#groups-group0)');
+        // refresh parent group incase of name change
+        //var parentId = tab.find('.ss_group-row .parent select').val();
+        //if(tab.attr('id') != 'groups-group' + parentId) {
+        //    loaded = loaded.add(body.find('#' + 'groups-group' + parentId));
+        //}
         loaded.off('show.resulted').on('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });
     });
 
-    body.on('resulted', '[id^="packs-"] .results', function () {
-        var groups = $(this).find('.pack-row .groups input[data-entities]').data('entities');
-        var loaded = body.find('#groups');
-        for(var g in groups) {
-            if(groups.hasOwnProperty(g) && groups[g].substr(0, 9) == 'ss_group-') {
-                loaded = loaded.add(body.find('#' + 'groups-group' + groups[g].substr(9)));
-            }
-        }
+    body.on('resulted.saved', '[id^="packs-"] .results', function () {
+        var loaded = body.find('[id^="groups"]:not(#groups-group0)');
         loaded.off('show.resulted').on('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });

@@ -297,18 +297,18 @@ $(document).ready(function () {
         }
     }
 
-    body.on('resulted', '[id^="packs-"] .results', function (evt) {
+    body.on('resulted.saved', '[id^="packs-"] .results', function (evt) {
         var results = $(this);
         var tab = results.closest('.panel-pane');
         autoSaveTimeout = null;
         if (tab.is('#packs-pack0') && typeof evt['results']['results']['pack'][0] != 'undefined') {
             window.views.render.apply(tab, ['packs', {entity: evt['results']['results']['pack'][0]}]);
             results.data('request', $.extend({requestKey: evt['results'].requestKey}, results.data('request')));
-            loadResults.apply(tab.find('.results').not(results));
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));
         }
-        var loaded = body.find('#groups');
+        loadResults.apply(tab.find('.results').not(results));
+        var loaded = body.find('[id^="groups"]:not(#groups-group0)');
         loaded.off('show.resulted').on('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });

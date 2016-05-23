@@ -457,8 +457,8 @@ $(document).ready(function () {
                     data: $.extend({requestKey: getDataRequest.apply(that).requestKey}, getQueryObject(that.data('action'))),
                     dataType: 'json',
                     success: function (data) {
-                        loadContent.apply(that.parents('.results'), [data]);
-                        that.parents('.results').trigger('resulted');
+                        debugger;
+                        loadContent.apply(that.parents('.results'), [data, 'saved']);
                     }
                 });
 
