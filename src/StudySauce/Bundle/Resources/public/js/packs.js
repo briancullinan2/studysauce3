@@ -309,7 +309,7 @@ $(document).ready(function () {
         }
         loadResults.apply(tab.find('.results').not(results));
         var loaded = body.find('[id^="groups"]:not(#groups-group0)');
-        loaded.off('show.resulted').on('show.resulted', function () {
+        loaded.off('show.resulted').one('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });
     });

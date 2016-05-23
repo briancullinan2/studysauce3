@@ -90,14 +90,14 @@ $(document).ready(function () {
         //if(tab.attr('id') != 'groups-group' + parentId) {
         //    loaded = loaded.add(body.find('#' + 'groups-group' + parentId));
         //}
-        loaded.off('show.resulted').on('show.resulted', function () {
+        loaded.off('show.resulted').one('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });
     });
 
     body.on('resulted.saved', '[id^="packs-"] .results', function () {
         var loaded = body.find('[id^="groups"]:not(#groups-group0)');
-        loaded.off('show.resulted').on('show.resulted', function () {
+        loaded.off('show.resulted').one('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });
     });
