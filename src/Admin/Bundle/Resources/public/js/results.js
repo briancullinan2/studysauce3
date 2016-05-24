@@ -441,7 +441,7 @@ $(document).ready(function () {
                             data[table] = subData[table];
                         }
                         rows.removeClass('changed');
-                        if (typeof data[table] != 'undefined' || typeof save[table] && fieldTab[0] == subTab[0]) {
+                        if (typeof data[table] != 'undefined' || (typeof save[table] != 'undefined' && fieldTab[0] == subTab[0])) {
                             hasSomethingToSave = true;
                         }
                     }
