@@ -24,7 +24,7 @@ $rowHtml = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($s
     'request' => $request,
     'results' => $results])));
 
-$row = $context->find(implode('', ['.', $table , '-id-', $card->getId()]));
+$row = $context->filter(implode('', ['.', $table , '-id-', $card->getId()]));
 
 if($row->length == 0) {
     $actual = $rowHtml->filter('[class*="-row"]');
@@ -33,10 +33,12 @@ else {
     $actual = $row->filter('[class*="-row"]');
 }
 if(!$actual->is(implode('', ['.card-row.type-' , $card->getResponseType()]))) {
-    $actual->attr('class', preg_replace('/\\s*type-.*?\\s/i', ' ', $actual->attr('class')));
+    $actual->attr('class', preg_replace('/\\s*type-[^ ]*/i', ' ', $actual->attr('class')));
     if (!empty($card->getResponseType())) {
         $actual->addClass(implode('', ['type-' , $card->getResponseType()]));
     }
 }
 
-print(jQuery('<div />')->append($rowHtml)->html());
+if($row->length == 0 || !$row->is('.edit')) {
+    print(jQuery('<div />')->append($rowHtml)->html());
+}

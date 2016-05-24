@@ -586,12 +586,12 @@ class AdminController extends Controller
 
         self::setUpClasses($orm);
 
-        if(!empty($request->get('tables'))) {
-            $tables = $request->get('tables');
-        }
-        else {
+        if(!empty($request->get('requestKey'))) {
             $searchRequest = unserialize($container->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
             $tables = $searchRequest['tables'];
+        }
+        if(!empty($request->get('tables'))) {
+            $tables = $request->get('tables');
         }
         if(empty($tables)) {
             throw new \Exception('Don\'t know what to save!');
@@ -722,8 +722,18 @@ class AdminController extends Controller
                         }
 
                         // if dealing with multiple entities, perform actions for each
+                        $removeAnswers = [];
                         foreach($entities as $subE) {
                             if(empty($subE)) {
+                                continue;
+                            }
+                            // TODO: put this in a shared model between client and server where setting a _clear answer resets the list?  Maybe there is a command before a row is saved to remove the old answers?
+
+                            if($subE == '_clear' && method_exists($entity, 'get' . ucfirst($f))) {
+                                $removeAnswers = call_user_func_array([$entity, 'get' . ucfirst($f)], []);
+                                if($removeAnswers instanceof Collection) {
+                                    $removeAnswers = $removeAnswers->toArray();
+                                }
                                 continue;
                             }
                             // automatically do inverse mapping
@@ -747,11 +757,22 @@ class AdminController extends Controller
                             }
                             if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
                                 call_user_func_array([$entity, $method], [$childEntity]);
+                                if($isAdding && ($unsetI = array_search($childEntity, $removeAnswers)) !== false) {
+                                    array_splice($removeAnswers, $unsetI, 1); // remove from remove array because we are keeping it, in the case of answers, the text is looked up by value so existing answers will match new list
+                                }
                                 if (!empty($childEntity->newId)) {
                                     $orm->persist($childEntity);
                                 } else if(!empty($value)) {
                                     $orm->merge($childEntity);
                                 }
+                            }
+                        }
+
+                        // if we are clearing, remove the entities that were not added in the complete list above
+                        if(($type = self::parameterType($method = 'remove' . ucfirst(rtrim($f, 's')), $entity)) !== false) {
+                            foreach($removeAnswers as $a) {
+                                call_user_func_array([$entity, $method], [$a]);
+                                $orm->remove($a);
                             }
                         }
                     }
@@ -1044,7 +1065,9 @@ var array_values = function (arr) { return (arr || []).slice(0); };
 var is_array = function (obj) { return typeof obj == 'array' || typeof obj == 'object'; }; // PHP and javascript don't make a distinction between arrays and objects syntax wise using [property], all php objects should be restful anyways
 var array_keys = function (obj) {var result=[]; for (var k in obj) { if (obj.hasOwnProperty(k)) { result[result.length] = k } } return result; };
 var implode = function (sep, arr) {return (arr || []).join(sep);};
-var preg_replace = function (needle, replacement, subject) { return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g'), replacement);};
+var preg_replace = function (needle, replacement, subject) {
+    return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g'), replacement);
+};
 var preg_match = function (needle, subject) { return ((subject || '').match(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])) || []).length;};
 var ucfirst = function (str) {return (str || '').substr(0, 1).toLocaleUpperCase() + str.substr(1);};
 var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};

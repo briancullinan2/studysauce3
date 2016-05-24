@@ -79,7 +79,7 @@ $(document).ready(function () {
         var tab = results.closest('.panel-pane');
         if (tab.is('#groups-group0')) {
             window.views.render.apply(tab, ['groups', {entity: evt['results']['results']['ss_group'][0]}]);
-            results.data('request', $.extend({requestKey: evt['results'].requestKey}, results.data('request')));
+            results.data('request', $.extend(results.data('request'), {requestKey: evt['results'].requestKey})); // replace key because template clears it
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('groups_edit', {group: id}));
         }

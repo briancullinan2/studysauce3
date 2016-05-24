@@ -456,9 +456,9 @@ $(document).ready(function () {
                     type: 'POST',
                     data: $.extend({requestKey: getDataRequest.apply(that).requestKey}, getQueryObject(that.data('action'))),
                     dataType: 'json',
-                    success: function (data) {
-                        debugger;
-                        loadContent.apply(that.parents('.results'), [data, 'saved']);
+                    success: function () {
+                        var event = $.Event('resulted.saved');
+                        that.parents('.results').trigger(event);
                     }
                 });
 

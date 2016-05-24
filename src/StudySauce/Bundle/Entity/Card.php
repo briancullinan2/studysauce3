@@ -402,7 +402,12 @@ class Card
      */
     public function removeAnswer(\StudySauce\Bundle\Entity\Answer $answers)
     {
-        $this->answers->removeElement($answers);
+        if($answers->getResponses()->count() > 0) {
+            $answers->setDeleted(true);
+        }
+        else {
+            $this->answers->removeElement($answers);
+        }
     }
 
     /**

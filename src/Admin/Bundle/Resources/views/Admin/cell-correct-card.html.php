@@ -53,7 +53,9 @@ $view['slots']->stop();
 $context = !empty($context) ? $context : jQuery($this);
 if($context->find('.answers')->length == 0) {
     $context->append($row = jQuery($view['slots']->get('all-answers')));
-    $row->find('textarea[name="answers"]')->data('delimiter', '\\s*\\n\\s*|\\s*\\\\n\\s*')->attr('data-delimiter', '\\s*\\n\\s*|\\s*\\\\n\\s*');
+    $row->find('textarea[name="answers"]')
+        ->data('delimiter', '\\s*\\n\\s*|\\s*\\\\n\\s*')->attr('data-delimiter', '\\s*\\n\\s*|\\s*\\\\n\\s*')
+        ->data('prefix', '_clear\\n')->attr('data-prefix', '_clear\\n');
 }
 
 print ($context->html());

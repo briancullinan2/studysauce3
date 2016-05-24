@@ -178,13 +178,22 @@ window.views.__defaultEntities['card'] = {
     getId: function () {return this.id},
     getCorrect: function () {
         var card = this;
-        return this.getAnswers().filter(function (i, a) {
-            return (a.getCorrect() || a.getValue() == card.correct || card.getResponseType() == 'tf' && ((a.getValue().match(/true|false/i) || [])[0] || '').toLowerCase() == card.correct) && !a.getDeleted();})[0];
+        var correct = this.getAnswers().filter(function (i, a) {
+            return (a.getCorrect() || a.getValue() == card.correct || card.getResponseType() == 'tf'
+                && ((a.getValue().match(/true|false/i) || [])[0] || '').toLowerCase() == card.correct)
+                && !a.getDeleted();})[0];
+        if(typeof correct == 'undefined' && typeof this.correct == 'string') {
+            return applyEntityObj({table: 'answer', value: this.correct});
+        }
+        return correct;
     },
     getAnswers: function () {
         // look up answers
         if(typeof this.answers == 'string') {
-            this.answers = this.answers.split(/\s*\r?\n\s*/ig).map(function (a) {return {table: 'answer', value: a, content: a};});
+            this.answers = this.answers
+            // TODO: find a better way to handle this from the element
+                .replace(/\s*_clear\s*/ig, '')
+                .split(/\s*\r?\n\s*/ig).map(function (a) {return {table: 'answer', value: a, content: a};});
         }
         return $(this.answers.map(function (up) {return typeof up == 'string' ? applyEntityObj({table: 'answer', value: up, content: up}) : applyEntityObj(up);}));
     },
@@ -197,7 +206,7 @@ window.views.__defaultEntities['answer'] = {
     getCorrect: function () {return this.correct},
     getDeleted: function () {return this.deleted},
     getValue: function () {return this.value},
-    getContent: function () {return this.content}
+    getContent: function () {return typeof this.content == 'undefined' ? this.value : this.content;}
 };
 window.views.__defaultEntities['file'] = {
     getUrl: function () { return this.url },
@@ -267,14 +276,321 @@ $(document).ready(function () {
         orderBy = 'last DESC',
         searchTimeout = null,
         searchRequest = null;
-
     var lastSelected = null;
     var selectViable = false;
+
+    function resetHeader() {
+        var command = $('.results.collapsible:visible').first();
+        if (command.length == 0) {
+            return;
+        }
+        command.each(function () {
+            var command = $(this);
+            var selected = $('[class*="-row"]:visible.selected').filter(function () {
+                return isElementInViewport($(this));
+            });
+
+            if (selected.length == 0) {
+                if ($(this).is('[class*="-row"]:visible') && isElementInViewport($(this))) {
+                    selected = $(this);
+                }
+                else {
+                    selected = command.find('[class*="-row"]:visible').filter(function () {
+                        return isElementInViewport($(this));
+                    });
+                }
+            }
+
+            if (selected.length == 0) {
+                command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
+                command.addClass('empty');
+            }
+            else {
+                command.removeClass('empty');
+                var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
+                table = 'showing-' + table;
+                if (!command.is('.' + table)) {
+                    command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
+                    command.addClass(table);
+                }
+            }
+        });
+    }
+
+    function getDataRequest() {
+        var admin = $(this).closest('.results');
+        var request = admin.data('request');
+        var result = typeof request.requestKey == 'undefined' ? request : {requestKey: request.requestKey};
+        var dataTables = result['tables'];
+        var tables = {};
+        if (admin.find('.class-names').length > 0) {
+            admin.find('.class-names input:checked').each(function () {
+                if (dataTables.hasOwnProperty($(this).val())) {
+                    tables[$(this).val()] = dataTables[$(this).val()];
+                }
+            });
+        }
+        else {
+            tables = dataTables;
+        }
+        result['order'] = orderBy;
+        result['tables'] = tables;
+        result['search'] = (admin.find('input[name="search"]').val() || '').trim();
+
+
+        admin.find('input[name="page"]').each(function () {
+            var table = $(this).parents('.paginate > .paginate').parent().attr('class').replace('paginate', '').trim();
+            result['page-' + table] = $(this).val();
+        });
+
+        admin.find('header .input input, header .input select').each(function () {
+            result[$(this).attr('name')] = $(this).val();
+        });
+
+        return result;
+    }
+    window.getDataRequest = getDataRequest;
+
+    function addResultRow(table) {
+        var results = $(this).closest('.results');
+        // TODO: fix this creating a blank through the template system
+        var request = results.data('request');
+        var newRow = $(window.views.render('row', {entity: applyEntityObj({table: table}), tables: request.tables, table: table, request: request, tableId: table}));
+        var last;
+        if((last = results.find('.' + table + '-row, header.' + table).last()).length > 0) {
+            newRow.removeClass('read-only').addClass('edit').insertAfter(last);
+        }
+        else if((last = results.find('.highlighted-link.' + table)).length > 0) {
+            newRow.removeClass('read-only').addClass('edit').insertBefore(last);
+        }
+        else {
+            newRow.removeClass('read-only').addClass('edit').appendTo(results);
+        }
+    }
+    window.addResultRow = addResultRow;
+
+    function getTab(readonly) {
+        return $(this).closest('.panel-pane').find('.results');
+    }
+    window.getTab = getTab;
+
+    // TODO: port to server in a shared code file, saves to database at the end
+    function standardSave(save) {
+        var field = $(this);
+        var tab = getTab.apply(field);
+        var tabId = getTabId.apply(tab);
+        var fieldTab = field.closest('.results').first();
+
+        var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]');
+
+        if (saveButton.is('.read-only > *, [disabled]') || isLoading) {
+            // select incorrect row handled by #goto-error
+            return;
+        }
+
+        // get the parsed list of data
+        for (var r = 0; r < tab.length; r++) {
+            var shouldContinue = (function (subTab) {
+                var hasSomethingToSave = false;
+                var data = {};
+                var subAction = subTab.closest('[action], [data-action]');
+                var tables = subTab.data('request').tables;
+                var name = subAction.attr('name');
+                var saveUrl = subAction.data('action') || subAction.attr('action');
+                var subData = {};
+                for (var table in tables) {
+                    if (tables.hasOwnProperty(table)) {
+                        // get list of possible fields in form
+                        var tmpTables = {};
+                        tmpTables[table] = tables[table];
+                        var fields = getAllFieldNames(tmpTables);
+                        var rows = subTab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
+                        for (var i = 0; i < rows.length; i++) {
+                            var row = $(rows[i]);
+                            var rowId = getRowId.apply(row);
+                            var newVal = {};
+                            if (row.is('.removed') || row.is('.empty')) {
+                                if (rowId == '' || rowId == null) {
+                                    continue;
+                                }
+                                newVal = {id: rowId, remove: true};
+                            }
+                            else {
+                                newVal = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
+                                if (row.is('[class*="new-id-"]')) {
+                                    newVal['newId'] = (/new-id-([a-z0-9]*)(\s|$)/ig).exec(row.attr('class'))[1];
+                                }
+                            }
+                            newVal = $.extend(true, newVal, getQueryObject(saveUrl));
+                            if (typeof subData[table] == 'undefined') {
+                                subData[table] = [];
+                            }
+                            if (subData[table].constructor !== Array) {
+                                subData[table] = [subData[table]];
+                            }
+                            subData[table][subData[table].length] = newVal;
+                            if (rows.length == 1 && subData[table].length == 1) {
+                                subData[table] = subData[table][0];
+                            }
+                        }
+                        if (typeof subData[table] != 'undefined' || typeof save[table] != 'undefined') {
+                            hasSomethingToSave = true;
+                        }
+                        if (typeof name != 'undefined' && typeof subData[table] != 'undefined') {
+                            assignSubKey(data, name, subData[table]);
+                        }
+                        else if (typeof subData[table] != 'undefined') {
+                            data[table] = subData[table];
+                        }
+                        rows.removeClass('changed');
+                    }
+
+                }
+
+                if (!hasSomethingToSave) {
+                    return;
+                }
+
+                data = $.extend(true, data, save || {});
+                data = $.extend(true, data, getQueryObject(saveUrl));
+                var request = getDataRequest.apply(subTab);
+                data = $.extend(data, {requestKey: request.requestKey});
+                saveUrl = saveUrl.replace(/\?.*/ig, '');
+
+                // loading animation from CTA or activating field
+                isLoading = true;
+                loadingAnimation(saveButton);
+
+                $.ajax({
+                    url: saveUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: data,
+                    success: function (data) {
+                        fieldTab.find('.squiggle').stop().remove();
+                        isLoading = false;
+                        // copy rows and select
+                        loadContent.apply(subTab, [data, 'saved']);
+                    },
+                    error: function () {
+                        isLoading = false;
+                        fieldTab.find('.squiggle').stop().remove();
+                    }
+                });
+
+                return tabId != 0;
+
+            })($(tab[r]));
+            if(shouldContinue === false) {
+                break;
+            }
+        }
+
+    }
+    window.standardSave = standardSave;
+
+    function getAllFieldNames(tables) {
+        var fields = [];
+        for (var table in tables) {
+            if (tables.hasOwnProperty(table)) {
+                // get list of possible fields in form
+                for (var f in tables[table]) {
+                    if (tables[table].hasOwnProperty(f)) {
+                        if (typeof f == 'string' && isNaN(parseInt(f))) {
+                            fields = $.merge(fields, [f]);
+                        }
+
+                        if (typeof tables[table][f] == 'string') {
+                            fields = $.merge(fields, [tables[table][f]]);
+                        }
+                        else if (Array.isArray(tables[table][f])) {
+                            fields = $.merge(fields, tables[table][f]);
+                        }
+                        else {
+                            throw 'Not supported!';
+                        }
+                    }
+                }
+            }
+        }
+        return fields;
+    }
+    window.getAllFieldNames = getAllFieldNames;
+
+    function getTabId() {
+        return getRowId.apply($(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first());
+    }
+    window.getTabId = getTabId;
+
+    function getRowId() {
+        var row = $(this).closest('[class*="-row"]').first();
+        var table = ((/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class')) || [])[2];
+        return ((new RegExp(table + '-id-([0-9]*)(\\s|$)', 'ig')).exec(row.attr('class')) || [])[1];
+    }
+    window.getRowId = getRowId;
+
+    function loadContent(data, namespace) {
+        var admin = $(this).closest('.results').first();
+
+        // merge updates using template system, same as results.html.php and rows.html.php
+        if (typeof data == 'object') {
+            for(var t in data.results) {
+                if(!data.results.hasOwnProperty(t)) {
+                    continue;
+                }
+                var tableName = t.split('-')[0];
+                if(t == 'allGroups') {
+                    tableName = 'ss_group';
+                }
+                if(window.views.__defaultEntities.hasOwnProperty(tableName)) {
+                    for(var o = 0; o < data.results[t].length; o++) {
+                        data.results[t][o] = applyEntityObj(data.results[t][o]);
+                    }
+                }
+            }
+
+            window.views.render.apply(admin, ['results', data]);
+        }
+        else {
+            throw 'Not allowed';
+        }
+
+        resetHeader();
+        var event = $.Event('resulted' + (typeof namespace == 'string' ? ('.' + namespace) : '.refresh'), {results: data});
+        admin.trigger(event);
+        centerize.apply(admin.find('.centerized'));
+    }
+    // make available to save functions that always lead back to index
+    window.loadContent = loadContent;
+
+    function loadResults() {
+        if (searchRequest != null)
+            searchRequest.abort();
+        if (searchTimeout != null)
+            clearTimeout(searchTimeout);
+        $(this).filter('.results:visible').each(function () {
+            var that = $(this);
+            searchTimeout = setTimeout(function () {
+                searchRequest = $.ajax({
+                    url: Routing.generate('command_callback'),
+                    type: 'GET',
+                    dataType: 'json',
+                    data: getDataRequest.apply(that),
+                    success: function (data) {
+                        loadContent.apply(that, [data, 'refresh']);
+                    }
+                });
+            }, 100);
+        });
+    }
+    window.loadResults = loadResults;
+
     document.onselectstart = function () {
         if (key.shift && selectViable) {
             return false;
         }
     };
+
     body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function (evt) {
         // cancel select toggle if target of click is also interactable
         if (($(this).is('.selected') || $(evt.target).is('a'))
@@ -323,7 +639,7 @@ $(document).ready(function () {
         }
     });
 
-    body.on('click', '.tiles [class*="-row"]:has(a.edit-icon)', function (evt) {
+    body.on('click', '.tiles [class*="-row"]', function (evt) {
         if (!$(evt.target).is('a:not(.edit-icon), [class*="-row"] > .packList, [class*="-row"] > .packList *')) {
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');
@@ -332,91 +648,18 @@ $(document).ready(function () {
         }
     });
 
-    function resetHeader() {
-        var command = $('.results.collapsible:visible').first();
-        if (command.length == 0) {
-            return;
-        }
-        command.each(function () {
-            var command = $(this);
-            var selected = $('[class*="-row"]:visible.selected').filter(function () {
-                return isElementInViewport($(this));
-            });
-
-            if (selected.length == 0) {
-                if ($(this).is('[class*="-row"]:visible') && isElementInViewport($(this))) {
-                    selected = $(this);
-                }
-                else {
-                    selected = command.find('[class*="-row"]:visible').filter(function () {
-                        return isElementInViewport($(this));
-                    });
-                }
-            }
-
-            if (selected.length == 0) {
-                command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
-                command.addClass('empty');
-            }
-            else {
-                command.removeClass('empty');
-                var table = (/(.*)-row/i).exec(selected.attr('class'))[1];
-                table = 'showing-' + table;
-                if (!command.is('.' + table)) {
-                    command.attr('class', command.attr('class').replace(/showing-(.*?)(\s+|$)/i, ''));
-                    command.addClass(table);
-                }
-            }
-        });
-    }
-
     body.on('show', '.panel-pane', function () {
         if (!$(this).is('.results-loaded')) {
             $(this).addClass('results-loaded');
             $(this).find('.results header .search .checkbox').draggable();
             //$(this).find('.results').each(function () {
             //    var results = $(this).data('results');
-                //var request = $(this).data('request');
+            //var request = $(this).data('request');
             //    loadContent.apply(this, [results]);
             //});
         }
         resetHeader();
     });
-
-    function getDataRequest() {
-        var admin = $(this).closest('.results');
-        var request = admin.data('request');
-        var result = typeof request.requestKey == 'undefined' ? request : {requestKey: request.requestKey};
-        var dataTables = result['tables'];
-        var tables = {};
-        if (admin.find('.class-names').length > 0) {
-            admin.find('.class-names input:checked').each(function () {
-                if (dataTables.hasOwnProperty($(this).val())) {
-                    tables[$(this).val()] = dataTables[$(this).val()];
-                }
-            });
-        }
-        else {
-            tables = dataTables;
-        }
-        result['order'] = orderBy;
-        result['tables'] = tables;
-        result['search'] = (admin.find('input[name="search"]').val() || '').trim();
-
-
-        admin.find('input[name="page"]').each(function () {
-            var table = $(this).parents('.paginate > .paginate').parent().attr('class').replace('paginate', '').trim();
-            result['page-' + table] = $(this).val();
-        });
-
-        admin.find('header .input input, header .input select').each(function () {
-            result[$(this).attr('name')] = $(this).val();
-        });
-
-        return result;
-    }
-
-    window.getDataRequest = getDataRequest;
 
     body.on('click', '.results .class-names .checkbox a', function (evt) {
         evt.preventDefault();
@@ -455,15 +698,6 @@ $(document).ready(function () {
             resetHeader();
         }
     });
-
-    function addResultRow(table) {
-        var results = $(this).closest('.results');
-        // TODO: fix this creating a blank through the template system
-        var request = results.data('request');
-        var newRow = $(window.views.render('row', {entity: applyEntityObj({table: table}), tables: request.tables, table: table, request: request, tableId: table}));
-        newRow.removeClass('read-only').addClass('edit').insertBefore(results.find('.' + table + '-row').first());
-    }
-    window.addResultRow = addResultRow;
 
     body.on('click', '.results a[href^="#add-"]', function (evt) {
         evt.preventDefault();
@@ -546,8 +780,6 @@ $(document).ready(function () {
             that.parents('[class*="-row"]').addClass('changed');
         }
 
-        var tab = getTab.apply(this);
-
         if (validationTimeout != null) {
             clearTimeout(validationTimeout);
         }
@@ -555,17 +787,6 @@ $(document).ready(function () {
             that.trigger('validate');
         }, 100);
     });
-
-    function getTab(readonly) {
-        if (readonly) {
-            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit), .results:has([class*="-row"].read-only)');
-        }
-        else {
-            return $(this).closest('.panel-pane').find('.results:has([class*="-row"].edit), .results:has([class*="-row"].read-only)');
-        }
-    }
-
-    window.getTab = getTab;
 
     body.on('click', '.results a[href^="#switch-view-"]', function (evt) {
         evt.preventDefault();
@@ -577,150 +798,6 @@ $(document).ready(function () {
     });
 
     var isLoading = false;
-
-    // TODO: port to server in a shared code file, saves to database at the end
-    function standardSave(save) {
-        var field = $(this);
-        var tab = getTab.apply(field);
-        var fieldTab = field.closest('.results').first();
-        tab = tab.add(fieldTab);
-        var actionItem = field.closest('[action], [data-action]');
-        if (actionItem.length == 0) {
-            actionItem = fieldTab.find('[action], [data-action]')
-        }
-        var saveUrl = actionItem.data('action') || actionItem.attr('action');
-
-        var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]');
-
-        if (typeof saveUrl == 'undefined') {
-            throw 'Save action not found!';
-        }
-
-        if (saveButton.is('.read-only > *, [disabled]') || isLoading) {
-            // select incorrect row handled by #goto-error
-            return;
-        }
-
-        // get the parsed list of data
-        var hasSomethingToSave = false;
-        var data = {};
-        for (var r = 0; r < tab.length; r++) {
-            var subTab = $(tab[r]);
-            var subAction = subTab.closest('[action], [data-action]');
-            var tables = subTab.data('request').tables;
-            var name = subAction.attr('name');
-            var subUrl = subAction.data('action') || subAction.attr('action');
-            var subData = {};
-            for (var table in tables) {
-                if (tables.hasOwnProperty(table)) {
-                    // get list of possible fields in form
-                    var tmpTables = {};
-                    tmpTables[table] = tables[table];
-                    var fields = getAllFieldNames(tmpTables);
-                    var rows = subTab.find('.' + table + '-row.valid.changed:not(.template), .' + table + '-row.removed:not(.template)');
-                    for (var i = 0; i < rows.length; i++) {
-                        var row = $(rows[i]);
-                        var rowId = getRowId.apply(row);
-                        var newVal = {};
-                        if (row.is('.removed') || row.is('.empty')) {
-                            if(rowId == '' || rowId == null) {
-                                continue;
-                            }
-                            newVal = {id: rowId, remove: true};
-                        }
-                        else {
-                            newVal = $.extend({id: rowId}, gatherFields.apply(row, [fields]));
-                            if(row.is('[class*="new-id-"]')) {
-                                newVal['newId'] = (/new-id-([a-z0-9]*)(\s|$)/ig).exec(row.attr('class'))[1];
-                            }
-                        }
-                        newVal = $.extend(true, newVal, getQueryObject(subUrl));
-                        if (typeof subData[table] == 'undefined') {
-                            subData[table] = [];
-                        }
-                        if (subData[table].constructor !== Array) {
-                            subData[table] = [subData[table]];
-                        }
-                        subData[table][subData[table].length] = newVal;
-                        if (rows.length == 1 && subData[table].length == 1) {
-                            subData[table] = subData[table][0];
-                        }
-                    }
-                    if(typeof subData[table] != 'undefined' || typeof save[table] != 'undefined') {
-                        hasSomethingToSave = true;
-                    }
-                    if(typeof name != 'undefined' && typeof subData[table] != 'undefined') {
-                        assignSubKey(data, name, subData[table]);
-                    }
-                    else if (typeof subData[table] != 'undefined') {
-                        data[table] = subData[table];
-                    }
-                    rows.removeClass('changed');
-                }
-
-            }
-        }
-
-        if(!hasSomethingToSave) {
-            return;
-        }
-
-        data = $.extend(true, data, save || {});
-        data = $.extend(true, data, getQueryObject(saveUrl));
-        data = $.extend(data, {requestKey: getDataRequest.apply(fieldTab).requestKey});
-        saveUrl = saveUrl.replace(/\?.*/ig, '');
-
-        // loading animation from CTA or activating field
-        isLoading = true;
-        loadingAnimation(saveButton);
-
-        $.ajax({
-            url: saveUrl,
-            type: 'POST',
-            dataType: 'json',
-            data: data,
-            success: function (data) {
-                fieldTab.find('.squiggle').stop().remove();
-                isLoading = false;
-                // copy rows and select
-                loadContent.apply(fieldTab.first(), [data, 'saved']);
-            },
-            error: function () {
-                isLoading = false;
-                fieldTab.find('.squiggle').stop().remove();
-            }
-        });
-    }
-
-    function getAllFieldNames(tables) {
-        var fields = [];
-        for (var table in tables) {
-            if (tables.hasOwnProperty(table)) {
-                // get list of possible fields in form
-                for (var f in tables[table]) {
-                    if (tables[table].hasOwnProperty(f)) {
-                        if (typeof f == 'string' && isNaN(parseInt(f))) {
-                            fields = $.merge(fields, [f]);
-                        }
-
-                        if (typeof tables[table][f] == 'string') {
-                            fields = $.merge(fields, [tables[table][f]]);
-                        }
-                        else if (Array.isArray(tables[table][f])) {
-                            fields = $.merge(fields, tables[table][f]);
-                        }
-                        else {
-                            throw 'Not supported!';
-                        }
-                    }
-                }
-            }
-        }
-        return fields;
-    }
-    window.getAllFieldNames = getAllFieldNames;
-
-    window.standardSave = standardSave;
 
     $(window).on('beforeunload', function (evt) {
         if ($('.panel-pane:visible').find('.results [class*="-row"].edit.changed:not(.template):not(.removed)').length > 0) {
@@ -734,79 +811,7 @@ $(document).ready(function () {
         row.removeClass('edit remove-confirm').addClass('read-only');
     });
 
-    function getTabId() {
-        return getRowId.apply($(this).closest('.panel-pane').find('[class*="-row"]:not(.template)').first());
-    }
-
-    window.getTabId = getTabId;
-
-    function getRowId() {
-        var row = $(this).closest('[class*="-row"]').first();
-        var table = ((/(^|\s)([a-z0-9_-]*)-row(\s|$)/ig).exec(row.attr('class')) || [])[2];
-        return ((new RegExp(table + '-id-([0-9]*)(\\s|$)', 'ig')).exec(row.attr('class')) || [])[1];
-    }
-
-    window.getRowId = getRowId;
-
-    function loadContent(data, namespace) {
-        var admin = $(this).closest('.results').first();
-
-        // merge updates using template system, same as results.html.php and rows.html.php
-        if (typeof data == 'object') {
-            for(var t in data.results) {
-                if(!data.results.hasOwnProperty(t)) {
-                    continue;
-                }
-                var tableName = t.split('-')[0];
-                if(t == 'allGroups') {
-                    tableName = 'ss_group';
-                }
-                if(window.views.__defaultEntities.hasOwnProperty(tableName)) {
-                    for(var o = 0; o < data.results[t].length; o++) {
-                        data.results[t][o] = applyEntityObj(data.results[t][o]);
-                    }
-                }
-            }
-
-            window.views.render.apply(admin, ['results', data]);
-        }
-        else {
-            throw 'Not allowed';
-        }
-
-        resetHeader();
-        var event = $.Event('resulted' + (typeof namespace == 'string' ? ('.' + namespace) : '.refresh'), {results: data});
-        admin.trigger(event);
-        centerize.apply(admin.find('.centerized'));
-    }
-
-    // make available to save functions that always lead back to index
-    window.loadContent = loadContent;
-
-    function loadResults() {
-        if (searchRequest != null)
-            searchRequest.abort();
-        if (searchTimeout != null)
-            clearTimeout(searchTimeout);
-        $(this).filter('.results:visible').each(function () {
-            var that = $(this);
-            searchTimeout = setTimeout(function () {
-                searchRequest = $.ajax({
-                    url: Routing.generate('command_callback'),
-                    type: 'GET',
-                    dataType: 'json',
-                    data: getDataRequest.apply(that),
-                    success: function (data) {
-                        loadContent.apply(that, [data, 'refresh']);
-                    }
-                });
-            }, 100);
-        });
-    }
-
-    window.loadResults = loadResults;
-
-    body.on('mouseover click', '.results [class*="-row"]', resetHeader);
+    //body.on('mouseover click', '.results [class*="-row"]', resetHeader);
 
     body.on('change', '.paginate input', function () {
         var results = $(this).parents('.results');
@@ -912,5 +917,6 @@ $(document).ready(function () {
             $(this).parents('.pulsate').removeClass('pulsate');
         });
     });
+
 
 });

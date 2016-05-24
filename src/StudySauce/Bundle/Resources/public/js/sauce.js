@@ -458,9 +458,12 @@ function gatherFields(fields, visibleOnly) {
         // must be a row, also include ID and tablename?
         for(var f in fields) {
             if (fields.hasOwnProperty(f)) {
-                var inputField = context.find(fieldMatch(fields[f]));
                 var key = fields[f];
-                if(inputField.is('[name^="' + fields[f] + '["]')) {
+                var inputField = context.find(fieldMatch(key));
+                if(visibleOnly !== false) {
+                    inputField = inputField.filter('label:visible *,:visible');
+                }
+                if(inputField.is('[name^="' + key + '["]')) {
                     key = inputField.attr('name');
                 }
                 var value = null;
@@ -472,6 +475,11 @@ function gatherFields(fields, visibleOnly) {
                 }
                 else if (inputField.length > 0) {
                     value = inputField.val();
+                }
+                if(inputField.is('[data-prefix]')) {
+                    // so we can prefix the command to the ORM to clear the list,
+                    // unlike any other lists the entire list is provided by the answers field
+                    value = inputField.data('prefix') + value;
                 }
                 if(inputField.is('[data-delimiter]')) {
                     value = value.split(new RegExp(inputField.data('delimiter'), 'ig'));
@@ -684,7 +692,7 @@ if(typeof window.jqAjax == 'undefined') {
                     }
                 }
             }
-            else if (typeof success != 'undefined')
+            if (typeof success != 'undefined')
                 success(data, textStatus, jqXHR);
         };
         settings.error = function ( jqXHR, textStatus, errorThrown) {

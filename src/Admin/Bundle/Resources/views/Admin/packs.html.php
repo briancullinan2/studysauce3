@@ -81,6 +81,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
+                        $request = array_merge($tab->find('.pack-edit .results')->data('request'), $request, ['requestKey' => null]);
                         $tab->find('.pack-edit .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
@@ -117,6 +118,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
+                        $request = array_merge($tab->find('.group-list .results')->data('request'), $request, ['requestKey' => null]);
                         $tab->find('.group-list .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
@@ -153,6 +155,7 @@ $view['slots']->start('body'); ?>
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
                     else {
+                        $request = array_merge($tab->find('.card-list .results')->data('request'), $request, ['requestKey' => null]);
                         $tab->find('.card-list .results')->data('request', $request)->attr('data-request', json_encode($request));
                     }
                     ?>
@@ -161,7 +164,16 @@ $view['slots']->start('body'); ?>
             }
             else {
                 $request['count-pack'] = 0;
-                $request['tables'] = ['pack' => ['idTiles' => ['created', 'id', 'title', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
+                $request['count-card'] = -1;
+                $request['count-ss_group'] = -1;
+                $request['count-ss_user'] = -1;
+                $request['count-user_pack'] = -1;
+                $request['tables'] = [
+                    'ss_group' => ['id', 'name', 'users', 'deleted', 'subgroups'],
+                    'ss_user' => ['id'],
+                    'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
+                    'card' => ['id', 'deleted'],
+                    'pack' => ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
                 $request['classes'] = ['tiles'];
                 $request['headers'] = ['pack' => 'newPack'];
                 $request['footers'] = ['pack' => 'newPack'];
@@ -169,6 +181,7 @@ $view['slots']->start('body'); ?>
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                 }
                 else {
+                    $request = array_merge($tab->find('.results')->data('request'), $request, ['requestKey' => null]);
                     $tab->find('.results')->data('request', $request)->attr('data-request', json_encode($request));
                 }
             } ?>

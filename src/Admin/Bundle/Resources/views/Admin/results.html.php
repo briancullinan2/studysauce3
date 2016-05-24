@@ -11,7 +11,7 @@ $resultOutput = $context->filter('.results');
 
 $selected = $resultOutput->find('[class*="-row"].selected');
 
-$resultOutput->children('.view, .template, .template + .expandable:not([class*="-row"]), header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
+$resultOutput->children('.view, header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
 
 $subVars = [
     'request' => $request,
@@ -27,6 +27,8 @@ $resultOutput->data('request', $request)->attr('data-request', json_encode($requ
     ->addClass(isset($request['classes']) && is_array($request['classes'])
         ? implode(' ', $request['classes'])
         : '');
+
+// update group listing with every results request
 if(isset($resultsJSON)) {
     $resultOutput->data('allGroups', $resultsJSON['allGroups'])->attr('data-results', json_encode($resultsJSON['allGroups']));
 }
@@ -103,7 +105,7 @@ foreach ($tables as $table => $t) {
     }
 
     if($resultOutput->find(implode('', ['.results-', $table , $ext]))->length > 0) {
-        $last = $resultOutput->find(implode('', ['.results-', $table , $ext]))->last();
+        $last = $resultOutput->find(implode('', ['.results-', $table , $ext, ',.results-', $table , $ext , ' + .expandable:not([class*="-row"])']))->last();
     }
 
     // print out all result entities
@@ -114,7 +116,7 @@ foreach ($tables as $table => $t) {
             $rowVars = array_merge($subVars, [
                 'classes' => $classes,
                 'table' => $table,
-                'context' => $context,
+                'context' => $context->find(implode('', ['.results-', $table , $ext])),
                 'tableId' => implode('', [$table , $ext])]);
             $rowVars[$table] = $entity;
             $row = jQuery($view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),                 $rowVars));
@@ -123,7 +125,7 @@ foreach ($tables as $table => $t) {
                 'classes' => $classes,
                 'entity' => $entity,
                 'table' => $table,
-                'context' => $context,
+                'context' => $context->find(implode('', ['.results-', $table , $ext])),
                 'tableId' => implode('', [$table , $ext])])));
         }
         // TODO: update new row IDs, no insert if(isset($entity->newId))

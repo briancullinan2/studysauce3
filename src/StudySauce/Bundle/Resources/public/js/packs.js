@@ -91,7 +91,7 @@ $(document).ready(function () {
 
         resizeTextAreas.apply(newRows);
         newRows.addClass('changed');
-        results.trigger('validate');
+        newRows.trigger('validate');
         if(results.find('.card-row:visible').length == 0) {
             for(var n = 0; n < 5; n++) {
                 addResultRow.apply(results, ['card']);
@@ -172,13 +172,16 @@ $(document).ready(function () {
 
     // TODO: merge with row-card.html.php or cell-id-card.html.php
     function setTypeClass() {
-        var row = $(this).closest('.card-row');
-        var results = row.parents('.results');
-        var request = results.data('request');
-        var data = gatherFields.apply(row, [getAllFieldNames(request.tables['card'])]);
-        data['table'] = 'card';
-        data['id'] = getRowId.apply(row);
-        window.views.render.apply(results, ['row-card', {card: applyEntityObj(data), request: request, tables: request.tables, table: 'card'}])
+        var that = $(this);
+        setTimeout(function () {
+            var row = that.closest('.card-row');
+            var results = row.parents('.results');
+            var request = results.data('request');
+            var data = gatherFields.apply(row, [getAllFieldNames(request.tables['card'])]);
+            data['table'] = 'card';
+            data['id'] = getRowId.apply(row);
+            window.views.render.apply(row, ['row-card', {card: applyEntityObj(data), request: request, tables: request.tables, table: 'card'}])
+        }, 13);
     }
 
     body.on('change', '[id*="packs-"] .card-row select[name="responseType"]', setTypeClass);
@@ -204,14 +207,14 @@ $(document).ready(function () {
 
     // TODO: generalize this
 
-    body.on('validate', '[id^="packs-"]', packsFunc);
+    body.on('validate', '[id^="packs-"] [class*="-row"]', packsFunc);
 
     // TODO: merge this with template then run changes through template on server and check each cell for invalid class to validate before saving to database
     function packsFunc() {
 
         var tab = getTab.apply(this);
-        var packRows = tab.find('.pack-row:not(.template),.pack-row:not(.valid):not(.template)'); // <-- this is critical for autosave to work
-        var cardRows = $(this).closest('.card-row:not(.removed)').add($(this).find('.card-row:not(.removed)'));
+        var packRows = tab.find('.pack-row').first(); // <-- this is critical for autosave to work
+        var cardRows = $(this).closest('.card-row:not(.removed)');
 
         for(var c  = 0; c < cardRows.length; c++) {
             var row = $(cardRows[c]);
@@ -228,13 +231,7 @@ $(document).ready(function () {
                 else {
                     row.find('.content').removeClass('invalid');
                 }
-                if (data.answers == '') {
-                    row.find('.answers').addClass('invalid');
-                }
-                else {
-                    row.find('.answers').removeClass('invalid');
-                }
-                if (data.correct == '') {
+                if (data.correct == '' || data.answers == '') {
                     row.find('.correct').addClass('invalid');
                 }
                 else {
@@ -303,12 +300,21 @@ $(document).ready(function () {
         autoSaveTimeout = null;
         if (tab.is('#packs-pack0') && typeof evt['results']['results']['pack'][0] != 'undefined') {
             window.views.render.apply(tab, ['packs', {entity: evt['results']['results']['pack'][0]}]);
-            results.data('request', $.extend({requestKey: evt['results'].requestKey}, results.data('request')));
+            results.data('request', $.extend(results.data('request'), {requestKey: evt['results'].requestKey})); // replace key because template clears it
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));
+            // save cards next!
+            standardSave.apply(tab.find('.card-list .results'), [{}]);
         }
-        loadResults.apply(tab.find('.results').not(results));
-        var loaded = body.find('[id^="groups"]:not(#groups-group0)');
+        //loadResults.apply(tab.find('.results').not(results));
+        var loaded = body.find('#packs'); // only top level packs page because packs cannot affect other pack pages
+        loaded.off('show.resulted').one('show.resulted', function () {
+            loadResults.apply($(this).find('.results'));
+        });
+    });
+
+    body.on('resulted.saved', '[id^="groups-"] .results', function () {
+        var loaded = body.find('[id^="packs"]:not(#packs-pack0)');
         loaded.off('show.resulted').one('show.resulted', function () {
             loadResults.apply($(this).find('.results'));
         });

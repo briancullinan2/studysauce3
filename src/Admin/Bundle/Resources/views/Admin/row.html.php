@@ -15,10 +15,10 @@ if(method_exists($entity, 'getId')) {
 }
 
 if(isset($entity->newId)) {
-    $row = $context->find(implode('', ['.', $rowId, ',.new-id-', $entity->newId]));
+    $row = $context->filter(implode('', ['.', $rowId, ',.new-id-', $entity->newId]));
 }
 else {
-    $row = $context->find(implode('', ['.', $rowId]));
+    $row = $context->filter(implode('', ['.', $rowId]));
 }
 $expandable = isset($request['expandable']) && is_array($request['expandable'])
     ? $request['expandable']
