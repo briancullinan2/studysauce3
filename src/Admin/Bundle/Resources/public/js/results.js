@@ -396,7 +396,7 @@ $(document).ready(function () {
                 var subAction = subTab.closest('[action], [data-action]');
                 var tables = subTab.data('request').tables;
                 var name = subAction.attr('name');
-                var saveUrl = subAction.data('action') || subAction.attr('action');
+                var saveUrl = subAction.data('action') || subAction.attr('action') || fieldTab.closest('[action]').attr('action');
                 var subData = {};
                 for (var table in tables) {
                     if (tables.hasOwnProperty(table)) {
