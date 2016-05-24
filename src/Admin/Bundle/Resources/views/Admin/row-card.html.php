@@ -10,19 +10,15 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 /** @var Card $card */
 $context = !empty($context) ? $context : jQuery($this);
 
-$subVars = [
-    'request' => $request,
-    'results' => $results
-];
-
-$rowHtml = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
+$rowHtml = jQuery($view->render('AdminBundle:Admin:row.html.php', [
     'tableId' => $tableId,
     'classes' => $classes,
     'entity' => $card,
     'table' => $table,
     'tables' => $tables,
     'request' => $request,
-    'results' => $results])));
+    'results' => $results,
+    'context' => $context]));
 
 $row = $context->filter(implode('', ['.', $table , '-id-', $card->getId()]));
 
