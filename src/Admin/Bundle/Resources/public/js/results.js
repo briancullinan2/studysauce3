@@ -433,9 +433,7 @@ $(document).ready(function () {
                                 subData[table] = subData[table][0];
                             }
                         }
-                        if (typeof subData[table] != 'undefined' || typeof save[table] != 'undefined') {
-                            hasSomethingToSave = true;
-                        }
+
                         if (typeof name != 'undefined' && typeof subData[table] != 'undefined') {
                             assignSubKey(data, name, subData[table]);
                         }
@@ -443,12 +441,15 @@ $(document).ready(function () {
                             data[table] = subData[table];
                         }
                         rows.removeClass('changed');
+                        if (typeof data[table] != 'undefined') {
+                            hasSomethingToSave = true;
+                        }
                     }
 
                 }
 
                 if (!hasSomethingToSave) {
-                    return;
+                    return true;
                 }
 
                 data = $.extend(true, data, save || {});
