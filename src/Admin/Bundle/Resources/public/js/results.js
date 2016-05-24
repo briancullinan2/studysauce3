@@ -772,7 +772,7 @@ $(document).ready(function () {
             if(that.val() != oldValue) {
                 that.trigger('change.confirm');
             }
-            else {
+            if(that.val() != oldValue) {
                 that.parents('[class*="-row"]').addClass('changed');
             }
         }
