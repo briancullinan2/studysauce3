@@ -54,7 +54,6 @@ class PacksController extends Controller
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        /** @var Pack $newPack */
         $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
 
         // process pack settings
@@ -103,9 +102,25 @@ class PacksController extends Controller
         // TODO: forward to index which only sets up queries needed for page.
         if (!empty($request->get('pack')) && is_array($request->get('pack'))) {
             if (isset($request->get('pack')['id']) && empty($request->get('pack')['id'])) {
+                /** @var Pack $newPack */
                 $searchRequest['edit'] = false;
                 $searchRequest['read-only'] = ['pack'];
                 $searchRequest['new'] = false;
+                $searchRequest['pack-id'] = $newPack->getId();
+                $searchRequest['requestKey'] = null;
+            }
+        }
+        if (!empty($request->get('card')) && empty($searchRequest['pack-id'])) {
+            if(!empty($newPack->getId())) {
+                if($newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() > 0) {
+                    $searchRequest['new'] = false;
+                    $searchRequest['count-card'] = 0;
+                }
+                else {
+                    $searchRequest['new'] = true;
+                    $searchRequest['count-card'] = 5;
+                }
+                $searchRequest['edit'] = false;
                 $searchRequest['pack-id'] = $newPack->getId();
                 $searchRequest['requestKey'] = null;
             }
