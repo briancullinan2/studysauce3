@@ -357,7 +357,7 @@ $(document).ready(function () {
         var request = results.data('request');
         var newRow = $(window.views.render('row', {entity: applyEntityObj({table: table}), tables: request.tables, table: table, request: request, tableId: table}));
         var last;
-        if((last = results.find('.' + table + '-row, header.' + table).last()).length > 0) {
+        if((last = results.find('.' + table + '-row, .' + table + '-row + .expandable:not([class*="-row"]), header.' + table).last()).length > 0) {
             newRow.removeClass('read-only').addClass('edit').insertAfter(last);
         }
         else if((last = results.find('.highlighted-link.' + table)).length > 0) {
