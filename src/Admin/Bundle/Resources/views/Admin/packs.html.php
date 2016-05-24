@@ -80,10 +80,6 @@ $view['slots']->start('body'); ?>
                     if($tab->length == 0) {
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
-                    else {
-                        $request = array_merge($tab->find('.pack-edit .results')->data('request'), $request, ['requestKey' => null]);
-                        $tab->find('.pack-edit .results')->data('request', $request)->attr('data-request', json_encode($request));
-                    }
                     ?>
                 </form>
                 <div class="group-list">
