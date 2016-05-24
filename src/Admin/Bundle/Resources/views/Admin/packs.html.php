@@ -113,6 +113,9 @@ $view['slots']->start('body'); ?>
                     if($tab->length == 0) {
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
+                    else {
+                        $tab->find('.group-list .results')->data('request', $request)->attr('data-request', json_encode($request));
+                    }
                     ?>
                     <div class="empty-members">
                         <div>Select name on the left to see group members</div>
