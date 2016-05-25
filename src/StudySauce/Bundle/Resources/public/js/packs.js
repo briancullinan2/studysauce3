@@ -35,63 +35,74 @@ $(document).ready(function () {
         // write out in a table
         for (var i=0; i<clipRows.length; i++) {
             // skip partial rows
-            if(clipRows[i].length < 2)
+            if (clipRows[i].length < 2)
                 continue;
 
-            var newRow = {};
-            // set card type
-            newRow['responseType'] = '';
-            if(clipRows[i].length > 2) {
-                if (clipRows[i][0].match(/multiple/ig) != null) {
-                    newRow['responseType'] = 'mc'
-                }
-                else if (clipRows[i][0].match(/false/ig) != null) {
-                    newRow['responseType'] = 'tf'
-                }
-                else if (clipRows[i][0].match(/blank|short/ig) != null) {
-                    newRow['responseType'] = 'sa';
-                }
-            }
+            (function (clipRow) {
+                setTimeout(function () {
+                    var newRow = {};
+                    // set card type
+                    newRow['responseType'] = '';
+                    if (clipRow.length > 2) {
+                        if (clipRow[0].match(/multiple/ig) != null) {
+                            newRow['responseType'] = 'mc'
+                        }
+                        else if (clipRow[0].match(/false/ig) != null) {
+                            newRow['responseType'] = 'tf'
+                        }
+                        else if (clipRow[0].match(/blank|short/ig) != null) {
+                            newRow['responseType'] = 'sa';
+                        }
+                    }
 
-            // set correct answers
-            newRow['answers'] = clipRows[i].splice(3).filter(function (x) {return x.trim() != '';}).join("\n");
+                    // set correct answers
+                    newRow['answers'] = clipRow.splice(3).filter(function (x) {
+                        return x.trim() != '';
+                    }).join("\n");
 
-            // merge this with row template and just pass a model containing type, answers, correct, content
-            if(clipRows[i].length == 2) {
-                newRow['content'] = clipRows[i][0];
-                newRow['correct'] = clipRows[i][1];
-            }
-            else {
-                if(newRow['responseType'] == 'tf') {
-                    newRow['correct'] = (clipRows[i][2].match(/true|false/i) || [''])[0].toLowerCase() == true ? 'true' : 'false';
-                }
-                else {
-                    newRow['correct'] = clipRows[i][2];
-                }
-                newRow['content'] = clipRows[i][1];
-            }
+                    // merge this with row template and just pass a model containing type, answers, correct, content
+                    if (clipRow.length == 2) {
+                        newRow['content'] = clipRow[0];
+                        newRow['correct'] = clipRow[1];
+                    }
+                    else {
+                        if (newRow['responseType'] == 'tf') {
+                            newRow['correct'] = (clipRow[2].match(/true|false/i) || [''])[0].toLowerCase() == true ? 'true' : 'false';
+                        }
+                        else {
+                            newRow['correct'] = clipRow[2];
+                        }
+                        newRow['content'] = clipRow[1];
+                    }
 
-            newRow['table'] = 'card';
-            var rowHtml = $(window.views.render('row-card', {card: applyEntityObj(newRow), table: 'card', tableId: 'card', tables: request.tables, request: request}))
-                .removeClass('read-only').addClass('edit');
+                    newRow['table'] = 'card';
+                    var rowHtml = $(window.views.render('row-card', {
+                        card: applyEntityObj(newRow),
+                        table: 'card',
+                        tableId: 'card',
+                        tables: request.tables,
+                        request: request
+                    }))
+                        .removeClass('read-only').addClass('edit');
 
-            // list under currently focused row
-            if(last != null) {
-                last = rowHtml.insertAfter(last.last());
-            }
-            else {
-                last = rowHtml.insertAfter(results.find('> header.card'));
-            }
-            newRows = newRows.add(last);
-
+                    // list under currently focused row
+                    if (last != null) {
+                        last = rowHtml.insertAfter(last.last());
+                    }
+                    else {
+                        last = rowHtml.insertAfter(results.find('> header.card'));
+                    }
+                    resizeTextAreas.apply(last);
+                    last.addClass('changed');
+                    last.trigger('validate');
+                    newRows = newRows.add(last);
+                }, 20);
+            })(clipRows[i]);
         }
 
         // remove empties
         results.find('.card-row.empty, .card-row.empty + .expandable:not([class*="-row"])').remove();
 
-        resizeTextAreas.apply(newRows);
-        newRows.addClass('changed');
-        newRows.trigger('validate');
         if(results.find('.card-row:visible').length == 0) {
             for(var n = 0; n < 5; n++) {
                 addResultRow.apply(results, ['card']);

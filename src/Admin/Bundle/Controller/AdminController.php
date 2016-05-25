@@ -487,7 +487,7 @@ class AdminController extends Controller
                 $tableName = 'ss_group';
             }
             $vars['resultsJSON'][$table] = array_map(function ($e) use ($tableName, $table, $searchRequest) {
-                return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 2 : 3);
+                return self::toFirewalledEntityArray($e, $searchRequest['tables'], $table == 'allGroups' ? 1 : 3);
             }, $vars['results'][$table]);
         }
         if (in_array('application/json', $request->getAcceptableContentTypes()) || $request->get('dataType') == 'json') {

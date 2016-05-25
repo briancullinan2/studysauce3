@@ -161,10 +161,10 @@ $view['slots']->start('body'); ?>
                 $request['count-user_pack'] = -1;
                 $request['tables'] = [
                     'ss_group' => ['id', 'name', 'users', 'deleted', 'subgroups'],
-                    'ss_user' => ['id'],
+                    'ss_user' => ['id', 'first', 'last', 'groups'],
                     'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
                     'card' => ['id', 'deleted'],
-                    'pack' => ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks.user'], 'actions' => ['status']]];
+                    'pack' => ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']]];
                 $request['classes'] = ['tiles'];
                 $request['headers'] = ['pack' => 'newPack'];
                 $request['footers'] = ['pack' => 'newPack'];

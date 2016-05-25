@@ -21,7 +21,7 @@ $view['slots']->start('all-answers');
 
 ?>
 <label class="input correct">
-    <textarea name="correct" placeholder="Answer"><?php print ($view->escape(!empty($card->getCorrect()) ? $view->escape($card->getCorrect()->getValue()) : trim($card->getResponseContent()))); ?></textarea>
+    <textarea name="correct" placeholder="Answer"><?php print ($view->escape(!empty($card->getCorrect()) ? $card->getCorrect()->getValue() : trim($card->getResponseContent()))); ?></textarea>
 </label>
 <div class="correct type-mc">
     <div class="radios">

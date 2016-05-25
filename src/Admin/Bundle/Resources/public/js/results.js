@@ -216,6 +216,8 @@ window.views.__defaultEntities['file'] = {
 window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),
     groups: $([]),
+    getFirst: function () {return this.first;},
+    getLast: function () {return this.last;},
     getId: function () {return this.id;},
     getEmailCanonical: function () {return this.email.toLowerCase();},
     hasRole: function (role) { return this.roles.indexOf(role) > -1; },
