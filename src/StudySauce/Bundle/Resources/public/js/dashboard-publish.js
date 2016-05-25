@@ -64,7 +64,8 @@ $(document).ready(function () {
             body.one('click.publish_confirm', '#general-dialog a[href="#submit"]', function () {
                 field.data('publish', publish);
                 field.filter('select').val('GROUP').data('oldValue', 'GROUP').trigger('change');
-                standardSave.apply(field, [assignSubKey({packId: packId.replace('pack-', '')}, 'pack[properties]', publish)]);
+                field.closest('.panel-pane').find('[class*="-row"].edit').removeClass('edit').addClass('read-only');
+                standardSave.apply(field, [assignSubKey({pack: {status: 'GROUP', id: packId.replace('pack-', '')}}, 'pack[properties]', publish)]);
             });
         });
     }

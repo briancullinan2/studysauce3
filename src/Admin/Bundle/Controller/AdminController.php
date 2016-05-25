@@ -756,7 +756,15 @@ class AdminController extends Controller
                                 $isAdding = false;
                             }
                             if(($type = self::parameterType($method = (!$isAdding ? 'remove' : 'add') . ucfirst(rtrim($f, 's')), $entity)) !== false) {
-                                call_user_func_array([$entity, $method], [$childEntity]);
+                                $parameters = [];
+                                if(!empty($childEntity)) {
+                                    $parameters[] = &$childEntity;
+                                }
+                                else {
+                                    $parameters = [null];
+                                }
+                                // TODO: ? copy back from parameters to childEntity?
+                                call_user_func_array([$entity, $method], $parameters);
                                 if($isAdding && ($unsetI = array_search($childEntity, $removeAnswers)) !== false) {
                                     array_splice($removeAnswers, $unsetI, 1); // remove from remove array because we are keeping it, in the case of answers, the text is looked up by value so existing answers will match new list
                                 }
@@ -789,7 +797,14 @@ class AdminController extends Controller
                         }
                         $joinFields = self::$defaultTables[$joinTable];
                         $value = self::applyFields($type->getName(), $joinTable, $joinFields, $value, $orm);
-                        call_user_func_array([$entity, 'set' . ucfirst($f)], [!empty($value) ? $value : null]);
+                        $parameters = [];
+                        if(!empty($value)) {
+                            $parameters[] = &$value;
+                        }
+                        else {
+                            $parameters = [null];
+                        }
+                        call_user_func_array([$entity, 'set' . ucfirst($f)], $parameters);
                         if (!empty($value->newId)) {
                             $orm->persist($value);
                         } else if(!empty($value)) {

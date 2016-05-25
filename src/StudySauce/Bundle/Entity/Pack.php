@@ -128,6 +128,9 @@ class Pack
      */
     public function setProperty($prop, $value)
     {
+        if($prop == 'schedule' && is_string($value)) {
+            $value = new \DateTime($value);
+        }
         $this->properties[$prop] = $value;
     }
 

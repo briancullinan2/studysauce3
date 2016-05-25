@@ -110,12 +110,13 @@ class Card
     /**
      * @param Answer $correct
      */
-    public function setCorrect(Answer $correct = null) {
+    public function setCorrect(Answer &$correct = null) {
         $contains = false;
         foreach($this->answers as $c) {
-            if($c == $correct) {
+            if($c->getValue() == $correct->getValue()) {
                 $contains = true;
                 $c->setCorrect(true);
+                $correct = $c;
             }
             else {
                 $c->setCorrect(false);
@@ -387,10 +388,19 @@ class Card
      * @param \StudySauce\Bundle\Entity\Answer $answers
      * @return Card
      */
-    public function addAnswer(\StudySauce\Bundle\Entity\Answer $answers)
+    public function addAnswer(\StudySauce\Bundle\Entity\Answer &$answers)
     {
-        if(!$this->answers->contains($answers)) {
+        $contains = false;
+        foreach($this->answers->toArray() as $a) {
+            /** @var Answer $a */
+            if($a->getValue() == $answers->getValue()) {
+                $contains = true;
+                $answers = $a;
+            }
+        }
+        if(!$contains) {
             $this->answers[] = $answers;
+            $answers->setCard($this);
         }
         return $this;
     }

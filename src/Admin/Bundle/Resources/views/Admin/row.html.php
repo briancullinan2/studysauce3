@@ -60,10 +60,17 @@ print (!empty($classes) ? $classes : ''); ?> ">
 }
 $view['slots']->stop();
 
+$newRow = $view['slots']->get('result-row');
 if($row->length == 0 || !$row->is('.edit')) {
-    print ($view['slots']->get('result-row'));
+    print ($newRow);
+    return; // stop short up updates
 }
-else if(isset($entity->newId)) {
+
+// update existing rows
+if(isset($entity->newId)) {
     // update newId?
     $row->removeClass(implode('', [$table , '-id-']))->removeClass(implode('', ['new-id-', $entity->newId]))->addClass($rowId);
 }
+
+// replace actions content even if the row already exists in edit mode, so they can create and delete without ever refreshing
+$row->children('[class*="actions"]')->replaceWith(jQuery($newRow)->children('[class*="actions"]'));
