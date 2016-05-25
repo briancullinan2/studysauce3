@@ -33,8 +33,10 @@ $(document).ready(function () {
         body.one('show', '#groups-group0', function () {
             $(this).find('.ss_group-row:not(.template) .parent select').val(groupId);
             if(row.find('[class*="id"] img:not(.default)').length > 0) {
+                var src = row.find('[class*="id"] img').attr('src');
+                $(this).find('.ss_group-row:not(.template) [class*="id"] input').val(src);
                 $(this).find('.ss_group-row:not(.template) [class*="id"] img')
-                    .attr('src', row.find('[class*="id"] img').attr('src')).removeClass('default');
+                    .attr('src', src).removeClass('default');
             }
         });
     });

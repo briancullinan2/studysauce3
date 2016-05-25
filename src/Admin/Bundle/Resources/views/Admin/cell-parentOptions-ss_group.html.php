@@ -12,7 +12,7 @@ foreach ($groups as $g) {
     $topGroups = [];
     foreach($results['allGroups'] as $sub) {
         /** @var Group $sub */
-        if(!empty($sub->getParent()) && $sub->getParent()->getId() == $g->getId()) {
+        if(!$sub->getDeleted() && !empty($sub->getParent()) && $sub->getParent()->getId() == $g->getId()) {
             $topGroups[count($topGroups)] = $sub;
         }
     }

@@ -9,7 +9,7 @@ use StudySauce\Bundle\Entity\Group;
         $topGroups = [];
         foreach($results['allGroups'] as $g) {
             /** @var Group $g */
-            if(empty($g->getParent())) {
+            if(empty($g->getParent()) && !$g->getDeleted()) {
                 $topGroups[count($topGroups)] = $g;
             }
         }
