@@ -461,7 +461,7 @@ function gatherFields(fields, visibleOnly) {
                 var key = fields[f];
                 var inputField = context.find(fieldMatch(key));
                 if(visibleOnly !== false) {
-                    inputField = inputField.filter('label:visible *,:visible');
+                    inputField = inputField.filter('label:visible *,:visible,*:visible > *');
                 }
                 if(inputField.is('[name^="' + key + '["]')) {
                     key = inputField.attr('name');
