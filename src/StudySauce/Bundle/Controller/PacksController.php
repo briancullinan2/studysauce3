@@ -151,14 +151,12 @@ class PacksController extends Controller
                 || $user->getUserPacks()
                     ->filter(function (UserPack $up) use ($p) {
                         return $up->getPack()->getId() == $p->getId();
-                    })
-                    ->count() > 0
+                    })->count() > 0
                 || $user->getInvites()->exists(function ($_, Invite $x) use ($p) {
                     return !empty($x->getInvitee())
                     && $x->getInvitee()->getUserPacks()->filter(function (UserPack $up) use ($p) {
                         return $up->getPack()->getId() == $p->getId();
-                    })
-                        ->count() > 0;
+                    })->count() > 0;
                 });
             $packGroups = $p->getGroups()->map(function (Group $g) {
                 return $g->getId();
@@ -183,7 +181,7 @@ class PacksController extends Controller
             if ($p->getStatus() == 'UNLISTED' && $hasPack) {
                 return true;
             }
-            if ($p->getStatus() == 'GROUP' && $hasGroups) {
+            if ($p->getStatus() == 'GROUP' && ($hasGroups || $hasPack)) {
                 // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
                 //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
                 return true;

@@ -226,7 +226,7 @@ class Pack
                 || $this->userPacks->matching(Criteria::create()
                     ->where(Criteria::expr()
                         ->neq('removed', true))->andWhere(Criteria::expr()
-                        ->eq('user', $u)))->count() > 0 && $this->getStatus() != 'GROUP'
+                        ->eq('user', $u)))->count() > 0
                 || $this->groups->matching(Criteria::create()
                     ->where(Criteria::expr()
                         ->in('name', $u->getGroupNames())))->count() > 0 && $this->getStatus() == 'GROUP';
