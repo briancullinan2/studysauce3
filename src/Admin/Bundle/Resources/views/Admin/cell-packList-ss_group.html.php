@@ -8,8 +8,8 @@ use StudySauce\Bundle\Entity\User;
 
 $subGroups = [$ss_group->getId()];
 $countGroups = 0;
-$countUsers = 0;
-$countPacks = 0;
+$countUsers = [];
+$countPacks = [];
 $added = true;
 while($added) {
     $added = false;
@@ -20,8 +20,18 @@ while($added) {
             && !in_array($g->getId(), $subGroups)) {
             $subGroups[count($subGroups)] = $g->getId();
             $countGroups += 1;
-            $countUsers += count($g->getUsers()->toArray());
-            $countPacks += count($g->getPacks()->toArray());
+            foreach($g->getUsers()->toArray() as $u) {
+                /** @var User $u */
+                if(!in_array($u->getId(), $countUsers)) {
+                    $countUsers[count($countUsers)] = $u->getId();
+                }
+            }
+            foreach($g->getPacks()->toArray() as $p) {
+                /** @var Pack $p */
+                if(!in_array($p->getId(), $countPacks)) {
+                    $countPacks[count($countPacks)] = $p->getId();
+                }
+            }
             $added = true;
         }
     }
@@ -29,7 +39,7 @@ while($added) {
 ?>
 
 <div>
-    <label><?php print ($countGroups); ?> subgroups / <?php print ($countPacks); ?> packs / <?php print ($countUsers); ?> users</label>
+    <label><?php print ($countGroups); ?> subgroups / <?php print (count($countPacks)); ?> packs / <?php print (count($countUsers)); ?> users</label>
     <?php
     foreach ($ss_group->getSubgroups()->toArray() as $g) {
         /** @var Group $g */
