@@ -135,6 +135,7 @@ EOF
         $orm = $this->getContainer()->get('doctrine')->getManager();
 
         $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
+            ->where('u.devices IS NOT NULL AND u.devices != \'\'')
             ->getQuery()->getResult();
 
         $controller = new PacksController();
@@ -242,6 +243,9 @@ EOF
                 }));
 
                 if(count($emailing) > 0) {
+                    if(!filter_var($u->getEmail(), FILTER_VALIDATE_EMAIL)) {
+                        continue;
+                    }
                     print "\t" . 'We have added ' . $emailing[0]->getTitle() . ' to Study Sauce';
                     $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($child) ? $child[0][1] : null);
                 }
