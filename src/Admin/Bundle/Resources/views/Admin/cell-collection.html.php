@@ -113,7 +113,16 @@ $input->attr('placeholder', $placeHolder);
 // if its inline, update header counts
 if (isset($entities) && (!isset($inline) || $inline !== true)) {
     $header = $search->find('header:not(.removed)');
-    $headerTitle = implode('', ['Members (', $headerTitle, ')']);
+    $heading = 'Members';
+    if(isset($headers)) {
+        if(is_string($headers)) {
+            $heading = $headers;
+        }
+        else if (is_array($headers) && isset($headers[$tableNames[0]])) {
+            $heading = $headers[$tableNames[0]];
+        }
+    }
+    $headerTitle = implode('', [$heading, ' (', $headerTitle, ')']);
     $header->find('label')->text($headerTitle);
     $search->find('header.removed label')->text('Removed');
     //if($search->find('header:not(.removed) ~ .checkbox')->length == 0 ||

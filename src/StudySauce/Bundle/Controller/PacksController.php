@@ -40,6 +40,21 @@ class PacksController extends Controller
         return $this->render('AdminBundle:Admin:packs.html.php', ['entity' => $pack]);
     }
 
+    public function cardAction(Card $card)
+    {
+        return $this->render('AdminBundle:Admin:cards.html.php', ['card' => $card]);
+    }
+
+    public function resultAction(Pack $pack)
+    {
+        return $this->render('AdminBundle:Admin:result.html.php', ['pack' => $pack]);
+    }
+
+    public function answerAction(Card $answer)
+    {
+        return $this->redirect($this->generateUrl('cards', ['card' => $answer->getId()]));
+    }
+
     public function groupsAction(Request $request, Group $group = null)
     {
         if ($request->get('_route') === 'groups_new') {
@@ -337,12 +352,13 @@ class PacksController extends Controller
         $orm = $this->get('doctrine')->getManager();
 
         $responses = $request->get('responses') ?: [];
-        if (!empty($request->get('pack')) && !empty($request->get('card')) && !empty($request->get('answer'))
+        if (!empty($request->get('pack')) && !empty($request->get('card'))
             && !empty($request->get('correct')) && !empty($request->get('created'))
         ) {
             $responses[] = [
                 'pack' => $request->get('pack'),
                 'card' => $request->get('card'),
+                'value' => $request->get('value'),
                 'answer' => $request->get('answer'),
                 'correct' => $request->get('correct'),
                 'created' => $request->get('created'),
@@ -366,6 +382,7 @@ class PacksController extends Controller
             }
 
             $response = new Response();
+            $response->setValue($r['value']);
             $response->setUser($user);
             $user->addResponse($response);
             $response->setCard($card);

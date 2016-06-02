@@ -185,7 +185,7 @@ EOF
                     $unique[] = $p->getId();
                 }
                 if (!in_array($p->getId(), $u->getProperty('notified') ?: [])) {
-                    $difference[] = $p;
+                    $difference[] = [$p, $c];
                 }
             }
 
@@ -198,36 +198,45 @@ EOF
                     return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
                 $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
-                $groupInvite = null;
-                $child = array_values(array_filter($notify, function ($n) use ($u) {
-                    /** @var User $child */
-                    /** @var Pack $pack */
-                    list($pack, $child) = $n;
-                    return $child != $u && $pack->getGroups()->filter(function (Group $i) use ($child) {
-                        return $child->hasGroup($i->getName());})->count() > 0;
-                }));
-
+                /** @var Pack[] $alerting */
+                $alerting = [];
+                /** @var Pack[] $emailing */
+                $emailing = [];
                 /** @var Group $groupInvite */
-                if(!empty($child)) {
-                    /** @var User $childUser */
-                    /** @var Pack $childPack */
-                    list($childPack, $childUser) = $child[0];
-                    $groupInvite = $childPack->getGroupForChild($childUser);
+                $groupInvite = null;
+                /** @var Pack $childPack */
+                $childPack = null;
+                /** @var User $childUser */
+                $childUser = null;
+                foreach($difference as $n) {
+                    /** @var Pack $pack */
+                    /** @var User $child */
+                    list($pack, $child) = $n;
+
+                    // select a child for alerts and emails
+                    if($pack->getProperty('alert')) {
+                        $alerting[] = $pack;
+                    }
+                    if($pack->getProperty('email')) {
+                        $emailing[] = $pack;
+                    }
+                    // TODO: select child invite for packs with alerts, and separately packs with emails
+                    if($child != $u && $pack->getGroups()->filter(function (Group $i) use ($child) {
+                            return $child->hasGroup($i->getName());})->count() > 0) {
+                        $childPack = $pack;
+                        $childUser = $child;
+                        $groupInvite = $pack->getGroupForChild($child);
+                        break; // TODO: stop short or list every pack in email?
+                    }
                 }
 
-                /** @var Pack[] $alerting */
-                $alerting = array_values(array_filter($difference, function (Pack $p) {
-                    return $p->getProperty('alert') == true;
-                }));
-
                 // send notifications to all users devices
-                // TODO: select child invite for packs with alerts, and separately packs with emails
                 if (count($alerting) > 0) {
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
-                            print "\t" . $groupInvite->getName() . ' added a new pack, "' . $alerting[0]->getTitle() . '"';
+                            print "\t" . $groupInvite->getName() . ' added a new pack, "' . $childPack->getTitle() . '"';
                             $this->sendNotification($groupInvite->getName() . ' added a new pack, "'
-                                . $alerting[0]->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
+                                . $childPack->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
                             print "\t" . 'You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce';
@@ -237,17 +246,12 @@ EOF
                     }
                 }
 
-                /** @var Pack[] $emailing */
-                $emailing = array_values(array_filter($difference, function (Pack $p) {
-                    return $p->getProperty('email') == true;
-                }));
-
                 if(count($emailing) > 0) {
                     if(!filter_var($u->getEmail(), FILTER_VALIDATE_EMAIL)) {
                         continue;
                     }
                     print "\t" . 'We have added ' . $emailing[0]->getTitle() . ' to Study Sauce';
-                    $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($child) ? $child[0][1] : null);
+                    $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($childUser) ? $childUser : null);
                 }
             }
         }

@@ -41,8 +41,26 @@
     float: left;
 }
 
-.user-shuffle .pack-row .titleNew {
+.user-shuffle .ss_user-row {
+    display:none;
+}
+
+.user-shuffle .pack-row .titleNew label:first-of-type {
+    display:inline-block;
+    margin:0 -2px;
+    padding: 0 2px;
+    width:20%;
+}
+.user-shuffle .pack-row .titleNew label:last-of-type {
+    display:inline-block;
+    margin:0 -2px;
+    padding: 0 2px;
     width:80%;
+    text-align: right;
+}
+
+.user-shuffle .pack-row .titleNew {
+    width:100%;
 }
 
 .user-shuffle .pack-row .titleNew strong {
@@ -79,7 +97,7 @@
 
 a[href="#shuffle-card"] {
     position:absolute;
-    padding-bottom:30%;
+    padding-bottom:36%;
     width:30%;
     display:block;
     background: url(../images/shuffle_btn.png) no-repeat 0 0 transparent;

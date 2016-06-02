@@ -41,7 +41,10 @@ window.views.__globalVars.app.getUser = function () {
     return user;
 };
 window.views.__globalVars.app.getRequest = function () {
-    return {get: function (name) { return getQueryObject(window.location.href)[name];}}
+    return {
+        get: function (name) { return getQueryObject(window.location.href)[name];},
+        cookies: Cookies
+    }
 };
 if(typeof window.views.exists == 'undefined') {
     window.views.exists = function (name) {
@@ -124,7 +127,8 @@ window.views.__defaultEntities['ss_group'] = {
     },
     getUsers: function () {return $(this.users.map(function (u) { return applyEntityObj(u);}));},
     getPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));},
-    getDeleted: function () {return this.deleted}
+    getDeleted: function () {return this.deleted},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
 window.views.__defaultEntities['invite'] = {
     group: null,
@@ -132,7 +136,8 @@ window.views.__defaultEntities['invite'] = {
     getFirst: function () {return this.first;},
     getLast: function () {return this.last;},
     getEmail: function () {return this.email;},
-    getGroup: function () {return this.group ? applyEntityObj(this.group) : null;}
+    getGroup: function () {return this.group ? applyEntityObj(this.group) : null;},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
 window.views.__defaultEntities['pack'] = {
     user: null,
@@ -164,16 +169,41 @@ window.views.__defaultEntities['pack'] = {
     },
     getTitle: function () {return this.title;},
     getUserPacks: function () {return $(this.userPacks.map(function (up) {return applyEntityObj(up);}));},
-    getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));}
+    getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));},
+    getUser: function () {return this.user ? applyEntityObj(this.user) : null;},
+    getUserById: function (id) {
+        /** @var UserPack $up */
+        if(this.getUser() != null && this.getUser().getId() == id) {
+            return $this.getUser();
+        }
+        var up = this.getUserPacks().filter(function () {return this.getUser().getId() == id;}).first();
+        if(up == null || up.length == 0) {
+            return null;
+        }
+        return up[0].getUser();
+    }
 };
 window.views.__defaultEntities['user_pack'] = {
-    getRemoved: function () {return this.removed},
-    getUser: function () {return applyEntityObj(this.user);},
-    getPack: function () {return applyEntityObj(this.pack);},
-    getDownloaded: function () {return !(this.downloaded) ? null : new Date(this.downloaded);}
+    retention: $([]),
+    getRemoved: function () {
+        return this.removed
+    },
+    getUser: function () {
+        return applyEntityObj(this.user);
+    },
+    getPack: function () {
+        return applyEntityObj(this.pack);
+    },
+    getDownloaded: function () {
+        return !(this.downloaded) ? null : new Date(this.downloaded);
+    },
+    getRetention: function () {
+        return this.retention;
+    },
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
 window.views.__defaultEntities['card'] = {
-    answers: $([]),
+    answers: [],
     getDeleted: function () {return this.deleted},
     getId: function () {return this.id},
     getCorrect: function () {
@@ -189,26 +219,42 @@ window.views.__defaultEntities['card'] = {
     },
     getAnswers: function () {
         // look up answers
-        if(typeof this.answers == 'string') {
-            this.answers = this.answers
-            // TODO: find a better way to handle this from the element
-                .replace(/\s*_clear\s*/ig, '')
-                .split(/\s*\r?\n\s*/ig).map(function (a) {return {table: 'answer', value: a, content: a};});
+        var result = [];
+        for(var s in this.answers) {
+            if (this.answers.hasOwnProperty(s)) {
+                if (this.answers[s] == '_clear') {
+                    continue;
+                }
+                if (typeof this.answers[s] == 'string') {
+                    result[result.length] = applyEntityObj({
+                        table: 'answer',
+                        value: this.answers[s],
+                        content: this.answers[s],
+                        correct: this.correct == this.answers[s]
+                    });
+                }
+                else {
+                    result[result.length] = applyEntityObj(this.answers[s])
+                }
+            }
         }
-        return $(this.answers.map(function (up) {return typeof up == 'string' ? applyEntityObj({table: 'answer', value: up, content: up}) : applyEntityObj(up);}));
+        return $(result);
     },
-    getContent: function () {return this.content},
+    getContent: function () {return (this.upload ? this.upload + "\n" : '') + this.content},
     getIndex: function () {return this.index},
     getResponseType: function () {return (this.responseType || '').split(/\s+/ig)[0]},
-    getResponseContent: function () {return this.responseContent}
+    getResponseContent: function () {return this.responseContent},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
 window.views.__defaultEntities['answer'] = {
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getCorrect: function () {return this.correct},
     getDeleted: function () {return this.deleted},
     getValue: function () {return this.value},
     getContent: function () {return typeof this.content == 'undefined' ? this.value : this.content;}
 };
 window.views.__defaultEntities['file'] = {
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getUrl: function () { return this.url },
     getId: function () { return this.id },
     getUser: function () { return this.user }
@@ -234,6 +280,9 @@ window.views.__defaultEntities['ss_user'] = {
             }
         }
     },
+    getLastVisit: function () {return !(this.lastVisit) ? null : new Date(this.lastVisit);},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    getUserPacks: function () {return $(this.userPacks.map(function (up) {return applyEntityObj(up);}));},
     getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));}
 };
 window.views.__globalVars.view.exists = window.views.exists;

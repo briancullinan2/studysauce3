@@ -230,6 +230,10 @@ class User extends BaseUser implements EncoderAwareInterface
         return $users;
     }
 
+    /**
+     * @param Pack $pack
+     * @return ArrayCollection
+     */
     public function getResponsesForPack(Pack $pack)
     {
         $criteria = Criteria::create()

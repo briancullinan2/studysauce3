@@ -84,8 +84,8 @@ $(document).ready(function () {
             results.data('request', $.extend(results.data('request'), {requestKey: evt['results'].requestKey})); // replace key because template clears it
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('groups_edit', {group: id}));
+            loadResults.apply(tab.find('.results').not(results));
         }
-        loadResults.apply(tab.find('.results').not(results));
         var loaded = body.find('[id^="groups"]:not(#groups-group0)');
         // refresh parent group incase of name change
         //var parentId = tab.find('.ss_group-row .parent select').val();

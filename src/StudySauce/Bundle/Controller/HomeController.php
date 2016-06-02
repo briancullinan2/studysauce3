@@ -85,7 +85,7 @@ class HomeController extends Controller
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
         }
-        return $this->render('StudySauceBundle:Home:results.html.php', $templateVars);
+        return $this->render('AdminBundle:Admin:home.html.php', $templateVars);
     }
 
     public function appLinksAction() {

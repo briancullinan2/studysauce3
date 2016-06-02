@@ -54,7 +54,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         <?php }
 
         if($app->getRequest()->get('_format') != 'funnel') { ?>
-            <div id="welcome-message" data-user="<?php print $view->escape(json_encode(['email' => !empty($user) ? $user->getEmail() : '', 'roles' => $user->getRoles()])); ?>">
+            <div id="welcome-message" data-user="<?php print $view->escape(json_encode(['id' => $user->getId(), 'email' => !empty($user) ? $user->getEmail() : '', 'roles' => $user->getRoles()])); ?>">
                 <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
                     <ul class="main-menu">
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>

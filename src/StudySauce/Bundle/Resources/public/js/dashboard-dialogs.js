@@ -456,9 +456,12 @@ $(document).ready(function () {
                     type: 'POST',
                     data: $.extend({requestKey: getDataRequest.apply(that).requestKey}, getQueryObject(that.data('action'))),
                     dataType: 'json',
-                    success: function () {
+                    success: function (data) {
                         var event = $.Event('resulted.saved');
                         that.parents('.results').trigger(event);
+                        if(!data.redirect) {
+                            loadContent.apply(that.parents('.results'), [data]);
+                        }
                     }
                 });
 

@@ -605,7 +605,7 @@ class EmailsController extends Controller
         $message = Swift_Message::newInstance()
             ->setSubject('Contact Us: From ' . $name)
             ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
-            ->setTo('brian@studysauce.com')
+            ->setTo('admin@studysauce.com')
             ->setBody($this->renderView('StudySauceBundle:Emails:contact-message.html.php', [
                         'link' => '&nbsp;',
                         'user' => $user,

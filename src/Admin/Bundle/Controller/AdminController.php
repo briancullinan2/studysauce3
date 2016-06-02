@@ -40,12 +40,12 @@ class AdminController extends Controller
     /** @var array $defaultTables A list of all available fields, firewall */
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
-        'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email'], 'groups', 'packs' => ['authored', 'userPacks.pack'], 'roles', 'actions' => ['deleted']],
+        'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted']],
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo', 'userCountStr', 'descriptionStr'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
-        'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded'],
+        'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
         'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content']
         // TODO: this really generalized template
@@ -145,9 +145,9 @@ class AdminController extends Controller
             }
         }
         // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-        if (!empty($joinName) && isset($request['tables'][$joinTable])) {
-            $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
-        }
+        //if (!empty($joinName) && isset($request['tables'][$joinTable])) {
+        //    $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
+        //}
         return $result;
     }
 
@@ -208,7 +208,7 @@ class AdminController extends Controller
                         }
                         $join = self::joinBuilder($qb, $table, $tableName, $field, $joinRequest, $joins);
                         if (!empty($join)) {
-                            $where['join'] = (empty($where['join']) ? '' : ($where['join'] . ' OR ')) . $join;
+                            $where['join'] = (empty($where['join']) ? '' : ($where['join'] . ' AND ')) . $join;
                         }
                     }
                 }
@@ -326,7 +326,7 @@ class AdminController extends Controller
         /** @var $user User */
         $user = $this->getUser();
 
-        if (empty($user) || !$user->hasRole('ROLE_ADMIN')) {
+        if (empty($user)) {
             throw new AccessDeniedHttpException();
         }
 
@@ -855,6 +855,7 @@ class AdminController extends Controller
         if (!$user->hasRole('ROLE_ADMIN')) {
             throw new AccessDeniedHttpException();
         }
+        $allGroups = $orm->getRepository('StudySauceBundle:Group')->findAll();
 
         /** @var Group $g */
         list($g) = self::standardSave($request, $this->container);
@@ -882,7 +883,7 @@ class AdminController extends Controller
                 $added = true;
                 while($added) {
                     $added = false;
-                    foreach($g->getSubgroups()->toArray() as $subGroup) {
+                    foreach($allGroups as $subGroup) {
                         /** @var Group $subGroup */
                         if(!empty($subGroup->getParent())
                             && in_array($subGroup->getParent()->getId(), $subGroups)
@@ -899,6 +900,37 @@ class AdminController extends Controller
                             }
                             $orm->flush();
                             $added = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(!empty($request->get('pack')) && is_array($request->get('pack'))) {
+            if(isset($request->get('pack')['groups'])) {
+                foreach($request->get('pack')['groups'] as $subG) {
+                    $subGroups = [$subG['id']];
+                    $added = true;
+                    while($added) {
+                        $added = false;
+                        foreach($allGroups as $subGroup) {
+                            /** @var Group $subGroup */
+                            if(!empty($subGroup->getParent())
+                                && in_array($subGroup->getParent()->getId(), $subGroups)
+                                && !in_array($subGroup->getId(), $subGroups)) {
+                                $subGroups[count($subGroups)] = $subGroup->getId();
+
+                                $entity = self::applyFields(AdminController::$allTables['pack']->name, 'pack', ['groups'], array_merge($request->get('pack'), ['groups' => [array_merge($subG, ['id' => $subGroup->getId()])]]), $orm);
+
+                                if(empty($entity->getId())) {
+                                    $orm->persist($entity);
+                                }
+                                else {
+                                    $orm->merge($entity);
+                                }
+                                $orm->flush();
+                                $added = true;
+                            }
                         }
                     }
                 }
@@ -1045,12 +1077,12 @@ window.AdminController.createEntity = function (t) {return $.extend({}, window.v
 window.AdminController.sortByFields = function (arr, fields) {
 arr.sort(function (a, b) { return (a[fields[0]] + ' ' + a[fields[1]]).toLocaleLowerCase() > (b[fields[0]] + ' ' + b[fields[1]]).toLocaleLowerCase() }); }
 window.AdminController.TableMapping = {
-getAssociationMappings: function () { return this.associationMappings; }
+    getAssociationMappings: function () { return this.associationMappings; }
 };
 for(var t in window.AdminController.__vars.allTables) {
-if(window.AdminController.__vars.allTables.hasOwnProperty(t)) {
-    window.AdminController.__vars.allTables[t] = $.extend(window.AdminController.__vars.allTables[t], window.AdminController.TableMapping);
-}
+    if(window.AdminController.__vars.allTables.hasOwnProperty(t)) {
+        window.AdminController.__vars.allTables[t] = $.extend(window.AdminController.__vars.allTables[t], window.AdminController.TableMapping);
+    }
 }
 window.AdminController.getAllFieldNames = function (tables) { return window.getAllFieldNames(tables); };
 
@@ -1066,6 +1098,12 @@ for(var a = 0; a < arguments.length; a++) {
 return args.reduce(function (a, b) {
     return isObject ? $.extend(a, b) : $.merge(a, b);
 });
+};
+var round = function (num, digits) {
+    if(digits > 0) {
+        return Math.round(num * (10 * (digits ? digits : 0))) / (10 * (digits ? digits : 0));
+    }
+    return Math.round(num);
 };
 var is_a = function (obj, typeStr) { return typeof obj == 'object' && obj != null && obj.constructor.name == typeStr();};
 var intval = function (str) {var result = parseInt(str); return isNaN(result) ? 0 : result;};
@@ -1083,7 +1121,16 @@ var implode = function (sep, arr) {return (arr || []).join(sep);};
 var preg_replace = function (needle, replacement, subject) {
     return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g'), replacement);
 };
-var preg_match = function (needle, subject) { return ((subject || '').match(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])) || []).length;};
+var preg_match = function (needle, subject, matches) {
+    var result = (new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])).exec(subject);
+    if(result == null) {
+        return 0;
+    }
+    for(var m = 0; m < result.length; m++) {
+        matches[m] = result[m];
+    }
+    return result.length;
+};
 var ucfirst = function (str) {return (str || '').substr(0, 1).toLocaleUpperCase() + str.substr(1);};
 var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};
 var call_user_func_array = function (context, params) {return context[0][context[1]].apply(context[0], params);};

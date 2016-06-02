@@ -11,7 +11,7 @@ $resultOutput = $context->filter('.results');
 
 $selected = $resultOutput->find('[class*="-row"].selected');
 
-$resultOutput->children('.view, header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
+$resultOutput->children('.views, header, footer, .highlighted-link, [class*="-row"]:not(.edit), [class*="-row"]:not(.edit) + .expandable:not([class*="-row"])')->remove();
 
 $subVars = [
     'request' => $request,
@@ -55,7 +55,11 @@ if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
     <?php }
     $view['slots']->stop();
 
-    $resultOutput->prepend($last = jQuery($view['slots']->get('view-settings'))->find('.views'));
+    $views = jQuery($view['slots']->get('view-settings'));
+    $resultOutput->prepend($views);
+    if($views->length > 0) {
+        $last = $views->last();
+    }
 }
 
 foreach ($tables as $table => $t) {
@@ -92,14 +96,14 @@ foreach ($tables as $table => $t) {
             $header = jQuery($view->render(implode('', ['AdminBundle:Admin:header-' , $headers[$table] , '.html.php']), array_merge($subVars, ['table' => $table])));
         }
 
-        if(empty($last) || $last->length == 0) {
-            $resultOutput->prepend($header);
-        }
-        else {
-            $last->after($header);
-        }
-
         if(!empty($header) && $header->length > 0) {
+            if(empty($last) || $last->length == 0) {
+                $resultOutput->prepend($header);
+            }
+            else {
+                $last->after($header);
+            }
+
             $last = $header->last();
         }
     }
@@ -129,14 +133,14 @@ foreach ($tables as $table => $t) {
                 'tableId' => implode('', [$table , $ext])])));
         }
         // TODO: update new row IDs, no insert if(isset($entity->newId))
-        if(empty($last) || $last->length == 0) {
-            $resultOutput->prepend($row);
-        }
-        else {
-            $last->after($row);
-        }
-
         if(!empty($row) && $row->length > 0) {
+            if(empty($last) || $last->length == 0) {
+                $resultOutput->prepend($row);
+            }
+            else {
+                $last->after($row);
+            }
+
             $last = $row->last();
         }
     }
@@ -164,14 +168,15 @@ foreach ($tables as $table => $t) {
                     'table' => $table,
                     'tableId' => implode('', [$table , $ext])])));
             }
-            if(empty($last) || $last->length == 0) {
-                $resultOutput->prepend($newRow);
-            }
-            else {
-                $last->after($newRow);
-            }
 
             if(!empty($newRow) && $newRow->length > 0) {
+                if(empty($last) || $last->length == 0) {
+                    $resultOutput->prepend($newRow);
+                }
+                else {
+                    $last->after($newRow);
+                }
+
                 $last = $newRow->last();
             }
         }
@@ -188,14 +193,14 @@ foreach ($tables as $table => $t) {
         $footer = jQuery($view->render(implode('', ['AdminBundle:Admin:footer-' , $footers[$table] , '.html.php']),     array_merge($subVars, ['table' => $table])));
     }
 
-    if(empty($last) || $last->length == 0) {
-        $resultOutput->prepend($footer);
-    }
-    else {
-        $last->after($footer);
-    }
-
     if(!empty($footer) && $footer->length > 0) {
+        if(empty($last) || $last->length == 0) {
+            $resultOutput->prepend($footer);
+        }
+        else {
+            $last->after($footer);
+        }
+
         $last = $footer->last();
     }
 }

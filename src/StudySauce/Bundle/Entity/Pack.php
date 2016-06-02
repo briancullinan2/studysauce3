@@ -236,6 +236,9 @@ class Pack
     public function getUserById($id)
     {
         /** @var UserPack $up */
+        if(!empty($this->getUser()) && $this->getUser()->getId() == $id) {
+            return $this->getUser();
+        }
         $up = $this->userPacks->filter(function (UserPack $up) use ($id) {return $up->getUser()->getId() == $id;})->first();
         if(empty($up)) {
             return null;

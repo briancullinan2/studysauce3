@@ -1,20 +1,34 @@
 <?php
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
-
+use StudySauce\Bundle\Controller\PacksController;
+use StudySauce\Bundle\Entity\UserPack;
 
 /** @var Pack $pack */
 /** @var User $user */
-if(!empty($pack->getUser()) && $pack->getUser()->getId() == $request['ss_user-id']) {
-    $user = $pack->getUser();
-}
-else {
-    $user = $pack->getUserById($request['ss_user-id']);
-}
+$retentionCount = 0;
 $isNew = true;
-if(!empty($user)) {
-    $isNew = $pack->isNewForChild($user);
+$id = 0;
+foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
+    /** @var UserPack $up */
+    if($up->getPack()->getId() == $pack->getId()) {
+        foreach($up->getRetention() as $i =>  $r) {
+            if($r[2]) {
+                if(empty($id)) {
+                    $id = $i;
+                }
+                $retentionCount += 1;
+            }
+            if(!empty($r[3])) {
+                $isNew = false;
+            }
+        }
+        if(!empty($up->getDownloaded()) && !$up->getRemoved()) {
+            $isNew = false;
+        }
+    }
 }
 ?>
-
-<label><?php print ($isNew ? '<strong>New </strong>' : ''); ?><span><?php print ($view->escape($pack->getTitle())); ?></span></label>
+<a href="<?php print ($view['router']->generate('cards', ['card' => $id])); ?>">
+    <label><?php print ($isNew ? '<strong>New </strong>' : ''); ?><span><?php print ($view->escape($pack->getTitle())); ?></span></label><label><?php print ($retentionCount); ?></label>
+</a>

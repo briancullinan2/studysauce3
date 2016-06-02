@@ -713,13 +713,13 @@ class HtmlPageCrawler extends Crawler
             $text = '';
             foreach ($this as $node) {
                 /** @var \DOMNode $node */
-                $text .= $node->nodeValue;
+                $text .= htmlspecialchars_decode($node->nodeValue, ENT_QUOTES);
             }
             return $text;
         } else {
             foreach ($this as $node) {
                 /** @var \DOMNode $node */
-                $node->nodeValue = $text;
+                $node->nodeValue = htmlspecialchars($text, ENT_QUOTES);
             }
             return $this;
         }

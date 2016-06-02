@@ -12,6 +12,7 @@ if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
     $isAudio = substr($url, -4) == '.mp3' || substr($url, -4) == '.m4a';
 
 }
+
 ?>
 
 <label class="input type">

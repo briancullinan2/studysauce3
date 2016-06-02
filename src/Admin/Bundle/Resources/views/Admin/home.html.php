@@ -13,40 +13,38 @@ $user = $app->getUser();
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(['@results_css'], [], ['output' => 'bundles/admin/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/home.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url):?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
+foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/home.css'],[],['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
+    <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
+<?php }
 $view['slots']->stop();
 
 $view['slots']->start('javascripts'); ?>
-<?php foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/results.js'], [], ['output' => 'bundles/admin/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach; ?>
 <?php $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="home<?php print (!empty($id) && $user->getId() != $id ? ('-user' . $id) : ''); ?>">
+    <div class="panel-pane" id="home<?php print (!empty($id) && $user->getId() != $id ? implode('', ['-user' , $id]) : ''); ?>">
         <div class="pane-content">
             <div class="study-top">
             <div class="user-shuffle">
-                <h2>Today's goal <?php print ($user->getId() != $id ? ('(' . $first . ' ' . $last . ')') : ''); ?></h2>
-                <a href="#shuffle-card" class="centerized">&nbsp;</a>
+                <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></h2>
+                <a href="#shuffle-card" class="centerized"></a>
             <?php
             $tables = [
-                'tables' => ['pack' => ['titleNew' => ['title'], 'retention', ['userPacks.user']], 'ss_user' => ['id'], 'user_pack' => ['user', 'pack', 'removed']],
+                'tables' => [
+                    'ss_user' => ['id' => ['id', 'packs', 'userPacks']],
+                    'pack' => ['titleNew' => ['id', 'title']],
+                    'user_pack' => ['user', 'pack', 'removed', 'retention', 'downloaded']],
                 //'user-ss_user-id' => 'NULL',
                 'user_pack-removed' => false,
                 'ss_user-id' => $id,
                 'headers' => false,
                 'count-pack' => 0,
-                'count-ss_user' => -1,
+                'read-only' => false,
+                'count-ss_user' => 1,
                 'count-user_pack' => -1,
                 'footers' => false
             ];
-            print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+            print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
             ?>
             </div>
             <div class="study-log">
@@ -61,7 +59,7 @@ $view['slots']->start('body'); ?>
                     'count-ss_user' => -1,
                     'footers' => false
                 ];
-                print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+                print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
                 ?>
             </div>
             </div>
@@ -78,7 +76,7 @@ $view['slots']->start('body'); ?>
                     'count-ss_user' => -1,
                     'footers' => false
                 ];
-                print $view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables));
+                print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
                 ?>
             </div>
         </div>
@@ -89,3 +87,5 @@ $view['slots']->start('body'); ?>
 $view['slots']->start('sincludes'); ?>
 
 <?php $view['slots']->stop();
+
+

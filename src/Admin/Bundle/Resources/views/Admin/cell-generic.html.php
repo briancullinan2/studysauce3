@@ -31,7 +31,7 @@ foreach($fields as $subfield) {
         }
     }
     // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-    if (!empty($joinName) && isset(AdminController::$defaultTables[$joinTable])) {
+    if (!empty($joinName) && isset(AdminController::$defaultTables[$joinTable]['name'])) {
         $searchTables[$joinTable] = AdminController::$defaultTables[$joinTable]['name'];
     }
 }

@@ -6,13 +6,9 @@ use StudySauce\Bundle\Entity\Card;
 
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
-$preview = $row->find('.preview');
+
 // TODO: how to get data from object or from view in the same way?
 // TODO: use applyFields and gatherFields here too?  at the row level?
-if($preview->length == 0) {
-    return;
-}
-
 $type = $card->getResponseType();
 $content = $card->getContent();
 $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
@@ -25,8 +21,6 @@ foreach($card->getAnswers()->toArray() as $answer) {
         $answersUnique[count($answersUnique)] = $answer->getContent();
     }
 }
-
-$matches = (array)(new stdClass());
 if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
     $url = trim($matches[0]);
 }
@@ -40,11 +34,11 @@ if(!empty($url)) {
 }
 
 $template = $type == ''
-    ? $preview->find('.preview-card:not([class*="type-"])')
-    : $preview->find(implode('', ['.preview-card.type-' , $type]));
+    ? $row->find('.preview-card:not([class*="type-"])')
+    : $row->find(implode('', ['.preview-card.type-' , $type]));
 // switch templates if needed
 if (2 != $template->length) {
-    $preview->children()->remove();
+    $row->children()->remove();
 
     // this is all prompt content
     $view['slots']->start('card-preview-prompt'); ?>
@@ -57,14 +51,7 @@ if (2 != $template->length) {
 
     // re-render preview completely because type has changed
     $view['slots']->start('card-preview'); ?>
-    <h3>Preview: </h3>
     <?php if (empty($type)) { ?>
-        <div class="preview-card">
-            <div class="preview-inner">
-                <?php $view['slots']->output('card-preview-prompt'); ?>
-            </div>
-            <div class="preview-tap">Tap to see answer</div>
-        </div>
         <div class="preview-card preview-answer">
             <div class="preview-prompt">
                 <?php $view['slots']->output('card-preview-prompt'); ?>
@@ -74,46 +61,13 @@ if (2 != $template->length) {
                 <div class="preview-content"><div class="centerized"></div></div>
             </div>
             <div class="preview-footer">
-            <div class="preview-wrong">✘</div>
+            <a href="#wrong" class="preview-wrong">✘</a>
             <div class="preview-guess">Did you guess correctly?</div>
-            <div class="preview-right">✔︎</div>
+            <a href="#right" class="preview-right">✔︎</a>
             </div>
         </div>
-    <?php } ?>
-    <?php if ($type == 'mc') { ?>
-        <div class="preview-card type-mc">
-            <div class="preview-inner">
-                <?php $view['slots']->output('card-preview-prompt'); ?>
-            </div>
-            <div class="preview-footer">
-            <div class="preview-response"><div class="centerized"></div></div>
-            <div class="preview-response"><div class="centerized"></div></div>
-            <div class="preview-response"><div class="centerized"></div></div>
-            <div class="preview-response"><div class="centerized"></div></div>
-            </div>
-        </div>
-    <?php } ?>
-    <?php if ($type == 'tf') { ?>
-        <div class="preview-card type-tf">
-            <div class="preview-inner">
-                <?php $view['slots']->output('card-preview-prompt'); ?>
-            </div>
-            <div class="preview-footer">
-            <div class="preview-false">False</div>
-            <div class="preview-guess"> </div>
-            <div class="preview-true">True</div>
-            </div>
-        </div>
-    <?php } ?>
-    <?php if ($type == 'sa') { ?>
-        <div class="preview-card type-sa">
-            <div class="preview-inner">
-                <?php $view['slots']->output('card-preview-prompt'); ?>
-            </div>
-            <label class="input"><input type="text" value=""/></label>
-        </div>
-    <?php } ?>
-    <?php if (!empty($type)) { ?>
+    <?php }
+    else { ?>
         <div class="preview-card type-mc type-tf type-sa preview-answer">
             <div class="preview-prompt">
                 <?php $view['slots']->output('card-preview-prompt'); ?>
@@ -126,7 +80,7 @@ if (2 != $template->length) {
     <?php }
     $view['slots']->stop();
 
-    $preview->append($view['slots']->get('card-preview'));
+    $row->append($view['slots']->get('card-preview'));
 }
 
 //$packTitle = !empty($card->getPack()) ? $card->getPack()->getTitle() : '';
@@ -135,29 +89,27 @@ if (2 != $template->length) {
 // replace with image
 if($isImage && isset($url)) {
     // TODO: change this if we need to support image and text at the same time not using entry box
-    $preview->find('.preview-card:not(.preview-answer) .preview-inner img, .preview-answer .preview-prompt img, .preview-card:not(.preview-answer) .preview-inner .preview-content, .preview-answer .preview-prompt .preview-content')
+    $row->find('.preview-card:not(.preview-answer) .preview-inner img, .preview-answer .preview-prompt img, .preview-card:not(.preview-answer) .preview-inner .preview-content, .preview-answer .preview-prompt .preview-content')
         ->replaceWith(implode('', ['<img src="', $url, '" />']));
-}
 
-if(($isImage || $isAudio) && isset($url)) {
     // TODO: if type-sa?
     if(!empty($content)) {
-        $preview->find('[type="text"]')->val($content);
+        $row->find('[type="text"]')->val($content);
     }
     else {
-        $preview->find('[type="text"]')->val('Type your answer');
+        $row->find('[type="text"]')->val('Type your answer');
     }
 }
 else {
-    $preview->find('[type="text"]')->val('Type your answer');
+    $row->find('[type="text"]')->val('Type your answer');
 }
 
-$preview->find('.preview-content div')->text($content);
+$row->find('.preview-content div')->text($content);
 
 for ($ai = 0; $ai < count($answersUnique); $ai++) {
-    $preview->find('.preview-response')->eq($ai)->find('div')->text($answersUnique[$ai]);
+    $row->find('.preview-response')->eq($ai)->find('div')->text($answersUnique[$ai]);
 }
 
-$preview->find('.preview-answer .preview-inner .preview-content div')->text($correct);
+$row->find('.preview-answer .preview-inner .preview-content div')->text($correct);
 
 print ($row->html());

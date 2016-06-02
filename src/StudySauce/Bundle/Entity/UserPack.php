@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use StudySauce\Bundle\Controller\PacksController;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\Entity\Pack;
 
@@ -75,6 +76,10 @@ class UserPack
             }
         }
         return $responses;
+    }
+
+    public function getRetention() {
+        return PacksController::getRetention($this->pack, $this->user);
     }
 
     /**

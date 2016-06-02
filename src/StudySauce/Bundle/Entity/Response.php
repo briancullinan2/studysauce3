@@ -50,7 +50,7 @@ class Response
     /**
      * @ORM\Column(type="text", name="value", nullable=true)
      */
-    protected $value;
+    protected $value = null;
 
     /**
      * @ORM\Column(type="boolean", name="correct")

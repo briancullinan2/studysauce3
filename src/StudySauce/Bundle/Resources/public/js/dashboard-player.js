@@ -26,6 +26,12 @@ $(document).ready(function () {
             }
         });
 
+        jp.bind($.jPlayer.event.playing, function () {
+            centerize.apply(body.find('.centerized:visible'));
+        });
+        jp.bind($.jPlayer.event.ended, function () {
+            centerize.apply(body.find('.centerized:visible'));
+        });
         /*
          jp.bind($.jPlayer.event.ended, function () {
          if(window.musicIndex == -1) {

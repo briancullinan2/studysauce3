@@ -581,6 +581,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     bottom:0;
     background: #BBB;
     overflow: hidden;
+    text-align: left;
 }
 
 .results > .views:hover {

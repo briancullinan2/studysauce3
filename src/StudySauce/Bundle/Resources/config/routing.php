@@ -359,6 +359,30 @@ $collection->add(
     )
 );
 $collection->add(
+    'cards',
+    new Route(
+        '/cards/{card}/{_format}',
+        ['_controller' => 'StudySauceBundle:Packs:card', '_format' => 'index', 'card' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'card' => '[0-9]*']
+    )
+);
+$collection->add(
+    'cards_answers',
+    new Route(
+        '/answers/{answer}/{_format}',
+        ['_controller' => 'StudySauceBundle:Packs:answer', '_format' => 'index', 'answer' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'answer' => '[0-9]*']
+    )
+);
+$collection->add(
+    'cards_result',
+    new Route(
+        '/results/{pack}/{_format}',
+        ['_controller' => 'StudySauceBundle:Packs:result', '_format' => 'index', 'pack' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'pack' => '[0-9]*']
+    )
+);
+$collection->add(
     'responses',
     new Route(
         '/packs/responses/{user}',
