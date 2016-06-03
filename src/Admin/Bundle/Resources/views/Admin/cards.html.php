@@ -45,14 +45,24 @@ $view['slots']->start('body'); ?>
             <?php
             $request = [
                 // view settings
-                'tables' => ['card' => ['card' => ['id', 'answers', 'correct']]],
+                'tables' => [
+                    'card' => ['card' => ['id', 'answers', 'correct']],
+                    'pack' => ['id'],
+                    'user_pack' => ['id' => ['user', 'pack', 'retention']],
+                    'ss_user' => ['id']
+                ],
                 'headers' => false,
                 'footers' => false,
                 'read-only' => false,
                 // search settings
                 'card-id' => $card->getId(),
+                'pack-id' => $card->getPack()->getId(),
+                'ss_user-id' => $user->getId(),
                 // for new=true the template generates the -count number of empty rows, and no database query is performed
                 'count-card' => 1,
+                'count-pack' => -1,
+                'count-user_pack' => 1,
+                'count-ss_user' => -1,
             ];
             if($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
@@ -65,14 +75,24 @@ $view['slots']->start('body'); ?>
             <?php
             $request = [
                 // view settings
-                'tables' => ['card' => ['cardAnswer' => ['id', 'answers', 'correct']]],
+                'tables' => [
+                    'card' => ['cardAnswer' => ['id', 'answers', 'correct']],
+                    'pack' => ['id'],
+                    'user_pack' => ['id' => ['user', 'pack', 'retention']],
+                    'ss_user' => ['id']
+                ],
                 'headers' => false,
                 'footers' => false,
                 'read-only' => false,
                 // search settings
                 'card-id' => $card->getId(),
+                'pack-id' => $card->getPack()->getId(),
+                'ss_user-id' => $user->getId(),
                 // for new=true the template generates the -count number of empty rows, and no database query is performed
                 'count-card' => 1,
+                'count-pack' => -1,
+                'count-user_pack' => 1,
+                'count-ss_user' => -1,
             ];
             if($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));

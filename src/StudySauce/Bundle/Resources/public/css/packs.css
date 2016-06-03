@@ -277,7 +277,7 @@
     background: #eee;
     vertical-align: middle;
     border: 1px solid #BBB;
-    padding: 10px;
+    padding: 10px 10px 30px;
     white-space: normal;
     margin:0 5px;
     word-wrap: break-word;
@@ -372,18 +372,6 @@
     text-align: right;
 }
 
-[id^="cards"] .preview-count,
-[id^="packs-"] .card-row + .expandable .preview-count {
-    position:absolute;
-    bottom:0;
-    left: 0;
-    width:100%;
-    color: #BBB;
-    font-size: 105%;
-    padding:5px;
-    text-align: center;
-}
-
 [id^="cards"] .preview-prompt,
 [id^="packs-"] .card-row + .expandable .preview-prompt {
     background: #FFF;
@@ -469,7 +457,13 @@
 [id^="packs-"] .card-row + .expandable .type-mc .preview-footer
 {
     height:40%;
-    padding:24px 0;
+    padding:24px 0 54px;
+}
+
+[id^="cards"] .preview-count {
+    position:relative;
+    top:5px;
+    color:#BBB;
 }
 
 [id^="cards"] .type-mc .preview-inner,

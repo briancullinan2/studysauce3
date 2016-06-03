@@ -1,11 +1,32 @@
 <?php
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
+use StudySauce\Bundle\Entity\UserPack;
+use DateTime as Date;
+use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+
+/** @var GlobalVariables $app */
+$request = $app->getRequest();
 
 /** @var Card $card */
 
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
+
+$total = 0;
+$index = 1;
+/** @var UserPack $user_pack */
+$user_pack = $results['user_pack'][0];
+foreach($user_pack->getRetention() as $id => $r) {
+    if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
+        || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
+        $total += 1;
+    }
+    if(new Date($r[3]) > new Date($request->cookies->get('retention'))) {
+        $index += 1;
+    }
+}
+
 
 // TODO: how to get data from object or from view in the same way?
 // TODO: use applyFields and gatherFields here too?  at the row level?
@@ -52,6 +73,9 @@ if (2 != $template->length) {
                 <?php $view['slots']->output('card-preview-prompt'); ?>
             </div>
             <div class="preview-tap">Tap to see answer</div>
+            <div class="preview-footer">
+                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+            </div>
         </div>
     <?php } ?>
     <?php if ($type == 'mc') { ?>
@@ -60,10 +84,11 @@ if (2 != $template->length) {
                 <?php $view['slots']->output('card-preview-prompt'); ?>
             </div>
             <div class="preview-footer">
-            <a href="" class="preview-response"><div class="centerized"></div></a>
-            <a href="" class="preview-response"><div class="centerized"></div></a>
-            <a href="" class="preview-response"><div class="centerized"></div></a>
-            <a href="" class="preview-response"><div class="centerized"></div></a>
+                <a href="" class="preview-response"><div class="centerized"></div></a>
+                <a href="" class="preview-response"><div class="centerized"></div></a>
+                <a href="" class="preview-response"><div class="centerized"></div></a>
+                <a href="" class="preview-response"><div class="centerized"></div></a>
+                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
             </div>
         </div>
     <?php } ?>
@@ -76,6 +101,7 @@ if (2 != $template->length) {
                 <a href="#false" class="preview-false">False</a>
                 <div class="preview-guess"> </div>
                 <a href="#true" class="preview-true">True</a>
+                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
             </div>
         </div>
     <?php } ?>
@@ -86,6 +112,9 @@ if (2 != $template->length) {
             </div>
             <label class="input"><input type="text" value="" data-disclaimer="if you are reading this you should be a hacker ;)" data-correct="<?php print ($card->getCorrect()->getValue()); ?>" /></label>
             <a href="#done" class="btn">Done</a>
+            <div class="preview-footer">
+                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+            </div>
         </div>
     <?php }
     $view['slots']->stop();

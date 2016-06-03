@@ -1,11 +1,31 @@
 <?php
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
+use DateTime as Date;
+use StudySauce\Bundle\Entity\UserPack;
+use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+
+/** @var GlobalVariables $app */
+$request = $app->getRequest();
 
 /** @var Card $card */
 
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
+
+$total = 0;
+$index = 1;
+/** @var UserPack $user_pack */
+$user_pack = $results['user_pack'][0];
+foreach($user_pack->getRetention() as $id => $r) {
+    if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
+        || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
+        $total += 1;
+    }
+    if(new Date($r[3]) > new Date($request->cookies->get('retention'))) {
+        $index += 1;
+    }
+}
 
 // TODO: how to get data from object or from view in the same way?
 // TODO: use applyFields and gatherFields here too?  at the row level?
@@ -61,9 +81,10 @@ if (2 != $template->length) {
                 <div class="preview-content"><div class="centerized"></div></div>
             </div>
             <div class="preview-footer">
-            <a href="#wrong" class="preview-wrong">✘</a>
-            <div class="preview-guess">Did you guess correctly?</div>
-            <a href="#right" class="preview-right">✔︎</a>
+                <a href="#wrong" class="preview-wrong">✘</a>
+                <div class="preview-guess">Did you guess correctly?</div>
+                <a href="#right" class="preview-right">✔︎</a>
+                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
             </div>
         </div>
     <?php }
@@ -75,6 +96,9 @@ if (2 != $template->length) {
             <div class="preview-inner">
                 <div class="preview-correct">Correct answer:</div>
                 <div class="preview-content"><div class="centerized"></div></div>
+            </div>
+            <div class="preview-footer">
+                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
             </div>
         </div>
     <?php }
