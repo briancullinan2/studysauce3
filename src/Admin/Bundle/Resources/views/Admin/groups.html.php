@@ -158,7 +158,7 @@ $view['slots']->start('body'); ?>
                     $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'];
                     $tables['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
                     $tables['card'] = ['id', 'deleted'];
-                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['group', 'groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                     $request = [
                         'count-pack' => $isNew ? -1 : 0,
                         'count-ss_group' => 1,

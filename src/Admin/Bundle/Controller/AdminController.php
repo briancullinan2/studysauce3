@@ -118,6 +118,7 @@ class AdminController extends Controller
     {
         $result = '';
         $joinFields = explode('.', $field);
+        $lastPart = 0;
         foreach ($joinFields as $jf) {
             $associated = self::$allTables[$joinTable]->getAssociationMappings();
             if (isset($associated[$jf])) {
@@ -133,11 +134,12 @@ class AdminController extends Controller
                     $joins[] = $newName;
                     $qb = $qb->leftJoin($joinName . '.' . $jf, $newName);
                     // allow searching of connected fields like userPacks-removed = false
-                    if (in_array($joinTable, array_keys($request['tables']))) {
+                    if (in_array($joinTable, array_keys($request['tables'])) && $lastPart < count($joinFields) - 1) {
                         $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $newName, $request, $joins);
                     }
                 }
                 $joinName = $newName;
+                $lastPart += 1;
             } else {
                 // join failed, don't search any other tables this round
                 $joinName = null;
@@ -145,9 +147,9 @@ class AdminController extends Controller
             }
         }
         // do one search on the last entity on the join, ie not searching intermediate tables like user_pack or ss_user_group
-        //if (!empty($joinName) && isset($request['tables'][$joinTable])) {
-        //    $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
-        //}
+        if (!empty($joinName) && isset($request['tables'][$joinTable])) {
+            $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $joinName, $request, $joins);
+        }
         return $result;
     }
 
