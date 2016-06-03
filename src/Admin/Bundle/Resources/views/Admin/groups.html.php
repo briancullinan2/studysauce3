@@ -155,7 +155,7 @@ $view['slots']->start('body'); ?>
                     <?php
                     $tables = (array)(new stdClass());
                     $tables['ss_group'] = ['id', 'deleted'];
-                    $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'userPacks', 'groups'];
+                    $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'groups'];
                     $tables['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
                     $tables['card'] = ['id', 'deleted'];
                     $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
