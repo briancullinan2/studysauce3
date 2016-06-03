@@ -168,6 +168,18 @@ window.views.__defaultEntities['pack'] = {
         return $(this.cards.map(function (c) {return applyEntityObj(c)}));
     },
     getTitle: function () {return this.title;},
+    getUserPack: function (user) {
+        for(var up = 0; up < this.userPacks.length; up++) {
+            if(this.userPacks[up].user.id == user.id) {
+                return applyEntityObj(this.userPacks[up]);
+            }
+        }
+        for(var up2 = 0; up2 < user.userPacks.length; up2++) {
+            if(user.userPacks[up2].pack.id == this.id) {
+                return applyEntityObj(pack.userPacks[up2]);
+            }
+        }
+    },
     getUserPacks: function () {return $(this.userPacks.map(function (up) {return applyEntityObj(up);}));},
     getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));},
     getUser: function () {return this.user ? applyEntityObj(this.user) : null;},

@@ -395,6 +395,11 @@
     display:block;
 }
 
+[id^="cards-answer"] .user_pack-row,
+[id^="cards-card"] .user_pack-row {
+    display:none;
+}
+
 [id^="cards"] .preview-inner,
 [id^="packs-"] .card-row + .expandable .preview-inner {
     height:100%;

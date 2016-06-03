@@ -106,12 +106,17 @@ $(document).ready(function () {
 
     var body = $('body');
 
+    var alreadySetting = false;
     body.on('change', '.header input[name="search"]', function () {
+        if(alreadySetting) {
+            return;
+        }
+        alreadySetting = true;
         var that = $(this);
         var value = that.val();
         var table = value.split('-')[0];
         var id = parseInt(value.split('-')[1]);
-        that[0].selectize.setValue('');
+        that[0].selectize.setValue('', true);
         that.blur();
         if(table == 'ss_user') {
             window.activateMenu(Routing.generate('home_user', {user: id}));
@@ -122,6 +127,7 @@ $(document).ready(function () {
         else if(table == 'pack') {
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));
         }
+        alreadySetting = false;
     });
 
     // entity search

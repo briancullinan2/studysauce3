@@ -21,7 +21,7 @@ if (isset($request['pack-id']) && $pack->getId() == $request['pack-id']) {
     if (isset($request['ss_group-id']) && !empty($group = $request['ss_group-id'])) {
         $userGroupCount = 0;
         foreach($pack->getUsers()->toArray() as $u) {
-            if(!empty($up = $u->getUserPack($pack)) && !empty($up->getDownloaded())) {
+            if(!empty($up = $pack->getUserPack($u)) && !empty($up->getDownloaded())) {
                 /** @var User $u */
                 foreach($u->getGroups()->toArray() as $g) {
                     /** @var Group $g */
