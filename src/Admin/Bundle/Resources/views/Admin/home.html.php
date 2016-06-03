@@ -32,7 +32,7 @@ $view['slots']->start('body'); ?>
             $tables = [
                 'tables' => [
                     'ss_user' => ['id' => ['id', 'packs', 'userPacks']],
-                    'pack' => ['titleNew' => ['id', 'title']],
+                    'pack' => ['titleNew' => ['id', 'title', 'status']],
                     'user_pack' => ['user', 'pack', 'removed', 'retention', 'downloaded']],
                 //'user-ss_user-id' => 'NULL',
                 'user_pack-removed' => false,
@@ -67,7 +67,7 @@ $view['slots']->start('body'); ?>
                 <h2>Study mastery report</h2>
                 <?php
                 $tables = [
-                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['userPacks.user'], 'expandMastery'], 'ss_user' => ['id']],
+                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['userPacks.user', 'status'], 'expandMastery'], 'ss_user' => ['id']],
                     //'user-ss_user-id' => 'NULL',
                     'classes' => ['last-right-expand'],
                     'ss_user-id' => $id,
