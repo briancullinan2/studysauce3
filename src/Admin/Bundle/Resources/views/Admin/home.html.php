@@ -29,12 +29,14 @@ $view['slots']->start('body'); ?>
                 <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></h2>
                 <a href="#shuffle-card" class="centerized"></a>
             <?php
-            $tables = [
-                'tables' => [
-                    'ss_user' => ['id' => ['id', 'packs', 'userPacks']],
-                    'pack' => ['titleNew' => ['id', 'title', 'status']],
-                    'user_pack' => ['user', 'pack', 'removed', 'retention', 'downloaded']],
+            $tables = (array)(new stdClass());
+            $tables['ss_user'] = ['id' => ['id', 'packs', 'userPacks']];
+            $tables['pack'] = ['titleNew' => ['id', 'title', 'status']];
+            $tables['user_pack'] = ['user', 'pack', 'removed', 'retention', 'downloaded'];
+            $request = [
+                'tables' => $tables,
                 //'user-ss_user-id' => 'NULL',
+                'user_pack-downloaded' => '!NULL',
                 'user_pack-removed' => false,
                 'ss_user-id' => $id,
                 'headers' => false,
@@ -44,13 +46,13 @@ $view['slots']->start('body'); ?>
                 'count-user_pack' => -1,
                 'footers' => false
             ];
-            print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
+            print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
             ?>
             </div>
             <div class="study-log">
                 <h2>Study log</h2>
                 <?php
-                $tables = [
+                $request = [
                     'tables' => ['ss_user' => ['mastery' => 'id']],
                     //'user-ss_user-id' => 'NULL',
                     'ss_user-id' => $id,
@@ -59,15 +61,18 @@ $view['slots']->start('body'); ?>
                     'count-ss_user' => -1,
                     'footers' => false
                 ];
-                print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $tables)));
+                print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                 ?>
             </div>
             </div>
             <div class="study-mastery">
                 <h2>Study mastery report</h2>
                 <?php
+                $tables = (array)(new stdClass());
+                $tables['pack'] = ['id', 'title', 'packMastery', ['userPacks.user', 'status'], 'expandMastery'];
+                $tables['ss_user'] = ['id'];
                 $tables = [
-                    'tables' => ['pack' => ['id', 'title', 'packMastery', ['userPacks.user', 'status'], 'expandMastery'], 'ss_user' => ['id']],
+                    'tables' => $tables,
                     //'user-ss_user-id' => 'NULL',
                     'classes' => ['last-right-expand'],
                     'ss_user-id' => $id,

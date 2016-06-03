@@ -43,14 +43,14 @@ $view['slots']->start('body'); ?>
     <div class="panel-pane" id="cards<?php print (!empty($card->getId()) ? implode('', ['-card' , $card->getId()]) : ''); ?>" data-card="<?php print ($view->escape(json_encode(['pack' => ['id' => $card->getPack()->getId()]]))); ?>">
         <div class="pane-content">
             <?php
+            $tables = (array)(new stdClass());
+            $tables['card'] = ['card' => ['id', 'answers', 'correct']];
+            $tables['pack'] = ['id'];
+            $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
+            $tables['ss_user'] = ['id'];
             $request = [
                 // view settings
-                'tables' => [
-                    'card' => ['card' => ['id', 'answers', 'correct']],
-                    'pack' => ['id'],
-                    'user_pack' => ['id' => ['user', 'pack', 'retention']],
-                    'ss_user' => ['id']
-                ],
+                'tables' => $tables,
                 'headers' => false,
                 'footers' => false,
                 'read-only' => false,
@@ -73,14 +73,14 @@ $view['slots']->start('body'); ?>
     <div class="panel-pane" id="cards<?php print (!empty($card->getId()) ? implode('', ['-answer' , $card->getId()]) : ''); ?>" data-card="<?php print ($view->escape(json_encode(['pack' => ['id' => $card->getPack()->getId()]]))); ?>">
         <div class="pane-content">
             <?php
+            $tables = (array)(new stdClass());
+            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct']];
+            $tables['pack'] = ['id'];
+            $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
+            $tables['ss_user'] = ['id'];
             $request = [
                 // view settings
-                'tables' => [
-                    'card' => ['cardAnswer' => ['id', 'answers', 'correct']],
-                    'pack' => ['id'],
-                    'user_pack' => ['id' => ['user', 'pack', 'retention']],
-                    'ss_user' => ['id']
-                ],
+                'tables' => $tables,
                 'headers' => false,
                 'footers' => false,
                 'read-only' => false,
