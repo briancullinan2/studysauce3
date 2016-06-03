@@ -1105,6 +1105,7 @@ var round = function (num, digits) {
     }
     return Math.round(num);
 };
+var is_string = function (obj) {return typeof obj == 'string';};
 var is_a = function (obj, typeStr) { return typeof obj == 'object' && obj != null && obj.constructor.name == typeStr();};
 var intval = function (str) {var result = parseInt(str); return isNaN(result) ? 0 : result;};
 var trim = function (str) {return (str || '').trim();};
