@@ -18,16 +18,18 @@ foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/
 <?php }
 $view['slots']->stop();
 
-$view['slots']->start('javascripts'); ?>
-<?php $view['slots']->stop();
+$view['slots']->start('javascripts');
+foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
+    <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
+<?php }
+$view['slots']->stop();
 
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="home<?php print (!empty($id) && $user->getId() != $id ? implode('', ['-user' , $id]) : ''); ?>">
         <div class="pane-content">
             <div class="study-top">
             <div class="user-shuffle">
-                <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></h2>
-                <a href="#shuffle-card" class="centerized"></a>
+                <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $user->getFirst() , ' ' , $user->getLast() , ')']) : ''); ?></h2>
             <?php
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'packs', 'userPacks']];
@@ -37,9 +39,9 @@ $view['slots']->start('body'); ?>
                 'tables' => $tables,
                 //'user-ss_user-id' => 'NULL',
                 'user_pack-downloaded' => '!NULL',
-                'user_pack-removed' => false,
+                'user_pack-removed' => '!1',
                 'ss_user-id' => $id,
-                'headers' => false,
+                'headers' => ['ss_user' => 'bigButton'],
                 'count-pack' => 0,
                 'read-only' => false,
                 'count-ss_user' => 1,

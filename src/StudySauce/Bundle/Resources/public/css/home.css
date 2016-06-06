@@ -97,15 +97,16 @@
     background-color:#09B;
 }
 
-a[href="#shuffle-card"] {
+.user-shuffle header a[href^="/cards"] {
     position:absolute;
     padding-bottom:36%;
     width:30%;
     display:block;
     background: url(../images/shuffle_btn.png) no-repeat 0 0 transparent;
     background-size: cover;
+    left:40px;
 }
 
-a[href="#shuffle-card"]:active {
+.user-shuffle header a[href^="/cards"]:active {
     background-position: 0 -554px;
 }

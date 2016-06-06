@@ -147,17 +147,6 @@
     vertical-align: top;
 }
 
-#welcome-message > a[href$="/logout"] {
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background: url(../images/logout.png) no-repeat center center;
-    overflow: hidden;
-    color: transparent;
-    margin-left: 10px;
-    vertical-align: middle;
-}
-
 @media all and (max-width:1300px)
 {
     #site-name

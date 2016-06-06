@@ -224,7 +224,7 @@
 .main-menu a
 {
     display:block;
-    padding:10px 0 10px 50px;
+    padding:10px 0 10px 30px;
     position:relative;
     letter-spacing: -1px;
 }
@@ -323,22 +323,20 @@ a[href*="/redirect/facebook"]:focus
     border-bottom-color: #224477;
 }
 
-.main-menu li ~ li a:hover,
-.main-menu li ~ li a:focus,
-.main-menu li ~ li a:active,
-.main-menu li ~ li a.active,
-#left-panel.expanded .main-menu li ~ li a:hover,
-#left-panel.expanded .main-menu li ~ li a:focus,
-#left-panel.expanded .main-menu li ~ li a:active,
-#left-panel.expanded .main-menu li ~ li a.active,
-#right-panel.expanded .main-menu li ~ li a:hover,
-#right-panel.expanded .main-menu li ~ li a:focus,
-#right-panel.expanded .main-menu li ~ li a:active,
-#right-panel.expanded .main-menu li ~ li a.active
+.main-menu li a:hover,
+.main-menu li a:focus,
+.main-menu li a:active,
+.main-menu li a.active,
+#left-panel.expanded .main-menu li a:hover,
+#left-panel.expanded .main-menu li a:focus,
+#left-panel.expanded .main-menu li a:active,
+#left-panel.expanded .main-menu li a.active,
+#right-panel.expanded .main-menu li a:hover,
+#right-panel.expanded .main-menu li a:focus,
+#right-panel.expanded .main-menu li a:active,
+#right-panel.expanded .main-menu li a.active
 {
-    padding-left:45px;
     background-color:#DDDDDD;
-    border-left:5px solid #0099BB;
     transition:background-color ease-in-out .15s, color ease-in-out .15s;
     color: #0099BB;
     font-weight: bold;
@@ -410,7 +408,7 @@ a[href*="/redirect/facebook"]:focus
 #right-panel.collapsed,
 #left-panel.collapsed
 {
-    width:50px;
+    width:0;
     white-space: nowrap;
     padding-top:100px;
 }
@@ -675,21 +673,6 @@ a[href*="/redirect/facebook"]:focus
     #right-panel a[href="#expand"],
     #right-panel a[href="#expand"] {
         display:none;
-    }
-
-    #right-panel.collapsed h3,
-    #right-panel.collapsed .main-menu,
-    #right-panel.expanded h3,
-    #right-panel.expanded .main-menu {
-        display:block;
-    }
-
-    #right-panel,
-    #right-panel.collapsed,
-    #right-panel.expanded {
-        width: 220px;
-        white-space: normal;
-        padding-top: 50px;
     }
 
 }

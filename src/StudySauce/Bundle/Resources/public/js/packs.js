@@ -401,7 +401,12 @@ $(document).ready(function () {
 
     body.on('show', '#home', function () {
         Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
+        loadResults.apply($(this).find('.results'));
         body.removeClass('study-mode')
+    });
+
+    body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
+        Cookies.set('retention_shuffle', $(this).is('header a'));
     });
 
     body.on('click', '[id^="cards"] .cardResult a[href^="/cards"]', function () {
@@ -412,7 +417,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('[href="#right"]');
-        var packId = $(this).parents('.panel-pane').data('card').pack.id;
+        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         $.ajax({
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
@@ -440,23 +445,36 @@ $(document).ready(function () {
     });
 
     function pickNextCard(data, packId) {
-        var picked = false;
         var retention = Cookies.get('retention');
         if(retention == null) {
             Cookies.set('retention', retention = moment(new Date()).formatPHP('r'), { expires: 7 });
         }
-        for(var i in data.retention) {
-            if(!data.retention.hasOwnProperty(i)) {
+        if(typeof data.retention[0] != 'undefined' && data.retention[0].constructor != Array) {
+            data.retention[0] = data.retention;
+        }
+
+        var remaining = [];
+        for(var j in data.retention) {
+            if(!data.retention.hasOwnProperty(j)) {
                 continue;
             }
-            if(data.retention[i][2] && (!data.retention[i][3] || new Date(data.retention[i][3]) < new Date(retention))) {
-                picked = true;
-                // TODO: created results tab without callback
-                activateMenu(Routing.generate('cards', {card: i}));
-                break;
+            for(var i in data.retention[j].retention) {
+                if(!data.retention[j].retention.hasOwnProperty(i)) {
+                    continue;
+                }
+                if(data.retention[j].retention[i][2] && (!data.retention[j].retention[i][3]
+                    || new Date(data.retention[j].retention[i][3]) < new Date(retention))) {
+                    remaining[remaining.length] = i;
+                }
             }
         }
-        if(!picked) {
+
+        // TODO: created results tab without callback
+        if(remaining.length > 0) {
+            var id = remaining[Math.floor(Math.random() * remaining.length)];
+            activateMenu(Routing.generate('cards', {card: id}));
+        }
+        else {
             // TODO: go to results page
             activateMenu(Routing.generate('cards_result', {pack: packId}));
         }
@@ -505,7 +523,7 @@ $(document).ready(function () {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('.correct');
-        var packId = $(this).parents('.panel-pane').data('card').pack.id;
+        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         $.ajax({
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
@@ -545,7 +563,7 @@ $(document).ready(function () {
         var input = $(this).parents('.card-row input');
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
-        var packId = $(this).parents('.panel-pane').data('card').pack.id;
+        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         $.ajax({
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',

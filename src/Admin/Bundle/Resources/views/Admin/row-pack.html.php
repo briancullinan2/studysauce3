@@ -23,7 +23,8 @@ $rowHtml = $view->render('AdminBundle:Admin:row.html.php', [
 $row = $context->filter(implode('', ['.', $table , '-id-', $pack->getId()]));
 
 // skip rows that have zero retention
-if(isset($request['user_pack-downloaded']) && strpos($rowHtml, '<label>0</label>') !== false) {
+if(isset($request['user_pack-downloaded']) && (strpos($rowHtml, '<label>0</label>') !== false
+    || $results['ss_user'][0]->getUserPack($pack)->getRemoved())) {
     return;
 }
 

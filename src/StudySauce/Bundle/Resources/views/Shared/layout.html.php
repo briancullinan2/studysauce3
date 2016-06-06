@@ -57,6 +57,7 @@ $collection = $router->getRouteCollection();
             <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
         <?php endforeach;
 
+        // divide by 100 in Y in photo and add 1, + positive for hover, - negative for default
         $iconSets = [
             '/bundles/studysauce/images/menu_new_half.png' => [
                 -97 => ['#search-'],
@@ -68,7 +69,15 @@ $collection = $router->getRouteCollection();
                 -32 => ['#edit-', '.edit-icon'],
                 33 => ['#edit-', '.edit-icon'],
                 -34 => ['#remove-', '/packs/remove', '/command/save/group?remove', '.remove-icon'],
-                35 => ['#remove-', '/packs/remove', '/command/save/group?remove', '.remove-icon']
+                35 => ['#remove-', '/packs/remove', '/command/save/group?remove', '.remove-icon'],
+                76 => ['#right-panel'],
+                -76 => ['#right-panel'],
+                52 => ['/logout'],
+                -52 => ['/logout'],
+                99 => ['/account'],
+                -99 => ['/account'],
+                17 => ['/?_switch_user=_exit'],
+                -17 => ['/?_switch_user=_exit']
             ],
             '/bundles/studysauce/images/menu_new2_half.png' => [
                 -1 => ['#upload-video'],
@@ -243,7 +252,6 @@ EOCSS;
 
     $view['slots']->output('javascripts');
     ?>
-    <script type="text/javascript" src="<?php print ($view['router']->generate('template')); ?>"></script>
     <?php
     $view['slots']->output('sincludes');
     // show error dialogs in debug environment

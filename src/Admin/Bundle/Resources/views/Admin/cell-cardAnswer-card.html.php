@@ -13,11 +13,10 @@ $request = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
 
-$total = 0;
+$total = isset($results['user_pack'][0]) ? 0 : count($card->getPack()->getCards()->toArray());
 $index = 1;
-/** @var UserPack $user_pack */
-$user_pack = $results['user_pack'][0];
-foreach($user_pack->getRetention() as $id => $r) {
+$retention = isset($results['user_pack'][0]) ? $results['user_pack'][0]->getRetention() : [];
+foreach($retention as $id => $r) {
     if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
         || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
         $total += 1;
@@ -33,14 +32,7 @@ $type = $card->getResponseType();
 $content = $card->getContent();
 $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
 $correct = !empty($card->getCorrect()) ? preg_replace('/\\\\n(\\\\r)?/i', "\n", $card->getCorrect()->getContent()) : '';
-/** @var Answer[] $answers */
-$answersUnique = [];
-foreach($card->getAnswers()->toArray() as $answer) {
-    /** @var Answer $answer */
-    if(!$answer->getDeleted() && !in_array($answer->getContent(), $answersUnique)) {
-        $answersUnique[count($answersUnique)] = $answer->getContent();
-    }
-}
+$matches = (array)(new stdClass());
 if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
     $url = trim($matches[0]);
 }
@@ -115,24 +107,9 @@ if($isImage && isset($url)) {
     // TODO: change this if we need to support image and text at the same time not using entry box
     $row->find('.preview-card:not(.preview-answer) .preview-inner img, .preview-answer .preview-prompt img, .preview-card:not(.preview-answer) .preview-inner .preview-content, .preview-answer .preview-prompt .preview-content')
         ->replaceWith(implode('', ['<img src="', $url, '" />']));
-
-    // TODO: if type-sa?
-    if(!empty($content)) {
-        $row->find('[type="text"]')->val($content);
-    }
-    else {
-        $row->find('[type="text"]')->val('Type your answer');
-    }
-}
-else {
-    $row->find('[type="text"]')->val('Type your answer');
 }
 
 $row->find('.preview-content div')->text($content);
-
-for ($ai = 0; $ai < count($answersUnique); $ai++) {
-    $row->find('.preview-response')->eq($ai)->find('div')->text($answersUnique[$ai]);
-}
 
 $row->find('.preview-answer .preview-inner .preview-content div')->text($correct);
 

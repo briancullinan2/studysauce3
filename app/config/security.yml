@@ -60,7 +60,7 @@ security:
                 provider: fos_userbundle
                 oauth_user_provider:
                     service: my_user_provider
-            switch_user: { role: ROLE_ADMIN, parameter: _switch_user }
+            switch_user: { role: ROLE_USER, parameter: _switch_user }
 
     access_control:
         # anonymous pages

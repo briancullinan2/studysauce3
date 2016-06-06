@@ -63,11 +63,17 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
                 <?php } ?>
                 <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode(AdminController::$defaultMiniTables)); ?>" data-confirm="false" placeholder="Search" /></label>
                 <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>
+                <?php
+                /*
                 <a href="<?php print $view['router']->generate('logout'); ?>" title="Log out">logout</a></div>
+                 */
+                ?>
+                <a href="#right-panel" title="Show/Hide menu">&nbsp;</a></div>
             <div id="jquery_jplayer" style="width: 0; height: 0;"></div>
         <?php } ?>
     </div>
 </div>
 <?php
+print ($view->render('StudySauceBundle:Shared:menu.html.php'));
 
 

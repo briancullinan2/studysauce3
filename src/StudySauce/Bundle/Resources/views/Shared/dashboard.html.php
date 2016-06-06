@@ -128,6 +128,7 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         foreach ($view['assetic']->javascripts(['@dashboard_scripts'],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
             <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
         <?php endforeach;
+        ?><script type="text/javascript" src="<?php print ($view['router']->generate('template')); ?>"></script><?php
         $view['slots']->output('tmp-javascripts');
         $view['slots']->stop();
     }

@@ -1,16 +1,33 @@
-<?php use Symfony\Component\HttpKernel\Controller\ControllerReference;
+<?php use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\User;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
-/** @var @var User $user */
+/** @var User $user */
 $user = $app->getUser();
 ?>
 
 <aside id="right-panel" class="collapsed">
     <nav>
-        <a href="#expand"><span class="navbar-toggle">Study Tools</span></a>
         <ul class="main-menu">
-            <li><a href="#collapse">Hide</a><h3>Study Tools</h3></li>
-            <li><a href="<?php print $view['router']->generate('results'); ?>"><span>&nbsp;</span>Home</a></li>
-            <li><a href="<?php print $view['router']->generate('account'); ?>"><span>&nbsp;</span>Account settings</a></li>
+            <?php
+            foreach ($user->getInvites()->toArray() as $invite) {
+                /** @var Invite $invite */
+                if (empty($invite->getInvitee())) {
+                    continue;
+                }
+                ?>
+                <li>
+                    <a href="<?php print ($view['router']->generate('_welcome', ['_switch_user' => $invite->getInvitee()->getEmail()])); ?>"><?php print (implode('', [$invite->getInvitee()->getFirst(), ' ', $invite->getInvitee()->getLast()])); ?></a>
+                </li>
+            <?php }
+            if ($view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
+                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit">Parent account</a></li>
+            <?php } ?>
+            <li><a href="#collapse">Hide</a>
+
+                <h3></h3></li>
+            <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Add Child</a></li>
+            <li><a href="<?php print ($view['router']->generate('logout')); ?>"><span>&nbsp;</span>Logout</a></li>
         </ul>
     </nav>
 </aside>

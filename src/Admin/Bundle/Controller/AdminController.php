@@ -1088,6 +1088,7 @@ for(var t in window.AdminController.__vars.allTables) {
 }
 window.AdminController.getAllFieldNames = function (tables) { return window.getAllFieldNames(tables); };
 
+var strpos = function (str, match) {var i; return (i = str.indexOf(match)) > -1 ? i : false;};
 var substr = function (str, start, length) {return str.substr(start, length);};
 var is_numeric = function (num) {return !isNaN(parseInt(num)) || !isNaN(parseFloat(num));};
 var strlen = function (str) {return (''+(str || '')).length;};

@@ -13,11 +13,10 @@ $request = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
 
-$total = 0;
+$total = isset($results['user_pack'][0]) ? 0 : count($card->getPack()->getCards()->toArray());
 $index = 1;
-/** @var UserPack $user_pack */
-$user_pack = $results['user_pack'][0];
-foreach($user_pack->getRetention() as $id => $r) {
+$retention = isset($results['user_pack'][0]) ? $results['user_pack'][0]->getRetention() : [];
+foreach($retention as $id => $r) {
     if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
         || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
         $total += 1;
@@ -27,15 +26,12 @@ foreach($user_pack->getRetention() as $id => $r) {
     }
 }
 
-
 // TODO: how to get data from object or from view in the same way?
 // TODO: use applyFields and gatherFields here too?  at the row level?
 $type = $card->getResponseType();
 $content = $card->getContent();
 $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
 $correct = !empty($card->getCorrect()) ? preg_replace('/\\\\n(\\\\r)?/i', "\n", $card->getCorrect()->getContent()) : '';
-/** @var Answer[] $answers */
-$answersUnique = [];
 $matches = (array)(new stdClass());
 if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
     $url = trim($matches[0]);
@@ -147,6 +143,7 @@ else {
 
 $row->find('.preview-content div')->text($content);
 
+$answersUnique = [];
 foreach($card->getAnswers()->toArray() as $answer) {
     /** @var Answer $answer */
     if (!$answer->getDeleted() && !in_array($answer->getContent(), $answersUnique)) {
@@ -171,7 +168,5 @@ if($card->getResponseType() == 'tf') {
         $resp->addClass(implode('', ['answer-id-', $card->getCorrect()->getId()]));
     }
 }
-
-$row->find('.preview-answer .preview-inner .preview-content div')->text($correct);
 
 print ($row->html());

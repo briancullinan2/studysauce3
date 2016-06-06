@@ -127,7 +127,10 @@ $(document).ready(function () {
     });
 
     function expandMenu(evt) {
-        var parent = $(this).parents('#left-panel, #right-panel');
+        var parent = $(this).closest('#left-panel, #right-panel');
+        if($(this).is('a[href="#right-panel"]')) {
+            parent = $('#right-panel');
+        }
         if ($(this).is('[href="#collapse"]'))
             return collapseMenu();
         if ($(this).is('[href="#expand"]'))
@@ -190,7 +193,7 @@ $(document).ready(function () {
     });
 
     body.on('click', ':not(#left-panel):not(#right-panel):not(#left-panel *):not(#right-panel *)', collapseMenu);
-    body.on('click', '#left-panel a[href="#collapse"], #right-panel a[href="#collapse"]', collapseMenu);
+    body.on('click', '#left-panel a[href="#collapse"], #right-panel a[href="#collapse"], a[href="#right-panel"]', collapseMenu);
 
     function handleLink(evt) {
         var that = $(this),

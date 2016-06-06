@@ -26,7 +26,7 @@ $user = $app->getUser();
                 <li><a href="<?php print $view['router']->generate('logout'); ?>">Logout</a></li>
             <?php }
             if ($view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
-                <li><a href="<?php print $view['router']->generate('command'); ?>?_switch_user=_exit">Exit</a></li>
+                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit">Exit</a></li>
             <?php } ?>
         </ul>
         <span><?php print 'Copyright ' . date('Y'); ?></span>

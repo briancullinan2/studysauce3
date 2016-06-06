@@ -34,8 +34,7 @@ if($tab->length == 0) {
     $view['slots']->start('javascripts');
     foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
         <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
-    <?php } ?>
-    <?php
+    <?php }
     $view['slots']->stop();
 }
 
