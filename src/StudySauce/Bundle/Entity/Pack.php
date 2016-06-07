@@ -212,6 +212,8 @@ class Pack
 
     public function getChildUsers(User $user)
     {
+        $this->userPacks->toArray();
+        $this->groups->toArray();
         return array_filter(
         // also return current user and children
             array_merge([$user], $user->getInvites()
@@ -248,6 +250,7 @@ class Pack
 
     public function getGroupForChild(User $childUser)
     {
+        $this->groups->toArray();
         return $this->groups->matching(Criteria::create()->where(Criteria::expr()->in('name', $childUser->getGroupNames())))->first();
     }
 

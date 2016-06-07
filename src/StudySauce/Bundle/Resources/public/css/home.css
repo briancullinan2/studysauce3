@@ -87,6 +87,10 @@
     position:relative;
 }
 
+.study-mastery .ss_user-row {
+    display:none;
+}
+
 .study-mastery .pack-row .title {
     width:20%;
 }

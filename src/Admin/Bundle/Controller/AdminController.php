@@ -132,7 +132,7 @@ class AdminController extends Controller
                 $newName = $joinName . '_' . preg_replace('[^a-z]', '_', $jf) . $joinTable;
                 if (!in_array($newName, $joins)) {
                     $joins[] = $newName;
-                    $qb = $qb->leftJoin($joinName . '.' . $jf, $newName);
+                    $qb = $qb->leftJoin($joinName . '.' . $jf, $newName)->select($newName);
                     // allow searching of connected fields like userPacks-removed = false
                     if (in_array($joinTable, array_keys($request['tables'])) && $lastPart < count($joinFields) - 1) {
                         $result .= (!empty($result) ? ' AND ' : '') . self::searchBuilder($qb, $joinTable, $newName, $request, $joins);
