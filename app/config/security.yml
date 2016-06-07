@@ -86,6 +86,7 @@ security:
         - { path: ^/scholars,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/torchandlaurel,         roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/torchandlaurelparents,  roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/home,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         # authentication pages
         - { path: ^/plan/pdf/,              roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }
         - { path: ^/redirect,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER, ROLE_GUEST, ROLE_DEMO], requires_channel: https }

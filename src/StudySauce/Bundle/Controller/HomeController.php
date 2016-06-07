@@ -9,6 +9,7 @@ use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Class HomeController
@@ -84,6 +85,9 @@ class HomeController extends Controller
 
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
+        }
+        if(empty($user) || $user->hasRole('ROLE_GUEST')) {
+            throw new AccessDeniedHttpException();
         }
         return $this->render('AdminBundle:Admin:home.html.php', $templateVars);
     }
