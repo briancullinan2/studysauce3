@@ -21,7 +21,7 @@ $invites = !empty($user) ? $user->getInvites()->toArray() : [];
                     <a href="<?php print ($view['router']->generate('_welcome', ['_switch_user' => $invite->getInvitee()->getEmail()])); ?>"><?php print (implode('', [$invite->getInvitee()->getFirst(), ' ', $invite->getInvitee()->getLast()])); ?></a>
                 </li>
             <?php }
-            if ($view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
+            if (!empty($user) && $view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
                 <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit">Parent account</a></li>
             <?php } ?>
             <li><a href="#collapse">Hide</a><h3></h3></li>

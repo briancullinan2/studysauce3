@@ -50,15 +50,13 @@ if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
             ?><li><a href="#switch-view-<?php print ($v); ?>"><?php print ($v); ?></a></li><?php
         } ?></ul></div><?php
     }
-    else { ?>
-        <div class="views"><ul><li><a href="#switch-view-" data-extend="{}">Refresh</a></li></div>
-    <?php }
+    else { ?><div class="views"><ul><li><a href="#switch-view-" data-extend="{}">Refresh</a></li></div><?php }
     $view['slots']->stop();
 
-    $views = jQuery($view['slots']->get('view-settings'));
+    $views = $view['slots']->get('view-settings');
     $resultOutput->prepend($views);
-    if($views->length > 0) {
-        $last = $views->last();
+    if(!empty($views)) {
+        $last = $resultOutput->find('.views');
     }
 }
 
@@ -89,14 +87,14 @@ foreach ($tables as $table => $t) {
         $header = null;
         if (!isset($aliasedRequest['headers']) || is_array($headers = $aliasedRequest['headers'])
             && isset($headers[$table]) && $headers[$table] === true) {
-            $header = jQuery($view->render('AdminBundle:Admin:header.html.php',                                         array_merge($subVars, ['table' => $table])));
+            $header = $view->render('AdminBundle:Admin:header.html.php',                                         array_merge($subVars, ['table' => $table]));
         } else if (is_array($headers = $aliasedRequest['headers'])
             && isset($headers[$table])
             && $view->exists(implode('', ['AdminBundle:Admin:header-' , $headers[$table] , '.html.php']))) {
-            $header = jQuery($view->render(implode('', ['AdminBundle:Admin:header-' , $headers[$table] , '.html.php']), array_merge($subVars, ['table' => $table])));
+            $header = $view->render(implode('', ['AdminBundle:Admin:header-' , $headers[$table] , '.html.php']), array_merge($subVars, ['table' => $table]));
         }
 
-        if(!empty($header) && $header->length > 0) {
+        if(!empty($header)) {
             if(empty($last) || $last->length == 0) {
                 $resultOutput->prepend($header);
             }
@@ -104,7 +102,7 @@ foreach ($tables as $table => $t) {
                 $last->after($header);
             }
 
-            $last = $header->last();
+            $last = $resultOutput->find('header')->last();
         }
     }
 
@@ -123,17 +121,17 @@ foreach ($tables as $table => $t) {
                 'context' => $context->find(implode('', ['.results-', $table , $ext])),
                 'tableId' => implode('', [$table , $ext])]);
             $rowVars[$table] = $entity;
-            $row = jQuery($view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),                 $rowVars));
+            $row = $view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),                 $rowVars);
         } else {
-            $row = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
+            $row = $view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
                 'classes' => $classes,
                 'entity' => $entity,
                 'table' => $table,
                 'context' => $context->find(implode('', ['.results-', $table , $ext])),
-                'tableId' => implode('', [$table , $ext])])));
+                'tableId' => implode('', [$table , $ext])]));
         }
         // TODO: update new row IDs, no insert if(isset($entity->newId))
-        if(!empty($row) && $row->length > 0) {
+        if(!empty($row)) {
             if(empty($last) || $last->length == 0) {
                 $resultOutput->prepend($row);
             }
@@ -141,7 +139,7 @@ foreach ($tables as $table => $t) {
                 $last->after($row);
             }
 
-            $last = $row->last();
+            $last = $resultOutput->find(implode('', ['.results-', $table , $ext, ',.results-', $table , $ext , ' + .expandable:not([class*="-row"])']))->last();
         }
     }
 
@@ -160,16 +158,16 @@ foreach ($tables as $table => $t) {
                     'table' => $table,
                     'tableId' => implode('', [$table , $ext])]);
                 $rowVars[$table] = $entity;
-                $newRow = jQuery($view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),          $rowVars));
+                $newRow = $view->render(implode('', ['AdminBundle:Admin:row-' , $table , '.html.php']),          $rowVars);
             } else {
-                $newRow = jQuery($view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
+                $newRow = $view->render('AdminBundle:Admin:row.html.php', array_merge($subVars, [
                     'classes' => $classes,
                     'entity' => $entity,
                     'table' => $table,
-                    'tableId' => implode('', [$table , $ext])])));
+                    'tableId' => implode('', [$table , $ext])]));
             }
 
-            if(!empty($newRow) && $newRow->length > 0) {
+            if(!empty($newRow)) {
                 if(empty($last) || $last->length == 0) {
                     $resultOutput->prepend($newRow);
                 }
@@ -177,7 +175,7 @@ foreach ($tables as $table => $t) {
                     $last->after($newRow);
                 }
 
-                $last = $newRow->last();
+                $last = $resultOutput->find(implode('', ['.results-', $table , $ext, ',.results-', $table , $ext , ' + .expandable:not([class*="-row"])']))->last();
             }
         }
     }
@@ -186,14 +184,14 @@ foreach ($tables as $table => $t) {
     $footer = null;
     if (!isset($aliasedRequest['footers']) || is_array($footers = $aliasedRequest['footers'])
         && isset($footers[$table]) && $footers[$table] === true) {
-        $footer = jQuery($view->render('AdminBundle:Admin:footer.html.php',                                             array_merge($subVars, ['table' => $table])));
+        $footer = $view->render('AdminBundle:Admin:footer.html.php',                                             array_merge($subVars, ['table' => $table]));
     } else if (is_array($footers = $aliasedRequest['footers'])
         && isset($footers[$table])
         && $view->exists(implode('', ['AdminBundle:Admin:footer-' , $footers[$table] , '.html.php']))) {
-        $footer = jQuery($view->render(implode('', ['AdminBundle:Admin:footer-' , $footers[$table] , '.html.php']),     array_merge($subVars, ['table' => $table])));
+        $footer = $view->render(implode('', ['AdminBundle:Admin:footer-' , $footers[$table] , '.html.php']),     array_merge($subVars, ['table' => $table]));
     }
 
-    if(!empty($footer) && $footer->length > 0) {
+    if(!empty($footer)) {
         if(empty($last) || $last->length == 0) {
             $resultOutput->prepend($footer);
         }
@@ -201,7 +199,7 @@ foreach ($tables as $table => $t) {
             $last->after($footer);
         }
 
-        $last = $footer->last();
+        $last = $resultOutput->find('.highlighted-link, footer')->last();
     }
 }
 
