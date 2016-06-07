@@ -405,6 +405,10 @@ $(document).ready(function () {
         body.removeClass('study-mode')
     });
 
+    body.on('show', '[id^="cards-pack"]', function () {
+        loadResults.apply($(this).find('.results'));
+    });
+
     body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
         Cookies.set('retention_shuffle', $(this).is('header a'));
     });
@@ -445,25 +449,26 @@ $(document).ready(function () {
     });
 
     function pickNextCard(data, packId) {
-        var retention = Cookies.get('retention');
-        if(retention == null) {
-            Cookies.set('retention', retention = moment(new Date()).formatPHP('r'), { expires: 7 });
+        var retentionDate = Cookies.get('retention');
+        if(retentionDate == null) {
+            Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
         }
-        if(typeof data.retention[0] != 'undefined' && data.retention[0].constructor != Array) {
-            data.retention[0] = data.retention;
+        var retention = data.retention;
+        if(typeof retention[0] == 'undefined' || retention[0].constructor != Array) {
+            retention = [data.retention];
         }
 
         var remaining = [];
-        for(var j in data.retention) {
-            if(!data.retention.hasOwnProperty(j)) {
+        for(var j in retention) {
+            if(!retention.hasOwnProperty(j)) {
                 continue;
             }
-            for(var i in data.retention[j].retention) {
-                if(!data.retention[j].retention.hasOwnProperty(i)) {
+            for(var i in retention[j].retention) {
+                if(!retention[j].retention.hasOwnProperty(i)) {
                     continue;
                 }
-                if(data.retention[j].retention[i][2] && (!data.retention[j].retention[i][3]
-                    || new Date(data.retention[j].retention[i][3]) < new Date(retention))) {
+                if(retention[j].retention[i][2] && (!retention[j].retention[i][3]
+                    || new Date(retention[j].retention[i][3]) < new Date(retentionDate))) {
                     remaining[remaining.length] = i;
                 }
             }
