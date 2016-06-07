@@ -29,7 +29,7 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <div class="study-top">
             <div class="user-shuffle">
-                <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $user->getFirst() , ' ' , $user->getLast() , ')']) : ''); ?></h2>
+                <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></h2>
             <?php
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'packs', 'userPacks']];
