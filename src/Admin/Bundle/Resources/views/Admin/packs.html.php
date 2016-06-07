@@ -60,8 +60,7 @@ $view['slots']->start('body'); ?>
                         '1' => 'status',
                         '2' => ['group','groups', 'user','userPacks.user'],
                         '3' => 'properties',
-                        'actions' => ['cards']];
-                    $tables['card'] = AdminController::$defaultTables['card'];
+                        'actions' => []];
                     $request = [
                         // view settings
                         'tables' => $tables,
@@ -130,9 +129,13 @@ $view['slots']->start('body'); ?>
                             break;
                         }
                     }
+                    $tables = (array)(new stdClass());
+                    $tables['pack'] = ['id' => ['id']];
+                    $tables['card'] = ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], '0' => ['pack'], 'actions' => ['deleted']];
+                    $tables['answer'] = ['id' => ['value', 'deleted', 'correct', 'content', 'id']];
                     $request = [
                         // view settings
-                        'tables' => ['pack', 'card', 'answer'],
+                        'tables' => $tables,
                         'expandable' => ['card' => ['preview']],
                         'headers' => ['card' => 'packCards'],
                         'footers' => ['card' => 'packCards'],

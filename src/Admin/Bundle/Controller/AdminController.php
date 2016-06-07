@@ -1131,8 +1131,10 @@ var preg_match = function (needle, subject, matches) {
     if(result == null) {
         return 0;
     }
-    for(var m = 0; m < result.length; m++) {
-        matches[m] = result[m];
+    if(typeof matches != 'undefined') {
+        for(var m = 0; m < result.length; m++) {
+            matches[m] = result[m];
+        }
     }
     return result.length;
 };

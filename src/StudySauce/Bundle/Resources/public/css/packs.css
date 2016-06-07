@@ -387,12 +387,18 @@
 [id^="cards"] .type-mc .preview-response,
 [id^="packs-"] .card-row + .expandable .type-mc .preview-response {
     height: 24%;
-    margin: 8px -10px;
+    margin: 4px -10px;
     background: #09B;
     color: #fff;
     padding:1px;
     position:relative;
     display:block;
+}
+
+[id^="cards"] .type-mc .preview-response
+{
+    margin-top:8px;
+    margin-bottom:8px;
 }
 
 [id^="cards-answer"] .user_pack-row,
@@ -462,7 +468,13 @@
 [id^="packs-"] .card-row + .expandable .type-mc .preview-footer
 {
     height:40%;
-    padding:24px 0 54px;
+    padding:12px 0 12px;
+}
+
+[id^="cards"] .type-mc .preview-footer
+{
+    padding-top:24px;
+    padding-bottom:54px; /* for card count */
 }
 
 [id^="cards"] .preview-count {
