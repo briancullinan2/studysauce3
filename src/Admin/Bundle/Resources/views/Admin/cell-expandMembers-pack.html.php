@@ -52,7 +52,7 @@ else if (isset($results['ss_group'])) {
 AdminController::sortByFields($users, ['first', 'last']);
 $removed = [];
 foreach($users as $u) {
-    if(!empty($up = $u->getUserPack($pack)) && $up->getRemoved()) {
+    if(!empty($up = $pack->getUserPack($u)) && $up->getRemoved()) {
         $removed[count($removed)] = $u;
     }
 }
