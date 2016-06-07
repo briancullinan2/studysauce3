@@ -34,7 +34,7 @@ $view['slots']->start('body'); ?>
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'userPacks']];
             $tables['pack'] = ['titleNew' => ['id', 'title', 'status']];
-            $tables['user_pack'] = ['user', 'pack', 'removed', 'retention', 'downloaded'];
+            $tables['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
             $request = [
                 'tables' => $tables,
                 //'user-ss_user-id' => 'NULL',
@@ -75,7 +75,7 @@ $view['slots']->start('body'); ?>
                 $tables['ss_user'] = ['id', 'userPacks'];
                 $tables['pack'] = ['id', 'title', 'packMastery', ['status', 'logo', 'cards'], 'expandMastery'];
                 $tables['card'] = ['id'];
-                $tables['user_pack'] = ['user', 'pack', 'removed', 'retention', 'downloaded'];
+                $tables['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
                 $request = [
                     'tables' => $tables,
                     //'user-ss_user-id' => 'NULL',
