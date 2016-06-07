@@ -44,7 +44,8 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['card' => ['id', 'answers', 'correct']];
+            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content']];
+            $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
             $tables['ss_user'] = ['id'];
@@ -61,6 +62,7 @@ $view['slots']->start('body'); ?>
                 // for new=true the template generates the -count number of empty rows, and no database query is performed
                 'count-card' => 1,
                 'count-pack' => -1,
+                'count-answer' => -1,
                 'count-user_pack' => 1,
                 'count-ss_user' => -1,
             ];
@@ -74,7 +76,8 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct']];
+            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content']];
+            $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
             $tables['ss_user'] = ['id'];
@@ -91,6 +94,7 @@ $view['slots']->start('body'); ?>
                 // for new=true the template generates the -count number of empty rows, and no database query is performed
                 'count-card' => 1,
                 'count-pack' => -1,
+                'count-answer' => -1,
                 'count-user_pack' => 1,
                 'count-ss_user' => -1,
             ];

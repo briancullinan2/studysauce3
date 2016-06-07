@@ -259,6 +259,7 @@ window.views.__defaultEntities['card'] = {
     getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
 window.views.__defaultEntities['answer'] = {
+    getId: function () {return this.id;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getCorrect: function () {return this.correct},
     getDeleted: function () {return this.deleted},

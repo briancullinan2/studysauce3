@@ -405,7 +405,7 @@ $(document).ready(function () {
         body.removeClass('study-mode')
     });
 
-    body.on('show', '[id^="cards-pack"]', function () {
+    body.on('show', '[id^="cards"]', function () {
         loadResults.apply($(this).find('.results'));
     });
 

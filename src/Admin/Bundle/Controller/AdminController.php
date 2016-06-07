@@ -47,7 +47,7 @@ class AdminController extends Controller
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
-        'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content']
+        'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content', 'id']
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
     ];
