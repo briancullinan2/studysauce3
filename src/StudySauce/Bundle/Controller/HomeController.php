@@ -112,7 +112,7 @@ class HomeController extends Controller
      */
     public static function getUserRedirect($user)
     {
-        if($user == 'anon.' || !is_object($user) || $user->hasRole('ROLE_GUEST'))
+        if($user == 'anon.' || !is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO'))
             return ['_welcome', []];
             // TODO: split this in to separate pages
         elseif($user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER') || $user->hasRole('ROLE_MASTER_ADVISER'))
