@@ -23,9 +23,6 @@ foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
                 $isNew = false;
             }
         }
-        if(!empty($up->getDownloaded()) && !$up->getRemoved()) {
-            $isNew = false;
-        }
     }
 }
 ?>

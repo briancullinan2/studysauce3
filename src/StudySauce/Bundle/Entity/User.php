@@ -238,6 +238,7 @@ class User extends BaseUser implements EncoderAwareInterface
     {
         $criteria = Criteria::create()
             ->where(Criteria::expr()->in('card', $pack->getCards()->toArray()));
+        $this->getResponses()->toArray();
         return $this->responses->matching($criteria) ?: new ArrayCollection();
     }
 

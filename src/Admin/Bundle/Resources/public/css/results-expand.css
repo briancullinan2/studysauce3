@@ -158,6 +158,9 @@
     text-align: left;
     margin-left:0;
     padding-left:0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
 }
 
 .last-right-expand .form-actions
