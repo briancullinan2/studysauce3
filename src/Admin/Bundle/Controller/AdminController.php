@@ -480,7 +480,7 @@ class AdminController extends Controller
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
         // convert db entity to flat object
-        foreach (array_merge(array_keys($searchRequest['tables']), ['allGroups']) as $table) {
+        foreach (array_merge(in_array('application/json', $request->getAcceptableContentTypes()) ? array_keys($searchRequest['tables']) : [], ['allGroups']) as $table) {
             if (!isset($vars['results'][$table])) {
                 continue;
             }
