@@ -85,7 +85,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
             if(($controller == 'HWI\Bundle\OAuthBundle\Controller\ConnectController::connectServiceAction' ||
                     $controller == 'StudySauce\Bundle\Controller\AccountController::loginAction' ||
                     $controller == 'StudySauce\Bundle\Controller\AccountController::registerAction' ||
-                    $controller == 'HWI\Bundle\OAuthBundle\Controller\ConnectController::redirectToServiceAction')&&
+                    $controller == 'HWI\Bundle\OAuthBundle\Controller\ConnectController::redirectToServiceAction') &&
                 ($user = $token->getUser()) !== null && ($user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')))
             {
                 $this->context->setToken(new AnonymousToken('main', 'anon.', []));

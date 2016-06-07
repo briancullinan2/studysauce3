@@ -79,6 +79,7 @@ security:
         - { path: ^/thanks,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/cron,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         # landing pages
+        - { path: ^/js/routing,             roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/parents,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/students,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/partners,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
@@ -104,6 +105,5 @@ security:
         - { path: ^/emails,                 role: ROLE_ADMIN }
         - { path: ^/validation,             role: ROLE_ADMIN }
         - { path: ^/activity,               role: ROLE_ADMIN }
-        - { path: ^/home,                   role: ROLE_USER }
         - { path: ^/,                       allow_if: "!has_role('ROLE_GUEST')" }
         #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }

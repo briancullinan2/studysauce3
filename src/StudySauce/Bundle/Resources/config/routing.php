@@ -378,8 +378,8 @@ $collection->add(
     'cards_result',
     new Route(
         '/results/{pack}/{_format}',
-        ['_controller' => 'StudySauceBundle:Packs:result', '_format' => 'index', 'pack' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'pack' => '[0-9]*']
+        ['_controller' => 'StudySauceBundle:Packs:answer', '_format' => 'index', 'pack' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'answer' => '[0-9]*']
     )
 );
 $collection->add(
