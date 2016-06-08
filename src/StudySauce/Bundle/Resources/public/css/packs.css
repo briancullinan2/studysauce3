@@ -769,12 +769,13 @@ body.study-mode {
     [id^="cards"] .preview-answer:not([class*="type-"]) .preview-inner,
     [id^="packs-"] .card-row + .expandable .preview-answer:not([class*="type-"]) .preview-inner
     {
-        padding-bottom:60px;
+        padding-bottom:80px;
     }
 
     [id^="cards"] .preview-guess, [id^="packs-"] .card-row + .expandable .preview-guess
     {
         margin: 0 -104px;
+        padding: 0 104px;
     }
 }
 
@@ -785,5 +786,43 @@ body.study-mode {
         left: 5px;
         right: 5px;
         bottom: 10px;
+    }
+
+    [id^="cards"] .type-mc .preview-response {
+        margin-top:4px;
+        margin-bottom:4px;
+    }
+
+    [id^="cards"] .type-mc .preview-footer {
+        padding-top:12px;
+        padding-bottom:42px;
+    }
+
+    [id^="cards"] .preview-true,
+    [id^="cards"] .preview-false,
+    [id^="packs-"] .card-row + .expandable .preview-true,
+    [id^="packs-"] .card-row + .expandable .preview-false,
+    [id^="cards"] .preview-right,
+    [id^="cards"] .preview-wrong,
+    [id^="packs-"] .card-row + .expandable .preview-right,
+    [id^="packs-"] .card-row + .expandable .preview-wrong
+    {
+        width:75px;
+        padding:22px 10px;
+        font-size: 20px;
+    }
+
+    [id^="cards"] .preview-card.type-tf:not(.preview-answer) .preview-inner,
+    [id^="packs-"] .preview-card.type-tf:not(.preview-answer) .preview-inner,
+    [id^="cards"] .preview-answer:not([class*="type-"]) .preview-inner,
+    [id^="packs-"] .card-row + .expandable .preview-answer:not([class*="type-"]) .preview-inner
+    {
+        padding-bottom:60px;
+    }
+
+    [id^="cards"] .preview-guess, [id^="packs-"] .card-row + .expandable .preview-guess
+    {
+        margin: 0 -80px;
+        padding: 0 80px;
     }
 }

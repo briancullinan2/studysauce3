@@ -271,6 +271,7 @@ a[href="#sign-in-with-email"]
         display: block;
         width: auto;
         padding: 40px 0 0;
+        margin:0;
     }
 
 }

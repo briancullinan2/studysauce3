@@ -93,7 +93,7 @@
 }
 
 .pane-content form > .highlighted-link:last-child {
-    margin: 0 -20px;
+    /* margin: 0 -20px; */
     padding: 20px;
 }
 

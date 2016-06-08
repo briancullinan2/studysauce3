@@ -44,7 +44,7 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content']];
+            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
@@ -76,7 +76,7 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content']];
+            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];

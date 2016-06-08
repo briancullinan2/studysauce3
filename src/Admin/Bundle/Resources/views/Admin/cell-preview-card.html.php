@@ -76,7 +76,7 @@ if (2 != $template->length) {
             <div class="preview-footer">
             <div class="preview-wrong">✘</div>
             <div class="preview-guess">Did you guess correctly?</div>
-            <div class="preview-right">✔︎</div>
+            <div class="preview-right">&#x2714;︎</div>
             </div>
         </div>
     <?php } ?>

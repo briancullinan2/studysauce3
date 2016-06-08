@@ -397,16 +397,41 @@ $(document).ready(function () {
     body.on('show', '[id^="cards"]', function () {
         body.addClass('study-mode');
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
+        goFullscreen();
     });
 
     body.on('show', '#home', function () {
         Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
         loadResults.apply($(this).find('.results'));
-        body.removeClass('study-mode')
+        body.removeClass('study-mode');
+        if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        }
     });
 
     body.on('show', '[id^="cards"]', function () {
         loadResults.apply($(this).find('.results'));
+    });
+
+    function goFullscreen() {
+        if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+            (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+            if (document.documentElement.requestFullScreen) {
+                document.documentElement.requestFullScreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullScreen) {
+                document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+        }
+    }
+
+    body.on('click', 'a[href^="/cards"]', function () {
+        goFullscreen();
     });
 
     body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
@@ -455,7 +480,7 @@ $(document).ready(function () {
         }
         var retention = data.retention;
         if(typeof retention[0] == 'undefined' || retention[0].constructor != Array) {
-            retention = [data.retention];
+            retention = [data];
         }
 
         var remaining = [];

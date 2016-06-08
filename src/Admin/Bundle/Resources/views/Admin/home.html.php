@@ -78,6 +78,8 @@ $view['slots']->start('body'); ?>
                 $tables['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
                 $request = [
                     'tables' => $tables,
+                    'user_pack-downloaded' => '!NULL',
+                    'user_pack-removed' => '!1',
                     //'user-ss_user-id' => 'NULL',
                     'classes' => ['last-right-expand'],
                     'ss_user-id' => $id,

@@ -3,6 +3,7 @@ use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var GlobalVariables $app */
@@ -23,8 +24,9 @@ $rowHtml = $view->render('AdminBundle:Admin:row.html.php', [
 $row = $context->filter(implode('', ['.', $table , '-id-', $pack->getId()]));
 
 // skip rows that have zero retention
+/** @var UserPack $up */
 if(isset($request['user_pack-downloaded']) && (strpos($rowHtml, '<label>0</label>') !== false
-    || $results['ss_user'][0]->getUserPack($pack)->getRemoved())) {
+    || empty($up = $results['ss_user'][0]->getUserPack($pack)) || $up->getRemoved())) {
     return;
 }
 

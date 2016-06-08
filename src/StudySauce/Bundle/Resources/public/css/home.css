@@ -110,9 +110,25 @@
     display:block;
     background: url(../images/shuffle_btn.png) no-repeat 0 0 transparent;
     background-size: cover;
-    left:40px;
+    left:5%;
 }
 
 .user-shuffle header a[href^="/cards"]:active {
     background-position: 0 -554px;
+}
+
+@media all and (max-width:700px) {
+    .user-shuffle {
+        display:block;
+        width:auto;
+    }
+
+    .study-log {
+        position:static;
+    }
+
+    .study-mastery .pack-row .packMastery,
+    .study-mastery .pack-row .title {
+        width:40%;
+    }
 }

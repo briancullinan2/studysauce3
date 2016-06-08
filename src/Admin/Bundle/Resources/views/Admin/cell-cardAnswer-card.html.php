@@ -75,7 +75,7 @@ if (2 != $template->length) {
             <div class="preview-footer">
                 <a href="#wrong" class="preview-wrong">✘</a>
                 <div class="preview-guess">Did you guess correctly?</div>
-                <a href="#right" class="preview-right">✔︎</a>
+                <a href="#right" class="preview-right">&#x2714;︎</a>
                 <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
             </div>
         </div>

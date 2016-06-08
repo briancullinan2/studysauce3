@@ -29,7 +29,7 @@ foreach($user_pack->getRetention() as $id => $r) {
     <div class="preview-footer">
         <a href="<?php print ($view['router']->generate('home')); ?>" class="preview-wrong">✘</a>
         <div class="preview-guess">&nbsp;</div>
-        <a href="<?php print ($view['router']->generate('cards', ['card' => $cardId])); ?>" class="preview-right">✔︎</a>
+        <a href="<?php print ($view['router']->generate('cards', ['card' => $cardId])); ?>" class="preview-right">&#x2714;︎</a>
     </div>
 <?php }
 else { ?>
