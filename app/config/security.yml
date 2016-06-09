@@ -103,6 +103,7 @@ security:
         - { path: ^/userlist,               roles: [ROLE_MASTER_ADVISER, ROLE_ADVISER, ROLE_PARTNER] }
         - { path: ^/import,                 roles: [ROLE_MASTER_ADVISER, ROLE_ADVISER, ROLE_PARTNER, ROLE_ADMIN] }
         - { path: ^/command,                role: ROLE_ADMIN }
+        - { path: ^/command/results,        allow_if: "!has_role('ROLE_GUEST')" }
         - { path: ^/emails,                 role: ROLE_ADMIN }
         - { path: ^/validation,             role: ROLE_ADMIN }
         - { path: ^/activity,               role: ROLE_ADMIN }

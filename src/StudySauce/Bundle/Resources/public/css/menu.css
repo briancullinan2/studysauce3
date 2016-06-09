@@ -71,7 +71,7 @@
 #right-panel a[href="#collapse"]
 {
     position:absolute;
-    display:block;
+    display:none;
     height:45px;
     width:70px;
     left:0;
