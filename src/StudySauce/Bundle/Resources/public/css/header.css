@@ -69,7 +69,7 @@
 #site-name a > span
 {
     font-size: 32px;
-    line-height: 110%;
+    line-height: 42px;
     display:inline-block;
     white-space: normal;
 }
@@ -134,12 +134,16 @@
 
 #welcome-message
 {
-    width: 650px;
+    width: 40%;
     display: inline-block;
     text-align: right;
     left: auto;
-    padding-right: 100px;
+    padding-right: 40px;
     line-height: 40px;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
 }
 
 #welcome-message > * {
@@ -147,18 +151,34 @@
     vertical-align: top;
 }
 
-@media all and (max-width:1300px)
+.header nav
 {
+    width:100%;
+    margin:0 -40% 0 -356px;
+    padding: 0 40% 0 356px;
+    display:inline-block;
+    vertical-align: top;
+}
+
+#welcome-message a[href="#right-panel"] {
+    padding-left: 30px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -20px;
+}
+
+@media all and (max-width: 1300px) {
+
+    .header nav {
+        margin-left: -256px;
+        padding-left: 256px;
+    }
+
     #site-name
     {
         padding-left:10px;
-        width:270px;
-    }
-
-    #welcome-message
-    {
-        padding-right:10px;
-        width:355px;
+        width:250px;
     }
 
     #welcome-message .input
@@ -175,20 +195,26 @@
     {
         display:none;
     }
+
+    #welcome-message .main-menu {
+        display:none;
+    }
+
+    .header nav {
+        margin-right:-30%;
+        padding-right:30%;
+    }
+
+    #welcome-message {
+        width:30%;
+    }
+
 }
 
 @media all and (max-width: 700px)
 {
-    #site-name
-    {
-        padding-left:40px;
-        padding-right:40px;
-        width:auto;
-        display:block;
-        text-align: center;
-    }
 
-    #welcome-message
+    #welcome-message .input
     {
         display:none;
     }
@@ -222,17 +248,35 @@
     {
         left:-220px;
     }
+
+    .header nav {
+        margin-right: -40px;
+        padding-right: 40px;
+        margin-left: -206px;
+        padding-left: 206px;
+    }
+
+    #site-name {
+        padding-left: 10px;
+        width: 200px;
+    }
+
+    #welcome-message {
+        width:40px;
+        height:40px;
+    }
+
+    #welcome-message strong {
+        display:none;
+    }
+
+    #site-name a > span
+    {
+        font-size: 24px;
+        letter-spacing: -1px;
+    }
 }
 
 @media all and (max-width: 500px) {
 
-    #site-name a > span
-    {
-        font-size: 38px;
-    }
-
-    #site-name img
-    {
-        display:none;
-    }
 }
