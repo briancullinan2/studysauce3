@@ -13,7 +13,7 @@ $request = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
 
-$total = isset($results['user_pack'][0]) ? 0 : $card->getPack()->getCards()->count();
+$total = isset($results['user_pack'][0]) ? 0 : count($card->getPack()->getCards()->toArray());
 $index = 1;
 $retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
 if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle')) {
