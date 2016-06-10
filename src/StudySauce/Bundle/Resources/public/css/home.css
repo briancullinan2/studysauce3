@@ -45,6 +45,17 @@
     display:none;
 }
 
+.user-shuffle header label {
+    border-bottom: 2px solid #555;
+    margin:0 -2px;
+    padding: 0 2px;
+    width:50%;
+}
+
+.user-shuffle header label:last-of-type {
+    text-align: right;
+}
+
 .user-shuffle .pack-row .titleNew label:first-of-type {
     display:inline-block;
     margin:0 -2px;
@@ -105,16 +116,17 @@
 
 .user-shuffle header a[href^="/cards"] {
     position:absolute;
-    padding-bottom:36%;
+    padding-bottom: 31.2%;
     width:30%;
     display:block;
     background: url(../images/shuffle_btn.png) no-repeat 0 0 transparent;
     background-size: cover;
     left:5%;
+    margin-bottom:40px;
 }
 
 .user-shuffle header a[href^="/cards"]:active {
-    background-position: 0 -554px;
+    background-position: 0 center;
 }
 
 @media all and (max-width:700px) {

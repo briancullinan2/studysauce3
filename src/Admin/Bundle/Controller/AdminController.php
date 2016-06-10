@@ -2,7 +2,9 @@
 
 namespace Admin\Bundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
@@ -319,6 +321,35 @@ class AdminController extends Controller
 
     }
 
+    /**
+     * @param $table
+     * @param QueryBuilder $qb
+     * @param array $joins
+     * @param User $user
+     * @return Criteria
+     * @throws Query\QueryException
+     */
+    public static function firewallCollection($table, QueryBuilder $qb, $joins = [], User $user) {
+        if($table == 'ss_user') {
+            if(!$user->hasRole('ROLE_ADMIN')) {
+                if(!in_array('invitees', $joins)) {
+                    $qb = $qb->leftJoin('ss_user.invitees', 'invitees');
+                }
+                $qb = $qb->addCriteria(Criteria::create()->where(Criteria::expr()->eq('invitees.user', $user))->orWhere(Criteria::expr()->eq('ss_user', $user)));
+                return $qb;
+            }
+        }
+        else if ($table == 'ss_group') {
+            if(!$user->hasRole('ROLE_ADMIN')) {
+                $groups = $user->getGroups()->toArray();
+                $qb = $qb->addCriteria(Criteria::create()->where(Criteria::expr()->in('ss_group.parent', $groups))
+                    ->orWhere(Criteria::expr()->in('ss_group', $groups)));
+                return $qb;
+            }
+        }
+        return $qb;
+    }
+
     public function resultsAction(Request $request)
     {
         set_time_limit(0);
@@ -422,6 +453,8 @@ class AdminController extends Controller
             if (!empty($defaultWhere)) {
                 $qb = $qb->andWhere($defaultWhere);
             }
+            // TODO: call collection firewall
+            $qb = self::firewallCollection($table, $qb, $joins, $user);
 
             $totalQuery = clone $qb;
             $query = $totalQuery->select('COUNT(DISTINCT(' . $table . '.' . self::$allTables[$table]->identifier[0] . '))')

@@ -25,8 +25,9 @@ $row = $context->filter(implode('', ['.', $table , '-id-', $pack->getId()]));
 
 // skip rows that have zero retention
 /** @var UserPack $up */
-if(isset($request['user_pack-downloaded']) && (strpos($rowHtml, '<label>0</label>') !== false
-    || empty($up = $results['ss_user'][0]->getUserPack($pack)) || $up->getRemoved())) {
+if(isset($request['user_pack-removed']) && (strpos($rowHtml, '<label>0</label>') !== false
+    || empty($up = $results['ss_user'][0]->getUserPack($pack)) || $up->getRemoved()
+        || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED')) {
     return;
 }
 

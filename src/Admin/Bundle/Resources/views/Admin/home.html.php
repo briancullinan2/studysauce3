@@ -34,12 +34,11 @@ $view['slots']->start('body'); ?>
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'userPacks']];
             $tables['pack'] = ['titleNew' => ['id', 'title', 'status']];
-            $tables['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
+            $tables['user_pack'] = ['pack', 'removed', 'retention'];
             $request = [
                 'tables' => $tables,
                 //'user-ss_user-id' => 'NULL',
-                'user_pack-downloaded' => '!NULL',
-                'user_pack-removed' => '!1',
+                'user_pack-removed' => false,
                 'ss_user-id' => $id,
                 'headers' => ['ss_user' => 'bigButton'],
                 'count-pack' => 0,
@@ -75,11 +74,10 @@ $view['slots']->start('body'); ?>
                 $tables['ss_user'] = ['id', 'userPacks'];
                 $tables['pack'] = ['id', 'title', 'packMastery', ['status', 'logo', 'cards'], 'expandMastery'];
                 $tables['card'] = ['id'];
-                $tables['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
+                $tables['user_pack'] = ['pack', 'removed', 'retention'];
                 $request = [
                     'tables' => $tables,
-                    'user_pack-downloaded' => '!NULL',
-                    'user_pack-removed' => '!1',
+                    'user_pack-removed' => false,
                     //'user-ss_user-id' => 'NULL',
                     'classes' => ['last-right-expand'],
                     'ss_user-id' => $id,

@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace StudySauce\Bundle\Security;
 
-namespace Symfony\Component\Security\Http\Firewall;
 
-use StudySauce\Bundle\Entity\Invite;
+use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -36,7 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SwitchUserListener implements ListenerInterface
+class SwitchListener extends SwitchUserListener
 {
     private $tokenStorage;
     private $provider;
@@ -122,14 +122,12 @@ class SwitchUserListener implements ListenerInterface
         }
 
         if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
-            throw new AccessDeniedException(sprintf('Cannot switch to use because you to not have "%s" role.', $this->role));
+            throw new AccessDeniedException();
         }
+
+        // TODO: decide based on connected users
 
         $username = $request->get($this->usernameParameter);
-
-        if(!$token->getUser()->getInvites()->exists(function ($_, Invite $i) use ($username) {return !empty($i->getInvitee()) && $i->getInvitee()->getUsername() == $username;})) {
-            throw new AccessDeniedException('Cannot switch to child user');
-        }
 
         if (null !== $this->logger) {
             $this->logger->info('Attempting to switch to user.', array('username' => $username));

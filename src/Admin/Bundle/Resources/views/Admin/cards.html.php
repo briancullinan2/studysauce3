@@ -46,9 +46,9 @@ $view['slots']->start('body'); ?>
             $tables = (array)(new stdClass());
             $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
-            $tables['pack'] = ['id'];
+            $tables['pack'] = ['id', 'status'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
-            $tables['ss_user'] = ['id'];
+            $tables['ss_user'] = ['id', 'userPacks'];
             $request = [
                 // view settings
                 'tables' => $tables,
@@ -78,9 +78,9 @@ $view['slots']->start('body'); ?>
             $tables = (array)(new stdClass());
             $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
-            $tables['pack'] = ['id'];
+            $tables['pack'] = ['id', 'status'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
-            $tables['ss_user'] = ['id'];
+            $tables['ss_user'] = ['id', 'userPacks'];
             $request = [
                 // view settings
                 'tables' => $tables,

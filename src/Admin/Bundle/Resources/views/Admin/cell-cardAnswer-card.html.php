@@ -15,14 +15,23 @@ $row = !empty($context) ? $context : jQuery($this);
 
 $total = isset($results['user_pack'][0]) ? 0 : count($card->getPack()->getCards()->toArray());
 $index = 1;
-$retention = isset($results['user_pack'][0]) ? $results['user_pack'][0]->getRetention() : [];
-foreach($retention as $id => $r) {
-    if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
-        || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
-        $total += 1;
+$retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
+if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle')) {
+    // TODO: count all cards
+    $retention = $results['user_pack'][0]->getUser()->getUserPacks()->toArray();
+}
+foreach($retention as $up) {
+    /** @var UserPack $up */
+    if($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED') {
+        continue;
     }
-    if(new Date($r[3]) > new Date($request->cookies->get('retention'))) {
-        $index += 1;
+    foreach($up->getRetention() as $id => $r) {
+        if($r[2]) {
+            $total += 1;
+        }
+        if(!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention'))) {
+            $index += 1;
+        }
     }
 }
 

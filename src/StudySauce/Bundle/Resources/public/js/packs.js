@@ -398,6 +398,12 @@ $(document).ready(function () {
         body.addClass('study-mode');
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         goFullscreen();
+        if(!$(this).is('.loaded')) {
+            $(this).addClass('loaded');
+        }
+        else {
+            loadResults.apply($(this).find('.results'));
+        }
     });
 
     body.on('show', '#home', function () {
@@ -411,10 +417,6 @@ $(document).ready(function () {
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
         }
-    });
-
-    body.on('show', '[id^="cards"]', function () {
-        loadResults.apply($(this).find('.results'));
     });
 
     function goFullscreen() {
