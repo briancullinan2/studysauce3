@@ -73,6 +73,11 @@ class PacksController extends Controller
 
         // process pack settings
         list($newPack) = AdminController::standardSave($request, $this->container);
+        if($newPack instanceof Pack) {
+            $newPack->setModified(new \DateTime());
+            $orm->merge($newPack);
+            $orm->flush();
+        }
 
         $allGroups = $orm->getRepository('StudySauceBundle:Group')->findAll();
 

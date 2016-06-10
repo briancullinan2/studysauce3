@@ -78,6 +78,10 @@
     width:100%;
 }
 
+.user-shuffle .pack-row .titleNew a {
+    display:block;
+}
+
 .user-shuffle .pack-row .titleNew strong {
     color:#CC2211;
 }

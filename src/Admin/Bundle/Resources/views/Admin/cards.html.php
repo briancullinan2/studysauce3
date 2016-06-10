@@ -44,9 +44,9 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType']];
+            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType', 'pack']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
-            $tables['pack'] = ['id', 'status'];
+            $tables['pack'] = ['id', 'status', 'cards'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
             $tables['ss_user'] = ['id', 'userPacks'];
             $request = [
@@ -76,9 +76,9 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType']];
+            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType', 'pack']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
-            $tables['pack'] = ['id', 'status'];
+            $tables['pack'] = ['id', 'status', 'cards'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention']];
             $tables['ss_user'] = ['id', 'userPacks'];
             $request = [

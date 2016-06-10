@@ -229,6 +229,7 @@ window.views.__defaultEntities['card'] = {
         }
         return correct;
     },
+    getPack: function () {return this.pack == null ? null : applyEntityObj(this.pack)},
     getAnswers: function () {
         // look up answers
         var result = [];
