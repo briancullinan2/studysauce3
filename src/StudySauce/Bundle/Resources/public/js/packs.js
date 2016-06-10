@@ -408,7 +408,12 @@ $(document).ready(function () {
 
     body.on('show', '#home', function () {
         Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
-        loadResults.apply($(this).find('.results'));
+        if(!$(this).is('.loaded')) {
+            $(this).addClass('loaded');
+        }
+        else {
+            loadResults.apply($(this).find('.results'));
+        }
         body.removeClass('study-mode');
         if (document.cancelFullScreen) {
             document.cancelFullScreen();
