@@ -79,7 +79,8 @@
 }
 
 .user-shuffle .pack-row .titleNew a {
-    display:block;
+    display: inline-block;
+    width: 100%;
 }
 
 .user-shuffle .pack-row .titleNew strong {

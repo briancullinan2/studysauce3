@@ -193,15 +193,35 @@ if (typeof key != 'undefined') {
 
 }(jQuery);
 
-window.onerror = function (errorMessage, url, lineNumber) {
-    var message = "Error: [" + errorMessage + "], url: [" + url + "], line: [" + lineNumber + "]";
+function stacktrace() {
+    function st2(f) {
+        if(!f) {
+            return [];
+        }
+        else {
+            var args = [];
+            for(var a = 0; a < args.length; a++) {
+                args[args.length] = '' + f.arguments;
+            }
+            return st2(f.caller).concat([f.toString().split('(')[0].substring(9) + '(' + args.join(',') + ')']);
+        }
+    }
+    return st2(arguments.callee.caller);
+}
+
+window.onerror = function (errorMessage, url, lineNumber, columnNo, error) {
+    var message = "Error: [" + errorMessage + "], url: [" + url + "], line: [" + lineNumber + ":" + columnNo + "]";
     window.jsErrors.push(message);
     if(window.noError)
         return false;
     var dialog = $('#error');
     if(dialog.length > 0)
     {
-        dialog.find('.modal-body').html(errorMessage);
+        var stack = stacktrace();
+        if(typeof error == 'object' && typeof error.stack != 'undefined') {
+            stack = error.stack;
+        }
+        dialog.find('.modal-body').html(message + '<br />' + stack);
         dialog.modal({show:true});
     }
     return true;

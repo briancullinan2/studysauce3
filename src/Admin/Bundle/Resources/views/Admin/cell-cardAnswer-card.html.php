@@ -26,7 +26,8 @@ foreach($retention as $up) {
         continue;
     }
     foreach($up->getRetention() as $id => $r) {
-        if($r[2]) {
+        if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
+            || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
             $total += 1;
         }
         if(!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention'))) {

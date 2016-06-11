@@ -1,9 +1,5 @@
-goog.provide('fos.Router');
 
-goog.require('goog.structs.Map');
-goog.require('goog.array');
-goog.require('goog.object');
-goog.require('goog.uri.utils');
+var fos = {};
 
 /**
  * @constructor
@@ -14,7 +10,13 @@ fos.Router = function(opt_context, opt_routes) {
     this.context_ = opt_context || {base_url: '', prefix: '', host: '', scheme: ''};
     this.setRoutes(opt_routes || {});
 };
-goog.addSingletonGetter(fos.Router);
+
+fos.Router.getInstance = function() {
+    if (fos.Router.instance_) {
+        return fos.Router.instance_;
+    }
+    return fos.Router.instance_ = new fos.Router();
+};
 
 /**
  * @typedef {{
@@ -34,11 +36,22 @@ fos.Router.Route;
  */
 fos.Router.Context;
 
+fos.Router.setData = function(data) {
+    var router = fos.Router.getInstance();
+    router.setBaseUrl(/** @type {string} */ (data['base_url']));
+    router.setRoutes(/** @type {Object.<string, fos.Router.Route>} */ (data['routes']));
+    if ('prefix' in data) {
+        router.setPrefix(/** @type {string} */ (data['prefix']));
+    }
+    router.setHost(/** @type {string} */ (data['host']));
+    router.setScheme(/** @type {string} */ (data['scheme']));
+};
+
 /**
  * @param {Object.<string, fos.Router.Route>} routes
  */
 fos.Router.prototype.setRoutes = function(routes) {
-    this.routes_ = new goog.structs.Map(routes);
+    this.routes_ = routes;
 };
 
 /**
@@ -112,7 +125,7 @@ fos.Router.prototype.buildQueryParams = function(prefix, params, add) {
     var rbracket = new RegExp(/\[\]$/);
 
     if (params instanceof Array) {
-        goog.array.forEach(params, function(val, i) {
+        params.forEach(function(val, i) {
             if (rbracket.test(prefix)) {
                 add(prefix, val);
             } else {
@@ -136,16 +149,16 @@ fos.Router.prototype.buildQueryParams = function(prefix, params, add) {
  */
 fos.Router.prototype.getRoute = function(name) {
     var prefixedName = this.context_.prefix + name;
-    if (!this.routes_.containsKey(prefixedName)) {
+    if (!this.routes_.hasOwnProperty(prefixedName)) {
         // Check first for default route before failing
-        if (!this.routes_.containsKey(name)) {
+        if (!this.routes_.hasOwnProperty(name)) {
             throw new Error('The route "' + name + '" does not exist.');
         }
     } else {
         name = prefixedName;
     }
 
-    return (this.routes_.get(name));
+    return (this.routes_[name]);
 };
 
 
@@ -160,12 +173,12 @@ fos.Router.prototype.getRoute = function(name) {
 fos.Router.prototype.generate = function(name, opt_params, absolute) {
     var route = (this.getRoute(name)),
         params = opt_params || {},
-        unusedParams = goog.object.clone(params),
+        unusedParams = $.extend({}, params),
         url = '',
         optional = true,
         host = '';
 
-    goog.array.forEach(route.tokens, function(token) {
+    route.tokens.forEach(function(token) {
         if ('text' === token[0]) {
             url = token[1] + url;
             optional = false;
@@ -174,13 +187,13 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
         }
 
         if ('variable' === token[0]) {
-            var hasDefault = goog.object.containsKey(route.defaults, token[3]);
-            if (false === optional || !hasDefault || (goog.object.containsKey(params, token[3]) && params[token[3]] != route.defaults[token[3]])) {
+            var hasDefault = route.defaults.hasOwnProperty(token[3]);
+            if (false === optional || !hasDefault || (params.hasOwnProperty(token[3]) && params[token[3]] != route.defaults[token[3]])) {
                     var value;
 
-                    if (goog.object.containsKey(params, token[3])) {
+                    if (params.hasOwnProperty(token[3])) {
                         value = params[token[3]];
-                        goog.object.remove(unusedParams, token[3]);
+                        delete unusedParams[token[3]];
                     } else if (hasDefault) {
                         value = route.defaults[token[3]];
                     } else if (optional) {
@@ -203,7 +216,7 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
 
                     optional = false;
                 } else if (hasDefault) {
-                    goog.object.remove(unusedParams, token[3]);
+                    delete unusedParams[token[3]];
                 }
 
                 return;
@@ -216,7 +229,7 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
         url = '/';
     }
 
-    goog.array.forEach(route.hosttokens, function (token) {
+    route.hosttokens.forEach(function (token) {
         var value;
 
         if ('text' === token[0]) {
@@ -226,10 +239,10 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
         }
 
         if ('variable' === token[0]) {
-            if (goog.object.containsKey(params, token[3])) {
+            if (params.hasOwnProperty(token[3])) {
                 value = params[token[3]];
-                goog.object.remove(unusedParams, token[3]);
-            } else if (goog.object.containsKey(route.defaults, token[3])) {
+                delete unusedParams[token[3]];
+            } else if (route.defaults.hasOwnProperty(token[3])) {
                 value = route.defaults[token[3]];
             }
 
@@ -238,7 +251,7 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
     });
 
     url = this.context_.base_url + url;
-    if (goog.object.containsKey(route.requirements, "_scheme") && this.getScheme() != route.requirements["_scheme"]) {
+    if (route.requirements.hasOwnProperty("_scheme") && this.getScheme() != route.requirements["_scheme"]) {
         url = route.requirements["_scheme"] + "://" + (host || this.getHost()) + url;
     } else if (host && this.getHost() !== host) {
         url = this.getScheme() + "://" + host + url;
@@ -246,7 +259,14 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
         url = this.getScheme() + "://" + this.getHost() + url;
     }
 
-    if (goog.object.getCount(unusedParams) > 0) {
+    var hasUnused = false;
+    for(var v in unusedParams) {
+        if(unusedParams.hasOwnProperty(v)) {
+            hasUnused = true;
+            break;
+        }
+    }
+    if (hasUnused) {
         var prefix;
         var queryParams = [];
         var add = function(key, value) {
@@ -283,11 +303,16 @@ fos.Router.prototype.match = function(url) {
     var matchedRoutes = [];
 
     var routes     = this.getRoutes();
-    var routeNames = routes.getKeys();
+    var routeNames = [];
+    for(var k in routes) {
+        if(routes.hasOwnProperty(k)) {
+            routeNames[routeNames.length] = k;
+        }
+    }
 
     for (var i in routeNames) {
         var routeName = routeNames[i];
-        var route = routes.get(routeName);
+        var route = routes[routeName];
 
         var regexpr = route['regexpr'];
 
@@ -311,7 +336,7 @@ fos.Router.prototype.match = function(url) {
             }
 
             // Add backslashes and remove doubled plus char
-            baseRegExpr = baseRegExpr.replace(/\//g, "\\/").replace(/\+\+/g, "+");
+            baseRegExpr = baseRegExpr.replace(/\//g, "\\/").replace(/\+\+/g, "+").replace(/\(\?:/g, '(');
 
             var newRegExpr = new RegExp(baseRegExpr);
 
@@ -319,14 +344,20 @@ fos.Router.prototype.match = function(url) {
 
             if (urlMatch = newRegExpr.exec(url)) {
 
+                //var error = url + "\n" + baseRegExpr;
+
                 // Recover params
                 for (var i in paramsMapper) {
-
-                    var paramName  = paramsMapper[i++];
-                    var paramValue = urlMatch[i];
+                    var paramName  = paramsMapper[i];
+                    var paramValue = urlMatch[(i*2)+2];
 
                     params[paramName] = paramValue;
+                    //error += '[' + paramName + ' = ' + paramValue + ']';
                 }
+
+                //if(routeName == 'cards') {
+                //    throw new Error(error);
+                //}
 
                 matchedRoutes.push({
                     'name':   routeName,
@@ -340,4 +371,6 @@ fos.Router.prototype.match = function(url) {
 
 
     return matchedRoutes;
-}
+};
+
+window['Routing'] = fos.Router.getInstance();

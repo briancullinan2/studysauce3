@@ -5,9 +5,64 @@ $(document).ready(function () {
     // TODO: remove old unused tabs
     var body = $('body');
 
-    body.on('click', 'a[href*="/plan/download"]', function () {
-        body.removeClass('download-plan');
+    function handleLink(evt) {
+
+        var that = $(this),
+            el = that[0],
+            path = $(this).attr('href'),
+            routes = Routing.match(path) || Routing.match(this.pathname);
+
+        if (!expandMenu.apply(this, [evt]))
+            return false;
+
+        if ($(this).is('.invalid a.more')) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            return false;
+        }
+
+        // the path is not a callback so just return normally
+        if (typeof window.history == 'undefined' || typeof window.history.pushState == 'undefined'
+                // check if there is a tab with the selected url
+            || typeof routes[0] == 'undefined' || typeof routes[0].route.requirements._format == 'undefined'
+            || routes[0].route.requirements['_format'].indexOf('tab') == -1) {
+            visits[visits.length] = {path: el.pathname, query: el.search, hash: el.hash, time: (new Date()).toJSON()};
+            collapseMenu.apply(this, [evt]);
+            return true;
+        }
+        // if the path clicked is a callback, use callback to load the new tab
+        else {
+            evt.preventDefault();
+            // allow other click responders to finish processing before doing a page change
+
+            setTimeout(function () {
+                if (routes[0].name == '_welcome') {
+                    path = Routing.generate(routes[0].name);
+                }
+                var message = new $.Event('beforeunload');
+                $(window).trigger(message);
+                if(typeof message.result !== 'undefined') {
+                    body.off('click.confirm_navigation').one('click.confirm_navigation', '#general-dialog a[href="#submit"]', function () {
+                        activateMenu.apply(that[0], [path]);
+                    });
+
+                    $('#general-dialog').modal('hide').modal({show: true, backdrop: true})
+                        .find('.modal-body').html(message.result)
+                }
+                else {
+                    activateMenu.apply(that[0], [path]);
+                }
+            }, 50);
+            return false;
+        }
+    }
+    window.handleLink = handleLink;
+
+    // capture all callback links
+    body.filter('.dashboard-home').on('click', 'button[value]', function () {
+
     });
+    body.filter('.dashboard-home').on('click dblclick dragstart', 'a[href]:not(.accordion-toggle)', handleLink);
 
     function activateMenu(path, noPush) {
         var that = $(this);
@@ -28,6 +83,7 @@ $(document).ready(function () {
                 }
             }
         }
+
         var panel = $('#' + key + '.panel-pane'),
             panelIds = body.find('.panel-pane').map(function () {
                 return $(this).attr('id');
@@ -65,6 +121,7 @@ $(document).ready(function () {
             item = item.add(that);
         }
 
+        var loadTabUrl = Routing.generate(routes[0].name, $.extend(routes[0].params, {_format: 'tab'}));
         // download the panel
         if (panel.length == 0) {
             item.each(function (i, obj) {
@@ -78,7 +135,7 @@ $(document).ready(function () {
             }
             window.sincluding[window.sincluding.length] = path;
             $.ajax({
-                url: Routing.generate(routes[0].name, $.extend({_format: 'tab'}, routes[0].params)),
+                url: loadTabUrl,
                 type: 'GET',
                 dataType: 'text',
                 success: function (tab) {
@@ -194,61 +251,6 @@ $(document).ready(function () {
 
     body.on('click', ':not(#left-panel):not(#right-panel):not(#left-panel *):not(#right-panel *)', collapseMenu);
     body.on('click', '#left-panel a[href="#collapse"], #right-panel a[href="#collapse"], a[href="#right-panel"]', collapseMenu);
-
-    function handleLink(evt) {
-        var that = $(this),
-            el = that[0],
-            path = $(this).attr('href'),
-            routes = Routing.match(path) || Routing.match(this.pathname);
-        if (!expandMenu.apply(this, [evt]))
-            return false;
-        if ($(this).is('.invalid a.more')) {
-            evt.preventDefault();
-            evt.stopPropagation();
-            return false;
-        }
-
-        // the path is not a callback so just return normally
-        if (typeof window.history == 'undefined' || typeof window.history.pushState == 'undefined'
-                // check if there is a tab with the selected url
-            || typeof routes[0] == 'undefined' || typeof routes[0].route.requirements._format == 'undefined'
-            || routes[0].route.requirements['_format'].indexOf('tab') == -1) {
-            visits[visits.length] = {path: el.pathname, query: el.search, hash: el.hash, time: (new Date()).toJSON()};
-            collapseMenu.apply(this, [evt]);
-            return true;
-        }
-        // if the path clicked is a callback, use callback to load the new tab
-        else {
-            evt.preventDefault();
-            // allow other click responders to finish processing before doing a page change
-            setTimeout(function () {
-                if (routes[0].name == '_welcome') {
-                    path = Routing.generate(routes[0].name);
-                }
-                var message = new $.Event('beforeunload');
-                $(window).trigger(message);
-                if(typeof message.result !== 'undefined') {
-                    body.off('click.confirm_navigation').one('click.confirm_navigation', '#general-dialog a[href="#submit"]', function () {
-                        activateMenu.apply(that[0], [path]);
-                    });
-
-                    $('#general-dialog').modal('hide').modal({show: true, backdrop: true})
-                        .find('.modal-body').html(message.result)
-                }
-                else {
-                    activateMenu.apply(that[0], [path]);
-                }
-            }, 50);
-            return false;
-        }
-    }
-    window.handleLink = handleLink;
-
-    // capture all callback links
-    body.filter('.dashboard-home').on('click', 'button[value]', function () {
-
-    });
-    body.filter('.dashboard-home').on('click dblclick dragstart', 'a[href]:not(.accordion-toggle)', handleLink);
 
     window.onpopstate = function (e) {
         var routes = Routing.match(e.state);

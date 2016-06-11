@@ -92,7 +92,7 @@ $collection->add(
     new Route(
         '/home/{user}/{_format}',
         ['_controller' => 'StudySauceBundle:Home:index', '_format' => 'index', 'user' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'user' => '[0-9]*']
+        ['_format' => DASHBOARD_VIEWS, 'user' => '[0-9]+']
     )
 );
 $collection->add(
@@ -324,7 +324,7 @@ $collection->add(
     new Route(
         '/packs/{pack}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:index', '_format' => 'index', 'pack' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'pack' => '[1-9][0-9]*']
+        ['_format' => DASHBOARD_VIEWS, 'pack' => '[1-9][0-9]+']
     )
 );
 $collection->add(
@@ -347,7 +347,7 @@ $collection->add(
     new Route(
         '/packs/list/{user}',
         ['_controller' => 'StudySauceBundle:Packs:list', 'user' => null],
-        ['user' => '[0-9]*']
+        ['user' => '[0-9]+']
     )
 );
 $collection->add(
@@ -355,7 +355,7 @@ $collection->add(
     new Route(
         '/packs/download/{user}',
         ['_controller' => 'StudySauceBundle:Packs:download', 'user' => null],
-        ['user' => '[0-9]*']
+        ['user' => '[0-9]+']
     )
 );
 $collection->add(
@@ -363,7 +363,7 @@ $collection->add(
     new Route(
         '/cards/{card}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:card', '_format' => 'index', 'card' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'card' => '[0-9]*']
+        ['_format' => DASHBOARD_VIEWS, 'card' => '[0-9]+']
     )
 );
 $collection->add(
@@ -371,7 +371,7 @@ $collection->add(
     new Route(
         '/answers/{answer}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:answer', '_format' => 'index', 'answer' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'answer' => '[0-9]*']
+        ['_format' => DASHBOARD_VIEWS, 'answer' => '[0-9]+']
     )
 );
 $collection->add(
@@ -379,7 +379,7 @@ $collection->add(
     new Route(
         '/results/{pack}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:result', '_format' => 'index', 'pack' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'pack' => '[0-9]*']
+        ['_format' => DASHBOARD_VIEWS, 'pack' => '[0-9]+']
     )
 );
 $collection->add(
@@ -403,7 +403,7 @@ $collection->add(
     new Route(
         '/groups/{group}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:groups', '_format' => 'index', 'group' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'group' => '[1-9][0-9]*']
+        ['_format' => DASHBOARD_VIEWS, 'group' => '[1-9][0-9]+']
     )
 );
 $collection->add(

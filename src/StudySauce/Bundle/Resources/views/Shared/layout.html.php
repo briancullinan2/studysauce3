@@ -233,7 +233,9 @@ EOCSS;
     <body class="<?php $view['slots']->output('classes') ?>">
     <?php $view['slots']->output('body') ?>
     <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
-    <script src="<?php echo $view['assets']->getUrl('bundles/fosjsrouting/js/router.js'); ?>"></script>
+    <?php foreach ($view['assetic']->javascripts(['@FOSJsRoutingBundle/Resources/js/router.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
+        <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
+    <?php endforeach; ?>
     <script src="<?php echo $view['router']->generate('fos_js_routing_js', array('callback' => 'fos.Router.setData')); ?>"></script>
     <?php foreach ($view['assetic']->javascripts(['@layout'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
         <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
