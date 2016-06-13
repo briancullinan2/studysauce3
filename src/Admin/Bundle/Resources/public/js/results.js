@@ -709,7 +709,12 @@ $(document).ready(function () {
         if (!$(evt.target).is('a:not(.edit-icon), [class*="-row"] > .packList, [class*="-row"] > .packList *')) {
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');
-            window.activateMenu(getRowId.apply(row));
+            if(row.is('.card-row')) {
+                window.activateMenu('packs_edit', {pack: getRowId.apply(row)});
+            }
+            else if (row.is('.ss_group')) {
+                window.activateMenu('groups_edit', {pack: getRowId.apply(row)});
+            }
             row.removeClass('edit').addClass('read-only');
         }
     });

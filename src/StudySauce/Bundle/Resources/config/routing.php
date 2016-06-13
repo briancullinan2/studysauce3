@@ -203,6 +203,14 @@ $collection->add(
     )
 );
 $collection->add(
+    'error404',
+    new Route(
+        '/not-found',
+        ['_controller' => 'StudySauceBundle:Account:error', '_format' => 'funnel'],
+        ['_format' => 'funnel']
+    )
+);
+$collection->add(
     'error403',
     new Route(
         '/denied',
