@@ -332,7 +332,7 @@ $collection->add(
     new Route(
         '/packs/{pack}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:index', '_format' => 'index', 'pack' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'pack' => '[1-9][0-9]+']
+        ['_format' => DASHBOARD_VIEWS, 'pack' => '[1-9][0-9]*']
     )
 );
 $collection->add(
@@ -411,7 +411,7 @@ $collection->add(
     new Route(
         '/groups/{group}/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:groups', '_format' => 'index', 'group' => 0],
-        ['_format' => DASHBOARD_VIEWS, 'group' => '[1-9][0-9]+']
+        ['_format' => DASHBOARD_VIEWS, 'group' => '[1-9][0-9]*']
     )
 );
 $collection->add(
