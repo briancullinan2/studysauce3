@@ -706,15 +706,15 @@ $(document).ready(function () {
     });
 
     body.on('click', '.tiles [class*="-row"]', function (evt) {
-        if (!$(evt.target).is('a, [class*="-row"] > .packList, [class*="-row"] > .packList *')) {
+        if (!$(evt.target).is('a, a *, [class*="-row"] > .packList, [class*="-row"] > .packList *')) {
             evt.preventDefault();
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');
             if(row.is('.pack-row')) {
-                window.activateMenu('packs_edit', {pack: getRowId.apply(row)});
+                window.activateMenu(Routing.generate('packs_edit', {pack: getRowId.apply(row)}));
             }
             else if (row.is('.ss_group-row')) {
-                window.activateMenu('groups_edit', {group: getRowId.apply(row)});
+                window.activateMenu(Routing.generate('groups_edit', {group: getRowId.apply(row)}));
             }
             row.removeClass('edit').addClass('read-only');
         }
