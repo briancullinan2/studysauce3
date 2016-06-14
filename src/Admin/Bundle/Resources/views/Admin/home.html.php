@@ -28,7 +28,6 @@ $view['slots']->stop();
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="home<?php print (!empty($id) && $user->getId() != $id ? implode('', ['-user' , $id]) : ''); ?>">
         <div class="pane-content">
-            <div class="study-top">
             <div class="user-shuffle">
                 <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></h2>
             <?php
@@ -49,6 +48,7 @@ $view['slots']->start('body'); ?>
                 'footers' => false
             ];
             print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+            /*
             ?>
             </div>
             <div class="study-log">
@@ -66,7 +66,6 @@ $view['slots']->start('body'); ?>
                 ];
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                 ?>
-            </div>
             </div>
             <div class="study-mastery">
                 <h2>Study mastery report</h2>
@@ -91,7 +90,9 @@ $view['slots']->start('body'); ?>
                     'footers' => false
                 ];
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
-                ?>
+
+            */
+            ?>
             </div>
         </div>
     </div>
