@@ -11,8 +11,27 @@ $entityIds = [];
 $subGroups = [$ss_group->getId()];
 $countGroups = 0;
 // TODO: use IDs so it works in javascript too
-$countUsers = $ss_group->getUsers()->toArray();
+$countUsers = [];
+$users = [];
 $countPacks = [];
+$packIds = [];
+/** @var Pack[] $packs */
+$packs = [];
+foreach($ss_group->getUsers()->toArray() as $u) {
+    /** @var User $u */
+    if(!in_array($u->getId(), $countUsers)) {
+        $countUsers[count($countUsers)] = $u->getId();
+        $users[count($users)] = $u;
+    }
+}
+foreach($ss_group->getPacks()->toArray() as $p) {
+    /** @var Pack $p */
+    if(!in_array($p->getId(), $countPacks) && $p->getStatus() != 'DELETED') {
+        $countPacks[count($countPacks)] = $p->getId();
+        $packs[count($packs)] = $p;
+        $packIds[count($packIds)] = implode('', ['pack-' , $p->getId()]);
+    }
+}
 $added = true;
 while($added) {
     $added = false;
@@ -25,43 +44,40 @@ while($added) {
             $countGroups += 1;
             foreach($g->getUsers()->toArray() as $u) {
                 /** @var User $u */
-                if(!in_array($u, $countUsers)) {
-                    $countUsers[count($countUsers)] = $u;
+                if(!in_array($u->getId(), $countUsers)) {
+                    $countUsers[count($countUsers)] = $u->getId();
+                    $users[count($users)] = $u;
                 }
             }
             foreach($g->getPacks()->toArray() as $p) {
                 /** @var Pack $p */
-                if(!in_array($p, $countPacks)) {
-                    $countPacks[count($countPacks)] = $p;
+                if(!in_array($p->getId(), $countPacks) && $p->getStatus() != 'DELETED') {
+                    $countPacks[count($countPacks)] = $p->getId();
+                    $packs[count($packs)] = $p;
+                    $packIds[count($packIds)] = implode('', ['pack-' , $p->getId()]);
                 }
             }
             $added = true;
         }
     }
 }
-AdminController::sortByFields($countUsers, ['first', 'last']);
+AdminController::sortByFields($users, ['first', 'last']);
 $ids = [];
 $removed = [];
-foreach($countUsers as $u) {
+foreach($users as $u) {
     $ids[count($ids)] = implode('', ['ss_user-' , $u->getId()]);
     if(!empty($request['pack-id']) && !empty($up = $u->getUserPack($results['pack'][0])) && $up->getRemoved()) {
         $removed[count($removed)] = $u;
     }
 }
-/** @var Pack[] $packs */
-$packs = $ss_group->getPacks()->toArray();
 AdminController::sortByFields($packs, ['title']);
-$packIds = [];
-foreach($packs as $p) {
-    $packIds[count($packIds)] = implode('', ['pack-' , $p->getId()]);
-}
 ?>
 <form action="<?php print ($view['router']->generate('save_group', ['ss_group' => ['id' => $ss_group->getId()], 'tables' => ['ss_group' => ['users']]])); ?>">
     <?php
 
     $groupMembersList = [
         'tables' => ['ss_user' => AdminController::$defaultMiniTables['ss_user']],
-        'entities' => $countUsers,
+        'entities' => $users,
         'entityIds' => $ids,
         'fieldName' => 'ss_group[users]'];
 

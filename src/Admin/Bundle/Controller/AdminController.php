@@ -455,7 +455,7 @@ class AdminController extends Controller
             }
             // TODO: call collection firewall
             $qb = self::firewallCollection($table, $qb, $joins, $user);
-
+            
             $totalQuery = clone $qb;
             $query = $totalQuery->select('COUNT(DISTINCT(' . $table . '.' . self::$allTables[$table]->identifier[0] . '))')
                 ->getQuery();

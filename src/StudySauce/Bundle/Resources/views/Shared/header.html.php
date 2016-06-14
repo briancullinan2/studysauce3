@@ -12,6 +12,13 @@ use Symfony\Component\HttpFoundation\Session\Session;
 /** @var User $user */
 $user = $app->getUser();
 
+$allGroups = [];
+AdminController::setUpClasses($this->container->get('doctrine')->getManager());
+foreach($user->getGroups()->toArray() as $g) {
+    /** @var Group $g */
+    $allGroups[count($allGroups)] = AdminController::toFirewalledEntityArray($g, [], 2);
+}
+
 /** @var Session $session */
 $session = $app->getSession();
 
@@ -54,7 +61,11 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
         <?php }
 
         if($app->getRequest()->get('_format') != 'funnel') { ?>
-            <div id="welcome-message" data-user="<?php print $view->escape(json_encode(['id' => $user->getId(), 'email' => !empty($user) ? $user->getEmail() : '', 'roles' => $user->getRoles()])); ?>">
+            <div id="welcome-message" data-user="<?php print $view->escape(json_encode([
+                    'id' => $user->getId(),
+                    'email' => !empty($user) ? $user->getEmail() : '',
+                    'groups' => $allGroups,
+                    'roles' => $user->getRoles()])); ?>">
                 <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
                     <ul class="main-menu">
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>

@@ -6,8 +6,20 @@ use StudySauce\Bundle\Entity\User;
 
 /** @var Group $ss_group */
 $subGroups = [$ss_group->getId()];
-$countUsers = count($ss_group->getUsers()->toArray());
-$countPacks = count($ss_group->getPacks()->toArray());
+$countUsers = [];
+foreach($ss_group->getUsers()->toArray() as $u) {
+    /** @var User $u */
+    if((!in_array($u->getId(), $countUsers))) {
+        $countUsers[count($countUsers)] = $u->getId();
+    }
+}
+$countPacks = [];
+foreach($ss_group->getGroupPacks()->toArray() as $p) {
+    /** @var Pack $p */
+    if((!in_array($p->getId(), $countPacks)) && $p->getStatus() != 'DELETED') {
+        $countPacks[count($countPacks)] = $p->getId();
+    }
+}
 $added = true;
 while($added) {
     $added = false;
@@ -17,8 +29,18 @@ while($added) {
             && in_array($g->getParent()->getId(), $subGroups)
             && !in_array($g->getId(), $subGroups)) {
             $subGroups[count($subGroups)] = $g->getId();
-            $countUsers += count($g->getUsers()->toArray());
-            $countPacks += count($g->getPacks()->toArray());
+            foreach($g->getUsers()->toArray() as $u) {
+                /** @var User $u */
+                if((!in_array($u->getId(), $countUsers))) {
+                    $countUsers[count($countUsers)] = $u->getId();
+                }
+            }
+            foreach($g->getGroupPacks()->toArray() as $p) {
+                /** @var Pack $p */
+                if((!in_array($p->getId(), $countPacks)) && $p->getStatus() != 'DELETED') {
+                    $countPacks[count($countPacks)] = $p->getId();
+                }
+            }
             $added = true;
         }
     }
@@ -28,6 +50,6 @@ if (isset($request['parent-ss_group-id']) && $ss_group->getId() == $request['par
     print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => ['All users (not in subgroups below)', 0, 0]]));
 } else { ?>
     <a href="<?php print ($view['router']->generate('groups_edit', ['group' => $ss_group->getId()])); ?>">
-    <?php print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => [$ss_group->getName(), $countUsers, $countPacks]])); ?>
+    <?php print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => [$ss_group->getName(), count($countUsers), count($countPacks)]])); ?>
     </a>
 <?php }

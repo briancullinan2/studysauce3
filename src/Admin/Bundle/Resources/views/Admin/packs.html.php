@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 /** @var GlobalVariables $app */
 /** @var $view TimedPhpEngine */
 /** @var $user User */
+$user = $app->getUser();
 /** @var Pack $entity */
 
 $context = !empty($context) ? $context : jQuery($this);
@@ -48,9 +49,9 @@ if($tab->length > 0) {
 }
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="packs<?php print ($entity !== null ? implode('', ['-pack' , intval($entity->getId())]) : ''); ?>">
+    <div class="panel-pane" id="packs<?php print ($entity !== null ? implode('', [method_exists($entity, 'getTitle') ? '-pack' : '-group' , intval($entity->getId())]) : ''); ?>">
         <div class="pane-content">
-            <?php if ($entity !== null) { ?>
+            <?php if ($entity !== null && method_exists($entity, 'getTitle')) { ?>
                 <form action="<?php print ($view['router']->generate('packs_create')); ?>" class="pack-edit">
                     <?php
                     $tables = (array)(new stdClass());
@@ -156,21 +157,55 @@ $view['slots']->start('body'); ?>
                 <?php
             }
             else {
-                $request['count-pack'] = 0;
-                $request['count-card'] = -1;
-                $request['count-ss_group'] = -1;
-                $request['count-ss_user'] = -1;
-                $request['count-user_pack'] = -1;
-                $request['tables'] = [
-                    'ss_group' => ['id', 'name', 'users', 'deleted', 'subgroups'],
-                    'ss_user' => ['id', 'first', 'last', 'groups'],
-                    'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
-                    'card' => ['id', 'deleted'],
-                    'pack' => ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']]];
-                $request['classes'] = ['tiles'];
-                $request['headers'] = ['pack' => 'newPack'];
-                $request['footers'] = ['pack' => 'newPack'];
-                if($tab->length == 0) {
+                if (empty($entity) && count($user->getGroups()->toArray()) > 1) {
+                    $tiles = [
+                        'file' => ['id', 'url'],
+                        'ss_user' => ['id'],
+                        'pack' => ['id', 'status', 'logo', 'title'],
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']]];
+                    $request = [
+                        'tables' => $tiles,
+                        'parent-ss_group-id' => 'NULL',
+                        'count-ss_group' => 0,
+                        'count-pack' => -1,
+                        'read-only' => false,
+                        'count-ss_user' => -1,
+                        'count-file' => -1,
+                        'classes' => ['tiles'],
+                        'headers' => ['ss_group' => 'newGroup'],
+                        'footers' => ['ss_group' => 'newGroup']
+                    ];
+                }
+                else {
+                    if(!empty($entity)) {
+                        $request['ss_group-deleted'] = $entity->getDeleted();
+                        $request['ss_group-id'] = $entity->getId();
+                        $request['ss_group-1ss_group-id'] = null;
+                        $request['subgroups-ss_group-deleted'] = null;
+                        $request['parent-ss_group-deleted'] = null;
+                        $request['ss_group-1parent-ss_group-id'] = $entity->getId();
+                    }
+                    $request['count-file'] = -1;
+                    $request['count-pack'] = 0;
+                    $request['count-card'] = -1;
+                    $request['count-ss_group'] = -1;
+                    $request['ss_group-1count-ss_group'] = 0;
+                    $request['read-only'] = false;
+                    $request['count-ss_user'] = -1;
+                    $request['count-user_pack'] = -1;
+                    $request['tables'] = [
+                        'file' => ['id', 'url'],
+                        'ss_group' => ['id', 'name', 'users', 'deleted'],
+                        'ss_group-1' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']],
+                        'ss_user' => ['id', 'first', 'last', 'groups'],
+                        'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
+                        'card' => ['id', 'deleted'],
+                        'pack' => ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']]];
+                    $request['classes'] = ['tiles'];
+                    $request['headers'] = ['pack' => 'newPack'];
+                    $request['footers'] = ['pack' => 'newPack'];
+                }
+                if ($tab->length == 0) {
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                 }
             } ?>

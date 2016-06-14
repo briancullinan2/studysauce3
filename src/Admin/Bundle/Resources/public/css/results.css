@@ -376,13 +376,17 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     width: 20%;
 }
 
-.results header > *:nth-child(1) {
-    width:100%;
+.results .form-actions > .big-add,
+.results header > .big-add
+{
+    margin:20px 0;
 }
 
-.results .form-actions > .big-add,
-.results header > .big-add {
-    margin:20px 0;
+.results .form-actions:after, .results header:after
+{
+    display:block;
+    content: " ";
+    clear:both;
 }
 
 .results header > *.id,

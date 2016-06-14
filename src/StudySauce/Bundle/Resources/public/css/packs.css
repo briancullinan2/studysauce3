@@ -168,7 +168,7 @@
     position:relative;
 }
 
-#packs .packList label {
+#packs [class*="List"] label {
     color: #BBB;
     font-weight: normal;
 }

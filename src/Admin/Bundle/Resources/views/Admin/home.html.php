@@ -29,7 +29,6 @@ $view['slots']->start('body'); ?>
     <div class="panel-pane" id="home<?php print (!empty($id) && $user->getId() != $id ? implode('', ['-user' , $id]) : ''); ?>">
         <div class="pane-content">
             <div class="user-shuffle">
-                <h2>Today&rsquo;s goal <?php print ($user->getId() != $id ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></h2>
             <?php
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'userPacks']];

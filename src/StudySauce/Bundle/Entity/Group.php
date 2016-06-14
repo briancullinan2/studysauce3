@@ -269,13 +269,7 @@ class Group extends BaseGroup implements GroupInterface
      */
     public function getPacks()
     {
-        $packs = [];
-        foreach(array_merge($this->packs->toArray(), $this->groupPacks->toArray()) as $p) {
-            if(!in_array($p, $packs)) {
-                $packs[] = $p;
-            }
-        }
-        return new ArrayCollection($packs);
+        return $this->groupPacks;
     }
 
     /**

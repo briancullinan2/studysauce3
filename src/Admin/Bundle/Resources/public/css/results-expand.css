@@ -8,6 +8,10 @@
     display: none;
 }
 
+.last-right-expand [class*="Members"] header > .big-add {
+    padding-left:5%;
+}
+
 [id^="packs-"] .group-list header + [class*="-row"] > [class*="Members"] .big-add,
 [id^="groups-"] .group-list header + [class*="-row"] > [class*="Members"] .big-add,
 .last-right-expand > header > .big-add {
@@ -38,6 +42,7 @@
 .last-right-expand header > *:not(.big-add)
 {
     border-bottom: 2px solid #bbb;
+    width:100%;
 }
 
 .last-right-expand [class*="-row"] .title

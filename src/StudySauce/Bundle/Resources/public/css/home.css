@@ -12,20 +12,24 @@
 }
 
 .user-shuffle {
-    display: inline-block;
-    background: #e9e9e9;
-    border: 1px solid #bbb;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    padding: 20px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #eee;
+    vertical-align: middle;
+    border: 1px solid #BBB;
+    padding: 10px 10px 30px;
+    white-space: normal;
+    margin: 0 5px;
+    word-wrap: break-word;
+    overflow:auto;
 }
 
 .user-shuffle h2 {
-    position:relative;
-    top:-70px;
-    left:-20px;
-    margin-bottom:-50px;
+    left: -66.66%;
+    position: relative;
 }
 
 .user-shuffle .results {
@@ -135,24 +139,33 @@
 }
 
 .user-shuffle header a[href^="/cards"] {
-    position:absolute;
-    padding-bottom: 55.6%;
-    width:33.33%;
-    display:block;
+    position: fixed;
+    padding-bottom: 20%;
+    width: 20%;
+    display: block;
     background: url(../images/shuffle_btn.png) no-repeat 0 0 transparent;
     background-size: cover;
-    left:2%;
-    top:0;
+    left: 10%;
+    top: 50%;
+    margin-top: -10%;
 }
 
 .user-shuffle header a[href^="/cards"]:active {
     background-position: 0 center;
 }
 
-@media all and (max-width:700px) {
-    .user-shuffle {
-        display:block;
-        width:auto;
+@media all and (max-width: 700px), all and (max-height:700px) {
+
+    [id^="home"] .pane-content {
+        top: 50px;
+        left: 5px;
+        right: 5px;
+        bottom: 10px;
+    }
+
+    .user-shuffle header a[href^="/cards"]
+    {
+
     }
 
     .study-log {

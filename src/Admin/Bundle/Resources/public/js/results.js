@@ -127,7 +127,7 @@ window.views.__defaultEntities['ss_group'] = {
         return $(this.invites.map(function (c) {return applyEntityObj(c);}));
     },
     getUsers: function () {return $(this.users.map(function (u) { return applyEntityObj(u);}));},
-    getPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));},
+    getGroupPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));},
     getDeleted: function () {return this.deleted},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
@@ -613,6 +613,9 @@ $(document).ready(function () {
                         data.results[t][o] = applyEntityObj(data.results[t][o]);
                     }
                 }
+                if(t == 'allGroups') {
+                    // TODO: update group list in user data heading
+                }
             }
 
             window.views.render.apply(admin, ['results', data]);
@@ -706,7 +709,7 @@ $(document).ready(function () {
     });
 
     body.on('click', '.tiles [class*="-row"]', function (evt) {
-        if (!$(evt.target).is('a, a *, [class*="-row"] > .packList, [class*="-row"] > .packList *')) {
+        if (!$(evt.target).is('a, a *, [class*="-row"] > [class*="List"], [class*="-row"] > [class*="List"] *')) {
             evt.preventDefault();
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');

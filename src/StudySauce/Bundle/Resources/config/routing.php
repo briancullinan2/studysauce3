@@ -336,6 +336,14 @@ $collection->add(
     )
 );
 $collection->add(
+    'packs_group',
+    new Route(
+        '/packs/group/{group}/{_format}',
+        ['_controller' => 'StudySauceBundle:Packs:group', '_format' => 'index', 'group' => 0],
+        ['_format' => DASHBOARD_VIEWS, 'group' => '[1-9][0-9]*']
+    )
+);
+$collection->add(
     'packs_new',
     new Route(
         '/packs/0/{_format}',

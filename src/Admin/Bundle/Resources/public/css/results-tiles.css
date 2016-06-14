@@ -57,7 +57,7 @@
     padding:0 10px;
 }
 
-.tiles [class*="-row"] .packList {
+.tiles [class*="-row"] [class*="List"] {
     display:block;
     width:auto;
     height: 120px;
@@ -68,7 +68,7 @@
     line-height: 140%;
 }
 
-.tiles [class*="-row"] .packList label {
+.tiles [class*="-row"] [class*="List"] label {
     color: #BBB;
     font-weight: normal;
 }
@@ -104,7 +104,7 @@
     color:#09B;
 }
 
-.tiles [class*="-row"] .packList span {
+.tiles [class*="-row"] [class*="List"] span {
     float:right;
 }
 

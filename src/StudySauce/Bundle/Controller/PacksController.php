@@ -50,6 +50,11 @@ class PacksController extends Controller
         return $this->render('AdminBundle:Admin:result.html.php', ['pack' => $pack]);
     }
 
+    public function groupAction(Group $group)
+    {
+        return $this->render('AdminBundle:Admin:packs.html.php', ['entity' => $group]);
+    }
+
     public function answerAction(Card $answer)
     {
         return $this->redirect($this->generateUrl('cards', ['card' => $answer->getId()]));
