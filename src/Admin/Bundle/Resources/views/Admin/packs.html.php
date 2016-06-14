@@ -172,8 +172,8 @@ $view['slots']->start('body'); ?>
                         'count-ss_user' => -1,
                         'count-file' => -1,
                         'classes' => ['tiles'],
-                        'headers' => ['ss_group' => 'newGroup'],
-                        'footers' => ['ss_group' => 'newGroup']
+                        'headers' => ['ss_group' => 'newPack'],
+                        'footers' => ['ss_group' => 'newPack']
                     ];
                 }
                 else {
@@ -193,14 +193,14 @@ $view['slots']->start('body'); ?>
                     $request['read-only'] = false;
                     $request['count-ss_user'] = -1;
                     $request['count-user_pack'] = -1;
-                    $request['tables'] = [
-                        'file' => ['id', 'url'],
-                        'ss_group' => ['id', 'name', 'users', 'deleted'],
-                        'ss_group-1' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']],
-                        'ss_user' => ['id', 'first', 'last', 'groups'],
-                        'user_pack' => ['user', 'pack', 'removed', 'downloaded'],
-                        'card' => ['id', 'deleted'],
-                        'pack' => ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']]];
+                    $request['tables'] = (array)(new stdClass());
+                    $request['tables']['file'] = ['id', 'url'];
+                    $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted', 'groupPacks'];
+                    $request['tables']['ss_group-1'] = ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']];
+                    $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
+                    $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
+                    $request['tables']['card'] = ['id', 'deleted'];
+                    $request['tables']['pack'] = ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = ['pack' => 'newPack'];
                     $request['footers'] = ['pack' => 'newPack'];
