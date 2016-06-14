@@ -195,7 +195,7 @@ $view['slots']->start('body'); ?>
                     $request['count-user_pack'] = -1;
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
-                    $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted', 'groupPacks'];
+                    $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
                     $request['tables']['ss_group-1'] = ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']];
                     $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
                     $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];

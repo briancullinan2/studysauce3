@@ -10,6 +10,18 @@ $subGroups = [$ss_group->getId()];
 $countGroups = 0;
 $countUsers = [];
 $countPacks = [];
+foreach($ss_group->getUsers()->toArray() as $u) {
+    /** @var User $u */
+    if(!in_array($u->getId(), $countUsers)) {
+        $countUsers[count($countUsers)] = $u->getId();
+    }
+}
+foreach($ss_group->getGroupPacks()->toArray() as $p) {
+    /** @var Pack $p */
+    if(!in_array($p->getId(), $countPacks) && $p->getStatus() != 'DELETED') {
+        $countPacks[count($countPacks)] = $p->getId();
+    }
+}
 $added = true;
 while($added) {
     $added = false;
@@ -26,7 +38,7 @@ while($added) {
                     $countUsers[count($countUsers)] = $u->getId();
                 }
             }
-            foreach($g->getPacks()->toArray() as $p) {
+            foreach($g->getGroupPacks()->toArray() as $p) {
                 /** @var Pack $p */
                 if(!in_array($p->getId(), $countPacks) && $p->getStatus() != 'DELETED') {
                     $countPacks[count($countPacks)] = $p->getId();
