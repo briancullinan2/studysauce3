@@ -225,6 +225,10 @@
     border-left: 20px solid #BBB;
 }
 
+[id^="packs-group"] .tiles .pack-row > [class^="id"] label span {
+    margin-left:20px;
+}
+
 [id^="packs-group"] .tiles .pack-row:hover .pack-icon:after {
     border-left-color: #09B;
 }
