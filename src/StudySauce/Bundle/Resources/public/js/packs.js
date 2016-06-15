@@ -486,7 +486,7 @@ $(document).ready(function () {
             Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
         }
         var retention = data.retention;
-        if(typeof retention[0] == 'undefined' || retention[0].constructor != Array) {
+        if(typeof retention[0] == 'undefined' || typeof retention[0].retention != Array) {
             retention = [data];
         }
 
