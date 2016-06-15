@@ -14,9 +14,11 @@ $user = $app->getUser();
 
 $allGroups = [];
 AdminController::setUpClasses($this->container->get('doctrine')->getManager());
-foreach($user->getGroups()->toArray() as $g) {
-    /** @var Group $g */
-    $allGroups[count($allGroups)] = AdminController::toFirewalledEntityArray($g, [], 2);
+if(!empty($user)) {
+    foreach ($user->getGroups()->toArray() as $g) {
+        /** @var Group $g */
+        $allGroups[count($allGroups)] = AdminController::toFirewalledEntityArray($g, [], 2);
+    }
 }
 
 /** @var Session $session */
