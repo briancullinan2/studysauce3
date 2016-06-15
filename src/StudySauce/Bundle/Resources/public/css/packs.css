@@ -190,16 +190,16 @@
     width:35%;
 }
 
-[id^="packs-group"] .tiles [class*="-row"] {
+[id^="packs-group"] .tiles .pack-row {
     width:100%;
 }
 
-[id^="packs-group"] .tiles [class*="-row"] > [class^="id"] {
+[id^="packs-group"] .tiles .pack-row > [class^="id"] {
     height:auto;
     padding:0;
 }
 
-[id^="packs-group"] .tiles [class*="-row"] > [class^="id"] label {
+[id^="packs-group"] .tiles .pack-row > [class^="id"] label {
     display: inline-block;
     width: 100%;
     clear: both;
@@ -211,7 +211,25 @@
     position: static;
 }
 
-[id^="packs-group"] .tiles [class*="-row"] > [class^="id"] label:last-of-type {
+[id^="packs-group"] .tiles .pack-row .pack-icon:after {
+    content: " ";
+    display:block;
+    position:absolute;
+    right:0;
+    margin-top:-40px;
+    top:50%;
+    width: 0;
+    height: 0;
+    border-top: 40px solid transparent;
+    border-bottom: 40px solid transparent;
+    border-left: 40px solid #BBB;
+}
+
+[id^="packs-group"] .tiles .pack-row:hover .pack-icon:after {
+    border-left-color: #09B;
+}
+
+[id^="packs-group"] .tiles .pack-row > [class^="id"] label:last-of-type {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -222,7 +240,7 @@
     margin-left: 0;
 }
 
-[id^="packs-group"] .tiles [class*="-row"] > [class^="id"] img {
+[id^="packs-group"] .tiles .pack-row > [class^="id"] img {
     width: 10%;
     left: 0;
     display: inline-block;
@@ -232,7 +250,7 @@
     margin-bottom:0;
 }
 
-[id^="packs-group"] .results [class*="-row"] > [class^="id"] .pack-icon {
+[id^="packs-group"] .results .pack-row > [class^="id"] .pack-icon {
     position: static;
 }
 
