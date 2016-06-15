@@ -161,14 +161,17 @@ $view['slots']->start('body'); ?>
                     $tiles = [
                         'file' => ['id', 'url'],
                         'ss_user' => ['id'],
-                        'pack' => ['id', 'status', 'logo', 'title', 'users'],
-                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'subgroups'], 'actions' => ['deleted']]];
+                        'user_pack' => ['user', 'removed', 'retention'],
+                        'pack' => ['id', 'status', 'logo', 'title', 'userPacks'],
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'subgroups'], 'actions' => ['deleted']]
+                    ];
                     $request = [
                         'tables' => $tiles,
                         'ss_user-id' => $user->getId(),
                         'ss_group-deleted' => false,
                         'count-ss_group' => 0,
                         'count-pack' => -1,
+                        'count-user_pack' => -1,
                         'read-only' => false,
                         'count-ss_user' => -1,
                         'count-file' => -1,
@@ -199,7 +202,7 @@ $view['slots']->start('body'); ?>
                     $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
                     $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
-                    $request['tables']['pack'] = ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'userPacks', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = ['pack' => 'newPack'];
                     $request['footers'] = ['pack' => 'newPack'];
