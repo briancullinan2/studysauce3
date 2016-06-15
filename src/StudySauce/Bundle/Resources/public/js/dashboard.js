@@ -219,7 +219,7 @@ $(document).ready(function () {
     }
 
     function collapseMenu(evt) {
-        if ($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]'))
+        if ($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]') || $(this).is('[href="#right-panel"]'))
             evt.preventDefault();
         if (body.is('.left-menu') || body.is('.right-menu')) {
             // collapse menus

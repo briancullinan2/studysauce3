@@ -388,7 +388,10 @@ $(document).ready(function () {
         window.views.render.apply(row.find('> .status'), ['cell_status_pack', {pack: pack}]);
     });
 
-    body.on('click', '[id^="cards"] .card-row .preview-card:not([class*="type-"])', function () {
+    body.on('click', '[id^="cards"] .card-row .preview-card:not([class*="type-"])', function (evt) {
+        if($(evt.target).is('a, a *, .preview-play, preview-play *')) {
+            return;
+        }
         // go to answer without submitting for flash card
         var id = getRowId.apply($(this).parents('.card-row'));
         activateMenu(Routing.generate('cards_answers', {answer: id}));
@@ -519,8 +522,10 @@ $(document).ready(function () {
     }
 
     function setupProgress() {
-        if(!$(this).is('.setup-progress') && $(this).find('.preview-progress').length > 0) {
-            $(this).data('progress', new ProgressBar.Circle($(this).find('.preview-progress')[0], {
+        var progress = $(this).find('.preview-progress:visible:not(.setup-progress)');
+        if(progress.length > 0) {
+            progress.addClass('setup-progress');
+            progress.data('progress', new ProgressBar.Circle(progress[0], {
                 strokeWidth: 12,
                 easing: 'linear',
                 duration: 250,
@@ -529,18 +534,24 @@ $(document).ready(function () {
                 trailWidth: 12,
                 svgStyle: null
             }));
-            $(this).addClass('setup-progress');
         }
     }
 
     body.on('show', '[id^="cards"]', setupProgress);
 
+    body.on('resulted.refresh', '[id^="cards"] .results', function () {
+        var that = $(this).parents('.panel-pane');
+        setupProgress.apply(that);
+    });
+
     var jPlayer = $('#jquery_jplayer');
     jPlayer.bind($.jPlayer.event.timeupdate, function (evt) {
         var player = $('#jquery_jplayer').data('jPlayer');
-        var progress = $('.preview-progress:visible').parents('.setup-progress').data('progress');
-        progress.stop();
-        progress.animate(player.status.currentTime / player.status.duration);
+        var progress = $('.preview-progress:visible').data('progress');
+        if(typeof progress != 'undefined') {
+            progress.stop();
+            progress.animate(player.status.currentTime / player.status.duration);
+        }
     });
 
     function doFlash(correct) {

@@ -42,6 +42,7 @@ $view['slots']->start('body'); ?>
                 'headers' => ['ss_user' => 'bigButton'],
                 'count-pack' => 0,
                 'read-only' => false,
+                'classes' => ['centerized'],
                 'count-ss_user' => 1,
                 'count-user_pack' => -1,
                 'footers' => false
