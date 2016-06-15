@@ -46,7 +46,7 @@
     }
 
     ?>
-    <label><?php print (count($groups)); ?> groups / <?php print ($groupUsers + count($diffUsers)); ?> users / <?php print ($cardCount); ?> cards</label>
+    <label><span><?php print (count($groups)); ?> groups / <?php print ($groupUsers + count($diffUsers)); ?> users / <?php print ($cardCount); ?> cards</span></label>
 </a>
 
 
