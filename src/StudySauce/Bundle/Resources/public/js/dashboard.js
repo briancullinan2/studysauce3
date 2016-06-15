@@ -249,8 +249,8 @@ $(document).ready(function () {
         $(this).remove();
     });
 
-    body.on('click', ':not(#left-panel):not(#right-panel):not(#left-panel *):not(#right-panel *)', collapseMenu);
-    body.on('click', '#left-panel a[href="#collapse"], #right-panel a[href="#collapse"], a[href="#right-panel"]', collapseMenu);
+    body.on('click', ':not(#left-panel):not(#right-panel):not(#left-panel *):not(#right-panel *):not([href="#right-panel"])', collapseMenu);
+    body.on('click', '#left-panel a[href="#collapse"], #right-panel a[href="#collapse"]', collapseMenu);
 
     window.onpopstate = function (e) {
         var routes = Routing.match(e.state);

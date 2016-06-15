@@ -584,7 +584,7 @@ a[href*="/redirect/facebook"]:focus
     #left-panel.expanded a[href="#collapse"],
     #right-panel.expanded a[href="#collapse"]
     {
-        display:block;
+        /*display:block;*/
     }
 
     #left-panel a[href="#collapse"],
