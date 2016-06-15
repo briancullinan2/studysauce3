@@ -216,13 +216,13 @@
     display:block;
     position:absolute;
     right:0;
-    margin-top:-40px;
+    margin-top:-20px;
     top:50%;
     width: 0;
     height: 0;
-    border-top: 40px solid transparent;
-    border-bottom: 40px solid transparent;
-    border-left: 40px solid #BBB;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #BBB;
 }
 
 [id^="packs-group"] .tiles .pack-row:hover .pack-icon:after {

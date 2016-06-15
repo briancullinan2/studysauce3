@@ -380,6 +380,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
 .results header > .big-add
 {
     margin:20px 0;
+    width:auto;
 }
 
 .results .form-actions:after, .results header:after
