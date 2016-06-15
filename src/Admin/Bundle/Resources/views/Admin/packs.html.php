@@ -161,11 +161,11 @@ $view['slots']->start('body'); ?>
                     $tiles = [
                         'file' => ['id', 'url'],
                         'ss_user' => ['id'],
-                        'pack' => ['id', 'status', 'logo', 'title'],
-                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']]];
+                        'pack' => ['id', 'status', 'logo', 'title', 'users'],
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'subgroups'], 'actions' => ['deleted']]];
                     $request = [
                         'tables' => $tiles,
-                        'parent-ss_group-id' => 'NULL',
+                        'ss_user-id' => $user->getId(),
                         'count-ss_group' => 0,
                         'count-pack' => -1,
                         'read-only' => false,
@@ -176,15 +176,13 @@ $view['slots']->start('body'); ?>
                         'footers' => ['ss_group' => 'newPack']
                     ];
                 }
-                else {
-                    if(!empty($entity)) {
-                        $request['ss_group-deleted'] = $entity->getDeleted();
-                        $request['ss_group-id'] = $entity->getId();
-                        $request['ss_group-1ss_group-id'] = null;
-                        $request['subgroups-ss_group-deleted'] = null;
-                        $request['parent-ss_group-deleted'] = null;
-                        $request['ss_group-1parent-ss_group-id'] = $entity->getId();
-                    }
+                else if(!empty($entity)) {
+                    $request['ss_group-deleted'] = $entity->getDeleted();
+                    $request['ss_group-id'] = $entity->getId();
+                    $request['ss_group-1ss_group-id'] = null;
+                    $request['subgroups-ss_group-deleted'] = null;
+                    $request['parent-ss_group-deleted'] = null;
+                    $request['ss_group-1parent-ss_group-id'] = $entity->getId();
                     $request['count-file'] = -1;
                     $request['count-pack'] = 0;
                     $request['count-card'] = -1;
@@ -197,6 +195,26 @@ $view['slots']->start('body'); ?>
                     $request['tables']['file'] = ['id', 'url'];
                     $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
                     $request['tables']['ss_group-1'] = ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']];
+                    $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
+                    $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
+                    $request['tables']['card'] = ['id', 'deleted'];
+                    $request['tables']['pack'] = ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']];
+                    $request['classes'] = ['tiles'];
+                    $request['headers'] = ['pack' => 'newPack'];
+                    $request['footers'] = ['pack' => 'newPack'];
+                }
+                else {
+                    $request['count-file'] = -1;
+                    $request['count-pack'] = 0;
+                    $request['count-card'] = -1;
+                    $request['count-ss_group'] = -1;
+                    $request['ss_group-1count-ss_group'] = 0;
+                    $request['read-only'] = false;
+                    $request['count-ss_user'] = -1;
+                    $request['count-user_pack'] = -1;
+                    $request['tables'] = (array)(new stdClass());
+                    $request['tables']['file'] = ['id', 'url'];
+                    $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
                     $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
                     $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
