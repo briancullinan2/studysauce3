@@ -166,6 +166,7 @@ $view['slots']->start('body'); ?>
                     $request = [
                         'tables' => $tiles,
                         'ss_user-id' => $user->getId(),
+                        'ss_group-deleted' => false,
                         'count-ss_group' => 0,
                         'count-pack' => -1,
                         'read-only' => false,
