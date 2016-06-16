@@ -222,7 +222,7 @@ $view['slots']->start('body'); ?>
                     $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
                     $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
-                    $request['tables']['pack'] = ['idTiles' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'packList' => ['groups', 'userPacks', 'cards'], 'actions' => ['status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'userPacks', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = ['pack' => 'newPack'];
                     $request['footers'] = ['pack' => 'newPack'];

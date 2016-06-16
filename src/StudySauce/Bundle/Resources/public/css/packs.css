@@ -190,16 +190,16 @@
     width:35%;
 }
 
-[id^="packs-group"] .tiles .pack-row {
+[id^="packs"] .tiles .pack-row {
     width:100%;
 }
 
-[id^="packs-group"] .tiles .pack-row > [class^="id"] {
+[id^="packs"] .tiles .pack-row > [class^="id"] {
     height:auto;
     padding:0;
 }
 
-[id^="packs-group"] .tiles .pack-row > [class^="id"] label {
+[id^="packs"] .tiles .pack-row > [class^="id"] label {
     display: inline-block;
     width: 100%;
     clear: both;
@@ -211,7 +211,7 @@
     position: static;
 }
 
-[id^="packs-group"] .tiles .pack-row .pack-icon:after {
+[id^="packs"] .tiles .pack-row .pack-icon:after {
     content: " ";
     display:block;
     position:absolute;
@@ -225,15 +225,15 @@
     border-left: 20px solid #BBB;
 }
 
-[id^="packs-group"] .tiles .pack-row > [class^="id"] label span {
+[id^="packs"] .tiles .pack-row > [class^="id"] label span {
     margin-left:20px;
 }
 
-[id^="packs-group"] .tiles .pack-row:hover .pack-icon:after {
+[id^="packs"] .tiles .pack-row:hover .pack-icon:after {
     border-left-color: #09B;
 }
 
-[id^="packs-group"] .tiles .pack-row > [class^="id"] label:last-of-type {
+[id^="packs"] .tiles .pack-row > [class^="id"] label:last-of-type {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -244,7 +244,7 @@
     margin-left: 0;
 }
 
-[id^="packs-group"] .tiles .pack-row > [class^="id"] img {
+[id^="packs"] .tiles .pack-row > [class^="id"] img {
     width: 10%;
     left: 0;
     display: inline-block;
@@ -254,7 +254,7 @@
     margin-bottom:0;
 }
 
-[id^="packs-group"] .results .pack-row > [class^="id"] .pack-icon {
+[id^="packs"] .tiles .pack-row > [class^="id"] .pack-icon {
     position: static;
 }
 
