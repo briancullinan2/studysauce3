@@ -178,12 +178,21 @@ $(document).ready(function () {
     body.on('click', '[id^="packs-"] .preview-play .play, [id^="cards"] .preview-play .play', function (evt) {
         evt.preventDefault();
         var player = $('#jquery_jplayer');
+        player.jPlayer("stop");
         if(player.data('jPlayer').status.src != $(this).attr('href')) {
-            player.jPlayer("setMedia", {
-                mp3: $(this).attr('href')
-            });
+            try {
+                player.jPlayer("setMedia", {
+                    mp3: $(this).attr('href')
+                });
+                player.jPlayer("play");
+            }
+            catch (e) {
+                // silently fail
+            }
         }
-        player.jPlayer("play");
+        else {
+            player.jPlayer("play");
+        }
     });
 
     // TODO: merge with row-card.html.php or cell-id-card.html.php
@@ -540,6 +549,7 @@ $(document).ready(function () {
     body.on('show', '[id^="cards"]', setupProgress);
 
     body.on('resulted.refresh', '[id^="cards"] .results', function () {
+        $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         var that = $(this).parents('.panel-pane');
         setupProgress.apply(that);
     });
@@ -608,7 +618,7 @@ $(document).ready(function () {
     body.on('click', '[id^="cards"] .card-row .type-sa a[href="#done"]', function (evt) {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
-        var input = $(this).parents('.card-row input');
+        var input = $(this).parents('.card-row').find('input');
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;

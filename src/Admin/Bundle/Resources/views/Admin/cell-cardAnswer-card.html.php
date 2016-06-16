@@ -65,7 +65,7 @@ if (2 != $template->length) {
     // this is all prompt content
     $view['slots']->start('card-preview-prompt'); ?>
     <?php if (!empty($isImage)) { ?><img src="<?php print ($url); ?>" class="centerized" /><?php } ?>
-    <?php if (!empty($isAudio)) { ?><div class="preview-play"><a href="<?php print ($url); ?>" class="play centerized"></a><a href="#pause" class="pause centerized"></a></div><?php } ?>
+    <?php if (!empty($isAudio)) { ?><div class="preview-progress centerized"></div><div class="preview-play"><a href="<?php print ($url); ?>" class="play centerized"></a><a href="#pause" class="pause centerized"></a></div><?php } ?>
     <?php if (empty($isImage) && empty($isAudio)) { ?>
         <div class="preview-content"><div class="centerized"><?php print ($view->escape($content)); ?></div></div>
     <?php } ?>

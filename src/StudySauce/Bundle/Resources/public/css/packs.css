@@ -532,14 +532,14 @@
     left: 10px;
 }
 
-[id^="cards"] .type-mc .preview-footer,
-[id^="packs-"] .card-row + .expandable .type-mc .preview-footer
+[id^="cards"] .type-mc:not(.preview-answer) .preview-footer,
+[id^="packs-"] .card-row + .expandable .type-mc:not(.preview-answer) .preview-footer
 {
     height:40%;
     padding:12px 0 12px;
 }
 
-[id^="cards"] .type-mc .preview-footer
+[id^="cards"] .type-mc:not(.preview-answer) .preview-footer
 {
     padding-top:24px;
     padding-bottom:54px; /* for card count */
@@ -876,7 +876,7 @@ body.study-mode {
         margin-bottom:4px;
     }
 
-    [id^="cards"] .type-mc .preview-footer {
+    [id^="cards"] .type-mc:not(.preview-answer) .preview-footer {
         padding-top:12px;
         padding-bottom:42px;
     }

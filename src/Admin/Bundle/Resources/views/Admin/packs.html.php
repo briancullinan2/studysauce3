@@ -163,7 +163,7 @@ $view['slots']->start('body'); ?>
                         'ss_user' => ['id'],
                         'user_pack' => ['user', 'removed', 'retention'],
                         'pack' => ['id', 'status', 'logo', 'title', 'userPacks'],
-                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'subgroups'], 'actions' => ['deleted']]
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks'], 'actions' => ['deleted']]
                     ];
                     $request = [
                         'tables' => $tiles,
