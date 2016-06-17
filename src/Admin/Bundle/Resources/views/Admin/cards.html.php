@@ -42,6 +42,7 @@ if($tab->length == 0) {
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="cards<?php print (!empty($card->getId()) ? implode('', ['-card' , $card->getId()]) : ''); ?>" data-card="<?php print ($view->escape(json_encode(['pack' => ['id' => $card->getPack()->getId()]]))); ?>">
         <div class="pane-content">
+            <h2><?php print($view->escape($card->getPack()->getTitle())); ?></h2>
             <?php
             $tables = (array)(new stdClass());
             $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType', 'pack']];
@@ -74,6 +75,7 @@ $view['slots']->start('body'); ?>
     </div>
     <div class="panel-pane" id="cards<?php print (!empty($card->getId()) ? implode('', ['-answer' , $card->getId()]) : ''); ?>" data-card="<?php print ($view->escape(json_encode(['pack' => ['id' => $card->getPack()->getId()]]))); ?>">
         <div class="pane-content">
+            <h2><?php print($view->escape($card->getPack()->getTitle())); ?></h2>
             <?php
             $tables = (array)(new stdClass());
             $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType', 'pack']];

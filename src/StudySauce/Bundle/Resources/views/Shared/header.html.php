@@ -32,11 +32,13 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
     return;
 }
 
+$home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
+
 ?>
 <div class="header-wrapper navbar navbar-inverse">
     <div class="header">
         <div id="site-name" class="container navbar-header">
-            <a title="Home" href="<?php print $view['router']->generate('_welcome'); ?>">
+            <a title="Home" href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
                     <img width="48" height="48" src="<?php echo $view->escape($url) ?>" alt="LOGO" />
                 <?php endforeach; ?><span>Study Sauce</span></a>

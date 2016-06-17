@@ -281,5 +281,16 @@
 }
 
 @media all and (max-width: 500px) {
+    #site-name a > span {
+        display:none;
+    }
 
+    #site-name {
+        width:60px;
+    }
+
+    .header nav {
+        margin-left:-64px;
+        padding-left:64px;
+    }
 }

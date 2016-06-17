@@ -453,11 +453,19 @@ $(document).ready(function () {
         goFullscreen();
     });
 
+    body.on('click', '[id^="packs"] .pack-row a[href^="/cards"]', function () {
+        var rowId = getRowId.apply($(this).parents('.pack-row'));
+        Cookies.set('retention_' + rowId, $(this).is('header a') ? 'true' : 'false');
+        Cookies.set('retention_summary', 'true');
+    });
+
     body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
-        Cookies.set('retention_shuffle', $(this).is('header a'));
+        Cookies.set('retention_summary', 'false');
+        Cookies.set('retention_shuffle', $(this).is('header a') ? 'true' : 'false');
     });
 
     body.on('click', '[id^="cards"] .cardResult a[href^="/cards"]', function () {
+        // TODO: if retention_summary
         Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
     });
 

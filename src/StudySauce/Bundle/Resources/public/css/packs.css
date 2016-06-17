@@ -255,7 +255,7 @@
 }
 
 [id^="packs"] .tiles .pack-row > [class^="id"] .pack-icon {
-    position: static;
+    min-height: 80px;
 }
 
 [id^="packs-"] .card-row .input.type {
@@ -557,6 +557,10 @@
     padding-bottom: 0;
 }
 
+[id^="packs"] .ss_user-row {
+    display:none;
+}
+
 [id^="cards"] .type-sa:not(.preview-answer) .preview-inner,
 [id^="packs-"] .card-row + .expandable .type-sa:not(.preview-answer) .preview-inner {
     margin-bottom: -2.4em;
@@ -580,6 +584,21 @@
     left: 0;
     width: 100%;
     top: 10px;
+}
+
+[id^="cards"] h2 {
+    position: fixed;
+    top: 0;
+    right: 100px;
+    z-index: 2002;
+    color: #fff;
+    font-size: 28px;
+    margin-bottom: 0;
+    max-width: 100%;
+    padding-left:60px;
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 [id^="cards"] .preview-tap,
@@ -663,8 +682,8 @@
     padding: 0 80px;
 }
 
-.study-mode .main-menu a:not([href^="/home"]),
-.study-mode #welcome-message .input,
+.study-mode .main-menu a,
+.study-mode #welcome-message,
 .study-mode .footer {
     display:none;
 }

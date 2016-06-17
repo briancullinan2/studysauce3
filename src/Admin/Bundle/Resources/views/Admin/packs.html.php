@@ -157,52 +157,71 @@ $view['slots']->start('body'); ?>
                 <?php
             }
             else {
-                if (empty($entity) && count($user->getGroups()->toArray()) > 1) {
+
+                if(count($user->getGroups()->toArray()) > 1) {
                     $tiles = [
                         'file' => ['id', 'url'],
-                        'ss_user' => ['id'],
-                        'user_pack' => ['user', 'removed', 'retention'],
-                        'pack' => ['id', 'status', 'logo', 'title', 'userPacks'],
-                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks'], 'actions' => ['deleted']]
+                        'ss_user' => ['id' => ['id', 'userPacks']],
+                        'user_pack' => ['pack', 'removed', 'retention'],
+                        'pack' => ['id', 'status', 'logo', 'title'],
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['parent', 'groupPacks'], 'actions' => ['deleted']]
                     ];
-                    $request = [
-                        'tables' => $tiles,
-                        'ss_user-id' => $user->getId(),
-                        'ss_group-deleted' => false,
-                        'count-ss_group' => 0,
-                        'count-pack' => -1,
-                        'count-user_pack' => -1,
-                        'read-only' => false,
-                        'count-ss_user' => -1,
-                        'count-file' => -1,
-                        'classes' => ['tiles'],
-                        'headers' => ['ss_group' => 'newPack'],
-                        'footers' => ['ss_group' => 'newPack']
-                    ];
+                    if (empty($entity)) {
+                        $request = [
+                            'tables' => $tiles,
+                            'ss_user-id' => $user->getId(),
+                            'ss_group-deleted' => false,
+                            'count-ss_group' => 0,
+                            'count-pack' => -1,
+                            'count-user_pack' => -1,
+                            'count-ss_user' => 1,
+                            'count-file' => -1,
+                            'read-only' => false,
+                            'classes' => ['tiles'],
+                            'headers' => false,
+                            'footers' => false
+                        ];
+                    } else {
+                        $request = [
+                            'tables' => $tiles,
+                            'ss_user-id' => $user->getId(),
+                            'parent-ss_group-id' => $entity->getId(),
+                            'ss_group-deleted' => false,
+                            'count-ss_group' => 0,
+                            'count-pack' => -1,
+                            'count-user_pack' => -1,
+                            'count-ss_user' => 1,
+                            'count-file' => -1,
+                            'read-only' => false,
+                            'classes' => ['tiles'],
+                            'headers' => false,
+                            'footers' => false
+                        ];
+                    }
+                    if ($tab->length == 0) {
+                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+                    }
                 }
-                else if(!empty($entity)) {
-                    $request['ss_group-deleted'] = $entity->getDeleted();
-                    $request['ss_group-id'] = $entity->getId();
-                    $request['ss_group-1ss_group-id'] = null;
-                    $request['subgroups-ss_group-deleted'] = null;
-                    $request['parent-ss_group-deleted'] = null;
-                    $request['ss_group-1parent-ss_group-id'] = $entity->getId();
+
+                $request = (array)(new stdClass());
+                if(empty($entity)) {
                     $request['count-file'] = -1;
                     $request['count-pack'] = 0;
                     $request['count-card'] = -1;
                     $request['count-ss_group'] = -1;
-                    $request['ss_group-1count-ss_group'] = 0;
-                    $request['read-only'] = false;
-                    $request['count-ss_user'] = -1;
+                    $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
+                    $request['ss_group-1count-ss_group'] = 0;
+                    $request['ss_user-id'] = $user->getId();
+                    $request['user_pack-removed'] = false;
+                    $request['read-only'] = false;
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
                     $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
-                    $request['tables']['ss_group-1'] = ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['groupPacks', 'parent', 'users', 'subgroups'], 'actions' => ['deleted']];
-                    $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
-                    $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
+                    $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
+                    $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
-                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'userPacks', 'cards', 'status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = ['pack' => 'newPack'];
                     $request['footers'] = ['pack' => 'newPack'];
@@ -212,17 +231,19 @@ $view['slots']->start('body'); ?>
                     $request['count-pack'] = 0;
                     $request['count-card'] = -1;
                     $request['count-ss_group'] = -1;
+                    $request['count-ss_user'] = 1;
+                    $request['count-user_pack'] = -1;
                     $request['ss_group-1count-ss_group'] = 0;
                     $request['read-only'] = false;
-                    $request['count-ss_user'] = -1;
-                    $request['count-user_pack'] = -1;
+                    $request['ss_user-id'] = $user->getId();
+                    $request['ss_group-id'] = $entity->getId();
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
                     $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
-                    $request['tables']['ss_user'] = ['id', 'first', 'last', 'groups'];
-                    $request['tables']['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
+                    $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
+                    $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
-                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'userPacks', 'cards', 'status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = ['pack' => 'newPack'];
                     $request['footers'] = ['pack' => 'newPack'];
