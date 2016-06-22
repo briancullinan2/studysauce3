@@ -462,8 +462,7 @@ $(document).ready(function () {
     body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
         Cookies.set('retention_summary', 'false');
         Cookies.set('retention_shuffle', $(this).is('header a') ? 'true' : 'false');
-        var retentionObj = getQueryObject($(this).attr('href'));
-        var retention = retentionObj['nextCard'].split(',');
+        var retention = $(this).data('retention');
         var retentionDate = Cookies.get('retention');
         var retentionId = Routing.match($(this).attr('href'));
         var nextId = getRandomCard(retention, retentionDate, retentionId[0].params.card);

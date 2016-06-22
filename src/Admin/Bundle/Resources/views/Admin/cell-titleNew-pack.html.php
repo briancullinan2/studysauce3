@@ -24,7 +24,7 @@ foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
 
 $firstCard = array_shift($retention);
 ?>
-<a href="<?php print ($view['router']->generate('cards', ['card' => $firstCard, 'nextCard' => implode(',', $retention)])); ?>">
+<a data-retention="<?php print ($view->escape(json_encode($retention))); ?>" href="<?php print ($view['router']->generate('cards', ['card' => $firstCard])); ?>">
     <label><?php print ($isNew ? '<strong>New </strong>' : ''); ?>
         <span><?php print ($view->escape($pack->getTitle())); ?></span>
     </label>
