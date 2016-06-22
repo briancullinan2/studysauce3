@@ -24,6 +24,7 @@ $row = $context->filter(implode('', ['.', $table , '-id-', $ss_group->getId()]))
 
 // skip rows that have zero retention
 
+$isInGroup = false;
 if(isset($request['notInGroup'])) {
     /** @var User $user */
     $user = $results['ss_user'][0];
@@ -32,9 +33,13 @@ if(isset($request['notInGroup'])) {
      */
     foreach($user->getGroups()->toArray() as $j => $g2) {
         if($ss_group->getId() == $g2->getId()) {
-            return;
+            $isInGroup = true;
+            break;
         }
     }
+}
+if(!$isInGroup) {
+    return;
 }
 
 if($row->length == 0 || !$row->is('.edit')) {

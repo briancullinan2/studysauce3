@@ -34,6 +34,7 @@ if(isset($request['user_pack-removed'])) {
         return;
     }
 }
+$isInGroup = false;
 if(isset($request['notInGroup'])) {
     /** @var User $user */
     $user = $results['ss_user'][0];
@@ -44,10 +45,17 @@ if(isset($request['notInGroup'])) {
          */
         foreach($user->getGroups()->toArray() as $j => $g2) {
             if($g->getId() == $g2->getId()) {
-                return;
+                $isInGroup = true;
+                break;
             }
         }
+        if($isInGroup) {
+            break;
+        }
     }
+}
+if(!$isInGroup) {
+    return;
 }
 
 if($row->length == 0 || !$row->is('.edit')) {
