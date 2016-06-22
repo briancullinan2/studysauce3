@@ -310,6 +310,7 @@
     left: 0;
     height: 100%;
     position: absolute;
+    cursor: pointer;
 }
 
 [id^="cards"] .user_pack-row:hover,
@@ -323,9 +324,9 @@
 
 [id^="cards"] .pane-content {
     position: absolute;
-    left: 50px;
+    left: 100px;
     top: 90px;
-    right: 50px;
+    right: 100px;
     bottom: 50px;
     text-align: center;
 }
@@ -532,14 +533,14 @@
     left: 10px;
 }
 
-[id^="cards"] .type-mc:not(.preview-answer) .preview-footer,
-[id^="packs-"] .card-row + .expandable .type-mc:not(.preview-answer) .preview-footer
+[id^="cards"] .preview-card.type-mc:not(.preview-answer) .preview-footer,
+[id^="packs-"] .card-row + .expandable .preview-card.type-mc:not(.preview-answer) .preview-footer
 {
     height:40%;
     padding:12px 0 12px;
 }
 
-[id^="cards"] .type-mc:not(.preview-answer) .preview-footer
+[id^="cards"] .preview-card.type-mc:not(.preview-answer) .preview-footer
 {
     padding-top:24px;
     padding-bottom:54px; /* for card count */
@@ -561,8 +562,8 @@
     display:none;
 }
 
-[id^="cards"] .type-sa:not(.preview-answer) .preview-inner,
-[id^="packs-"] .card-row + .expandable .type-sa:not(.preview-answer) .preview-inner {
+[id^="cards"] .preview-card.type-sa:not(.preview-answer) .preview-inner,
+[id^="packs-"] .card-row + .expandable .preview-card.type-sa:not(.preview-answer) .preview-inner {
     margin-bottom: -2.4em;
     padding-bottom: 2.4em;
 }
@@ -659,6 +660,7 @@
     height: 100%;
     overflow: auto;
     overflow-x:hidden;
+    font-size: 20px;
 }
 
 [id^="packs-"] .card-row + .expandable .preview-true,
@@ -879,23 +881,33 @@ body.study-mode {
         margin: 0 -104px;
         padding: 0 104px;
     }
-}
-
-@media all and (max-width: 700px), all and (max-height:700px) {
 
     [id^="cards"] .pane-content {
         top: 50px;
-        left: 5px;
-        right: 5px;
         bottom: 10px;
     }
+}
+
+@media all and (max-width: 1300px) {
+
+    [id^="cards"] h2 {
+        right:10px;
+    }
+
+    [id^="cards"] .pane-content {
+        left: 5px;
+        right: 5px;
+    }
+}
+
+@media all and (max-width: 700px), all and (max-height:700px) {
 
     [id^="cards"] .type-mc .preview-response {
         margin-top:4px;
         margin-bottom:4px;
     }
 
-    [id^="cards"] .type-mc:not(.preview-answer) .preview-footer {
+    [id^="cards"] .preview-card.type-mc:not(.preview-answer) .preview-footer {
         padding-top:12px;
         padding-bottom:42px;
     }
@@ -927,5 +939,12 @@ body.study-mode {
     {
         margin: 0 -80px;
         padding: 0 80px;
+    }
+}
+
+@media all and (max-width: 700px) {
+    [id^="cards"] h2 {
+        font-size:20px;
+        top:5px;
     }
 }

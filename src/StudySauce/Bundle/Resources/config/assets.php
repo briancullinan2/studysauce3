@@ -64,7 +64,8 @@ $container->loadFromExtension('assetic', [
                 '@StudySauceBundle/Resources/public/js/dashboard-publish.js',
                 '@StudySauceBundle/Resources/public/js/dashboard-player.js',
                 '@StudySauceBundle/Resources/public/js/dashboard-upload.js',
-                '@AdminBundle/Resources/public/js/results.js'
+                '@AdminBundle/Resources/public/js/results.js',
+                '@StudySauceBundle/Resources/public/js/seedrandom.min.js',
             ],
             'filters' => [],
             'options' => [

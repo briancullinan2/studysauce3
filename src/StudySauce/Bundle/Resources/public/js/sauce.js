@@ -614,12 +614,12 @@ $(document).ready(function () {
         var triggerShow = setInterval(function () {
             if (window.sincluding.length == 0) {
                 body.css('overflow', 'hidden');
-                var panels = body.find('.panel-pane:visible').not(panel)
+                var panels = body.find('.panel-pane:visible').not(panel).addClass('hiding')
                     .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
                         panels.hide();
                     } });
                 panels.trigger('hiding');
-                panel.css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
+                panel.addClass('showing').css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
                     panel.css('position', '');
                     body.css('overflow', '');
                 } });
@@ -630,8 +630,9 @@ $(document).ready(function () {
                     if (panels.is(':visible'))
                         return;
                     panels.trigger('hide');
+                    panels.removeClass('hiding');
                     setTimeout(function () {
-                        panel.scrollintoview(DASHBOARD_MARGINS).trigger('show')
+                        panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
                     }, 40);
                     clearInterval(triggerHide);
                 }, 40);

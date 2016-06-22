@@ -5,48 +5,26 @@ use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 /** @var $view TimedPhpEngine */
 /** @var $user User */
 
-$view->extend('StudySauceBundle:Shared:layout.html.php');
+$view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('classes') ?>landing-home<?php $view['slots']->stop();
 
 $view['slots']->start('stylesheets');
 
-foreach ($view['assetic']->stylesheets(
-    [
-        '@StudySauceBundle/Resources/public/css/landing2.css',
-        '@StudySauceBundle/Resources/public/css/footer.css'
-    ],
-    [],
-    ['output' => 'bundles/studysauce/css/*.css']
-) as $url):
-    ?>
+foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/about.css',],[],['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
     <link rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
-<?php endforeach;
+<?php }
 
 $view['slots']->stop();
 
 $view['slots']->start('javascripts');
 
-foreach ($view['assetic']->javascripts(['@landing_scripts'],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
-
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-<div id="warp">
-    <div class="nav">
-        <div class="home"><a href="<?php print $view['router']->generate('_welcome'); ?>">Home</a></div>
-        <div class="about active"><a href="<?php print $view['router']->generate('about'); ?>">About</a></div>
-    </div>
-    <div class="main">
-        <div class="head">
-            <div id="site-name" class="container navbar-header">
-                <a title="Home" href="<?php print $view['router']->generate('_welcome'); ?>">
-                    <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
-                        <img width="50" src="<?php echo $view->escape($url) ?>" alt="LOGO" />
-                    <?php endforeach; ?><span><strong>Study</strong> Sauce</span></a>
-            </div>
+<div class="panel-pane" id="about">
+    <div class="pane-content">
+        <div class="inner-wrapper">
             <h3>Our Mission:</h3>
             <p>We are obsessed with helping you remember whatever you think is important!  You spend so much time studying, so why not use the most effective methods and remember for the long term?</p>
             <h3>The Science:</h3>

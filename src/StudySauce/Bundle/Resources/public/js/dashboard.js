@@ -64,7 +64,7 @@ $(document).ready(function () {
     });
     body.filter('.dashboard-home').on('click dblclick dragstart', 'a[href]:not(.accordion-toggle)', handleLink);
 
-    function activateMenu(path, noPush) {
+    function loadPanel(path, noPush, activatePanel) {
         var that = $(this);
         var routes = Routing.match(path) || Routing.match(this.pathname),
             subKey = routes[0].name.split('_')[0],
@@ -176,7 +176,11 @@ $(document).ready(function () {
             activatePanel(panel);
         }
     }
+    window.loadPanel = loadPanel;
 
+    function activateMenu(path, noPush) {
+        loadPanel.apply(this, [path, noPush, activatePanel]);
+    }
     window.activateMenu = activateMenu;
 
     body.on('click', 'a[href*="/redirect/facebook"], a[href*="/redirect/google"]', function () {

@@ -455,18 +455,34 @@ $(document).ready(function () {
 
     body.on('click', '[id^="packs"] .pack-row a[href^="/cards"]', function () {
         var rowId = getRowId.apply($(this).parents('.pack-row'));
-        Cookies.set('retention_' + rowId, $(this).is('header a') ? 'true' : 'false');
+        Cookies.set('retention_' + rowId, moment(new Date()).formatPHP('r'), { expires: 7 });
         Cookies.set('retention_summary', 'true');
     });
 
     body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
         Cookies.set('retention_summary', 'false');
         Cookies.set('retention_shuffle', $(this).is('header a') ? 'true' : 'false');
+        var retentionObj = getQueryObject($(this).attr('href'));
+        var retention = retentionObj['nextCard'].split(',');
+        var retentionDate = Cookies.get('retention');
+        var retentionId = Routing.match($(this).attr('href'));
+        var nextId = getRandomCard(retention, retentionDate, retentionId[0].params.card);
+        if($('#cards-card' + nextId).length == 0) {
+            body.one('show', '[id^="cards"]', function () {
+                loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
+            });
+        }
     });
 
     body.on('click', '[id^="cards"] .cardResult a[href^="/cards"]', function () {
-        // TODO: if retention_summary
-        Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
+        // if retention_summary
+        if(Cookies.set('retention_summary') == 'true') {
+            var rowId = getRowId.apply($(this).parents('.pack-row'));
+            Cookies.set('retention_' + rowId, moment(new Date()).formatPHP('r'), { expires: 7 });
+        }
+        else {
+            Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
+        }
     });
 
     body.on('click', '[id^="cards"] .card-row .preview-answer:not([class*="type-"]) [href="#wrong"], [id^="cards"] .card-row .preview-answer:not([class*="type-"]) [href="#right"]', function (evt) {
@@ -493,17 +509,35 @@ $(document).ready(function () {
                     $(this).stop().css({left: 0});
                     doFlash(correct);
                 });
-                pickNextCard(data, packId);
+                pickNextCard(data, packId, id);
             },
             error: function () {
             }
         });
     });
 
-    function pickNextCard(data, packId) {
-        var retentionDate = Cookies.get('retention');
-        if(retentionDate == null) {
-            Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
+    function getRandomCard(retention, prefix, previousId) {
+        retention.sort();
+        console.log(retention.join(','));
+        var seed = prefix + previousId;
+        console.log(seed);
+        var rng = new Math.seedrandom(seed);
+        return retention[Math.floor(rng() * retention.length)];
+    }
+
+    function pickNextCard(data, packId, cardId) {
+        var retentionDate;
+        if(Cookies.set('retention_summary') == 'true') {
+            retentionDate = Cookies.get('retention_' + packId);
+            if(retentionDate == null) {
+                Cookies.set('retention_' + packId, retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
+            }
+        }
+        else {
+            retentionDate = Cookies.get('retention');
+            if(retentionDate == null) {
+                Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
+            }
         }
         var retention = data.retention;
         if(typeof retention[0] == 'undefined' || typeof retention[0].retention == 'undefined') {
@@ -516,7 +550,7 @@ $(document).ready(function () {
                 continue;
             }
             for(var i in retention[j].retention) {
-                if(!retention[j].retention.hasOwnProperty(i)) {
+                if(!retention[j].retention.hasOwnProperty(i) || i == cardId) {
                     continue;
                 }
                 if(retention[j].retention[i][2] && (!retention[j].retention[i][3]
@@ -528,8 +562,16 @@ $(document).ready(function () {
 
         // TODO: created results tab without callback
         if(remaining.length > 0) {
-            var id = remaining[Math.floor(Math.random() * remaining.length)];
-            activateMenu(Routing.generate('cards', {card: id}));
+            var newId = getRandomCard(remaining, retentionDate, cardId);
+            activateMenu(Routing.generate('cards', {card: newId}));
+            var removeI = remaining.indexOf(newId);
+            remaining.splice(removeI, 1);
+            var nextId = getRandomCard(remaining, retentionDate, newId);
+            if($('#cards-card' + nextId).length == 0) {
+                body.one('show', '[id^="cards"]', function () {
+                    loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
+                });
+            }
         }
         else {
             // TODO: go to results page
@@ -612,11 +654,11 @@ $(document).ready(function () {
                 if(!correct) {
                     activateMenu(Routing.generate('cards_answers', {answer: id}));
                     body.one('click', '#cards-answer' + id + ' .card-row .preview-answer[class*="type-"]', function () {
-                        pickNextCard(data, packId);
+                        pickNextCard(data, packId, id);
                     });
                     return;
                 }
-                pickNextCard(data, packId);
+                pickNextCard(data, packId, id);
             },
             error: function () {
             }
@@ -653,11 +695,11 @@ $(document).ready(function () {
                 if(!correct) {
                     activateMenu(Routing.generate('cards_answers', {answer: id}));
                     body.one('click', '#cards-answer' + id + ' .card-row .preview-answer[class*="type-"]', function () {
-                        pickNextCard(data, packId);
+                        pickNextCard(data, packId, id);
                     });
                     return;
                 }
-                pickNextCard(data, packId);
+                pickNextCard(data, packId, id);
             },
             error: function () {
             }

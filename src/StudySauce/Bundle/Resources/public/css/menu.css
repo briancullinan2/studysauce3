@@ -3,7 +3,6 @@
 #left-panel
 {
     display: block;
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
     height: 100%;
     position: fixed;
     top: 0;
@@ -21,7 +20,7 @@
 {
     width: 220px;
     white-space: normal;
-    padding-top: 50px;
+    padding-top: 40px;
 }
 
 #right-panel.expanded h3,
@@ -65,6 +64,7 @@
     overflow-y:auto;
     height: 100%;
     width: 100%;
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
 }
 
 #left-panel a[href="#collapse"],
@@ -401,7 +401,7 @@ a[href*="/redirect/facebook"]:focus
 {
     width:0;
     white-space: nowrap;
-    padding-top:100px;
+    padding-top:40px;
 }
 
 #right-panel .navbar-toggle
@@ -572,12 +572,6 @@ a[href*="/redirect/facebook"]:focus
 
 @media all and (max-width: 1300px), (max-height: 700px)
 {
-    #left-panel,
-    #right-panel {
-        width:40px;
-        white-space: nowrap;
-        padding-top:100px;
-    }
 
     #left-panel a[href="#expand"],
     #right-panel a[href="#expand"],
@@ -677,6 +671,17 @@ a[href*="/redirect/facebook"]:focus
 }
 
 @media all and (max-width: 700px) {
+
+    #left-panel nav,
+    #left-panel.expanded nav,
+    #left-panel:not(.collapsed) nav,
+    #right-panel nav,
+    #right-panel.expanded nav,
+    #right-panel:not(.collapsed) nav
+    {
+        background: #555 none;
+    }
+
 
     #left-panel.expanded a[href="#collapse"],
     #right-panel.expanded a[href="#collapse"],
@@ -847,7 +852,6 @@ a[href*="/redirect/facebook"]:focus
     #left-panel.expanded, #right-panel.expanded
     {
         padding-top:0;
-        background:#555 none;
         color:#ffffff;
     }
 

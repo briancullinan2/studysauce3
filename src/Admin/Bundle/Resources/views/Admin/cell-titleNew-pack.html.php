@@ -6,18 +6,14 @@ use StudySauce\Bundle\Entity\UserPack;
 
 /** @var Pack $pack */
 /** @var User $user */
-$retentionCount = 0;
+$retention = [];
 $isNew = true;
-$id = 0;
 foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
     /** @var UserPack $up */
     if($up->getPack()->getId() == $pack->getId()) {
         foreach($up->getRetention() as $i =>  $r) {
             if($r[2]) {
-                if(empty($id)) {
-                    $id = $i;
-                }
-                $retentionCount += 1;
+                $retention[count($retention)] = $i;
             }
             if(!empty($r[3])) {
                 $isNew = false;
@@ -25,10 +21,12 @@ foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
         }
     }
 }
+
+$firstCard = array_shift($retention);
 ?>
-<a href="<?php print ($view['router']->generate('cards', ['card' => $id])); ?>">
+<a href="<?php print ($view['router']->generate('cards', ['card' => $firstCard, 'nextCard' => implode(',', $retention)])); ?>">
     <label><?php print ($isNew ? '<strong>New </strong>' : ''); ?>
         <span><?php print ($view->escape($pack->getTitle())); ?></span>
     </label>
-    <label><?php print ($retentionCount); ?></label>
+    <label><?php print (count($retention)); ?></label>
 </a>

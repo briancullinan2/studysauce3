@@ -51,7 +51,9 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
             <nav>
                 <ul class="main-menu">
                     <li><a href="<?php print $view['router']->generate('home'); ?>"><span>&nbsp;</span>Home</a></li>
+                    <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
                     <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
+                    <?php } ?>
                     <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
                     <?php /*
                     <li><a href="<?php print $view['router']->generate('command'); ?>"><span>&nbsp;</span>Users</a></li>
@@ -66,7 +68,9 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
 
         if($app->getRequest()->get('_format') != 'funnel') { ?>
             <div id="welcome-message" data-user="<?php print $view->escape(json_encode([
-                    'id' => $user->getId(),
+                    'id' => !empty($user) ? $user->getId() : '',
+                    'first' => !empty($user) ? $user->getFirst() : '',
+                    'last' => !empty($user) ? $user->getLast() : '',
                     'email' => !empty($user) ? $user->getEmail() : '',
                     'groups' => $allGroups,
                     'roles' => $user->getRoles()])); ?>">
@@ -75,8 +79,10 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
                     </ul>
+                <?php }
+                if($user->hasRole('ROLE_ADMIN')) { ?>
+                    <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode(AdminController::$defaultMiniTables)); ?>" data-confirm="false" placeholder="Search" /></label>
                 <?php } ?>
-                <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode(AdminController::$defaultMiniTables)); ?>" data-confirm="false" placeholder="Search" /></label>
                 <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>
                 <?php
                 /*

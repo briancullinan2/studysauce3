@@ -28,9 +28,12 @@ foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
         $isNew = false;
     }
 }
+
+$firstCard = array_shift($retention);
+
 ?>
 <header class="<?php print ($table); ?> <?php print ($total == 0 ? 'disabled' : ''); ?>">
-    <a href="<?php print ($view['router']->generate('cards', ['card' => $retention[0]])); ?>"></a>
-    <label>Today&rsquo;s cards <?php print ($user->getId() != $request->get('ss_user-id') ? implode('', ['(' , $first , ' ' , $last , ')']) : ''); ?></label>
+    <a href="<?php print ($view['router']->generate('cards', ['card' => $firstCard, 'nextCard' => implode(',', $retention)])); ?>"></a>
+    <label>Today&rsquo;s cards</label>
     <label><?php print ($total); ?> card<?php print ($total != 1 ? 's' : ''); ?></label>
 </header>

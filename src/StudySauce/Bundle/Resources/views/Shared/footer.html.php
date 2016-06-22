@@ -21,10 +21,9 @@ $user = $app->getUser();
             <li><a href="<?php print $view['router']->generate('privacy'); ?>">Privacy policy</a></li>
             <li><a href="<?php print $view['router']->generate('about'); ?>">About us</a></li>
             <li><a href="#contact-support" data-toggle="modal">Contact us</a></li>
-            <li><a href="<?php print $view['router']->generate('refund'); ?>">Refund policy</a></li>
-            <?php if (!empty($user) && is_object($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) { ?>
+            <?php /* if (!empty($user) && is_object($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) { ?>
                 <li><a href="<?php print $view['router']->generate('logout'); ?>">Logout</a></li>
-            <?php }
+            <?php } */
             if ($view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
                 <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit">Exit</a></li>
             <?php } ?>

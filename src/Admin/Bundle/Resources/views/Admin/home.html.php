@@ -19,10 +19,9 @@ foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/
 $view['slots']->stop();
 
 $view['slots']->start('javascripts');
-/*foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
+foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/packs.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
     <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
 <?php }
-*/
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>

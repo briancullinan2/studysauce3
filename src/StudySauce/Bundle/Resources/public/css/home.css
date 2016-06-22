@@ -3,6 +3,15 @@
     position:relative;
 }
 
+[id^="home"][style*="block"] ~ .footer,
+[id^="home"][style*="block"] ~ .footer a {
+    color:#eee;
+}
+
+[id^="home"][style*="block"] ~ .footer a:hover {
+    color:#fff;
+}
+
 .study-log {
     position:absolute;
     top:0;
@@ -29,12 +38,13 @@
     background: #eee;
     vertical-align: middle;
     border: 1px solid #BBB;
-    padding: 10px 10px 30px;
+    padding: 10px;
     white-space: normal;
     word-wrap: break-word;
     overflow:auto;
     margin-left:40%;
     max-height: 100%;
+    margin-bottom:40px; /* even out menu spacing with footer */
 }
 
 .user-shuffle:before {
@@ -65,7 +75,7 @@
     left: 0;
     height: 100%;
     position: absolute;
-    background: url(../images/neural_darkened.png) no-repeat center center #333;
+    background: url(../images/neural_darkened.jpg) no-repeat center center #333;
     background-size: cover;
 }
 
@@ -157,26 +167,52 @@
     margin-top: -10%;
 }
 
+.showing .user-shuffle header a[href^="/cards"],
+.hiding .user-shuffle header a[href^="/cards"] {
+    visibility: hidden;
+}
+
 .user-shuffle header a[href^="/cards"]:active {
     background-position: 0 center;
 }
 
-@media all and (max-width: 700px), all and (max-height:700px) {
+@media all and (min-width: 700px) {
+    .user-shuffle .results {
+        font-size:140%;
+        line-height: 140%;
+    }
+}
+
+@media all and (max-width: 700px) {
+
+    .user-shuffle {
+        top:50%;
+    }
+
+    .user-shuffle .results {
+        margin-left: 0;
+        margin-top: 0 !important;
+    }
+
+    .user-shuffle header a[href^="/cards"] {
+        position: absolute;
+        top: -100%;
+        text-align: center;
+        left: 50%;
+        margin-left: -20%;
+        width: 40%;
+        padding-bottom: 40%;
+        margin-top: 20px;
+    }
+
+    .study-log {
+        position: static;
+    }
 
     [id^="home"] .pane-content {
         top: 50px;
         left: 5px;
         right: 5px;
-        bottom: 10px;
-    }
-
-    .user-shuffle header a[href^="/cards"]
-    {
-
-    }
-
-    .study-log {
-        position:static;
     }
 
     .study-mastery .pack-row .packMastery,
@@ -184,3 +220,5 @@
         width:40%;
     }
 }
+
+

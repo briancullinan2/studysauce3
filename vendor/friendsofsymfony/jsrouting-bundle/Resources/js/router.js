@@ -340,9 +340,10 @@ fos.Router.prototype.match = function(url) {
 
             var newRegExpr = new RegExp(baseRegExpr);
 
-            var urlMatch, params = {};
+            var queryStart = (url || '').indexOf('?');
+            var urlMatch, params = {}, urlNoQuery = (url || '').substr(0, queryStart == -1 ? (url || '').length : queryStart);
 
-            if (urlMatch = newRegExpr.exec(url)) {
+            if (urlMatch = newRegExpr.exec(urlNoQuery)) {
 
                 //var error = url + "\n" + baseRegExpr;
 
@@ -368,7 +369,6 @@ fos.Router.prototype.match = function(url) {
             }
         }
     }
-
 
     return matchedRoutes;
 };

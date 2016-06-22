@@ -362,11 +362,10 @@ class PacksController extends Controller
         $orm = $this->get('doctrine')->getManager();
 
         $responses = $request->get('responses') ?: [];
-        if (!empty($request->get('pack')) && !empty($request->get('card'))
+        if (!empty($request->get('card'))
             && !empty($request->get('correct')) && !empty($request->get('created'))
         ) {
             $responses[] = [
-                'pack' => $request->get('pack'),
                 'card' => $request->get('card'),
                 'value' => $request->get('value'),
                 'answer' => $request->get('answer'),

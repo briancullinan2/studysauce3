@@ -24,7 +24,7 @@ foreach($retention as $up) {
     $summaryDate = $request->cookies->get(implode('', ['retention_', $up->getPack()->getId()]));
 
     foreach ($up->getRetention() as $id => $r) {
-        if (!$r[0] || empty($r[3]) || empty($summaryDate) || new Date($r[3]) < new Date($summaryDate)) {
+        if (!$r[0] || empty($r[3]) || empty($summaryDate) || $summaryDate === 'false' || new Date($r[3]) < new Date($summaryDate)) {
             $card = $id;
             break;
         }

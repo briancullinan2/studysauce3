@@ -449,6 +449,7 @@ body.right-menu #bookmark
     font-size: 22px;
     font-weight: bold;
     position:relative;
+    background: #eee;
 }
 
 .modal .modal-header + .modal-footer
