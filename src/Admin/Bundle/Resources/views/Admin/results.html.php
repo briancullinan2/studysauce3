@@ -54,10 +54,10 @@ if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
     $view['slots']->stop();
 
     $views = $view['slots']->get('view-settings');
-    //$resultOutput->prepend($views);
-    //if(!empty($views)) {
-    //    $last = $resultOutput->find('.views');
-    //}
+    $resultOutput->prepend($views);
+    if(!empty($views)) {
+        $last = $resultOutput->find('.views');
+    }
 }
 
 foreach ($tables as $table => $t) {

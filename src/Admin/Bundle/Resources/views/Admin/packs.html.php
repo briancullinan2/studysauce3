@@ -176,6 +176,7 @@ $view['slots']->start('body'); ?>
                             'count-user_pack' => -1,
                             'count-ss_user' => 1,
                             'count-file' => -1,
+                            'notInGroup' => true,
                             'read-only' => false,
                             'classes' => ['tiles'],
                             'headers' => false,
@@ -211,6 +212,7 @@ $view['slots']->start('body'); ?>
                     $request['count-ss_group'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
+                    $request['notInGroup'] = true;
                     $request['ss_group-1count-ss_group'] = 0;
                     $request['ss_user-id'] = $user->getId();
                     $request['user_pack-removed'] = false;
