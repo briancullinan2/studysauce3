@@ -466,7 +466,7 @@ $(document).ready(function () {
         var retentionDate = Cookies.get('retention');
         var retentionId = Routing.match($(this).attr('href'));
         var nextId = getRandomCard(retention, retentionDate, retentionId[0].params.card);
-        if($('#cards-card' + nextId).length == 0) {
+        if(typeof nextId != 'undefined' && $('#cards-card' + nextId).length == 0) {
             body.one('show', '[id^="cards"]', function () {
                 loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
             });
@@ -566,7 +566,7 @@ $(document).ready(function () {
             var removeI = remaining.indexOf(newId);
             remaining.splice(removeI, 1);
             var nextId = getRandomCard(remaining, retentionDate, newId);
-            if($('#cards-card' + nextId).length == 0) {
+            if(typeof nextId != 'undefined' && $('#cards-card' + nextId).length == 0) {
                 body.one('show', '[id^="cards"]', function () {
                     loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
                 });

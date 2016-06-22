@@ -587,7 +587,8 @@
     top: 10px;
 }
 
-[id^="cards"] h2 {
+[id^="cards-answer"] h2,
+[id^="cards-card"] h2 {
     position: fixed;
     top: 0;
     right: 100px;
@@ -713,10 +714,16 @@ body.study-mode {
 [id^="cards"] .results .cardResult h3
 {
     text-align: center;
+    white-space: normal;
 }
 
 [id^="cards"] .results .cardResult h1 {
     color:#F90;
+    font-size:80px;
+}
+
+[id^="cards"] .results .cardResult h2 {
+    font-size:40px;
 }
 
 [id^="cards"] .preview-card.type-mc:not(.preview-answer) .preview-inner,
