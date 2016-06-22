@@ -56,7 +56,7 @@ $view['slots']->start('body'); ?>
                 // search settings
                 'ss_user-id' => $user->getId(),
                 'pack-id' => $pack->getId(),
-                'classes' => 'centerized',
+                'classes' => ['centerized'],
                 // for new=true the template generates the -count number of empty rows, and no database query is performed
                 'count-user_pack' => 1,
                 'count-ss_user' => -1,
