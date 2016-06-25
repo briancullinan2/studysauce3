@@ -306,12 +306,12 @@ $(document).ready(function () {
         });
 
         $(window).resize(function () {
-            s.refresh();
-            if(typeof window.lastNode != 'undefined') {
-                setTimeout(function () {
-                    tooltips.open(window.lastNode, config.node, window.lastNode[s.renderers[0].options.prefix + 'x'], window.lastNode[s.renderers[0].options.prefix + 'y']);
-                }, 13);
-            }
+            setTimeout(function () {
+                s.refresh();
+                if(typeof window.lastNode != 'undefined') {
+                        tooltips.open(window.lastNode, config.node, window.lastNode[s.renderers[0].options.prefix + 'x'], window.lastNode[s.renderers[0].options.prefix + 'y']);
+                }
+            }, 13);
         });
 
         s.bind('clickNode', function (e) {

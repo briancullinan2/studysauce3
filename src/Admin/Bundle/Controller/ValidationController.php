@@ -30,7 +30,6 @@ use Doctrine\ORM\Query;
 use PHP_Timer;
 use PHPUnit_Framework_TestFailure;
 use PHPUnit_Util_Test;
-use RemoteWebDriver;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DomCrawler\Crawler;
@@ -40,6 +39,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 /**
  * Class ValidationController
@@ -367,6 +367,9 @@ class ValidationController extends Controller
         return null;
     }
 
+    /** @var SuiteManager $suiteManager */
+    var $suiteManager = null;
+
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -439,7 +442,7 @@ class ValidationController extends Controller
                     } elseif ($x->getStep()->getAction() == 'click') {
                         $ss = 'TestClick' . substr(md5(microtime()), -5);
                         /** @var WebDriver $driver */
-                        $driver = SuiteManager::$modules['WebDriver'];
+                        $driver = $this->suiteManager->getModuleContainer()->getModule('WebDriver');
                         /** @var \RemoteWebElement $ele */
                         $ele = $this->findClickable($driver->webDriver, trim($x->getStep()->getArguments()[0], '"'));
                         if (!empty($ele) && $ele->getSize()->getWidth() > 0 && $ele->getSize()->getHeight() > 0) {
@@ -522,9 +525,9 @@ class ValidationController extends Controller
                 Events::STEP_AFTER,
                 function (StepEvent $x) use (&$steps) {
                     // look for javascript errors
-                    if (isset(SuiteManager::$modules['WebDriver'])) {
                         /** @var WebDriver $driver */
-                        $driver = SuiteManager::$modules['WebDriver'];
+                    if ($this->suiteManager->getModuleContainer()->hasModule('WebDriver')) {
+                        $driver = $this->suiteManager->getModuleContainer()->getModule('WebDriver');
                         $driver->wait(1);
                         $jsErrors = $driver->executeJS(
                             'if(typeof window.jsErrors != \'undefined\') { return (function () {var tmpErrors = window.jsErrors; window.jsErrors = []; return tmpErrors || [];})() };'
@@ -538,7 +541,6 @@ class ValidationController extends Controller
                             $x->getTest()->getTestResultObject()->addFailure($x->getTest(), $e, PHP_Timer::stop());
                         }
                     }
-
                     // check for failures
                     //$x->getTest()->getTestResultObject()->failures()
                 }
@@ -552,9 +554,9 @@ class ValidationController extends Controller
                             ENT_QUOTES
                         );
                     // try to get a screenshot to show in the browser
-                    if (isset(SuiteManager::$modules['WebDriver'])) {
+                    if ($this->suiteManager->getModuleContainer()->hasModule('WebDriver')) {
                         /** @var WebDriver $driver */
-                        $driver = SuiteManager::$modules['WebDriver'];
+                        $driver = $this->suiteManager->getModuleContainer()->getModule('WebDriver');
                         $driver->makeScreenshot($ss);
                         $steps[$x->getTest()->getName()] .= '<br /><a target="_blank" href="/bundles/admin/results/debug/' .
                             $ss . '.png"><img width="300" src="/bundles/admin/results/debug/' . $ss . '.png" /></a>';
@@ -573,9 +575,9 @@ class ValidationController extends Controller
                             ENT_QUOTES
                         );
                     // try to get a screenshot to show in the browser
-                    if (isset(SuiteManager::$modules['WebDriver'])) {
+                    if ($this->suiteManager->getModuleContainer()->hasModule('WebDriver')) {
                         /** @var WebDriver $driver */
-                        $driver = SuiteManager::$modules['WebDriver'];
+                        $driver = $this->suiteManager->getModuleContainer()->getModule('WebDriver');
                         $driver->makeScreenshot($ss);
                         $steps[$x->getTest()->getName()] .= '<br /><a target="_blank" href="/bundles/admin/results/debug/' .
                             $ss . '.png"><img width="300" src="/bundles/admin/results/debug/' . $ss . '.png" /></a>';
@@ -592,9 +594,9 @@ class ValidationController extends Controller
                             ENT_QUOTES
                         );
                     // try to get a screenshot to show in the browser
-                    if (isset(SuiteManager::$modules['WebDriver'])) {
+                    if ($this->suiteManager->getModuleContainer()->hasModule('WebDriver')) {
                         /** @var WebDriver $driver */
-                        $driver = SuiteManager::$modules['WebDriver'];
+                        $driver = $this->suiteManager->getModuleContainer()->getModule('WebDriver');
                         $driver->makeScreenshot($ss);
                         rename(
                             codecept_log_dir() . 'debug' . DIRECTORY_SEPARATOR . $ss . '.png',
@@ -615,19 +617,21 @@ class ValidationController extends Controller
                 unset(static::$settings['modules']['enabled'][$i]);
             }
 
-            $suiteManager = new SuiteManager(self::$dispatcher, $suite, static::$settings);
-            $suiteManager->initialize();
+            $this->suiteManager = new SuiteManager(self::$dispatcher, $suite, static::$settings);
+            $this->suiteManager->initialize();
             // add Symfony2 module back in without initializing, setting the correct kernel for the current instance
             static::$settings['modules']['enabled'] = ['Symfony2'];
             /** @var Symfony2 $symfony */
-            $symfony = Configuration::modules(static::$settings)['Symfony2'];
-            SuiteManager::$modules['Symfony2'] = $symfony;
-            $symfony->kernel = $this->container->get('kernel');
-            $suiteManager->getSuite()->setBackupGlobals(false);
-            $suiteManager->getSuite()->setBackupStaticAttributes(false);
-            $suiteManager->loadTests(null);
-            Doctrine2::$em = $this->get('doctrine')->getManager();
-            $suiteManager->run($runner, $result, $options);
+            //$config = Configuration::modules(static::$settings);
+            //if(isset($config['Symfony2'])) {
+            //    $symfony = $config['Symfony2'];
+            //    $suiteManager->getModuleContainer()->cre('Symfony2') = $symfony;
+            //    $symfony->kernel = $this->container->get('kernel');
+            //}
+            $this->suiteManager->getSuite()->setBackupGlobals(false);
+            $this->suiteManager->getSuite()->setBackupStaticAttributes(false);
+            $this->suiteManager->loadTests(null);
+            $this->suiteManager->run($runner, $result, $options);
         }
 
         return new JsonResponse(true);

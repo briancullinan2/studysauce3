@@ -201,6 +201,14 @@
     line-height: 34px;
 }
 
+.header .main-menu li a:before {
+    display:none;
+}
+
+.header .main-menu li a span {
+    display:none;
+}
+
 .main-menu li.coming
 {
     padding-left:45px;

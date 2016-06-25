@@ -17,15 +17,21 @@ foreach ($cells as $i => $f) {
     <?php
     if ($view->exists(implode('', ['AdminBundle:Admin:cell-' , $field , '-' , $table , '.html.php']))) {
         $specificCell = [
+            'tables' => $tables,
             'table' => $table,
             'request' => $request,
+            'fields' => is_array($fields) ? $fields : [$fields],
+            'field' => $field,
             'results' => $results];
         $specificCell[$table] = $entity;
         print ($view->render(implode('', ['AdminBundle:Admin:cell-' , $field , '-' , $table , '.html.php']), $specificCell));
     } else if ($view->exists(implode('', ['AdminBundle:Admin:cell-' , $field , '.html.php']))) {
         print ($view->render(implode('', ['AdminBundle:Admin:cell-' , $field , '.html.php']), [
+            'tables' => $tables,
             'entity' => $entity,
             'table' => $table,
+            'fields' => is_array($fields) ? $fields : [$fields],
+            'field' => $field,
             'request' => $request,
             'results' => $results]));
     } else {

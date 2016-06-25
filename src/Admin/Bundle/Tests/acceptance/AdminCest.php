@@ -134,8 +134,11 @@ class AdminCest
         /** @var Invite $invite */
         $invite = Doctrine2::$em->getRepository('StudySauceBundle:Invite')->findOneBy(['id' => $matches[1]]);
 
-        $I->amOnPage('http://localhost:50001/run/home_screen');
-        $I->see('PASS');
+        $I->seeAmOnPage('/home');
+
+        // TODO: answer all cards
+
+
 
         // check if results are recorded properly
         $I->wait(1);

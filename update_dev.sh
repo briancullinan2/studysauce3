@@ -11,3 +11,5 @@ chown www-data:www-data -R app/logs/
 chown www-data:www-data -R src/Admin/Bundle/Tests
 chown www-data:www-data -R src/Admin/Bundle/Resources/public/results/
 chown www-data:www-data -R vendor/ezyang/htmlpurifier/library/HTMLPurifier/DefinitionCache/Serializer
+
+

@@ -21,9 +21,9 @@ class AcceptanceHelper extends \Codeception\Module
 
     // HOOK: before scenario
     /**
-     * @param Cest $test
+     * @param TestCase $test
      */
-    public function _before(Cest $test)
+    public function _before(TestCase $test)
     {
         $this->result = $test->getTestResultObject();
     }

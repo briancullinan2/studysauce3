@@ -37,7 +37,11 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/admin.
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="command">
         <div class="pane-content">
-            <?php print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', ['tables' => ['ss_user']]))); ?>
+            <?php
+            $request = (array)(new stdClass());
+            $request['tables'] = (array)(new stdClass());
+            $request['ss_user'] = ['0' => 'id', 'title' => ['first', 'last', 'email']];
+            print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request))); ?>
         </div>
     </div>
 <?php $view['slots']->stop();
