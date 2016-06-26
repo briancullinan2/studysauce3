@@ -58,7 +58,7 @@ $(document).ready(function () {
                     // set correct answers
                     newRow['answers'] = clipRow.splice(3).filter(function (x) {
                         return x.trim() != '';
-                    }).join("\n");
+                    });
 
                     // merge this with row template and just pass a model containing type, answers, correct, content
                     if (clipRow.length == 2) {

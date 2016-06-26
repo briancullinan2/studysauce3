@@ -194,14 +194,14 @@
     margin:0 -3px;
 }
 
-.header .main-menu li a {
+.header .main-menu li a:not(.more):not(.btn):not(.cloak) {
     color:#eee;
     padding:5px 10px;
     height:40px;
     line-height: 34px;
 }
 
-.header .main-menu li a:before {
+.header .main-menu li a:not(.more):not(.btn):not(.cloak):before {
     display:none;
 }
 
