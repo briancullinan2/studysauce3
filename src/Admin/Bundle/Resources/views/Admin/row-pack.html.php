@@ -10,6 +10,30 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 /** @var Pack $pack */
 $context = !empty($context) ? $context : jQuery($this);
 
+if(isset($request['notInGroup'])) {
+    $isInGroup = false;
+    /** @var User $user */
+    $user = $results['ss_user'][0];
+    foreach($pack->getGroups()->toArray() as $i => $g) {
+        /**
+         * @var Group $g
+         * @var Group $g2
+         */
+        foreach($user->getGroups()->toArray() as $j => $g2) {
+            if($g->getId() == $g2->getId()) {
+                $isInGroup = true;
+                break;
+            }
+        }
+        if($isInGroup) {
+            break;
+        }
+    }
+    if($isInGroup) {
+        return;
+    }
+}
+
 $rowHtml = $view->render('AdminBundle:Admin:row.html.php', [
     'tableId' => $tableId,
     'classes' => $classes,
@@ -31,29 +55,6 @@ if(isset($request['user_pack-removed'])) {
         || empty($up = $user->getUserPack($pack)) || $up->getRemoved()
         || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED'
     ) {
-        return;
-    }
-}
-if(isset($request['notInGroup'])) {
-    $isInGroup = false;
-    /** @var User $user */
-    $user = $results['ss_user'][0];
-    foreach($pack->getGroups()->toArray() as $i => $g) {
-        /**
-         * @var Group $g
-         * @var Group $g2
-         */
-        foreach($user->getGroups()->toArray() as $j => $g2) {
-            if($g->getId() == $g2->getId()) {
-                $isInGroup = true;
-                break;
-            }
-        }
-        if($isInGroup) {
-            break;
-        }
-    }
-    if($isInGroup) {
         return;
     }
 }

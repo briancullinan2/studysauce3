@@ -118,7 +118,15 @@ class SwitchListener extends SwitchUserListener
                 return $token;
             }
 
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            // switch back and attempt new switch
+            if (null !== $this->dispatcher) {
+                $user = $this->provider->refreshUser($originalToken->getUser());
+                $switchEvent = new SwitchUserEvent($request, $user);
+                $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+            }
+            else {
+                throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            }
         }
 
         if (false === $this->accessDecisionManager->decide($token, array($this->role))) {

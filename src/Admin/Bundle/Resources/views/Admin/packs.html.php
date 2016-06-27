@@ -158,7 +158,7 @@ $view['slots']->start('body'); ?>
             }
             else {
 
-                if(count($user->getGroups()->toArray()) > 1) {
+                if(count($user->getGroups()->toArray()) > 0) {
                     $tiles = [
                         'file' => ['id', 'url'],
                         'ss_user' => ['id' => ['id', 'userPacks']],
@@ -170,7 +170,7 @@ $view['slots']->start('body'); ?>
                         $request = [
                             'tables' => $tiles,
                             'ss_user-id' => $user->getId(),
-                            'ss_group-deleted' => false,
+                            'ss_group-deleted' => null,
                             'count-ss_group' => 0,
                             'count-pack' => -1,
                             'count-user_pack' => -1,

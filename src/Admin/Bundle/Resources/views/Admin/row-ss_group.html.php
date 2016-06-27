@@ -10,19 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 /** @var Group $ss_group */
 $context = !empty($context) ? $context : jQuery($this);
 
-$rowHtml = $view->render('AdminBundle:Admin:row.html.php', [
-    'tableId' => $tableId,
-    'classes' => $classes,
-    'entity' => $ss_group,
-    'table' => $table,
-    'tables' => $tables,
-    'request' => $request,
-    'results' => $results,
-    'context' => $context]);
-
-$row = $context->filter(implode('', ['.', $table , '-id-', $ss_group->getId()]));
-
-// skip rows that have zero retention
+// skip rows that are not in the users group
 
 if(isset($request['notInGroup'])) {
     $isInGroup = false;
@@ -37,10 +25,22 @@ if(isset($request['notInGroup'])) {
             break;
         }
     }
-    if(!$isInGroup) {
+    if(!$isInGroup || $ss_group->getDeleted()) {
         return;
     }
 }
+
+$rowHtml = $view->render('AdminBundle:Admin:row.html.php', [
+    'tableId' => $tableId,
+    'classes' => $classes,
+    'entity' => $ss_group,
+    'table' => $table,
+    'tables' => $tables,
+    'request' => $request,
+    'results' => $results,
+    'context' => $context]);
+
+$row = $context->filter(implode('', ['.', $table , '-id-', $ss_group->getId()]));
 
 if($row->length == 0 || !$row->is('.edit')) {
     print($rowHtml);
