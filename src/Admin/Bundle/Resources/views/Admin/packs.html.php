@@ -225,8 +225,8 @@ $view['slots']->start('body'); ?>
                     $request['tables']['card'] = ['id', 'deleted'];
                     $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
-                    $request['headers'] = ['pack' => 'newPack'];
-                    $request['footers'] = ['pack' => 'newPack'];
+                    $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
+                    $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                 }
                 else {
                     $request['count-file'] = -1;
@@ -247,8 +247,8 @@ $view['slots']->start('body'); ?>
                     $request['tables']['card'] = ['id', 'deleted'];
                     $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
-                    $request['headers'] = ['pack' => 'newPack'];
-                    $request['footers'] = ['pack' => 'newPack'];
+                    $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
+                    $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                 }
                 if ($tab->length == 0) {
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));

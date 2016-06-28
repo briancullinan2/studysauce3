@@ -13,7 +13,8 @@ $request = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
 
-$total = isset($results['user_pack'][0]) ? 0 : count($card->getPack()->getCards()->toArray());
+$total = [];
+$remaining = [];
 $index = 1;
 $retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
 if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') =='true') {
@@ -28,10 +29,13 @@ foreach($retention as $up) {
     foreach($up->getRetention() as $id => $r) {
         if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
             || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
-            $total += 1;
+            $total[count($total)] = $id;
         }
         if(!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention'))) {
             $index += 1;
+        }
+        else {
+            $remaining[count($remaining)] = $id;
         }
     }
 }
@@ -86,7 +90,7 @@ if (2 != $template->length) {
                 <a href="#wrong" class="preview-wrong">✘</a>
                 <div class="preview-guess">Did you guess correctly?</div>
                 <a href="#right" class="preview-right">&#x2714;︎</a>
-                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
     <?php }
@@ -100,7 +104,7 @@ if (2 != $template->length) {
                 <div class="preview-content"><div class="centerized"></div></div>
             </div>
             <div class="preview-footer">
-                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
     <?php }
@@ -122,5 +126,7 @@ if($isImage && isset($url)) {
 $row->find('.preview-content div')->text($content);
 
 $row->find('.preview-answer .preview-inner .preview-content div')->text($correct);
+
+$row->find('.preview-card')->attr('data-retention', json_encode($remaining))->data('retention', $remaining);
 
 print ($row->html());

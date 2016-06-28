@@ -408,13 +408,24 @@ $(document).ready(function () {
 
     body.on('show', '[id^="cards"]', function () {
         body.addClass('study-mode');
-        $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         goFullscreen();
         if(!$(this).is('.loaded')) {
             $(this).addClass('loaded');
+            if($(this).closest('.panel-pane').find('.card-row').length > 0) {
+                var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).closest('.panel-pane').data('card').pack.id;
+                loadOneExtra.apply(this, [$(this).find('.preview-card').data('retention'), packId, getRowId.apply($(this).find('.card-row'))]);
+            }
         }
         else {
             loadResults.apply($(this).find('.results'));
+        }
+        $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
+        centerize.apply($(this).find('.preview-play a'));
+        if($(this).find('.preview-card:not(.preview-answer) .preview-play').length > 0) {
+            $(this).find('.preview-card:not(.preview-answer) .preview-play .play').first().trigger('click');
+        }
+        if($(this).find('.type-sa').length > 0) {
+            $(this).find('.type-sa input').focus();
         }
     });
 
@@ -462,21 +473,12 @@ $(document).ready(function () {
     body.on('click', '[id^="home"] .user-shuffle a[href^="/cards"]', function () {
         Cookies.set('retention_summary', 'false');
         Cookies.set('retention_shuffle', $(this).is('header a') ? 'true' : 'false');
-        var retention = $(this).data('retention');
-        var retentionDate = Cookies.get('retention');
-        var retentionId = Routing.match($(this).attr('href'));
-        var nextId = getRandomCard(retention, retentionDate, retentionId[0].params.card);
-        if(typeof nextId != 'undefined' && $('#cards-card' + nextId).length == 0) {
-            body.one('show', '[id^="cards"]', function () {
-                loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
-            });
-        }
     });
 
     body.on('click', '[id^="cards"] .cardResult a[href^="/cards"]', function () {
         // if retention_summary
-        if(Cookies.set('retention_summary') == 'true') {
-            var rowId = getRowId.apply($(this).parents('.pack-row'));
+        if(Cookies.get('retention_summary') == 'true') {
+            var rowId = $(this).parents('.panel-pane').data('card').pack.id;
             Cookies.set('retention_' + rowId, moment(new Date()).formatPHP('r'), { expires: 7 });
         }
         else {
@@ -489,6 +491,17 @@ $(document).ready(function () {
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('[href="#right"]');
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+
+        body.one('hiding', '[id^="cards"]', function () {
+            $(this).stop().hide();
+        });
+        body.one('showing', '.panel-pane', function () {
+            $(this).stop().css({left: 0});
+            doFlash(correct);
+        });
+        pickNextCard(data, packId, id);
+
         $.ajax({
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
@@ -501,14 +514,7 @@ $(document).ready(function () {
                 answer: ''
             },
             success: function (data) {
-                body.one('hiding', '[id^="cards"]', function () {
-                    $(this).stop().hide();
-                });
-                body.one('showing', '.panel-pane', function () {
-                    $(this).stop().css({left: 0});
-                    doFlash(correct);
-                });
-                pickNextCard(data, packId, id);
+
             },
             error: function () {
             }
@@ -517,6 +523,10 @@ $(document).ready(function () {
 
     function getRandomCard(retention, prefix, previousId) {
         retention.sort();
+        var i = retention.indexOf(parseInt(previousId));
+        if(i > -1) {
+            retention.splice(i, 1);
+        }
         console.log(retention.join(','));
         var seed = prefix + previousId;
         console.log(seed);
@@ -524,9 +534,10 @@ $(document).ready(function () {
         return retention[Math.floor(rng() * retention.length)];
     }
 
-    function pickNextCard(data, packId, cardId) {
+    function loadOneExtra(retention, packId, newId) {
+        // pick card based on last time hitting home page, same retention rules as in the app
         var retentionDate;
-        if(Cookies.set('retention_summary') == 'true') {
+        if(Cookies.get('retention_summary') == 'true') {
             retentionDate = Cookies.get('retention_' + packId);
             if(retentionDate == null) {
                 Cookies.set('retention_' + packId, retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
@@ -538,45 +549,43 @@ $(document).ready(function () {
                 Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
             }
         }
-        var retention = data.retention;
-        if(typeof retention[0] == 'undefined' || typeof retention[0].retention == 'undefined') {
-            retention = [data];
-        }
 
-        var remaining = [];
-        for(var j in retention) {
-            if(!retention.hasOwnProperty(j)) {
-                continue;
+        // pick card based on last time hitting home page, same retention rules as in the app
+        var nextId = getRandomCard(retention, retentionDate, newId);
+        var tab = $('#cards-card' + nextId);
+        if(typeof nextId != 'undefined' && tab.length == 0) {
+            loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
+        }
+        else if(typeof nextId != 'undefined') {
+            loadResults.apply(tab.find('.results'));
+        }
+    }
+
+    function pickNextCard(retention, packId, cardId) {
+        var retentionDate;
+        if(Cookies.get('retention_summary') == 'true') {
+            retentionDate = Cookies.get('retention_' + packId);
+            if(retentionDate == null) {
+                Cookies.set('retention_' + packId, retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
             }
-            for(var i in retention[j].retention) {
-                if(!retention[j].retention.hasOwnProperty(i) || i == cardId) {
-                    continue;
-                }
-                if(retention[j].retention[i][2] && (!retention[j].retention[i][3]
-                    || new Date(retention[j].retention[i][3]) < new Date(retentionDate))) {
-                    remaining[remaining.length] = i;
-                }
+        }
+        else {
+            retentionDate = Cookies.get('retention');
+            if(retentionDate == null) {
+                Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
             }
         }
 
         // TODO: created results tab without callback
-        if(remaining.length > 0) {
-            var newId = getRandomCard(remaining, retentionDate, cardId);
+        if(retention.length > 0) {
+            var newId = getRandomCard(retention, retentionDate, cardId);
             activateMenu(Routing.generate('cards', {card: newId}));
-            var removeI = remaining.indexOf(newId);
-            remaining.splice(removeI, 1);
-            var nextId = getRandomCard(remaining, retentionDate, newId);
-            if(typeof nextId != 'undefined' && $('#cards-card' + nextId).length == 0) {
-                body.one('show', '[id^="cards"]', function () {
-                    loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
-                });
-            }
         }
+        // go to results page
         else {
-            // TODO: go to results page
             activateMenu(Routing.generate('cards_result', {pack: packId}));
         }
-        // TODO: pick card based on last time hitting home page, same retention rules as in the app
+
     }
 
     function setupProgress() {
@@ -599,8 +608,12 @@ $(document).ready(function () {
 
     body.on('resulted.refresh', '[id^="cards"] .results', function () {
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
-        var that = $(this).parents('.panel-pane');
+        var that = $(this).closest('.panel-pane');
         setupProgress.apply(that);
+        if($(this).is('[id^="cards-card"], [id^="cards-answer"]')) {
+            var packId = Cookies.get('retention_shuffle') == 'true' ? null : that.data('card').pack.id;
+            loadOneExtra.apply(this, [$(this).find('.preview-card').data('retention'), packId, getRowId.apply($(this).find('.card-row'))]);
+        }
     });
 
     var jPlayer = $('#jquery_jplayer');
@@ -626,11 +639,36 @@ $(document).ready(function () {
         }
     }
 
-    body.on('click', '[id^="cards"] .card-row .type-mc .preview-response, [id^="cards"] .card-row .type-tf a', function (evt) {
+    body.on('click', '[id^="cards-answer"] .card-row .preview-answer[class*="type-"]', function () {
+        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
+        var id = getRowId.apply($(this).parents('.card-row'));
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+        pickNextCard(data, packId, id);
+    });
+
+    body.on('click', '[id^="cards"] .card-row .type-mc .preview-response, [id^="cards"] .card-row .type-tf a[href="#true"], [id^="cards"] .card-row .type-tf a[href="#false"]', function (evt) {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('.correct');
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+
+        // do transition
+        body.one('hiding', '[id^="cards"]', function () {
+            $(this).stop().hide();
+        });
+        body.one('showing', '.panel-pane', function () {
+            $(this).stop().css({left: 0});
+            doFlash(correct);
+        });
+        if(!correct) {
+            activateMenu(Routing.generate('cards_answers', {answer: id}));
+        }
+        else {
+            pickNextCard(data, packId, id);
+        }
+
+        // save response
         $.ajax({
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
@@ -643,21 +681,7 @@ $(document).ready(function () {
                 answer: ((/answer-id-([0-9]*)/).exec($(this).attr('class')) || [])[1]
             },
             success: function (data) {
-                body.one('hiding', '[id^="cards"]', function () {
-                    $(this).stop().hide();
-                });
-                body.one('showing', '.panel-pane', function () {
-                    $(this).stop().css({left: 0});
-                    doFlash(correct);
-                });
-                if(!correct) {
-                    activateMenu(Routing.generate('cards_answers', {answer: id}));
-                    body.one('click', '#cards-answer' + id + ' .card-row .preview-answer[class*="type-"]', function () {
-                        pickNextCard(data, packId, id);
-                    });
-                    return;
-                }
-                pickNextCard(data, packId, id);
+
             },
             error: function () {
             }
@@ -671,6 +695,25 @@ $(document).ready(function () {
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+
+
+        // do transition
+        body.one('hiding', '[id^="cards"]', function () {
+            $(this).stop().hide();
+        });
+        body.one('showing', '.panel-pane', function () {
+            $(this).stop().css({left: 0});
+            doFlash(correct);
+        });
+        if(!correct) {
+            activateMenu(Routing.generate('cards_answers', {answer: id}));
+        }
+        else {
+            pickNextCard(data, packId, id);
+        }
+
+        // save response
         $.ajax({
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
@@ -684,21 +727,6 @@ $(document).ready(function () {
                 answer: ((/answer-id-([0-9]*)/).exec($(this).attr('class')) || [])[1]
             },
             success: function (data) {
-                body.one('hiding', '[id^="cards"]', function () {
-                    $(this).stop().hide();
-                });
-                body.one('showing', '.panel-pane', function () {
-                    $(this).stop().css({left: 0});
-                    doFlash(correct);
-                });
-                if(!correct) {
-                    activateMenu(Routing.generate('cards_answers', {answer: id}));
-                    body.one('click', '#cards-answer' + id + ' .card-row .preview-answer[class*="type-"]', function () {
-                        pickNextCard(data, packId, id);
-                    });
-                    return;
-                }
-                pickNextCard(data, packId, id);
             },
             error: function () {
             }

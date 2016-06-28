@@ -40,7 +40,7 @@ if($tab->length == 0) {
 }
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="cards<?php print (!empty($pack) ? implode('', ['-pack' , $pack->getId()]) : ''); ?>">
+    <div class="panel-pane" id="cards<?php print (!empty($pack) ? implode('', ['-pack' , $pack->getId()]) : ''); ?>" data-card="<?php print ($view->escape(json_encode(['pack' => ['id' => $pack->getId()]]))); ?>">
         <div class="pane-content">
             <?php
             $request = [

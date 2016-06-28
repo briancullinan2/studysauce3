@@ -13,7 +13,16 @@ $request = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
 
-$total = isset($results['user_pack'][0]) ? 0 : count($card->getPack()->getCards()->toArray());
+$isSummary = $isSummary = $request->cookies->get('retention_summary') == 'true';
+if($isSummary) {
+    $retentionDate = $request->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
+}
+else {
+    $retentionDate = $request->cookies->get('retention');
+}
+
+$total = [];
+$remaining = [];
 $index = 1;
 $retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
 if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') == 'true') {
@@ -26,11 +35,14 @@ foreach($retention as $up) {
         continue;
     }
     foreach($up->getRetention() as $id => $r) {
-        if(empty($r[3]) || new Date($request->cookies->get('retention')) < new Date($r[3]) || $r[2]) {
-            $total += 1;
+        if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
+            $total[count($total)] = $id;
         }
-        if(!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention'))) {
+        if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
             $index += 1;
+        }
+        else {
+            $remaining[count($remaining)] = $id;
         }
     }
 }
@@ -79,7 +91,7 @@ if (2 != $template->length) {
             </div>
             <div class="preview-tap">Tap to see answer</div>
             <div class="preview-footer">
-                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
     <?php } ?>
@@ -93,7 +105,7 @@ if (2 != $template->length) {
                 <a href="" class="preview-response"><div class="centerized"></div></a>
                 <a href="" class="preview-response"><div class="centerized"></div></a>
                 <a href="" class="preview-response"><div class="centerized"></div></a>
-                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
     <?php } ?>
@@ -106,7 +118,7 @@ if (2 != $template->length) {
                 <a href="#false" class="preview-false">False</a>
                 <div class="preview-guess"> </div>
                 <a href="#true" class="preview-true">True</a>
-                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
     <?php } ?>
@@ -118,7 +130,7 @@ if (2 != $template->length) {
             <label class="input"><input type="text" value="" data-disclaimer="if you are reading this you should be a hacker ;)" data-correct="<?php print ($card->getCorrect()->getValue()); ?>" /></label>
             <a href="#done" class="btn">Done</a>
             <div class="preview-footer">
-                <div class="preview-count"><?php print ($index); ?> of <?php print ($total); ?></div>
+                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
     <?php }
@@ -177,5 +189,7 @@ if($card->getResponseType() == 'tf') {
         $resp->addClass(implode('', ['answer-id-', $card->getCorrect()->getId()]));
     }
 }
+
+$row->find('.preview-card')->attr('data-retention', json_encode($remaining))->data('retention', $remaining);
 
 print ($row->html());

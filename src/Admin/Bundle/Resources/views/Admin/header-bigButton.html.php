@@ -33,7 +33,7 @@ $firstCard = array_shift($retention);
 
 ?>
 <header class="<?php print ($table); ?> <?php print ($total == 0 ? 'disabled' : ''); ?>">
-    <a data-retention="<?php print ($view->escape(json_encode($retention))); ?>" href="<?php print ($view['router']->generate('cards', ['card' => $firstCard])); ?>"></a>
+    <a href="<?php print ($view['router']->generate('cards', ['card' => $firstCard])); ?>"></a>
     <label>Today&rsquo;s cards</label>
     <label><?php print ($total); ?> card<?php print ($total != 1 ? 's' : ''); ?></label>
 </header>

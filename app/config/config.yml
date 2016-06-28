@@ -202,31 +202,6 @@ hwi_oauth:
                 last: family_name
                 first: given_name
 
-        gcal:
-            type:                google
-            options:
-                access_type:         offline
-                approval_prompt: force
-            client_id:           648236823314.apps.googleusercontent.com
-            client_secret:       ViH13EFLjELlf3vUCeSY81G8
-            scope:               "email profile https://www.googleapis.com/auth/calendar"
-            user_response_class: StudySauce\Bundle\Security\PathUserResponse
-            paths:
-                realname:  ["given_name", "family_name"]
-                last: family_name
-                first: given_name
-
-        evernote:
-            type:                evernote
-            client_id:           bjcullinan
-            client_secret:       cd8e3ff10d842747
-            realm:               "evernote.com"
-            user_response_class: StudySauce\Bundle\Security\PathUserResponse
-            paths:
-                identifier: id
-                nickname:   username
-                realname:   name
-
     http_client:
         timeout:       5 # Time in seconds, after library will shutdown request, by default: 5
         verify_peer:   false # Setting allowing you to turn off SSL verification, by default: true
