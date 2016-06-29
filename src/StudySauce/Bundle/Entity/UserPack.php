@@ -89,7 +89,7 @@ class UserPack
         if(!empty($this->retention) && !$refresh) {
             return $this->retention;
         }
-
+        $refresh = true;
         // if a card hasn't been answered, return the next card
         $cards = $this->getPack()->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->toArray();
         $responses = $this->getUser()->getResponsesForPack($this->getPack());
