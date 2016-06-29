@@ -337,4 +337,18 @@ class UserPack
     {
         return $this->removed;
     }
+
+    /**
+     * Set retention
+     *
+     * @param array $retention
+     *
+     * @return UserPack
+     */
+    public function setRetention($retention)
+    {
+        $this->retention = $retention;
+
+        return $this;
+    }
 }
