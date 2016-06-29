@@ -44,7 +44,7 @@ if(!empty($parentToken) && !empty($parentToken->getUser())) {
                 </li>
             <?php }
             if (!empty($user) && $view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
-                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
+                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($p) ? 'Switch back' : implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
             <?php } ?>
             <li><a href="#collapse">Hide</a><h3></h3></li>
             <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Add Child</a></li>
