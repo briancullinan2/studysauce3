@@ -29,7 +29,7 @@ if(isset($request['notInGroup'])) {
             break;
         }
     }
-    if($isInGroup) {
+    if($isInGroup && count($user->getGroups()->toArray()) > 1) {
         return;
     }
 }

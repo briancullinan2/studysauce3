@@ -158,7 +158,7 @@ $view['slots']->start('body'); ?>
             }
             else {
 
-                if(count($user->getGroups()->toArray()) > 0) {
+                if(count($user->getGroups()->toArray()) > 1) {
                     $tiles = [
                         'file' => ['id', 'url'],
                         'ss_user' => ['id' => ['id', 'userPacks']],

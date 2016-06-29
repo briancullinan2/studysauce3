@@ -376,6 +376,7 @@ class PacksController extends Controller
         }
         /** @var [UserPack] $userPacks */
         $result = [];
+        $changedPacks = [];
         foreach ($responses as $r) {
 
             /** @var Card $card */
@@ -395,6 +396,7 @@ class PacksController extends Controller
             $response->setUser($user);
             $user->addResponse($response);
             $response->setCard($card);
+            $changedPacks[] = $card->getPack()->getId();
             $card->addResponse($response);
             $response->setCreated(date_timezone_set(new \DateTime($r['created']), new \DateTimeZone(date_default_timezone_get())));
             $response->setCorrect($r['correct'] == '1' || $r['correct'] == 'true');
@@ -419,11 +421,14 @@ class PacksController extends Controller
         $packs = array_filter($packs, function (Pack $x) {return !($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || $x->getProperty('schedule') > new \DateTime());});
         if (!empty($request->get('pack'))) {
             $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return $p->getId() == intval($request->get('pack')) && in_array($user, $p->getChildUsers($currentUser));}));
-            $retention = self::getRetention($packs[0], $user);
+            $up = $user->getUserPack($packs[0]);
+            $retention = $up->getRetention(in_array($request->get('pack'), $changedPacks));
+            $orm->merge($up);
+            $orm->flush();
         }
         else {
             $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return in_array($user, $p->getChildUsers($currentUser));}));
-            $retention = array_values(array_map(function (Pack $p) use ($user) {return ['id' => $p->getId(), 'retention' => self::getRetention($p, $user)];}, $packs));
+            $retention = array_values(array_map(function (Pack $p) use ($user, $changedPacks) {return ['id' => $p->getId(), 'retention' => $user->getUserPack($p)->getRetention(in_array($p->getId(), $changedPacks))];}, $packs));
         }
 
         $ids = array_map(function ($r) {
@@ -437,58 +442,10 @@ class PacksController extends Controller
     /**
      * @param Pack $pack
      * @param User $user
+     * @param bool $refresh
      * @return mixed
      */
-    public static function getRetention(Pack $pack, User $user) {
-        $intervals = [1, 2, 4, 7, 14, 28, 28 * 3, 28 * 6, 7 * 52];
-        // if a card hasn't been answered, return the next card
-        $cards = $pack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->toArray();
-        $responses = $user->getResponsesForPack($pack);
-        $result = [];
-        foreach($cards as $c) {
-            /** @var Card $c */
-            /** @var Response[] $cardResponses */
-            $cardResponses = $responses->matching(Criteria::create()->where(Criteria::expr()->eq('card', $c)))->toArray();
-            usort($cardResponses, function (Response $r1, Response $r2) {return $r1->getCreated()->getTimestamp() - $r2->getCreated()->getTimestamp();});
-            /** @var \DateTime $last */
-            $last = null;
-            $i = 0;
-            $correctAfter = false;
-            $max = null;
-            foreach($cardResponses as $r) {
-                if ($r->getCorrect()) {
-                    // If it is in between time intervals ignore the response
-                    while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {
-                        // shift the time interval if answers correctly in the right time frame
-                        $last = $r->getCreated();
-                        $i += 1;
-                    }
-                    $correctAfter = true;
-                }
-                else {
-                    $i = 0;
-                    $last = $r->getCreated();
-                    $correctAfter = false;
-                }
-                $max = $r->getCreated();
-            }
-            if ($i < 0) {
-                $i = 0;
-            }
-            if ($i > count($intervals) - 1) {
-                $i = count($intervals) - 1;
-            }
-            $result[$c->getId()] = [
-                // interval value
-                $intervals[$i],
-                // last interval date
-                !empty($last) ? $last->format('r') : null,
-                // should display on home screen
-                empty($last) || ($i == 0 && !$correctAfter) || date_add(date_time_set(clone $last, 3, 0, 0), new \DateInterval('P' . $intervals[$i] . 'D')) <= date_time_set(new \DateTime(), 3, 0, 0),
-                // last response date for card, used for counting
-                empty($max) ? null : $max->format('r')
-            ];
-        }
-        return $result;
+    public static function getRetention(Pack $pack, User $user, $refresh = false) {
+
     }
 }

@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use StudySauce\Bundle\Controller\PacksController;
 use StudySauce\Bundle\Entity\User;
@@ -50,6 +51,11 @@ class UserPack
     protected $created;
 
     /**
+     * @ORM\Column(type="array", name="retention", nullable=true)
+     */
+    protected $retention;
+
+    /**
      * @ORM\Column(type="boolean", name="removed")
      */
     protected $removed = false;
@@ -78,8 +84,63 @@ class UserPack
         return $responses;
     }
 
-    public function getRetention() {
-        return PacksController::getRetention($this->pack, $this->user);
+    public function getRetention(&$refresh = false) {
+        $intervals = [1, 2, 4, 7, 14, 28, 28 * 3, 28 * 6, 7 * 52];
+        if(!empty($this->retention) && !$refresh) {
+            return $this->retention;
+        }
+
+        // if a card hasn't been answered, return the next card
+        $cards = $this->getPack()->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->toArray();
+        $responses = $this->getUser()->getResponsesForPack($this->getPack());
+        $result = [];
+        foreach($cards as $c) {
+            /** @var Card $c */
+            /** @var Response[] $cardResponses */
+            $cardResponses = $responses->matching(Criteria::create()->where(Criteria::expr()->eq('card', $c)))->toArray();
+            usort($cardResponses, function (Response $r1, Response $r2) {return $r1->getCreated()->getTimestamp() - $r2->getCreated()->getTimestamp();});
+            /** @var \DateTime $last */
+            $last = null;
+            $i = 0;
+            $correctAfter = false;
+            $max = null;
+            foreach($cardResponses as $r) {
+                if ($r->getCorrect()) {
+                    // If it is in between time intervals ignore the response
+                    while ($i < count($intervals) && ($last == null || date_time_set(clone $r->getCreated(), 3, 0, 0) >= date_time_set(date_add(clone $last, new \DateInterval('P' . $intervals[$i] . 'D')), 3, 0, 0))) {
+                        // shift the time interval if answers correctly in the right time frame
+                        $last = $r->getCreated();
+                        $i += 1;
+                    }
+                    $correctAfter = true;
+                }
+                else {
+                    $i = 0;
+                    $last = $r->getCreated();
+                    $correctAfter = false;
+                }
+                $max = $r->getCreated();
+            }
+            if ($i < 0) {
+                $i = 0;
+            }
+            if ($i > count($intervals) - 1) {
+                $i = count($intervals) - 1;
+            }
+            $result[$c->getId()] = [
+                // interval value
+                $intervals[$i],
+                // last interval date
+                !empty($last) ? $last->format('r') : null,
+                // should display on home screen
+                empty($last) || ($i == 0 && !$correctAfter) || date_add(date_time_set(clone $last, 3, 0, 0), new \DateInterval('P' . $intervals[$i] . 'D')) <= date_time_set(new \DateTime(), 3, 0, 0),
+                // last response date for card, used for counting
+                empty($max) ? null : $max->format('r')
+            ];
+        }
+        $this->retention = $result;
+
+        return $result;
     }
 
     /**

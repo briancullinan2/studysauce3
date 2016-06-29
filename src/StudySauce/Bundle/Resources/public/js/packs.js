@@ -437,6 +437,7 @@ $(document).ready(function () {
 
     body.on('show', '#home', function () {
         Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
+        body.addClass('clear-header');
         if(!$(this).is('.loaded')) {
             $(this).addClass('loaded');
         }
@@ -451,6 +452,10 @@ $(document).ready(function () {
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
         }
+    });
+
+    body.on('hiding', '#home', function () {
+        body.removeClass('clear-header');
     });
 
     function goFullscreen() {

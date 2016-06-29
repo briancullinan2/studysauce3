@@ -17,6 +17,10 @@
     cursor: pointer;
 }
 
+.clear-header .header-wrapper {
+    background:transparent;
+}
+
 .header-wrapper,
 #partner-message a
 {
@@ -27,6 +31,25 @@
     width:auto;
     min-width:200px;
     margin:0;
+}
+
+.header a[href="#right-panel"]:before {
+    content: " ";
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 15px solid #EEE;
+    top: 50%;
+    position: absolute;
+    margin-top: -10px;
+    left: 50%;
+    margin-left: -10px;
+}
+
+.header a[href="#right-panel"]:hover:before {
+    border-top: 15px solid #FFF;
 }
 
 .header .selectize-dropdown {

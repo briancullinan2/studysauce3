@@ -11,7 +11,14 @@ $isNew = true;
 foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
     /** @var UserPack $up */
     if($up->getPack()->getId() == $pack->getId()) {
-        foreach($up->getRetention() as $i =>  $r) {
+        $refresh = false;
+        $retentionCache = $up->getRetention($refresh);
+        if($refresh) {
+            $orm = $this->container->get('doctrine')->getManager();
+            $orm->merge($up);
+            $orm->flush();
+        }
+        foreach($retentionCache as $i =>  $r) {
             if($r[2]) {
                 $retention[count($retention)] = $i;
             }
