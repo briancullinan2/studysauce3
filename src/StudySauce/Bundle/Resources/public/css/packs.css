@@ -736,8 +736,9 @@ body.study-mode {
     height: auto;
 }
 
+[id^="cards"] .preview-card.type-sa:not(.preview-answer) input,
 [id^="packs-"] .card-row + .expandable .type-sa label input {
-    font-size: 110%;
+    font-size: 140%;
     height:auto;
     border:1px solid #555;
     border-radius:0;

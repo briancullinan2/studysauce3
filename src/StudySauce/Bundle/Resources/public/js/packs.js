@@ -23,6 +23,13 @@ $(document).ready(function () {
         }
     });
 
+    key('enter, return', function () {
+        var tab = $('[id*="cards-card"]:visible');
+        if(tab.find('.type-sa input')) {
+            tab.find('.type-sa a[href="#done"]').trigger('click');
+        }
+    });
+
     function rowImport(clipText) {
         var results = $(this).find('.card-list .results'),
             request = results.data('request'),

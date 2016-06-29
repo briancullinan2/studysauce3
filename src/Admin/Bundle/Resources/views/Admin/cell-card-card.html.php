@@ -89,7 +89,7 @@ if (2 != $template->length) {
             <div class="preview-inner">
                 <?php $view['slots']->output('card-preview-prompt'); ?>
             </div>
-            <div class="preview-tap">Tap to see answer</div>
+            <div class="preview-tap">Click to see answer</div>
             <div class="preview-footer">
                 <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>

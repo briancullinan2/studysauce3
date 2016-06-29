@@ -104,6 +104,7 @@ if (2 != $template->length) {
                 <div class="preview-content"><div class="centerized"></div></div>
             </div>
             <div class="preview-footer">
+                <div class="preview-guess">Click to continue</div>
                 <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
             </div>
         </div>
