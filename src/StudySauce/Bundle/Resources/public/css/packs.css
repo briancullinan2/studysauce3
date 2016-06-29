@@ -622,7 +622,7 @@
     font-size: 30px;
     display: inline-block;
     vertical-align: middle;
-    background: #C00;
+    background: #FF0D00;
     padding: 3% 10px;
     margin: 0 -4px;
     line-height: 0;
@@ -633,7 +633,7 @@
 [id^="packs-"] .card-row + .expandable .preview-true,
 [id^="packs-"] .card-row + .expandable .preview-right
 {
-    background:#0C0;
+    background:#078600;
 }
 
 [id^="cards"] .preview-guess,

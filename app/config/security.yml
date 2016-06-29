@@ -51,8 +51,6 @@ security:
                 resource_owners:
                     facebook:           "/login/facebook/"
                     google:             "/login/google/"
-                    evernote:           "/login/evernote/"
-                    gcal:               "/login/gcal/"
                 login_path:        /login
                 use_forward:       false
                 failure_path:      /login

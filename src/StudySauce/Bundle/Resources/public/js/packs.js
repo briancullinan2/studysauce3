@@ -408,7 +408,6 @@ $(document).ready(function () {
 
     body.on('show', '[id^="cards"]', function () {
         body.addClass('study-mode');
-        goFullscreen();
         if(!$(this).is('.loaded')) {
             $(this).addClass('loaded');
             if($(this).closest('.panel-pane').find('.card-row').length > 0) {
@@ -461,7 +460,6 @@ $(document).ready(function () {
     }
 
     body.on('click', 'a[href^="/cards"]', function () {
-        goFullscreen();
     });
 
     body.on('click', '[id^="packs"] .pack-row a[href^="/cards"]', function () {
@@ -577,8 +575,8 @@ $(document).ready(function () {
         }
 
         // TODO: created results tab without callback
+        var newId = getRandomCard(retention, retentionDate, cardId);
         if(retention.length > 0) {
-            var newId = getRandomCard(retention, retentionDate, cardId);
             activateMenu(Routing.generate('cards', {card: newId}));
         }
         // go to results page
