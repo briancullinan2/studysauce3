@@ -91,6 +91,7 @@ class Group extends BaseGroup implements GroupInterface
 
     public function getUsersPacksGroupsRecursively()
     {
+        return [[], [], []];
         $packs = $this->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
         $users = $this->getUsers()->toArray();
         $groups = $this->getSubgroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();

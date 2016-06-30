@@ -61,7 +61,6 @@ while($added) {
     }
 }
 
-
 ?>
 
 <div>
