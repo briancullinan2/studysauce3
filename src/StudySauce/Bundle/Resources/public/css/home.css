@@ -81,9 +81,9 @@
 
 [id^="home"] .pane-content {
     position: absolute;
-    left: 50px;
+    left: 100px;
     top: 90px;
-    right: 50px;
+    right: 100px;
     bottom: 50px;
     text-align: center;
 }
