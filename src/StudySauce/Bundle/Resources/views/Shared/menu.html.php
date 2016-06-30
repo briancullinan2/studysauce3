@@ -9,20 +9,22 @@ $user = $app->getUser();
 $invites = !empty($user) ? $user->getInvites()->toArray() : [];
 /** @var TokenInterface $token */
 $token = $this->container->get('security.token_storage')->getToken();
-foreach ($token->getRoles() as $role) {
-    if ($role instanceof SwitchUserRole) {
-        $parentToken = $role->getSource();
+if(!empty($token)) {
+    foreach ($token->getRoles() as $role) {
+        if ($role instanceof SwitchUserRole) {
+            $parentToken = $role->getSource();
+        }
     }
-}
 
-if(!empty($parentToken) && !empty($parentToken->getUser())) {
-    /** @var User $parentUser */
-    $parentUser = $parentToken->getUser();
-    foreach($user->getInvitees()->toArray() as $p) {
-        /** @var Invite $p */
-        if($parentUser->getUsername() == $p->getUser()->getUsername()) {
-            $invites = $p->getUser()->getInvites()->toArray();
-            break;
+    if (!empty($parentToken) && !empty($parentToken->getUser())) {
+        /** @var User $parentUser */
+        $parentUser = $parentToken->getUser();
+        foreach ($user->getInvitees()->toArray() as $p) {
+            /** @var Invite $p */
+            if ($parentUser->getUsername() == $p->getUser()->getUsername()) {
+                $invites = $p->getUser()->getInvites()->toArray();
+                break;
+            }
         }
     }
 }

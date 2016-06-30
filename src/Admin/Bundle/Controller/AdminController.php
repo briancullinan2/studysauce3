@@ -515,7 +515,7 @@ class AdminController extends Controller
         // convert db entity to flat object
         $tableKeys = array_merge(in_array('application/json', $request->getAcceptableContentTypes()) ? array_keys($searchRequest['tables']) : [], ['allGroups']);
         foreach ($tableKeys as $table) {
-            if (!isset($vars['results'][$table])) {
+            if (!isset($vars['results'][$table]) || $table == 'allGroups') {
                 continue;
             }
             $tableName = explode('-', $table)[0];
