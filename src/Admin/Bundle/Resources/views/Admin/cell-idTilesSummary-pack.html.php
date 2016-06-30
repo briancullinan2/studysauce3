@@ -6,6 +6,8 @@ use StudySauce\Bundle\Entity\User;
 use \DateTime as Date;
 use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+/** @var User $user */
+$user = $app->getUser();
 
 /** @var Pack $pack */
 
@@ -74,8 +76,12 @@ foreach($retention as $up) {
         }
     }
 
-    ?>
-    <label><span><?php print (count($groups)); ?> groups / <?php print ($groupUsers + count($diffUsers)); ?> users / <?php print ($cardCount); ?> cards</span></label>
+    if($user->hasRole('ROLE_ADMIN')) { ?>
+        <label><span><?php print (count($groups)); ?> groups / <?php print ($groupUsers + count($diffUsers)); ?> users / <?php print ($cardCount); ?> cards</span></label>
+    <?php }
+    else { ?>
+        <label><span><?php print ($cardCount); ?> cards</span></label>
+    <?php } ?>
 </a>
 
 

@@ -17,9 +17,17 @@ $total = [];
 $remaining = [];
 $index = 1;
 $retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
-if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') =='true') {
-    // TODO: count all cards
-    $retention = $results['user_pack'][0]->getUser()->getUserPacks()->toArray();
+
+$isSummary = $isSummary = $request->cookies->get('retention_summary') == 'true';
+if($isSummary) {
+    $retentionDate = $request->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
+}
+else {
+    $retentionDate = $request->cookies->get('retention');
+    if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') == 'true') {
+        // TODO: count all cards
+        $retention = $results['user_pack'][0]->getUser()->getUserPacks()->toArray();
+    }
 }
 foreach($retention as $up) {
     /** @var UserPack $up */
@@ -27,11 +35,10 @@ foreach($retention as $up) {
         continue;
     }
     foreach($up->getRetention() as $id => $r) {
-        if($r[2] && (empty($r[3]) || new Date($r[3]) < new Date($request->cookies->get('retention')))
-            || (!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention')))) {
+        if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
             $total[count($total)] = $id;
         }
-        if(!empty($r[3]) && new Date($r[3]) > new Date($request->cookies->get('retention'))) {
+        if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
             $index += 1;
         }
         else {

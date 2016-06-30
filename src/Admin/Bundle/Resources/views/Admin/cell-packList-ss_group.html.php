@@ -3,6 +3,15 @@ use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
+use DateTime as Date;
+use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+
+/** @var User $user */
+$user = $app->getUser();
+
+/** @var GlobalVariables $app */
+$request = $app->getRequest();
 
 /** @var Group $ss_group */
 
@@ -51,27 +60,44 @@ while($added) {
         }
     }
 }
+
+
 ?>
 
 <div>
-    <label><?php print ($countGroups); ?> subgroups / <?php print (count($groupPacks)); ?> packs / <?php print (count($countUsers)); ?> users</label>
-    <?php
+    <?php if($user->hasRole('ROLE_ADMIN')) { ?>
+        <label><?php print ($countGroups); ?> subgroups / <?php print (count($groupPacks)); ?> packs / <?php print (count($countUsers)); ?> users</label>
+    <?php }
+    else { ?>
+        <label><?php print (count($groupPacks)); ?> packs</label>
+    <?php }
     foreach ($groupPacks as $g) {
         /** @var Pack $g */
         if($g->getDeleted()) {
             continue;
         }
 
-        $subGroupCount = 0;
-        foreach($g->getUsers()->toArray() as $c) {
-            /** @var Card $c */
-            //if(!$c->getDeleted()) {
-                $subGroupCount += 1;
-            //}
+        // get next summary process card
+        $retention = $results['ss_user'][0]->getUserPacks()->toArray();
+        $card = 0;
+        foreach($retention as $up) {
+            /** @var UserPack $up */
+            if ($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getId() != $g->getId()) {
+                continue;
+            }
+
+            $summaryDate = $request->cookies->get(implode('', ['retention_', $up->getPack()->getId()]));
+
+            foreach ($up->getRetention() as $id => $r) {
+                if (!$r[0] || empty($r[3]) || empty($summaryDate) || $summaryDate === 'false' || new Date($r[3]) < new Date($summaryDate)) {
+                    $card = $id;
+                    break;
+                }
+            }
         }
 
         ?>
-        <a href="<?php print ($view['router']->generate('packs_edit', ['pack' => $g->getId()])); ?>" class="pack-list"><?php print ($view->escape($g->getTitle())); ?>
-            <span><?php print ($subGroupCount); ?></span></a>
+        <a href="<?php print ($view['router']->generate('cards', ['card' => $card])); ?>" class="pack-list"><?php print ($view->escape($g->getTitle())); ?>
+            <span><?php print (count($g->getCards()->toArray())); ?></span></a>
     <?php } ?>
 </div>

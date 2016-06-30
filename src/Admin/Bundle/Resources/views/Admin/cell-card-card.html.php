@@ -13,21 +13,21 @@ $request = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
 
+$total = [];
+$remaining = [];
+$index = 1;
+$retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
+
 $isSummary = $isSummary = $request->cookies->get('retention_summary') == 'true';
 if($isSummary) {
     $retentionDate = $request->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
 }
 else {
     $retentionDate = $request->cookies->get('retention');
-}
-
-$total = [];
-$remaining = [];
-$index = 1;
-$retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
-if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') == 'true') {
-    // TODO: count all cards
-    $retention = $results['user_pack'][0]->getUser()->getUserPacks()->toArray();
+    if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') == 'true') {
+        // TODO: count all cards
+        $retention = $results['user_pack'][0]->getUser()->getUserPacks()->toArray();
+    }
 }
 foreach($retention as $up) {
     /** @var UserPack $up */

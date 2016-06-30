@@ -413,8 +413,17 @@ $(document).ready(function () {
         activateMenu(Routing.generate('cards_answers', {answer: id}));
     });
 
-    body.on('show', '[id^="cards"]', function () {
+    body.on('show', '.panel-pane', function () {
+        if(!$(this).is('[id^="cards"]')) {
+            body.removeClass('study-mode');
+        }
+    });
+
+    body.on('showing', '[id^="cards"]', function () {
         body.addClass('study-mode');
+    });
+
+    body.on('show', '[id^="cards"]', function () {
         if(!$(this).is('.loaded')) {
             $(this).addClass('loaded');
             if($(this).closest('.panel-pane').find('.card-row').length > 0) {
@@ -444,7 +453,6 @@ $(document).ready(function () {
         else {
             loadResults.apply($(this).find('.results'));
         }
-        body.removeClass('study-mode');
         if (document.cancelFullScreen) {
             document.cancelFullScreen();
         } else if (document.mozCancelFullScreen) {
