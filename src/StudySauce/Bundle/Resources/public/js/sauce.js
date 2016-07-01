@@ -610,30 +610,35 @@ $(document).ready(function () {
     });
 
     function activatePanel(panel) {
-        // animate panels
-        body.css('overflow', 'hidden');
-        var panels = body.find('.panel-pane:visible').not(panel).addClass('hiding')
-            .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
-                panels.hide();
-            } });
-        panels.trigger('hiding');
-        panel.addClass('showing').css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
-            panel.css('position', '');
-        } });
-        panel.trigger('showing');
-        centerize.apply(panel.find('.centerized:visible'));
-        // poll for panel visibility and fire events
-        var triggerHide = setInterval(function () {
-            if (panels.is(':visible'))
+        setTimeout(function () {
+            if(panel.is(':visible')) {
                 return;
-            panels.trigger('hide');
-            panels.removeClass('hiding');
-            body.css('overflow', '');
-            setTimeout(function () {
-                panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
+            }
+            // animate panels
+            body.css('overflow', 'hidden');
+            var panels = body.find('.panel-pane:visible').not(panel).addClass('hiding')
+                .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
+                    panels.hide();
+                } });
+            panels.trigger('hiding');
+            panel.addClass('showing').css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
+                panel.css('position', '');
+            } });
+            panel.trigger('showing');
+            centerize.apply(panel.find('.centerized:visible'));
+            // poll for panel visibility and fire events
+            var triggerHide = setInterval(function () {
+                if (panels.is(':visible'))
+                    return;
+                panels.trigger('hide');
+                panels.removeClass('hiding');
+                body.css('overflow', '');
+                setTimeout(function () {
+                    panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
+                }, 40);
+                clearInterval(triggerHide);
             }, 40);
-            clearInterval(triggerHide);
-        }, 40);
+        }, 50);
     }
     window.activatePanel = activatePanel;
 
