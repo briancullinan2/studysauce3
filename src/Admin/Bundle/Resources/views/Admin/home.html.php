@@ -46,7 +46,7 @@ $view['slots']->start('body'); ?>
                 'count-user_pack' => -1,
                 'footers' => false
             ];
-            print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+            print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request), ['strategy' => 'sinclude']));
             /*
             ?>
             </div>

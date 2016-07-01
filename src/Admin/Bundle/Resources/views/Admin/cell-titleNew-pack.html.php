@@ -30,7 +30,7 @@ foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
 }
 
 ?>
-<a href="<?php print ($view['router']->generate('cards', ['card' => $retention[0]])); ?>">
+<a href="<?php print ($view['router']->generate('cards', ['card' => count($retention) > 0 ? $retention[0] : 0])); ?>">
     <label><?php print ($isNew ? '<strong>New </strong>' : ''); ?>
         <span><?php print ($view->escape($pack->getTitle())); ?></span>
     </label>

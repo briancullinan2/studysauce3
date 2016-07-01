@@ -611,34 +611,29 @@ $(document).ready(function () {
 
     function activatePanel(panel) {
         // animate panels
-        var triggerShow = setInterval(function () {
-            if (window.sincluding.length == 0) {
-                body.css('overflow', 'hidden');
-                var panels = body.find('.panel-pane:visible').not(panel).addClass('hiding')
-                    .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
-                        panels.hide();
-                    } });
-                panels.trigger('hiding');
-                panel.addClass('showing').css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
-                    panel.css('position', '');
-                    body.css('overflow', '');
-                } });
-                panel.trigger('showing');
-                centerize.apply(panel.find('.centerized:visible'));
-                // poll for panel visibility and fire events
-                var triggerHide = setInterval(function () {
-                    if (panels.is(':visible'))
-                        return;
-                    panels.trigger('hide');
-                    panels.removeClass('hiding');
-                    setTimeout(function () {
-                        panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
-                    }, 40);
-                    clearInterval(triggerHide);
-                }, 40);
-                clearInterval(triggerShow);
-            }
-        }, 50);
+        body.css('overflow', 'hidden');
+        var panels = body.find('.panel-pane:visible').not(panel).addClass('hiding')
+            .css({'position': 'absolute', left: 0}).animate({left: '-100%'}, { duration: 500, queue: false, done: function () {
+                panels.hide();
+            } });
+        panels.trigger('hiding');
+        panel.addClass('showing').css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
+            panel.css('position', '');
+            body.css('overflow', '');
+        } });
+        panel.trigger('showing');
+        centerize.apply(panel.find('.centerized:visible'));
+        // poll for panel visibility and fire events
+        var triggerHide = setInterval(function () {
+            if (panels.is(':visible'))
+                return;
+            panels.trigger('hide');
+            panels.removeClass('hiding');
+            setTimeout(function () {
+                panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
+            }, 40);
+            clearInterval(triggerHide);
+        }, 40);
     }
     window.activatePanel = activatePanel;
 
@@ -706,13 +701,8 @@ if(typeof window.jqAjax == 'undefined') {
             if (data != null && typeof data.redirect != 'undefined') {
                 var a = document.createElement('a');
                 a.href = data.redirect;
-                if (window.location.pathname == data.redirect) {
-                    // do nothing because we are already on the page
-                }
-                else {
-                    if (typeof window.handleLink == 'undefined' || window.handleLink.apply(a, [jQuery.Event('click')])) {
-                        window.location = data.redirect;
-                    }
+                if (typeof window.handleLink == 'undefined' || window.handleLink.apply(a, [jQuery.Event('click')])) {
+                    window.location = data.redirect;
                 }
             }
             if (typeof success != 'undefined')

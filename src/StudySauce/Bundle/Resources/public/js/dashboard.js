@@ -15,7 +15,10 @@ $(document).ready(function () {
         if (!expandMenu.apply(this, [evt]))
             return false;
 
-        if ($(this).is('.invalid a.more')) {
+        if ($(this).is('.invalid a.more') ||
+            // do nothing because we are already on the page
+            window.location.pathname == this.pathname
+        ) {
             evt.preventDefault();
             evt.stopPropagation();
             return false;
@@ -26,8 +29,10 @@ $(document).ready(function () {
                 // check if there is a tab with the selected url
             || typeof routes[0] == 'undefined' || typeof routes[0].route.requirements._format == 'undefined'
             || routes[0].route.requirements['_format'].indexOf('tab') == -1) {
+
             visits[visits.length] = {path: el.pathname, query: el.search, hash: el.hash, time: (new Date()).toJSON()};
             collapseMenu.apply(this, [evt]);
+
             return true;
         }
         // if the path clicked is a callback, use callback to load the new tab
@@ -162,7 +167,13 @@ $(document).ready(function () {
                             newPane = content.filter('.panel-pane').first();
                         }
                         item.find('.squiggle').stop().remove();
-                        activatePanel(newPane);
+                        var triggerShow = setInterval(function () {
+                                if (window.sincluding.length == 0) {
+                                    clearInterval(triggerShow);
+                                    activatePanel(newPane);
+                                }
+                        }, 50);
+
                     }
                 },
                 error: function () {
