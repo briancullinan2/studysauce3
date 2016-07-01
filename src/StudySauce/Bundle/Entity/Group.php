@@ -89,37 +89,6 @@ class Group extends BaseGroup implements GroupInterface
         $this->created = new \DateTime();
     }
 
-    public function getUsersPacksGroupsRecursively()
-    {
-        return [[], [], []];
-        $packs = $this->getGroupPacks()->filter(function (Pack $p) {return !$p->getDeleted();})->toArray();
-        $users = $this->getUsers()->toArray();
-        $groups = $this->getSubgroups()->filter(function (Group $g) {return !$g->getDeleted();})->toArray();
-        foreach($groups as $g) {
-            /** @var Group $g */
-            if($g->getDeleted() || in_array($g, $groups)) {
-                continue;
-            }
-            list($subUsers, $subPacks, $subGroups) = $g->getUsersPacksGroupsRecursively();
-            foreach($subPacks as $p) {
-                if(!in_array($p, $packs)) {
-                    $packs[] = $p;
-                }
-            }
-            foreach($subUsers as $u) {
-                if(!in_array($u, $users)) {
-                    $users[] = $u;
-                }
-            }
-            foreach($subGroups as $sg) {
-                if(!in_array($sg, $groups)) {
-                    $groups[] = $sg;
-                }
-            }
-        }
-        return [$users, $packs, $groups];
-    }
-
     /**
      * Get id
      *
@@ -174,16 +143,6 @@ class Group extends BaseGroup implements GroupInterface
     public function getCreated()
     {
         return $this->created;
-    }
-
-    public function getUserCountStr() {
-        list($users, $packs) = $this->getUsersPacksGroupsRecursively();
-        return '(' . count($users) . ' users)';
-    }
-
-    public function getDescriptionStr() {
-        list($users, $packs, $groups) = $this->getUsersPacksGroupsRecursively();
-        return '(' . count($groups) . ' subgroups / ' . count($packs) . ' packs)';
     }
 
     public function getRoles()

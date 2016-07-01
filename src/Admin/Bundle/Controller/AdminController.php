@@ -43,8 +43,8 @@ class AdminController extends Controller
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted']],
-        'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo', 'userCountStr', 'descriptionStr'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
-        'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'userCountStr', 'cardCountStr'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
+        'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
+        'pack' => ['id' => ['id'], 'name' => ['title', 'logo'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
@@ -55,9 +55,9 @@ class AdminController extends Controller
     ];
 
     public static $defaultMiniTables = [
-        'pack' => ['title', 'userCountStr', 'cardCountStr', 'id', 'status'],
+        'pack' => ['title', 'id', 'status'],
         'ss_user' => ['first', 'last', 'email', 'id', 'deleted'],
-        'ss_group' => ['name', 'userCountStr', 'descriptionStr', 'id', 'deleted'],
+        'ss_group' => ['name', 'id', 'deleted'],
         'file' => ['id', 'url', 'user', 'deleted']
     ];
 
@@ -309,16 +309,17 @@ class AdminController extends Controller
 
     public static function setUpClasses(EntityManager $orm) {
 
-        self::$allTableClasses = $orm->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
+        if(empty(self::$allTableClasses)) {
+            self::$allTableClasses = $orm->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
 
-        self::$allTableMetadata = array_map(function ($table) use ($orm) {
-            return $orm->getMetadataFactory()->getMetadataFor($table);
-        }, self::$allTableClasses);
+            self::$allTableMetadata = array_map(function ($table) use ($orm) {
+                return $orm->getMetadataFactory()->getMetadataFor($table);
+            }, self::$allTableClasses);
 
-        self::$allTables = array_combine(array_map(function (ClassMetadata $md) {
-            return $md->getTableName();
-        }, self::$allTableMetadata), self::$allTableMetadata);
-
+            self::$allTables = array_combine(array_map(function (ClassMetadata $md) {
+                return $md->getTableName();
+            }, self::$allTableMetadata), self::$allTableMetadata);
+        }
     }
 
     /**
@@ -515,7 +516,7 @@ class AdminController extends Controller
         // convert db entity to flat object
         $tableKeys = array_merge(in_array('application/json', $request->getAcceptableContentTypes()) ? array_keys($searchRequest['tables']) : [], ['allGroups']);
         foreach ($tableKeys as $table) {
-            if (!isset($vars['results'][$table]) || $table == 'allGroups') {
+            if (!isset($vars['results'][$table])) {
                 continue;
             }
             $tableName = explode('-', $table)[0];

@@ -57,7 +57,7 @@ $view['slots']->start('body'); ?>
                     $tables = (array)(new stdClass());
                     $tables['pack'] = [
                         'idEdit' => ['modified', 'created', 'id', 'logo'],
-                        'name' => ['title','userCountStr','cardCountStr'],
+                        'name' => ['title'],
                         '1' => 'status',
                         '2' => ['group','groups', 'user','userPacks.user'],
                         '3' => 'properties',
@@ -164,7 +164,7 @@ $view['slots']->start('body'); ?>
                         'ss_user' => ['id' => ['id', 'userPacks']],
                         'user_pack' => ['pack', 'removed', 'retention'],
                         'pack' => ['id', 'status', 'logo', 'title'],
-                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'userCountStr', 'descriptionStr', 'logo'], 'packList' => ['parent', 'groupPacks'], 'actions' => ['deleted']]
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'logo'], 'packList' => ['parent', 'groupPacks'], 'actions' => ['deleted']]
                     ];
                     if (empty($entity)) {
                         $request = [
@@ -223,7 +223,7 @@ $view['slots']->start('body'); ?>
                     $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
-                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'cards', 'status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['groups', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                     $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
@@ -245,7 +245,7 @@ $view['slots']->start('body'); ?>
                     $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
-                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'userCountStr', 'cardCountStr'], 'actions' => ['groups', 'cards', 'status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['groups', 'cards', 'status']];
                     $request['classes'] = ['tiles'];
                     $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                     $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
