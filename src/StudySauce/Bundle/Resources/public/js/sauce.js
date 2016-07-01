@@ -619,7 +619,6 @@ $(document).ready(function () {
         panels.trigger('hiding');
         panel.addClass('showing').css({'position': 'absolute', 'left': '100%'}).show().animate({left: '0'}, { duration: 500, queue: false, done: function () {
             panel.css('position', '');
-            body.css('overflow', '');
         } });
         panel.trigger('showing');
         centerize.apply(panel.find('.centerized:visible'));
@@ -629,6 +628,7 @@ $(document).ready(function () {
                 return;
             panels.trigger('hide');
             panels.removeClass('hiding');
+            body.css('overflow', '');
             setTimeout(function () {
                 panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
             }, 40);
