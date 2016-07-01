@@ -17,7 +17,7 @@ $(document).ready(function () {
 
         if ($(this).is('.invalid a.more') ||
             // do nothing because we are already on the page
-            (window.location.pathname == this.pathname && this.location.hostname == this.hostname)
+            (window.location.pathname == this.pathname && window.location.hostname == this.hostname)
         ) {
             evt.preventDefault();
             evt.stopPropagation();
