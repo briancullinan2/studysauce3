@@ -404,7 +404,7 @@ $(document).ready(function () {
         window.views.render.apply(row.find('> .status'), ['cell_status_pack', {pack: pack}]);
     });
 
-    body.on('click', '[id^="cards"] .card-row .preview-card:not([class*="type-"])', function (evt) {
+    body.on('click', '[id^="cards-card"] .card-row .preview-card:not([class*="type-"])', function (evt) {
         if($(evt.target).is('a, a *, .preview-play, preview-play *')) {
             return;
         }
@@ -657,7 +657,11 @@ $(document).ready(function () {
         }
     }
 
-    body.on('click', '[id^="cards-answer"] .card-row .preview-answer[class*="type-"]', function () {
+    body.on('click', '[id^="cards-answer"] .card-row .preview-card.preview-answer[class*="type-"]', function (evt) {
+        if($(evt.target).is('a, a *, .preview-play, preview-play *')) {
+            return;
+        }
+
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         var id = getRowId.apply($(this).parents('.card-row'));
         var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
