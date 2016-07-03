@@ -1178,7 +1178,7 @@ var str_replace = function (needle, replacement, haystack) {return (haystack || 
 var call_user_func_array = function (context, params) {return context[0][context[1]].apply(context[0], params);};
 var print = function (s) { window.views.__output += s };
 var strtolower = function(s) { return s.toLocaleLowerCase(); };
-var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s == false || s == null || (typeof s == 'object' && s.constructor == Array && s.length == 0) ; };
+var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s === false || s === 'false' || s == null || (typeof s == 'object' && s.constructor == Array && s.length == 0) ; };
 var json_encode = JSON.stringify;
 var method_exists = function (s,m) { return typeof s == 'object' && typeof s[m] == 'function'; };
 var isset = function (s) { return typeof s != 'undefined'; };
