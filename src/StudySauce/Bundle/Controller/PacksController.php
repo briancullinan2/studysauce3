@@ -420,8 +420,7 @@ class PacksController extends Controller
         $packs = self::getPacksForUser($currentUser);
         $packs = array_filter($packs, function (Pack $x) {return !($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || $x->getProperty('schedule') > new \DateTime());});
         if (!empty($request->get('pack'))) {
-            $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return $p->getId() == intval($request->get('pack')) && in_array($user, $p->getChildUsers($currentUser));}));
-            $up = $user->getUserPack($packs[0]);
+            $up = $user->getUserPackById($request->get('pack'));
             $refresh = in_array($request->get('pack'), $changedPacks);
             $retention = $up->getRetention($refresh);
             $orm->merge($up);
