@@ -413,12 +413,14 @@ $(document).ready(function () {
         activateMenu(Routing.generate('cards_answers', {answer: id}));
     });
 
+    // turn off study mode when not on a card
     body.on('show', '.panel-pane', function () {
         if(!$(this).is('[id^="cards"]')) {
             body.removeClass('study-mode');
         }
     });
 
+    // turn on study mode to hide extra menus
     body.on('showing', '[id^="cards"]', function () {
         body.addClass('study-mode');
     });
@@ -426,9 +428,20 @@ $(document).ready(function () {
     body.on('show', '[id^="cards"]', function () {
         if(!$(this).is('.loaded')) {
             $(this).addClass('loaded');
+            // change the request to only load single user_pack
+            var results = $(this).find('.results');
+            var request = results.data('request');
+            delete request['requestKey'];
+            request['tables']['ss_user'] = ['id'];
+            delete request['skipRetention'];
+            $(this).find('.results').data('request', request);
+
+            updateUserRetention.apply(this);
+
+            // load the next card in the sequence
             if($(this).closest('.panel-pane').find('.card-row').length > 0) {
                 var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).closest('.panel-pane').data('card').pack.id;
-                loadOneExtra.apply(this, [$(this).find('.preview-card').data('retention'), packId, getRowId.apply($(this).find('.card-row'))]);
+                loadOneExtra.apply(this, [$(this).find('.preview-card').data('remaining'), packId, getRowId.apply($(this).find('.card-row'))]);
             }
         }
         else {
@@ -460,6 +473,7 @@ $(document).ready(function () {
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
         }
+        updateUserRetention.apply(this);
     });
 
     body.on('hiding', '#home', function () {
@@ -508,8 +522,8 @@ $(document).ready(function () {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('[href="#right"]');
-        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+        var packId = $(this).parents('.panel-pane').data('card').pack.id;
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
 
         body.one('hiding', '[id^="cards"]', function () {
             $(this).stop().hide();
@@ -630,9 +644,36 @@ $(document).ready(function () {
         setupProgress.apply(that);
         if($(this).is('[id^="cards-card"], [id^="cards-answer"]')) {
             var packId = Cookies.get('retention_shuffle') == 'true' ? null : that.data('card').pack.id;
-            loadOneExtra.apply(this, [$(this).find('.preview-card').data('retention'), packId, getRowId.apply($(this).find('.card-row'))]);
+            loadOneExtra.apply(this, [$(this).find('.preview-card').data('remaining'), packId, getRowId.apply($(this).find('.card-row'))]);
         }
+
+        updateUserRetention.apply(this);
     });
+
+    function updateUserRetention() {
+        // update global list of packs
+        var user = window.views.__globalVars.app.getUser();
+        var ups = user.getUserPacks().toArray();
+        var newRetention = $(this).find('[data-retention]').data('retention');
+        var hasUserPack = false;
+        for(var n in newRetention) {
+            if(newRetention.hasOwnProperty(n)) {
+                for(var u in ups) {
+                    if(ups.hasOwnProperty(u)) {
+                        if(ups[u].pack.id == newRetention[n].pack.id) {
+                            hasUserPack = true;
+                            ups[u].retention = newRetention[n].retention;
+                            break;
+                        }
+                    }
+                }
+                if(!hasUserPack) {
+                    user.userPacks = $.merge(user.userPacks, [newRetention[n]]);
+                }
+            }
+        }
+        $('#welcome-message').data('user', user);
+    }
 
     var jPlayer = $('#jquery_jplayer');
     jPlayer.bind($.jPlayer.event.timeupdate, function (evt) {
@@ -664,7 +705,7 @@ $(document).ready(function () {
 
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         var id = getRowId.apply($(this).parents('.card-row'));
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
         pickNextCard(data, packId, id);
     });
 
@@ -672,8 +713,8 @@ $(document).ready(function () {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('.correct');
-        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+        var packId = $(this).parents('.panel-pane').data('card').pack.id;
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
 
         // do transition
         body.one('hiding', '[id^="cards"]', function () {
@@ -716,8 +757,8 @@ $(document).ready(function () {
         var input = $(this).parents('.card-row').find('input');
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
-        var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('retention');
+        var packId = $(this).parents('.panel-pane').data('card').pack.id;
+        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
 
 
         // do transition

@@ -69,13 +69,7 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
         <?php }
 
         if($app->getRequest()->get('_format') != 'funnel') { ?>
-            <div id="welcome-message" data-user="<?php print $view->escape(json_encode([
-                    'id' => !empty($user) ? $user->getId() : '',
-                    'first' => !empty($user) ? $user->getFirst() : '',
-                    'last' => !empty($user) ? $user->getLast() : '',
-                    'email' => !empty($user) ? $user->getEmail() : '',
-                    'groups' => $allGroups,
-                    'roles' => $user->getRoles()])); ?>">
+            <div id="welcome-message" data-user="<?php print $view->escape(json_encode(AdminController::toFirewalledEntityArray($user, AdminController::$defaultTables['ss_user'], 1) + ['groups' => $allGroups])); ?>">
                 <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
                     <ul class="main-menu">
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>

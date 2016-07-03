@@ -10,13 +10,15 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /** @var GlobalVariables $app */
+$httpRequest = $app->getRequest();
+
 /** @var User $user */
 /** @var Card $card */
 $user = $app->getUser();
 
 $context = !empty($context) ? $context : jQuery($this);
 $tab = $context->filter('.panel-pane');
-
+$isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
 
 if($tab->length == 0) {
 
@@ -49,7 +51,12 @@ $view['slots']->start('body'); ?>
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id', 'status', 'cards'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention', 'removed']];
-            $tables['ss_user'] = ['id', 'userPacks'];
+            if($httpRequest->get('_format') == 'index' && !$isSummary && $httpRequest->cookies->get('retention_shuffle') == 'true') {
+                $tables['ss_user'] = ['id', 'userPacks'];
+            }
+            else {
+                $tables['ss_user'] = ['id'];
+            }
             $request = [
                 // view settings
                 'tables' => $tables,
@@ -67,6 +74,12 @@ $view['slots']->start('body'); ?>
                 'count-user_pack' => 1,
                 'count-ss_user' => -1,
             ];
+            if($httpRequest->get('_format') == 'index' && !$isSummary && $httpRequest->cookies->get('retention_shuffle') == 'true') {
+
+            }
+            else {
+                $request['skipRetention'] = true;
+            }
             if($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
             }
@@ -82,7 +95,12 @@ $view['slots']->start('body'); ?>
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id', 'status'];
             $tables['user_pack'] = ['id' => ['user', 'pack', 'retention', 'removed']];
-            $tables['ss_user'] = ['id', 'userPacks'];
+            if($httpRequest->get('_format') == 'index' && !$isSummary && $httpRequest->cookies->get('retention_shuffle') == 'true') {
+                $tables['ss_user'] = ['id', 'userPacks'];
+            }
+            else {
+                $tables['ss_user'] = ['id'];
+            }
             $request = [
                 // view settings
                 'tables' => $tables,
@@ -100,6 +118,12 @@ $view['slots']->start('body'); ?>
                 'count-user_pack' => 1,
                 'count-ss_user' => -1,
             ];
+            if($httpRequest->get('_format') == 'index' && !$isSummary && $httpRequest->cookies->get('retention_shuffle') == 'true') {
+
+            }
+            else {
+                $request['skipRetention'] = true;
+            }
             if($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
             }

@@ -15,10 +15,7 @@ $(document).ready(function () {
         if (!expandMenu.apply(this, [evt]))
             return false;
 
-        if ($(this).is('.invalid a.more') ||
-            // do nothing because we are already on the page
-            (window.location.pathname == this.pathname && window.location.hostname == this.hostname)
-        ) {
+        if ($(this).is('.invalid a.more')) {
             evt.preventDefault();
             evt.stopPropagation();
             return false;
@@ -134,7 +131,8 @@ $(document).ready(function () {
             });
             if (window.sincluding.length > 0) {
                 setTimeout(function () {
-                    activateMenu.apply(that, [path, true]);
+                    // We already pushed above for this activation, loading is serialized incase it's already being loaded.
+                    loadPanel.apply(that, [path, true, activatePanel]);
                 }, 1000);
                 return;
             }
@@ -190,6 +188,10 @@ $(document).ready(function () {
     window.loadPanel = loadPanel;
 
     function activateMenu(path, noPush) {
+        if(window.location.pathname == path) {
+            // do nothing because we are already on the page
+            return;
+        }
         loadPanel.apply(this, [path, noPush, activatePanel]);
     }
     window.activateMenu = activateMenu;

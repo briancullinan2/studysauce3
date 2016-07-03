@@ -1,4 +1,5 @@
 <?php
+use Admin\Bundle\Controller\AdminController;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\UserPack;
@@ -6,7 +7,7 @@ use DateTime as Date;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var GlobalVariables $app */
-$request = $app->getRequest();
+$httpRequest = $app->getRequest();
 
 /** @var Card $card */
 
@@ -18,22 +19,43 @@ $remaining = [];
 $index = 1;
 $retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
 
-$isSummary = $isSummary = $request->cookies->get('retention_summary') == 'true';
+$isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
 if($isSummary) {
-    $retentionDate = $request->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
+    $retentionDate = $httpRequest->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
 }
 else {
-    $retentionDate = $request->cookies->get('retention');
-    if(isset($results['user_pack'][0]) && $request->cookies->get('retention_shuffle') == 'true') {
+    $retentionDate = $httpRequest->cookies->get('retention');
+    if(empty($request['skipRetention']) && isset($results['user_pack'][0]) && $httpRequest->cookies->get('retention_shuffle') == 'true') {
         // TODO: count all cards
-        $retention = $results['user_pack'][0]->getUser()->getUserPacks()->toArray();
+        $retention = array_merge($retention, $results['user_pack'][0]->getUser()->getUserPacks()->toArray());
+        if($app->getUser()->getId() == $results['user_pack'][0]->getUser()->getId()) {
+            foreach($retention as $r => $up) {
+                /** @var UserPack $up */
+                $hasUp = false;
+                foreach($app->getUser()->getUserPacks()->toArray() as $ur => $upr) {
+                    /** @var UserPack $upr */
+                    if($up->getPack()->getId() == $upr->getPack()->getId()) {
+                        $upr->setRetention($up->getRetention());
+                        $hasUp = true;
+                    }
+                }
+                if(!$hasUp) {
+                    $appUser = $app->getUser();
+                    $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
+                    jQuery('#welcome-message')->data('user', $appUser);
+                }
+            }
+            $retention = $app->getUser()->getUserPacks()->toArray();
+        }
     }
 }
+$retentionObj = [];
 foreach($retention as $up) {
     /** @var UserPack $up */
     if($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED') {
         continue;
     }
+    $retentionObj[count($retentionObj)] = AdminController::toFirewalledEntityArray($up, $request['tables'], 1);
     foreach($up->getRetention() as $id => $r) {
         if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
             $total[count($total)] = $id;
@@ -190,6 +212,7 @@ if($card->getResponseType() == 'tf') {
     }
 }
 
-$row->find('.preview-card')->attr('data-retention', json_encode($remaining))->data('retention', $remaining);
+$row->find('.preview-card')->attr('data-remaining', json_encode($remaining))->data('remaining', $remaining);
+$row->find('.preview-card')->attr('data-retention', json_encode($retentionObj))->data('retention', $retentionObj);
 
 print ($row->html());

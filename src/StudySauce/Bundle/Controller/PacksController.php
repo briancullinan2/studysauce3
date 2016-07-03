@@ -422,7 +422,8 @@ class PacksController extends Controller
         if (!empty($request->get('pack'))) {
             $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return $p->getId() == intval($request->get('pack')) && in_array($user, $p->getChildUsers($currentUser));}));
             $up = $user->getUserPack($packs[0]);
-            $retention = $up->getRetention(in_array($request->get('pack'), $changedPacks));
+            $refresh = in_array($request->get('pack'), $changedPacks);
+            $retention = $up->getRetention($refresh);
             $orm->merge($up);
             $orm->flush();
         }

@@ -32,7 +32,7 @@ foreach($results['ss_user'][0]->getUserPacks()->toArray() as $i => $up) {
 $firstCard = array_shift($retention);
 
 ?>
-<header class="<?php print ($table); ?> <?php print ($total == 0 ? 'disabled' : ''); ?>">
+<header data-remaining="<?php print ($view->escape(json_encode($retention))); ?>" class="<?php print ($table); ?> <?php print ($total == 0 ? 'disabled' : ''); ?>">
     <a href="<?php print ($view['router']->generate('cards', ['card' => $firstCard])); ?>"></a>
     <label>Today&rsquo;s cards</label>
     <label><?php print ($total); ?> card<?php print ($total != 1 ? 's' : ''); ?></label>

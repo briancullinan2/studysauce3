@@ -37,9 +37,11 @@ if (typeof window.views.__globalVars.view['slots'].output == 'undefined') {
 }
 window.views.slotStack = [];
 window.views.__globalVars.app.getUser = function () {
-    var user = $.extend({}, $('#welcome-message').data('user'));
-    user = $.extend(user, window.views.__defaultEntities['ss_user']);
-    return user;
+    var welcome = $('#welcome-message');
+    var user = $.extend({}, welcome.data('user'));
+    var newUser = applyEntityObj(user);
+    welcome.data('user', newUser);
+    return newUser;
 };
 window.views.__globalVars.app.getRequest = function () {
     return {
@@ -121,13 +123,13 @@ window.views.__defaultEntities['ss_group'] = {
     getName: function () {return this.name;},
     getParent: function () {return this.parent ? applyEntityObj(this.parent) : null;},
     getSubgroups: function () {
-        return $(this.subgroups.map(function (c) {return applyEntityObj(c);}));
+        return $($(this.subgroups).toArray().map(function (c) {return applyEntityObj(c);}));
     },
     getInvites: function () {
-        return $(this.invites.map(function (c) {return applyEntityObj(c);}));
+        return $($(this.invites).toArray().map(function (c) {return applyEntityObj(c);}));
     },
-    getUsers: function () {return $(this.users.map(function (u) { return applyEntityObj(u);}));},
-    getGroupPacks: function () {return $(this.groupPacks.map(function (u) { return applyEntityObj(u);}));},
+    getUsers: function () {return $($(this.users).toArray().map(function (u) { return applyEntityObj(u);}));},
+    getGroupPacks: function () {return $($(this.groupPacks).toArray().map(function (u) { return applyEntityObj(u);}));},
     getDeleted: function () {return this.deleted},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
@@ -143,6 +145,7 @@ window.views.__defaultEntities['invite'] = {
 window.views.__defaultEntities['pack'] = {
     user: null,
     userPacks: $([]),
+    groups: $([]),
     cards: $([]),
     properties: {},
     getDeleted: function () {return this.status == 'DELETED';},
@@ -166,7 +169,7 @@ window.views.__defaultEntities['pack'] = {
         return $(users);
     },
     getCards: function () {
-        return $(this.cards.map(function (c) {return applyEntityObj(c)}));
+        return $($(this.cards).toArray().map(function (c) {return applyEntityObj(c)}));
     },
     getTitle: function () {return this.title;},
     getUserPack: function (user) {
@@ -181,8 +184,8 @@ window.views.__defaultEntities['pack'] = {
             }
         }
     },
-    getUserPacks: function () {return $(this.userPacks.map(function (up) {return applyEntityObj(up);}));},
-    getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));},
+    getUserPacks: function () {return $($(this.userPacks).toArray().map(function (up) {return applyEntityObj(up);}));},
+    getGroups: function () {return $($(this.groups).toArray().map(function (up) {return applyEntityObj(up);}));},
     getUser: function () {return this.user ? applyEntityObj(this.user) : null;},
     getUserById: function (id) {
         /** @var UserPack $up */
@@ -213,7 +216,8 @@ window.views.__defaultEntities['user_pack'] = {
     getRetention: function () {
         return this.retention;
     },
-    getCreated: function () {return !(this.created) ? null : new Date(this.created);}
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    setRetention: function (retention) {this.retention = retention;}
 };
 window.views.__defaultEntities['card'] = {
     answers: [],
@@ -297,8 +301,8 @@ window.views.__defaultEntities['ss_user'] = {
     },
     getLastVisit: function () {return !(this.lastVisit) ? null : new Date(this.lastVisit);},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
-    getUserPacks: function () {return $(this.userPacks.map(function (up) {return applyEntityObj(up);}));},
-    getGroups: function () {return $(this.groups.map(function (up) {return applyEntityObj(up);}));}
+    getUserPacks: function () {return $($(this.userPacks).toArray().map(function (up) {return applyEntityObj(up);}));},
+    getGroups: function () {return $($(this.groups).toArray().map(function (up) {return applyEntityObj(up);}));}
 };
 window.views.__globalVars.view.exists = window.views.exists;
 window.views.__globalVars.view.render = window.views.render;
