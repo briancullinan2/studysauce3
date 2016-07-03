@@ -31,7 +31,7 @@ print ($rowId); ?> <?php
 print (isset($request['edit']) && ($request['edit'] === true
     || is_array($request['edit']) && in_array($table, $request['edit']))
     ? 'edit'
-    : (isset($request['read-only']) && ($request['read-only'] === false
+    : (isset($request['read-only']) && ($request['read-only'] === false || $request['read-only'] === 'false'
         || is_array($request['read-only']) && !in_array($table, $request['read-only']))
         ? ''
         : 'read-only')); ?> <?php
