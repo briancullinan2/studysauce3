@@ -426,34 +426,47 @@ $(document).ready(function () {
     });
 
     body.on('show', '[id^="cards"]', function () {
-        if(!$(this).is('.loaded')) {
-            $(this).addClass('loaded');
+        var tab = $(this);
+        var results = tab.find('.results');
+        var request = results.data('request');
+
+        if(!tab.is('.loaded')) {
+            tab.addClass('loaded');
             // change the request to only load single user_pack
-            var results = $(this).find('.results');
-            var request = results.data('request');
             delete request['requestKey'];
             request['tables']['ss_user'] = ['id'];
             delete request['skipRetention'];
-            $(this).find('.results').data('request', request);
+            tab.find('.results').data('request', request);
 
             updateUserRetention.apply(this);
+        }
 
-            // load the next card in the sequence
-            if($(this).closest('.panel-pane').find('.card-row').length > 0) {
-                var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).closest('.panel-pane').data('card').pack.id;
-                loadOneExtra.apply(this, [$(this).find('.preview-card').data('remaining'), packId, getRowId.apply($(this).find('.card-row'))]);
-            }
+        // update the card count at the bottom
+        var footer = tab.find('.preview-footer');
+        var user = window.views.__globalVars.app.getUser();
+        footer.find('.preview-count').remove();
+        window.views.render('cell-cardFooter-card', {
+            context: footer,
+            request: request,
+            results: {user_pack: [$.extend(user.getUserPack({id: request['pack-id']}), {user: user})]}
+        });
+
+        // load the next card in the sequence
+        if(tab.closest('.panel-pane').find('.card-row').length > 0) {
+            var packId = Cookies.get('retention_shuffle') == 'true' ? null : tab.closest('.panel-pane').data('card').pack.id;
+            loadOneExtra.apply(this, [tab.find('[data-remaining]').data('remaining'), packId, getRowId.apply(tab.find('.card-row'))]);
         }
-        else {
-            loadResults.apply($(this).find('.results'));
-        }
+
+        // setup the play button
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
-        centerize.apply($(this).find('.preview-play a'));
-        if($(this).find('.preview-card:not(.preview-answer) .preview-play').length > 0) {
-            $(this).find('.preview-card:not(.preview-answer) .preview-play .play').first().trigger('click');
+        centerize.apply(tab.find('.preview-play a'));
+        if(tab.find('.preview-card:not(.preview-answer) .preview-play').length > 0) {
+            tab.find('.preview-card:not(.preview-answer) .preview-play .play').first().trigger('click');
         }
-        if($(this).find('.type-sa').length > 0) {
-            $(this).find('.type-sa input').focus();
+
+        // default focus on short answer cards
+        if(tab.find('.type-sa').length > 0) {
+            tab.find('.type-sa input').focus();
         }
     });
 
@@ -523,7 +536,7 @@ $(document).ready(function () {
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('[href="#right"]');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
+        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
 
         body.one('hiding', '[id^="cards"]', function () {
             $(this).stop().hide();
@@ -588,9 +601,6 @@ $(document).ready(function () {
         if(typeof nextId != 'undefined' && tab.length == 0) {
             loadPanel.apply(this, [Routing.generate('cards', {card: nextId}), true, function () {}]);
         }
-        else if(typeof nextId != 'undefined') {
-            loadResults.apply(tab.find('.results'));
-        }
     }
 
     function pickNextCard(retention, packId, cardId) {
@@ -638,16 +648,22 @@ $(document).ready(function () {
 
     body.on('show', '[id^="cards"]', setupProgress);
 
+    body.on('resulted.refresh', '[id^="cards"] .results, [id^="home"] .results', function () {
+        updateUserRetention.apply(this);
+    });
+
+    body.on('loaded', '[id^="home"] .results', function () {
+        updateUserRetention.apply(this);
+    });
+
     body.on('resulted.refresh', '[id^="cards"] .results', function () {
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         var that = $(this).closest('.panel-pane');
         setupProgress.apply(that);
         if($(this).is('[id^="cards-card"], [id^="cards-answer"]')) {
             var packId = Cookies.get('retention_shuffle') == 'true' ? null : that.data('card').pack.id;
-            loadOneExtra.apply(this, [$(this).find('.preview-card').data('remaining'), packId, getRowId.apply($(this).find('.card-row'))]);
+            loadOneExtra.apply(this, [$(this).find('[data-remaining]').data('remaining'), packId, getRowId.apply($(this).find('.card-row'))]);
         }
-
-        updateUserRetention.apply(this);
     });
 
     function updateUserRetention() {
@@ -705,7 +721,7 @@ $(document).ready(function () {
 
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         var id = getRowId.apply($(this).parents('.card-row'));
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
+        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
         pickNextCard(data, packId, id);
     });
 
@@ -714,7 +730,7 @@ $(document).ready(function () {
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('.correct');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
+        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
 
         // do transition
         body.one('hiding', '[id^="cards"]', function () {
@@ -758,7 +774,7 @@ $(document).ready(function () {
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('.preview-card').data('remaining');
+        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
 
 
         // do transition

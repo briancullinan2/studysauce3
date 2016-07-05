@@ -200,7 +200,7 @@ window.views.__defaultEntities['pack'] = {
     }
 };
 window.views.__defaultEntities['user_pack'] = {
-    retention: $([]),
+    retention: {},
     getRemoved: function () {
         return this.removed
     },

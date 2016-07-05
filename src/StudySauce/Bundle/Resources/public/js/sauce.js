@@ -603,6 +603,8 @@ $(document).ready(function () {
                         newStuff = newStuff.not('#' + id);
                 });
                 that.replaceWith(newStuff);
+                centerize.apply(newStuff.find('.centerized').add(newStuff.filter('.centerized')));
+                newStuff.trigger('loaded');
             },
             error: function () {
             }

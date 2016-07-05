@@ -1,73 +1,11 @@
 <?php
-use Admin\Bundle\Controller\AdminController;
-use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
-use StudySauce\Bundle\Entity\UserPack;
-use DateTime as Date;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
-
-/** @var GlobalVariables $app */
-$httpRequest = $app->getRequest();
 
 /** @var Card $card */
 
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
-
-$total = [];
-$remaining = [];
-$index = 1;
-$retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
-
-$isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
-if($isSummary) {
-    $retentionDate = $httpRequest->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
-}
-else {
-    $retentionDate = $httpRequest->cookies->get('retention');
-    if(empty($request['skipRetention']) && isset($results['user_pack'][0]) && $httpRequest->cookies->get('retention_shuffle') == 'true') {
-        // TODO: count all cards
-        $retention = array_merge($retention, $results['user_pack'][0]->getUser()->getUserPacks()->toArray());
-        if($app->getUser()->getId() == $results['user_pack'][0]->getUser()->getId()) {
-            foreach($retention as $r => $up) {
-                /** @var UserPack $up */
-                $hasUp = false;
-                foreach($app->getUser()->getUserPacks()->toArray() as $ur => $upr) {
-                    /** @var UserPack $upr */
-                    if($up->getPack()->getId() == $upr->getPack()->getId()) {
-                        $upr->setRetention($up->getRetention());
-                        $hasUp = true;
-                    }
-                }
-                if(!$hasUp) {
-                    $appUser = $app->getUser();
-                    $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
-                    jQuery('#welcome-message')->data('user', $appUser);
-                }
-            }
-            $retention = $app->getUser()->getUserPacks()->toArray();
-        }
-    }
-}
-$retentionObj = [];
-foreach($retention as $up) {
-    /** @var UserPack $up */
-    if($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED') {
-        continue;
-    }
-    $retentionObj[count($retentionObj)] = AdminController::toFirewalledEntityArray($up, $request['tables'], 1);
-    foreach($up->getRetention() as $id => $r) {
-        if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
-            $total[count($total)] = $id;
-        }
-        if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
-            $index += 1;
-        }
-        else {
-            $remaining[count($remaining)] = $id;
-        }
-    }
-}
 
 // TODO: how to get data from object or from view in the same way?
 // TODO: use applyFields and gatherFields here too?  at the row level?
@@ -119,7 +57,7 @@ if (2 != $template->length) {
                 <a href="#wrong" class="preview-wrong">✘</a>
                 <div class="preview-guess">Did you guess correctly?</div>
                 <a href="#right" class="preview-right">&#x2714;︎</a>
-                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
             </div>
         </div>
     <?php }
@@ -134,7 +72,7 @@ if (2 != $template->length) {
             </div>
             <div class="preview-footer">
                 <div class="preview-guess">Click to continue</div>
-                <div class="preview-count"><?php print ($index); ?> of <?php print (count($total)); ?></div>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
             </div>
         </div>
     <?php }
@@ -156,8 +94,5 @@ if($isImage && isset($url)) {
 $row->find('.preview-content div')->text($content);
 
 $row->find('.preview-answer .preview-inner .preview-content div')->text($correct);
-
-$row->find('.preview-card')->attr('data-remaining', json_encode($remaining))->data('remaining', $remaining);
-$row->find('.preview-card')->attr('data-retention', json_encode($retentionObj))->data('retention', $retentionObj);
 
 print ($row->html());
