@@ -425,7 +425,7 @@ $(document).ready(function () {
         body.addClass('study-mode');
     });
 
-    body.on('show', '[id^="cards"]', function () {
+    body.on('show', '[id^="cards-card"], [id^="cards-answer"]', function () {
         var tab = $(this);
         var results = tab.find('.results');
         var request = results.data('request');
@@ -444,10 +444,12 @@ $(document).ready(function () {
         // update the card count at the bottom
         var footer = tab.find('.preview-footer');
         var user = window.views.__globalVars.app.getUser();
+        var cardId = getRowId.apply(tab.find('.card-row'));
         footer.find('.preview-count').remove();
         window.views.render('cell-cardFooter-card', {
             context: footer,
             request: request,
+            card: applyEntityObj({table: 'card', id: cardId}),
             results: {user_pack: [$.extend(user.getUserPack({id: request['pack-id']}), {user: user})]}
         });
 
@@ -537,6 +539,18 @@ $(document).ready(function () {
         var correct = $(this).is('[href="#right"]');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
         var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
+        var responses = {
+            pack: packId,
+            correct : correct,
+            card : id,
+            created : moment(new Date()).formatPHP('r'),
+            answer: ''
+        };
+
+        var user = window.views.__globalVars.app.getUser();
+        var up = user.getUserPack({id: packId});
+        up.retention[id][2] = !correct;
+        up.retention[id][3] = response.created;
 
         body.one('hiding', '[id^="cards"]', function () {
             $(this).stop().hide();
@@ -551,13 +565,7 @@ $(document).ready(function () {
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
             dataType: 'json',
-            data: {
-                pack: packId,
-                correct : correct,
-                card : id,
-                created : new Date(),
-                answer: ''
-            },
+            data: responses,
             success: function (data) {
 
             },
@@ -569,6 +577,10 @@ $(document).ready(function () {
     function getRandomCard(retention, prefix, previousId) {
         retention.sort();
         var i = retention.indexOf(parseInt(previousId));
+        if(i > -1) {
+            retention.splice(i, 1);
+        }
+        i = retention.indexOf(previousId);
         if(i > -1) {
             retention.splice(i, 1);
         }
@@ -731,6 +743,18 @@ $(document).ready(function () {
         var correct = $(this).is('.correct');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
         var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
+        var response = {
+            pack: packId,
+            correct : correct,
+            card : id,
+            created : moment(new Date()).formatPHP('r'),
+            answer: ((/answer-id-([0-9]*)/).exec($(this).attr('class')) || [])[1]
+        };
+
+        var user = window.views.__globalVars.app.getUser();
+        var up = user.getUserPack({id: packId});
+        up.retention[id][2] = !correct;
+        up.retention[id][3] = response.created;
 
         // do transition
         body.one('hiding', '[id^="cards"]', function () {
@@ -752,13 +776,7 @@ $(document).ready(function () {
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
             dataType: 'json',
-            data: {
-                pack: packId,
-                correct : correct,
-                card : id,
-                created : new Date(),
-                answer: ((/answer-id-([0-9]*)/).exec($(this).attr('class')) || [])[1]
-            },
+            data: response,
             success: function (data) {
 
             },
@@ -775,7 +793,19 @@ $(document).ready(function () {
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
         var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
+        var response = {
+            pack: packId,
+            correct : correct,
+            card : id,
+            created : moment(new Date()).formatPHP('r'),
+            value : input.val(),
+            answer: ((/answer-id-([0-9]*)/).exec($(this).attr('class')) || [])[1]
+        };
 
+        var user = window.views.__globalVars.app.getUser();
+        var up = user.getUserPack({id: packId});
+        up.retention[id][2] = !correct;
+        up.retention[id][3] = response.created;
 
         // do transition
         body.one('hiding', '[id^="cards"]', function () {
@@ -794,18 +824,12 @@ $(document).ready(function () {
 
         // save response
         $.ajax({
-            url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
+            url: Routing.generate('responses', {user: $('#welcome-message').data('user').id}),
             type: 'POST',
             dataType: 'json',
-            data: {
-                pack: packId,
-                correct : correct,
-                card : id,
-                created : new Date(),
-                value : input.val(),
-                answer: ((/answer-id-([0-9]*)/).exec($(this).attr('class')) || [])[1]
-            },
+            data: response,
             success: function (data) {
+                // TODO: update global retention
             },
             error: function () {
             }

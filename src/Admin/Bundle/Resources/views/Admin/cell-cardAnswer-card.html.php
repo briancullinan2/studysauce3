@@ -57,7 +57,7 @@ if (2 != $template->length) {
                 <a href="#wrong" class="preview-wrong">✘</a>
                 <div class="preview-guess">Did you guess correctly?</div>
                 <a href="#right" class="preview-right">&#x2714;︎</a>
-                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>
         </div>
     <?php }
@@ -72,7 +72,7 @@ if (2 != $template->length) {
             </div>
             <div class="preview-footer">
                 <div class="preview-guess">Click to continue</div>
-                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>
         </div>
     <?php }

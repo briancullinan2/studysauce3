@@ -59,6 +59,9 @@ foreach($retention as $up) {
         if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
             $total[count($total)] = $id;
         }
+        if(intval($id) == $card->getId()) {
+            continue;
+        }
         if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
             $index += 1;
         }

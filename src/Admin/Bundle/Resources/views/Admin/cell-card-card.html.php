@@ -52,7 +52,7 @@ if (2 != $template->length) {
             </div>
             <div class="preview-tap">Click to see answer</div>
             <div class="preview-footer">
-                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>
         </div>
     <?php } ?>
@@ -66,7 +66,7 @@ if (2 != $template->length) {
                 <a href="" class="preview-response"><div class="centerized"></div></a>
                 <a href="" class="preview-response"><div class="centerized"></div></a>
                 <a href="" class="preview-response"><div class="centerized"></div></a>
-                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>
         </div>
     <?php } ?>
@@ -79,7 +79,7 @@ if (2 != $template->length) {
                 <a href="#false" class="preview-false">False</a>
                 <div class="preview-guess"> </div>
                 <a href="#true" class="preview-true">True</a>
-                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>
         </div>
     <?php } ?>
@@ -91,7 +91,7 @@ if (2 != $template->length) {
             <label class="input"><input type="text" value="" data-disclaimer="if you are reading this you should be a hacker ;)" data-correct="<?php print ($card->getCorrect()->getValue()); ?>" /></label>
             <a href="#done" class="btn">Done</a>
             <div class="preview-footer">
-                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request])); ?>
+                <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>
         </div>
     <?php }
