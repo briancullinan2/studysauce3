@@ -539,7 +539,7 @@ $(document).ready(function () {
         var correct = $(this).is('[href="#right"]');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
         var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
-        var responses = {
+        var response = {
             pack: packId,
             correct : correct,
             card : id,
@@ -565,7 +565,7 @@ $(document).ready(function () {
             url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
             type: 'POST',
             dataType: 'json',
-            data: responses,
+            data: response,
             success: function (data) {
 
             },
