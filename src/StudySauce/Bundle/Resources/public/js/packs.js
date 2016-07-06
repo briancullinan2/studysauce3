@@ -468,7 +468,7 @@ $(document).ready(function () {
 
         // default focus on short answer cards
         if(tab.find('.type-sa').length > 0) {
-            tab.find('.type-sa input').focus();
+            tab.find('.type-sa input').val('').focus();
         }
     });
 
@@ -789,6 +789,8 @@ $(document).ready(function () {
         evt.preventDefault();
         var id = getRowId.apply($(this).parents('.card-row'));
         var input = $(this).parents('.card-row').find('input');
+
+
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
         var packId = $(this).parents('.panel-pane').data('card').pack.id;

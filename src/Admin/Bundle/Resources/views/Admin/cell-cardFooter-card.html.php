@@ -1,10 +1,12 @@
 <?php
 
 use Admin\Bundle\Controller\AdminController;
+use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use DateTime as Date;
 
+/** @var Card $card */
 /** @var GlobalVariables $app */
 $httpRequest = $app->getRequest();
 // check if we need to update or create template
@@ -59,13 +61,10 @@ foreach($retention as $up) {
         if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
             $total[count($total)] = $id;
         }
-        if(intval($id) == $card->getId()) {
-            continue;
-        }
         if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
             $index += 1;
         }
-        else {
+        else if (intval($id) != $card->getId() && ($isSummary || $r[2])) {
             $remaining[count($remaining)] = $id;
         }
     }
