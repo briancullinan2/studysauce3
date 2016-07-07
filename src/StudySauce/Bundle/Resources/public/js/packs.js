@@ -564,6 +564,12 @@ $(document).ready(function () {
 
     body.on('click', '[id^="cards"] .card-row .preview-answer:not([class*="type-"]) [href="#wrong"], [id^="cards"] .card-row .preview-answer:not([class*="type-"]) [href="#right"]', function (evt) {
         evt.preventDefault();
+        var row = $(this).parents('.card-row');
+        if(row.is('.read-only')) {
+            return;
+        }
+        row.addClass('read-only');
+
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('[href="#right"]');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
@@ -768,6 +774,12 @@ $(document).ready(function () {
 
     body.on('click', '[id^="cards"] .card-row .type-mc .preview-response, [id^="cards"] .card-row .type-tf a[href="#true"], [id^="cards"] .card-row .type-tf a[href="#false"]', function (evt) {
         evt.preventDefault();
+        var row = $(this).parents('.card-row');
+        if(row.is('.read-only')) {
+            return;
+        }
+        row.addClass('read-only');
+
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('.correct');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
@@ -816,9 +828,14 @@ $(document).ready(function () {
 
     body.on('click', '[id^="cards"] .card-row .type-sa a[href="#done"]', function (evt) {
         evt.preventDefault();
+        var row = $(this).parents('.card-row');
+        if(row.is('.read-only')) {
+            return;
+        }
+        row.addClass('read-only');
+
         var id = getRowId.apply($(this).parents('.card-row'));
         var input = $(this).parents('.card-row').find('input');
-
 
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
