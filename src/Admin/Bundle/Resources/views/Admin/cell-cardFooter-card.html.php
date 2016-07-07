@@ -50,6 +50,7 @@ else {
         }
     }
 }
+
 $retentionObj = [];
 foreach($retention as $up) {
     /** @var UserPack $up */
@@ -61,10 +62,13 @@ foreach($retention as $up) {
         if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
             $total[count($total)] = $id;
         }
+        if(implode('', ['', $id]) == implode('', ['', $card->getId()])) {
+            continue;
+        }
         if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
             $index += 1;
         }
-        else if (intval($id) != $card->getId() && ($isSummary || $r[2])) {
+        else if ($isSummary || $r[2]) {
             $remaining[count($remaining)] = $id;
         }
     }

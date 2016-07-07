@@ -420,19 +420,43 @@ $(document).ready(function () {
         }
     });
 
-    // turn on study mode to hide extra menus
-    body.on('showing', '[id^="cards"]', function () {
+    body.on('showing', '[id^="cards-pack"]', function () {
         body.addClass('study-mode');
-    });
 
-    body.on('show', '[id^="cards-card"], [id^="cards-answer"]', function () {
         var tab = $(this);
         var results = tab.find('.results');
         var request = results.data('request');
 
+        // TODO: call recalculate on template
         if(!tab.is('.loaded')) {
             tab.addClass('loaded');
-            // change the request to only load single user_pack
+            updateUserRetention.apply(this);
+        }
+
+        var footer = tab.find('.results .cardResult');
+        var user = window.views.__globalVars.app.getUser();
+        footer.find('*').remove();
+        var up = $.extend(user.getUserPack({id: request['pack-id']}), {user: user});
+        window.views.render('cell-cardResult-user_pack', {
+            context: footer,
+            request: request,
+            user_pack: up,
+            results: {user_pack: [up]}
+        });
+
+    });
+
+    // turn on study mode to hide extra menus
+    body.on('showing', '[id^="cards-card"], [id^="cards-answer"]', function () {
+        body.addClass('study-mode');
+
+        var tab = $(this);
+        var results = tab.find('.results');
+        var request = results.data('request');
+
+        // change the request to only load single user_pack
+        if(!tab.is('.loaded')) {
+            tab.addClass('loaded');
             delete request['requestKey'];
             request['tables']['ss_user'] = ['id'];
             delete request['skipRetention'];
@@ -453,11 +477,21 @@ $(document).ready(function () {
             results: {user_pack: [$.extend(user.getUserPack({id: request['pack-id']}), {user: user})]}
         });
 
+        // default focus on short answer cards
+        if(tab.find('.type-sa').length > 0) {
+            tab.find('.type-sa input').val('').focus();
+        }
+
         // load the next card in the sequence
         if(tab.closest('.panel-pane').find('.card-row').length > 0) {
             var packId = Cookies.get('retention_shuffle') == 'true' ? null : tab.closest('.panel-pane').data('card').pack.id;
             loadOneExtra.apply(this, [tab.find('[data-remaining]').data('remaining'), packId, getRowId.apply(tab.find('.card-row'))]);
         }
+
+    });
+
+    body.on('show', '[id^="cards-card"], [id^="cards-answer"]', function () {
+        var tab = $(this);
 
         // setup the play button
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
@@ -466,10 +500,6 @@ $(document).ready(function () {
             tab.find('.preview-card:not(.preview-answer) .preview-play .play').first().trigger('click');
         }
 
-        // default focus on short answer cards
-        if(tab.find('.type-sa').length > 0) {
-            tab.find('.type-sa input').val('').focus();
-        }
     });
 
     body.on('show', '#home', function () {
@@ -508,9 +538,6 @@ $(document).ready(function () {
         }
     }
 
-    body.on('click', 'a[href^="/cards"]', function () {
-    });
-
     body.on('click', '[id^="packs"] .pack-row a[href^="/cards"]', function () {
         var rowId = getRowId.apply($(this).parents('.pack-row'));
         Cookies.set('retention_' + rowId, moment(new Date()).formatPHP('r'), { expires: 7 });
@@ -522,11 +549,13 @@ $(document).ready(function () {
         Cookies.set('retention_shuffle', $(this).is('header a') ? 'true' : 'false');
     });
 
-    body.on('click', '[id^="cards"] .cardResult a[href^="/cards"]', function () {
+    body.on('click', '[id^="cards-pack"] a[href^="/cards"]', function () {
+        var tab = $(this);
+        var results = tab.find('.results');
+        var request = results.data('request');
         // if retention_summary
         if(Cookies.get('retention_summary') == 'true') {
-            var rowId = $(this).parents('.panel-pane').data('card').pack.id;
-            Cookies.set('retention_' + rowId, moment(new Date()).formatPHP('r'), { expires: 7 });
+            Cookies.set('retention_' + request['pack-id'], moment(new Date()).formatPHP('r'), { expires: 7 });
         }
         else {
             Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });

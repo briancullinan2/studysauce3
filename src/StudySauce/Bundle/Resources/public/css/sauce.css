@@ -441,7 +441,6 @@ input[type="button"].more
     outline: none;
     color: #ffffff;
     background-color: #0099BB;
-    border-bottom: 1px solid #0099BB;
     transition: background-color ease-in-out .15s, border-color ease-in-out .15s;
     position: relative;
 }
@@ -475,7 +474,6 @@ input[type="button"].more:focus
     text-decoration: none;
     color: #ffffff;
     background-color: #0088BB;
-    border-color: #004477;
 }
 
 .net-promoter label
@@ -525,7 +523,6 @@ input[type="button"].more:active
     appearance: none;
     color: #ffffff;
     background-color: #0088BB;
-    border-color: #004477;
 }
 
 #plan .fc-button:active,
