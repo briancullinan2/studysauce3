@@ -59,20 +59,29 @@ if($tab->length > 0) {
     $schoolStr = '';
     $visited = [];
     foreach($publicGroups as $g) {
-        $group = applyEntityObj($g);
         /** @var Group $group */
-        if(!empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getParent()->getId(), $visited)) {
+        $group = applyEntityObj($g);
+        if(!empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getId(), $visited)) {
 
-            $visited[count($visited)] = $group->getParent()->getId();
+            $visited[count($visited)] = $group->getId();
             if($group->getParent()->getId() == $parentVal) {
                 $yearStr = implode('', [$yearStr, '<option value="' , $group->getId() , '">' , $group->getName() , '</option>']);
             }
             if($group->getParent()->getId() == $yearVal) {
-                $schoolStr = implode('', [$schoolStr, '<option value="' , $group->getId() , '">' , $group->getName() , '</option>']);
+                $code = $group->getId();
+                foreach($invites as $i) {
+                    /** @var Invite $invite */
+                    $invite = applyEntityObj($i);
+                    if($invite->getGroup()->getId() == $group->getId()) {
+                        $code = $invite->getCode();
+                        break;
+                    }
+                }
+                $schoolStr = implode('', [$schoolStr, '<option value="' , $code , '">' , $group->getName() , '</option>']);
             }
         }
     }
-    
+
 
     // update list of groups
     $year->find('option:not(:first-of-type)')->remove();
