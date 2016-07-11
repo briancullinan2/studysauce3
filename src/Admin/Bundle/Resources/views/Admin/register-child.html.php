@@ -72,13 +72,7 @@ if($tab->length > 0) {
             }
         }
     }
-    //foreach($invites as $i) {
-    //    $invite = applyEntityObj($i);
-    //    /** @var Invite $invite */
-    //    if($invite->getGroup()->getId() == $yearVal) {
-    //        $schoolStr = implode('', [$schoolStr, '<option value="' , $invite->getCode() , '">' , $invite->getGroup()->getName() , '</option>']);
-    //    }
-    //}
+    
 
     // update list of groups
     $year->find('option:not(:first-of-type)')->remove();
