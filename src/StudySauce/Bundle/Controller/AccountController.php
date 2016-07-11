@@ -2,6 +2,8 @@
 
 namespace StudySauce\Bundle\Controller;
 
+use Admin\Bundle\Controller\AdminController;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
 use FOS\UserBundle\Security\LoginManager;
@@ -56,6 +58,36 @@ class AccountController extends Controller
                 'services' => $services
             ]
         );
+    }
+
+    public function registerChildAction() {
+        $csrfToken = $this->has('form.csrf_provider')
+            ? $this->get('form.csrf_provider')->generateCsrfToken('account_create')
+            : null;
+
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+
+        if(AdminController::$allTableClasses == null) {
+            AdminController::setUpClasses($orm);
+        }
+
+        $invites = $orm->getRepository('StudySauceBundle:Invite')->createQueryBuilder('i')
+            ->where('i.properties LIKE \'%s:13:"public_school";b:1;%\'')
+            ->andWhere('i.group IS NOT NULL')
+            ->getQuery()->getResult();
+
+        $allGroups = [];
+        foreach($invites as $i) {
+            /** @var Invite $i */
+            $group = $i->getGroup();
+            do {
+                $allGroups[] = $group;
+                $group = $group->getParent();
+            } while (!empty($group) && $group->getParent() != $group && !in_array($group, $allGroups));
+        }
+
+        return $this->render('AdminBundle:Admin:register-child.html.php', ['invites' => $invites, 'csrf_token' => $csrfToken]);
     }
 
     /**
@@ -262,7 +294,7 @@ class AccountController extends Controller
             return new JsonResponse($templateVars);
         }
         else {
-            return $this->render('StudySauceBundle:Account:register.html.php', $templateVars);
+            return $this->render('AdminBundle:Admin:register.html.php', $templateVars);
         }
     }
 
@@ -439,7 +471,8 @@ class AccountController extends Controller
             $user->setEnabled(true);
             $user->setFirst($request->get('first'));
             $user->setLast($request->get('last'));
-            // assign user to partner
+
+            // assign invite code to use only if there is no child information supplied
             if(empty($request->get('childFirst')) || empty($request->get('childLast'))) {
                 InviteListener::setInviteRelationship($orm, $request, $user);
             }
@@ -450,14 +483,20 @@ class AccountController extends Controller
             $email = false;
         }
 
+        // apply invite code to child account instead of parent account
         if(!empty($request->get('childFirst')) && !empty($request->get('childLast'))) {
             /** @var Invite $groupInvite */
             $groupInvite = $this->setChildAccount($user, $request, $userManager, $orm);
         }
 
         // get the path the user should go to after logging in
-        list($route, $options) = HomeController::getUserRedirect($user);
-        $response = $this->redirect($this->generateUrl($route, $options));
+        if($request->get('hasChild') == 'true') {
+            $response = $this->redirect($this->generateUrl('register_child'));
+        }
+        else {
+            list($route, $options) = HomeController::getUserRedirect($user);
+            $response = $this->redirect($this->generateUrl($route, $options));
+        }
 
         if ($login) {
             $context = $this->get('security.context');

@@ -145,7 +145,7 @@ class User extends BaseUser implements EncoderAwareInterface
     protected $gcal_access_token;
 
     /** @ORM\Column(name="devices", type="simple_array", nullable=true) */
-    protected $devices;
+    protected $devices = [];
 
     /**
      * @ORM\ManyToMany(targetEntity="Group")
@@ -309,7 +309,6 @@ class User extends BaseUser implements EncoderAwareInterface
         $this->invitees = new ArrayCollection();
         $this->userPacks = new ArrayCollection();
         $this->authored = new ArrayCollection();
-        $this->devices = new ArrayCollection();
         parent::__construct();
     }
 

@@ -358,7 +358,7 @@ $(document).ready(function () {
                         entityField.data(tableName, options.slice(0));
                     }
                 }
-                standardSave.apply(entityField, [updates]);
+                resultsSave.apply(entityField, [updates]);
                 isSettingSelectize = false;
             });
         }
@@ -530,7 +530,7 @@ $(document).ready(function () {
 
         // reset toField
         resetFieldToData.apply(toField);
-        standardSave.apply(toField, [updates]);
+        resultsSave.apply(toField, [updates]);
     }
 
     body.on('hidden.bs.modal', '#create-entity', function () {

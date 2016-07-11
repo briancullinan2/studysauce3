@@ -49,7 +49,7 @@ if(!empty($token)) {
                 <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($p) ? 'Switch back' : implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
             <?php } ?>
             <li><a href="#collapse">Hide</a><h3></h3></li>
-            <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Add Child</a></li>
+            <li><a href="<?php print ($view['router']->generate('register_child')); ?>"><span>&nbsp;</span>Add Child</a></li>
             <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Account settings</a></li>
             <li><a href="<?php print ($view['router']->generate('logout')); ?>"><span>&nbsp;</span>Logout</a></li>
         </ul>

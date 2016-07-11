@@ -38,6 +38,10 @@ class BuyController extends Controller
         'yearly' => ['price' => 99, 'reoccurs' => 12, 'description' => '$99/year <sup class="premium">Recommended</sup>']
     ];
 
+    public function storeAction() {
+
+    }
+
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response

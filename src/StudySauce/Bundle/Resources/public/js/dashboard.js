@@ -75,6 +75,7 @@ $(document).ready(function () {
             requirements = routes[0].route.requirements;
 
         // add route parameter to tab id if loading a specific page like /packs/2 or /adviser/1
+        var hasSubKey = false;
         for (var r in requirements) {
             if (requirements.hasOwnProperty(r) && r != '_format') {
                 if (typeof routes[0].params[r] == 'undefined' && !isNaN(parseInt(requirements[r]))) {
@@ -83,7 +84,11 @@ $(document).ready(function () {
                 else {
                     key += '-' + r + routes[0].params[r];
                 }
+                hasSubKey = true;
             }
+        }
+        if(!hasSubKey) {
+            key = routes[0].name;
         }
 
         var panel = $('#' + key + '.panel-pane'),

@@ -218,12 +218,15 @@ class PacksController extends Controller
         }));
     }
 
+
+    // TODO: use results API instead
     /**
      * @param User|null $user
      * @return JsonResponse
      */
     public function listAction(User $user = null)
     {
+
 
         if(!$this->getUser()->hasRole('ROLE_ADMIN') || $user == null) {
             $user = $this->getUser();
@@ -346,6 +349,8 @@ class PacksController extends Controller
             ];
         }, $cards));
     }
+
+    // TODO: use standard save API
 
     public function responsesAction(Request $request, User $user)
     {

@@ -36,7 +36,7 @@ $view['slots']->start('body'); ?>
             $request = [
                 'tables' => $tables,
                 //'user-ss_user-id' => 'NULL',
-                'user_pack-removed' => false,
+                'user_pack-removed' => null,
                 'ss_user-id' => $id,
                 'headers' => ['ss_user' => 'bigButton'],
                 'count-pack' => 0,

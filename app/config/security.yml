@@ -78,6 +78,7 @@ security:
         - { path: ^/cron,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         # landing pages
         - { path: ^/js/routing,             roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/command/template,             roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/parents,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/students,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/partners,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }

@@ -52,9 +52,14 @@ jQuery(document).ready(function() {
         accountFunc();
     });
 
-    body.on('change', '#register .first-name input, #register .last-name input, #register .email input, #register .password input', accountFunc);
-    body.on('keyup', '#register .first-name input, #register .last-name input, #register .email input, #register .password input', accountFunc);
-    body.on('keydown', '#register .first-name input, #register .last-name input, #register .email input, #register .password input', accountFunc);
+    body.on('change', '[id^="register"] .hasChild input, #register_child select', function () {
+        var tab = $(this).parents('.panel-pane');
+        Cookies.set('hasChild', $(this).is(':checked') ? 'true' : 'false');
+        window.views.render.apply(tab, [tab.attr('id'), {context: tab}]);
+    });
+
+    body.on('change keyup keydown', '#register .first-name input, #register .last-name input, #register .email input, #register .password input', accountFunc);
+
     body.on('click', '#register a[href="#sign-in-with-email"]', function (evt) {
         var account = jQuery('#register');
         evt.preventDefault();
@@ -62,58 +67,17 @@ jQuery(document).ready(function() {
         account.find('form').show();
         accountFunc();
     });
-    function submitRegister(evt) {
-        evt.preventDefault();
+
+    body.on('submit', '#register form', function (evt) {
         var account = jQuery('#register');
-        if(account.find('.form-actions').is('.invalid')) {
-            if (account.is('.first-required') || account.is('.last-required') ||
-                account.is('.email-required') || account.is('.password-required')) {
-                account.addClass('invalid-only');
-                if (account.is('.first-required')) {
-                    account.find('.first-name input').focus();
-                }
-                else if (account.is('.last-required')) {
-                    account.find('.last-name input').focus();
-                }
-                else if (account.is('.email-required')) {
-                    account.find('.email input').focus();
-                }
-                else if (account.is('.password-required')) {
-                    account.find('.password input').focus();
-                }
-            }
-            return;
-        }
-        account.find('.form-actions').removeClass('valid').addClass('invalid');
-        loadingAnimation($(this).find('[value="#user-register"]'));
+        evt.preventDefault();
         var hash = getHash();
-        jQuery.ajax({
-            url: Routing.generate('account_create'),
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                _remember_me: 'on',
-                first: account.find('.first-name input').val(),
-                last: account.find('.last-name input').val(),
-                email: account.find('.email input').val(),
-                pass: account.find('.password input').val(),
-                csrf_token: account.find('input[name="csrf_token"]').val()
-            },
-            success: function (data) {
-                account.find('.squiggle').stop().remove();
-                account.find('input[name="csrf_token"]').val(data.csrf_token);
-                account.data('state', hash);
-                if(typeof data.error != 'undefined') {
-                    account.find('.form-actions').prepend($('<span class="error">E-mail already registered.</span>'));
-                }
-                account.find('.password input').val('');
-            },
-            error: function () {
-                account.find('.squiggle').stop().remove();
-            }
-        });
-    }
-    body.on('submit', '#register form', submitRegister);
+        var data = gatherFields.apply($(this), [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
+        standardSave.apply($(this), [data, function () {
+            account.data('state', hash);
+        }]);
+        $(this).find('.form-actions').removeClass('invalid').addClass('valid');
+    });
 
     function resetFunc() {
         var reset = $('#reset');

@@ -61,7 +61,9 @@ if (typeof window.views.render == 'undefined') {
         if(typeof window.views[name] == 'undefined') {
             throw 'View not found';
         }
-
+        if(typeof vars == 'undefined') {
+            vars = {};
+        }
         // save state
         var useThis;
         if(typeof vars.context != 'undefined') {
@@ -445,15 +447,14 @@ $(document).ready(function () {
     window.getTab = getTab;
 
     // TODO: port to server in a shared code file, saves to database at the end
-    function standardSave(save) {
+    function resultsSave(save) {
         var field = $(this);
         var tab = getTab.apply(field);
         var tabId = getTabId.apply(tab);
         var fieldTab = field.closest('.results').first();
 
-        var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]');
-
-        if (saveButton.is('.read-only > *, [disabled]') || isLoading) {
+        var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]').first();
+        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *') || isLoading) {
             // select incorrect row handled by #goto-error
             return;
         }
@@ -521,32 +522,13 @@ $(document).ready(function () {
                     return true;
                 }
 
-                data = $.extend(true, data, save || {});
-                data = $.extend(true, data, getQueryObject(saveUrl));
                 var request = getDataRequest.apply(subTab);
                 data = $.extend(data, {requestKey: request.requestKey});
-                saveUrl = saveUrl.replace(/\?.*/ig, '');
 
                 // loading animation from CTA or activating field
-                isLoading = true;
-                loadingAnimation(saveButton);
-
-                $.ajax({
-                    url: saveUrl,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: data,
-                    success: function (data) {
-                        fieldTab.find('.squiggle').stop().remove();
-                        isLoading = false;
-                        // copy rows and select
-                        loadContent.apply(subTab, [data, 'saved']);
-                    },
-                    error: function () {
-                        isLoading = false;
-                        fieldTab.find('.squiggle').stop().remove();
-                    }
-                });
+                standardSave.apply(subTab, [data, function (data) {
+                    loadContent.apply(subTab, [data, 'saved']);
+                }]);
 
                 return tabId != 0;
 
@@ -555,7 +537,43 @@ $(document).ready(function () {
                 break;
             }
         }
+    }
+    window.resultsSave = resultsSave;
 
+    function standardSave(save, callback) {
+        var subTab = $(this);
+        var subAction = subTab.closest('[action], [data-action]');
+        var saveUrl = subAction.data('action') || subAction.attr('action') || subTab.closest('[action]').attr('action') || subTab.closest('[data-action]').data('action');
+        var data = {};
+        data = $.extend(true, data, save || {});
+        data = $.extend(true, data, getQueryObject(saveUrl));
+        saveUrl = saveUrl.replace(/\?.*/ig, '');
+
+        var saveButton = subTab.find('.highlighted-link [href^="#save-"], .highlighted-link [value^="#save-"]').first();
+        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *') || isLoading) {
+            // select incorrect row handled by #goto-error
+            return;
+        }
+        isLoading = true;
+        loadingAnimation(saveButton);
+
+        $.ajax({
+            url: saveUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            success: function (data) {
+                saveButton.find('.squiggle').stop().remove();
+                isLoading = false;
+                if(typeof callback == 'function') {
+                    callback(data);
+                }
+            },
+            error: function () {
+                isLoading = false;
+                saveButton.find('.squiggle').stop().remove();
+            }
+        });
     }
     window.standardSave = standardSave;
 
@@ -717,13 +735,10 @@ $(document).ready(function () {
             evt.preventDefault();
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');
-            if(row.is('.pack-row')) {
-                window.activateMenu(Routing.generate('packs_edit', {pack: getRowId.apply(row)}));
+            row.find('.pack-icon').trigger('click');
+            if(row.is('.edit')) {
+                row.removeClass('edit').addClass('read-only');
             }
-            else if (row.is('.ss_group-row')) {
-                window.activateMenu(Routing.generate('groups_edit', {group: getRowId.apply(row)}));
-            }
-            row.removeClass('edit').addClass('read-only');
         }
     });
 
@@ -834,7 +849,7 @@ $(document).ready(function () {
         var rows = tab.find('[class*="-row"].empty:not(.template)');
         rows.add(rows.next('.expandable')).removeClass('selected').addClass('removed');
         tab.find('[class*="-row"].edit').removeClass('edit remove-confirm').addClass('read-only');
-        standardSave.apply(tab, [{}]);
+        resultsSave.apply(tab, [{}]);
     });
 
     var validationTimeout = null;
@@ -988,13 +1003,17 @@ $(document).ready(function () {
         loadResults.apply(admin);
     });
 
-    body.on('click', 'a[href="#goto-error"]', function (evt) {
-        evt.preventDefault();
+    function gotoError () {
         var invalid = $(this).parents('.results').find('.invalid .invalid:has(input, select, textarea)').first();
         invalid.scrollintoview(DASHBOARD_MARGINS).addClass('pulsate');
         invalid.find('input, select, textarea').focus().one('change', function () {
             $(this).parents('.pulsate').removeClass('pulsate');
         });
+    }
+
+    body.on('click', 'a[href="#goto-error"]', function (evt) {
+        evt.preventDefault();
+        gotoError.apply(this);
     });
 
 

@@ -1137,10 +1137,10 @@ en-todo,
     width: 16px;
     height: 16px;
     outline: 0;
-    border:2px solid #555555;
+    border:1px solid #BBB;
     background: #FFF;
     margin:0 5px;
-    border-radius: 2px;
+    border-radius: 1px;
     vertical-align: middle;
     transition: opacity ease-in-out .15s, border-color ease-in-out .15s, background-color ease-in-out .15s;
 }
@@ -1160,15 +1160,15 @@ en-todo:after,
 .checkbox-inline input[type=checkbox]~i:after
 {
     content: ' ';
-    top: -7px;
-    left: -3px;
+    top: -4px;
+    left: -2px;
     width: 24px;
     height: 24px;
     text-align: center;
     position: absolute;
-    background: url(../images/menu_new_compressed.png) no-repeat -11px -2916px transparent;
+    background: url(../images/menu_new_compressed.png) no-repeat center -2916px transparent;
     display:block;
-    border-radius: 2px;
+    border-radius: 1px;
     opacity: 0;
     transition: opacity ease-in-out .15s, border-color ease-in-out .15s, background-color ease-in-out .15s;
 }

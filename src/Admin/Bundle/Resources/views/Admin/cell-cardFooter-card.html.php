@@ -19,7 +19,7 @@ $retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
 
 $isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
 if($isSummary) {
-    $retentionDate = $httpRequest->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
+    $retentionDate = $httpRequest->cookies->get(implode('', ['retention_', $request['pack-id']]));
 }
 else {
     $retentionDate = $httpRequest->cookies->get('retention');

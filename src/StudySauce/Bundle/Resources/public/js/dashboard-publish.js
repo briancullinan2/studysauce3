@@ -65,7 +65,7 @@ $(document).ready(function () {
                 field.data('publish', publish);
                 field.filter('select').val('GROUP').data('oldValue', 'GROUP').trigger('change');
                 field.closest('.panel-pane').find('[class*="-row"].edit').removeClass('edit').addClass('read-only');
-                standardSave.apply(field, [assignSubKey({pack: {status: 'GROUP', id: packId.replace('pack-', '')}}, 'pack[properties]', publish)]);
+                resultsSave.apply(field, [assignSubKey({pack: {status: 'GROUP', id: packId.replace('pack-', '')}}, 'pack[properties]', publish)]);
             });
         });
     }

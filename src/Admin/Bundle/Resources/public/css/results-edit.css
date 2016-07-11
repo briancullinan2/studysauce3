@@ -23,11 +23,17 @@
     width:45%;
 }
 
-[class*="-edit"] [class*="-row"] > [class^="id"]:before {
+[class*="-edit"]:before {
     content: " ";
     display: inline-block;
-    padding-bottom: 100%;
+    padding-top: 10%;
     position: static;
+    vertical-align: middle;
+}
+
+[class*="-edit"] .results {
+    display:inline-block;
+    width:100%;
 }
 
 [class*="-edit"] [class*="-row"] > [class^="id"] {

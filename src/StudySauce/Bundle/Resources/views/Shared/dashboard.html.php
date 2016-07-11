@@ -34,6 +34,7 @@ if(empty($request->get('_route')) && $request->get('_format') == 'tab') {
         }
     }
 }
+$hasSubKey = false;
 if(!empty($request->get('_route'))) {
     $pane = explode('_', $request->get('_route'))[0];
     $route = $collection->get($request->get('_route'));
@@ -41,7 +42,11 @@ if(!empty($request->get('_route'))) {
     foreach($route->getRequirements() as $r => $regex) {
         if ($r != '_format') {
             $pane .= '-' . $r . $request->attributes->get('_route_params')[$r];
+            $hasSubKey = true;
         }
+    }
+    if(!$hasSubKey) {
+        $pane = $request->get('_route');
     }
 }
 if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_format') == 'funnel' ||
@@ -125,9 +130,9 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         $view['slots']->output('javascripts');
         $view['slots']->stop();
         $view['slots']->start('javascripts');
-        foreach ($view['assetic']->javascripts(['@dashboard_scripts'],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
+        foreach ($view['assetic']->javascripts(['@dashboard_scripts'],[],['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
             <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-        <?php endforeach;
+        <?php }
         ?><script type="text/javascript" src="<?php print ($view['router']->generate('template')); ?>"></script><?php
         $view['slots']->output('tmp-javascripts');
         $view['slots']->stop();
@@ -138,9 +143,10 @@ if($app->getRequest()->get('_format') == 'index' || $app->getRequest()->get('_fo
         $view['slots']->output('javascripts');
         $view['slots']->stop();
         $view['slots']->start('javascripts');
-        foreach ($view['assetic']->javascripts(['@funnel',],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
+        foreach ($view['assetic']->javascripts(['@funnel',],[],['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
             <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-        <?php endforeach;
+        <?php }
+        ?><script type="text/javascript" src="<?php print ($view['router']->generate('template')); ?>"></script><?php
         $view['slots']->output('tmp-javascripts');
         $view['slots']->stop();
     }

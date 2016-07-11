@@ -92,11 +92,6 @@
     background: #EEEEEE;
 }
 
-.pane-content form > .highlighted-link:last-child {
-    /* margin: 0 -20px; */
-    padding: 20px;
-}
-
 .pane-content h4,
 .pane-content h2
 {

@@ -320,7 +320,7 @@ $(document).ready(function () {
         // save at most every 2 seconds, don't autosave from admin lists
         if (autoSaveTimeout === null && $('.panel-pane[id^="packs-"]:visible').length > 0) {
             autoSaveTimeout = setTimeout(function () {
-                standardSave.apply(tab, [{}]);
+                resultsSave.apply(tab, [{}]);
                 autoSaveTimeout = null;
             }, 2000);
         }
@@ -336,7 +336,7 @@ $(document).ready(function () {
             var id = getTabId.apply(results);
             window.activateMenu(Routing.generate('packs_edit', {pack: id}));
             // save cards next!
-            standardSave.apply(tab.find('.card-list .results'), [{}]);
+            resultsSave.apply(tab.find('.card-list .results'), [{}]);
             loadResults.apply(tab.find('.group-list .results'));
         }
         var loaded = body.find('#packs'); // only top level packs page because packs cannot affect other pack pages
@@ -476,6 +476,9 @@ $(document).ready(function () {
             card: applyEntityObj({table: 'card', id: cardId}),
             results: {user_pack: [$.extend(user.getUserPack({id: request['pack-id']}), {user: user})]}
         });
+
+        // remove read-only from the last time it was saved
+        tab.find('.card-row').removeClass('read-only');
 
         // default focus on short answer cards
         if(tab.find('.type-sa').length > 0) {

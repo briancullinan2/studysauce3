@@ -1,4 +1,4 @@
-#register .pane-content
+[id^="register"] .pane-content
 {
     text-align: center;
 }
@@ -71,7 +71,7 @@ a[href="#sign-in-with-email"]
     padding-top:100px;
 }
 
-#register form
+[id^="register"] form
 {
     max-width: 600px;
     margin:0 auto;
@@ -115,36 +115,42 @@ a[href="#sign-in-with-email"]
     margin:0 -4px;
 }
 
-#register .first-name,
-#register .last-name
+[id^="register"] .first-name,
+[id^="register"] .last-name
 {
     margin: 0 -2px;
-    padding-right: 2px;
+    padding-right: 3px;
     width: 50%;
     max-width: 300px;
     display:inline-block;
+    padding-bottom:5px;
 }
 
-#register .first-name label,
-#register .last-name label
-{
-    margin-bottom:0;
-}
-
-#register .last-name
+[id^="register"] .last-name
 {
     padding-right:0;
     padding-left:2px;
 }
 
-#register .email,
-#register .password,
+[id^="register"] .hasChild {
+    float:left;
+}
+
+[id^="register"] .email,
+[id^="register"] .password,
+[id^="register"] .highlighted-link:last-child,
+[id^="register"] .parent,
+[id^="register"] .year,
+[id^="register"] .school,
 #login .email,
-#login .password
+#login .password,
+#login  .highlighted-link:last-child
 {
     width: auto;
     margin: 0 auto;
     max-width: 600px;
+    padding-bottom:5px;
+    display:block;
 }
 
 #account .password,
@@ -187,11 +193,11 @@ a[href="#sign-in-with-email"]
 
 #reset .form-actions .error,
 #login .form-actions .error,
-#register .form-actions .error,
+[id^="register"] .form-actions .error,
 #account .form-actions .error,
 #account .invalid-only,
 #login .invalid-only,
-#register .invalid-only
+[id^="register"] .invalid-only
 {
     clear: both;
     position: relative;
@@ -203,14 +209,14 @@ a[href="#sign-in-with-email"]
 
 #login .invalid-only,
 #account .invalid-only,
-#register .invalid-only
+[id^="register"] .invalid-only
 {
     display:none;
 }
 
 #login.invalid-only .invalid-only,
 #account.invalid-only .invalid-only,
-#register.invalid-only .invalid-only
+[id^="register"].invalid-only .invalid-only
 {
     display:inline-block;
 }
@@ -223,17 +229,17 @@ a[href="#sign-in-with-email"]
 #account.invalid-only.confirm-required .confirm-password input,
 #login.invalid-only.email-required .email input,
 #login.invalid-only.password-required .password input,
-#register.invalid-only.first-required .first-name input,
-#register.invalid-only.last-required .last-name input,
-#register.invalid-only.email-required .email input,
-#register.invalid-only.password-required .password input
+[id^="register"].invalid-only.first-required .first-name input,
+[id^="register"].invalid-only.last-required .last-name input,
+[id^="register"].invalid-only.email-required .email input,
+[id^="register"].invalid-only.password-required .password input
 {
     border-bottom:3px solid #CC0000;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
 
-#register .form-actions a[href*="/logout"],
+[id^="register"] .form-actions a[href*="/logout"],
 #login .form-actions a[href*="/logout"] {
     max-width: 280px;
     float:left;
@@ -286,12 +292,12 @@ a[href="#sign-in-with-email"]
         max-width: 130px;
     }
 
-    #register form
+    [id^="register"] form
     {
         padding-top: 40px;
     }
 
-    #register .first-name, #register .last-name
+    [id^="register"] .first-name, [id^="register"] .last-name
     {
         margin:0;
         width:100%;
