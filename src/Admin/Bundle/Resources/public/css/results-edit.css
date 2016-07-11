@@ -29,11 +29,13 @@
     padding-top: 10%;
     position: static;
     vertical-align: middle;
+    margin-right:-6px;
 }
 
 [class*="-edit"] .results {
     display:inline-block;
     width:100%;
+    vertical-align: middle;
 }
 
 [class*="-edit"] [class*="-row"] > [class^="id"] {

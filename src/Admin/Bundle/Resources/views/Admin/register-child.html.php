@@ -75,7 +75,7 @@ if($tab->length > 0) {
     foreach($invites as $i) {
         $invite = applyEntityObj($i);
         /** @var Invite $invite */
-        if($invite->getGroup()->getId() == $yearVal) {
+        if($invite->getGroup()->getParent()->getId() == $yearVal) {
             $schoolStr = implode('', [$schoolStr, '<option value="' , $invite->getCode() , '">' , $invite->getGroup()->getName() , '</option>']);
         }
     }
