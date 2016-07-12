@@ -92,9 +92,6 @@ $(document).ready(function () {
         }
 
         var panel = $('#' + key + '.panel-pane'),
-            panelIds = body.find('.panel-pane').map(function () {
-                return $(this).attr('id');
-            }).toArray(),
             item = body.find('.main-menu a[href$="' + subPath + '"]').first();
 
         // activate the menu
@@ -147,7 +144,10 @@ $(document).ready(function () {
                 type: 'GET',
                 dataType: 'text',
                 success: function (tab) {
-                    var content = $(tab),
+                    var panelIds = body.find('.panel-pane').map(function () {
+                            return $(this).attr('id');
+                        }).toArray(),
+                        content = $(tab),
                         panes = content.filter('.panel-pane'),
                         styles = ssMergeStyles(content),
                         scripts = ssMergeScripts(content);
@@ -165,19 +165,20 @@ $(document).ready(function () {
                         });
                         panes.hide().insertBefore(body.find('.footer'));
                         content.not(panes).insertBefore(body.find('.footer'));
-                        var newPane = content.filter('#' + key);
-                        if (newPane.length == 0) {
-                            newPane = content.filter('.panel-pane').first();
-                        }
-                        item.find('.squiggle').stop().remove();
-                        var triggerShow = setInterval(function () {
-                                if (window.sincluding.length == 0) {
-                                    clearInterval(triggerShow);
-                                    activatePanel(newPane);
-                                }
-                        }, 50);
-
                     }
+
+                    // show the new panel
+                    var newPane = body.find('#' + key);
+                    if (newPane.length == 0) {
+                        newPane = content.filter('.panel-pane').first();
+                    }
+                    item.find('.squiggle').stop().remove();
+                    var triggerShow = setInterval(function () {
+                        if (window.sincluding.length == 0) {
+                            clearInterval(triggerShow);
+                            activatePanel(newPane);
+                        }
+                    }, 50);
                 },
                 error: function () {
                     item.find('.squiggle').stop().remove();
