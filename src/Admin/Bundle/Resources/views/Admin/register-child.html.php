@@ -50,7 +50,7 @@ if($tab->length > 0) {
     $parentVal = $tab->find('.parent select')->val();
     $year = $tab->find('.year select');
     $yearVal = $year->val();
-    $school = $tab->find('.school select');
+    $school = $tab->find('._code select');
     $schoolVal = $school->val();
 
     $publicGroups = $tab->data('groups');
@@ -58,6 +58,7 @@ if($tab->length > 0) {
     $yearStr = '';
     $schoolStr = '';
     $visited = [];
+    $codes = [];
     foreach($publicGroups as $g) {
         /** @var Group $group */
         $group = applyEntityObj($g);
@@ -77,11 +78,18 @@ if($tab->length > 0) {
                         break;
                     }
                 }
+                $codes[count($codes)] = $code;
                 $schoolStr = implode('', [$schoolStr, '<option value="' , $code , '">' , $group->getName() , '</option>']);
             }
         }
     }
-
+    foreach($invites as $i) {
+        $invite = applyEntityObj($i);
+        /** @var Invite $invite */
+        if($invite->getGroup()->getId() == $yearVal && !in_array($invite->getCode(), $codes)) {
+            $schoolStr = implode('', [$schoolStr, '<option value="' , $invite->getCode() , '">' , $invite->getGroup()->getName() , '</option>']);
+        }
+    }
 
     // update list of groups
     $year->find('option:not(:first-of-type)')->remove();
@@ -116,9 +124,9 @@ else {
                     <input type="hidden" name="_code" value="<?php print ($code); ?>"/>
                 <?php } ?>
                 <input type="hidden" name="_remember_me" value="on"/>
-                <label class="input first-name"><input type="text" name="childFirst" placeholder="Child first name"
+                <label class="input childFirst"><input type="text" name="childFirst" placeholder="Child first name"
                                                        value="<?php print (isset($first) ? $first : ''); ?>"></label>
-                <label class="input last-name"><input type="text" name="childLast" placeholder="Child last name"
+                <label class="input childLast"><input type="text" name="childLast" placeholder="Child last name"
                                                       value="<?php print (isset($last) ? $last : ''); ?>"></label>
                 <input type="hidden" name="csrf_token" value="<?php print ($csrf_token); ?>"/>
                 <label class="input parent"><select name="parent">
@@ -128,13 +136,13 @@ else {
                 <label class="input year"><select name="year">
                         <option value="">- Select child&rsquo;s school year -</option>
                     </select></label>
-                <label class="input school"><select name="school">
+                <label class="input _code"><select name="_code">
                         <option value="">- Select child&rsquo;s school name -</option>
                     </select>
                 </label>
                 <div class="form-actions highlighted-link invalid">
                     <label class="checkbox hasChild"><input name="hasChild" type="checkbox" value="true" <?php print ($hasChild ? 'checked="checked"' : ''); ?>><i></i><span>Register another child</span></label>
-                    <div class="invalid-only">You must complete all fields before moving on.</div>
+                    <div class="invalid-error">You must complete all fields before moving on.</div>
                     <a href="<?php print ($view['router']->generate('home')); ?>">Cancel</a>
                     <button type="submit" value="#save-user"
                             class="more"><?php print ($hasChild ? 'Next' : 'Done'); ?></button>

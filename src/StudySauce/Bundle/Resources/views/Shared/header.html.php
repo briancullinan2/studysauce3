@@ -55,6 +55,7 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
                     <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
                     <?php } ?>
                     <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
+                    <li><a href="<?php print $view['router']->generate('store'); ?>"><span>&nbsp;</span>Store</a></li>
                     <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
                     <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>
                     <li><a href="<?php print $view['router']->generate('activity'); ?>"><span>&nbsp;</span>Activity</a></li>

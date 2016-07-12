@@ -853,7 +853,7 @@ $(document).ready(function () {
     });
 
     var validationTimeout = null;
-    body.on('change keyup keydown', '.results [class*="-row"] input, .results [class*="-row"] select, .results [class*="-row"] textarea', function (evt) {
+    function standardChangeHandler (evt) {
         var that = $(evt.target);
         // do not autosave from selectize because the input underneath will change
         if (that.parents('.selectize-input').length > 0) {
@@ -880,7 +880,9 @@ $(document).ready(function () {
         validationTimeout = setTimeout(function () {
             that.trigger('validate');
         }, 100);
-    });
+    }
+    window.standardChangeHandler = standardChangeHandler;
+    body.on('change keyup keydown', '.results [class*="-row"] input, .results [class*="-row"] select, .results [class*="-row"] textarea', standardChangeHandler);
 
     body.on('click', '.results a[href^="#switch-view-"]', function (evt) {
         evt.preventDefault();

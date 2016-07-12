@@ -49,116 +49,10 @@ if($tab->length > 0) {
 }
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="packs<?php print ($entity !== null ? implode('', [method_exists($entity, 'getTitle') ? '-pack' : '-group' , intval($entity->getId())]) : ''); ?>">
+    <div class="panel-pane" id="store">
         <div class="pane-content">
-            <?php if ($entity !== null && method_exists($entity, 'getTitle')) { ?>
-                <form action="<?php print ($view['router']->generate('packs_create')); ?>" class="pack-edit">
-                    <?php
-                    $tables = (array)(new stdClass());
-                    $tables['pack'] = [
-                        'idEdit' => ['modified', 'created', 'id', 'logo'],
-                        'name' => ['title'],
-                        '1' => 'status',
-                        '2' => ['group','groups', 'user','userPacks.user'],
-                        '3' => 'properties',
-                        'actions' => []];
-                    $request = [
-                        // view settings
-                        'tables' => $tables,
-                        'headers' => ['pack' => 'packPacks'],
-                        'footers' => ['pack' => 'packPacks'],
-                        'new' => $isNew,
-                        'edit' => $isNew,
-                        // search settings
-                        'pack-id' => $entity->getId(),
-                        'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
-                        // for new=true the template generates the -count number of empty rows, and no database query is performed
-                        'count-pack' => 1,
-                        'count-card' => -1
-                    ];
-                    if($tab->length == 0) {
-                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
-                    }
-                    ?>
-                </form>
-                <div class="group-list">
-                    <?php
-                    $tables = (array)(new stdClass());
-                    $tables['file'] = AdminController::$defaultMiniTables['file'];
-                    $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'groups'];
-                    $tables['user_pack'] = ['user', 'removed', 'downloaded'];
-                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo'], 'expandMembers' => ['userPacks'], '2' => ['status'] /* search field but don't display a template */];
-                    $tables['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
-                    $request = [
-                        // view settings
-                        'tables' => $tables,
-                        'classes' => ['last-right-expand'],
-                        'headers' => ['pack' => 'createSubGroups'],
-                        'footers' => false,
-                        'edit' => false,
-                        'new' => $isNew,
-                        'read-only' => false,
-                        // search settings
-                        'pack-id' => $isNew ? '0' : $entity->getId(),
-                        'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
-                        'parent-ss_group-deleted' => null,
-                        'ss_group-deleted' => false,
-                        'count-ss_group' => $isNew ? -1 : 0,
-                        'count-pack' => $isNew ? -1 : 1,
-                        'count-ss_user' => -1,
-                        'count-file' => -1,
-                        'count-user_pack' => -1,
-                    ];
-                    if($tab->length == 0) {
-                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
-                    }
-                    else {
-                        $tab->find('.group-list .results')->data('request', $request)->attr('data-request', json_encode($request));
-                    }
-                    ?>
-                    <div class="empty-members">
-                        <div>Select name on the left to see group members</div>
-                    </div>
-                </div>
-                <form action="<?php print ($view['router']->generate('packs_create', ['pack' => ['id' => $entity->getId()]])); ?>" <?php print (empty($entity->getId()) ? 'name="pack[cards]"' : ''); ?> class="card-list">
-                    <?php
-                    $newCards = true;
-                    foreach($entity->getCards()->toArray() as $c) {
-                        /** @var Card $c */
-                        if(!$c->getDeleted()) {
-                            $newCards = false;
-                            break;
-                        }
-                    }
-                    $tables = (array)(new stdClass());
-                    $tables['pack'] = ['id' => ['id']];
-                    $tables['card'] = ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], '0' => ['pack'], 'actions' => ['deleted']];
-                    $tables['answer'] = ['id' => ['value', 'deleted', 'correct', 'content', 'id']];
-                    $request = [
-                        // view settings
-                        'tables' => $tables,
-                        'expandable' => ['card' => ['preview']],
-                        'headers' => ['card' => 'packCards'],
-                        'footers' => ['card' => 'packCards'],
-                        'new' => $newCards,
-                        'edit' => $isNew,
-                        // search settings
-                        'pack-id' => $entity->getId(),
-                        // for new=true the template generates the -count number of empty rows, and no database query is performed
-                        'count-pack' => -1,
-                        'count-answer' => -1,
-                        'count-card' => $newCards ? 5 : 0,
-                    ];
-                    if($tab->length == 0) {
-                        print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
-                    }
-                    ?>
-                </form>
-                <?php
-            }
-            else {
-
-                if(count($user->getGroups()->toArray()) > 1) {
+            <?php
+                /* if(count($user->getGroups()->toArray()) > 1) {
                     $tiles = [
                         'file' => ['id', 'url'],
                         'ss_user' => ['id' => ['id', 'userPacks']],
@@ -202,23 +96,21 @@ $view['slots']->start('body'); ?>
                     if ($tab->length == 0) {
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                     }
-                }
+                } */
 
                 $request = (array)(new stdClass());
                 if(empty($entity)) {
                     $request['count-file'] = -1;
-                    $request['count-pack'] = 0;
+                    $request['count-pack'] = -1;
+                    $request['count-coupon'] = 0;
                     $request['count-card'] = -1;
                     $request['count-ss_group'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
-                    $request['notInGroup'] = true;
-                    $request['ss_user-id'] = $user->getId();
-                    $request['user_pack-removed'] = false;
-                    $request['userPacks-user_pack-removed'] = null;
                     $request['read-only'] = false;
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
+                    $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs']];
                     $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
                     $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
@@ -230,17 +122,16 @@ $view['slots']->start('body'); ?>
                 }
                 else {
                     $request['count-file'] = -1;
-                    $request['count-pack'] = 0;
+                    $request['count-pack'] = -1;
+                    $request['count-coupon'] = 0;
                     $request['count-card'] = -1;
                     $request['count-ss_group'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
                     $request['read-only'] = false;
-                    $request['ss_user-id'] = $user->getId();
-                    $request['userPacks-user_pack-removed'] = null;
-                    $request['ss_group-id'] = $entity->getId();
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
+                    $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs']];
                     $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
                     $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
@@ -252,8 +143,7 @@ $view['slots']->start('body'); ?>
                 }
                 if ($tab->length == 0) {
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
-                }
-            } ?>
+                } ?>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>

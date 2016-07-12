@@ -48,9 +48,9 @@ else {
                     <input type="hidden" name="_code" value="<?php print ($code); ?>"/>
                 <?php } ?>
                 <input type="hidden" name="_remember_me" value="on"/>
-                <label class="input first-name"><input type="text" name="first" placeholder="<?php print ($hasChild ? 'Parent first' : 'First'); ?> name"
+                <label class="input first"><input type="text" name="first" placeholder="<?php print ($hasChild ? 'Parent first' : 'First'); ?> name"
                                             value="<?php print (isset($first) ? $first : ''); ?>"></label>
-                <label class="input last-name"><input type="text" name="last" placeholder="<?php print ($hasChild ? 'Parent last' : 'Last'); ?> name"
+                <label class="input last"><input type="text" name="last" placeholder="<?php print ($hasChild ? 'Parent last' : 'Last'); ?> name"
                                             value="<?php print (isset($last) ? $last : ''); ?>"></label>
                 <label class="input email"><input type="text" name="email" placeholder="Email"
                                             value="<?php print (isset($email) ? $email : ''); ?>"></label>
@@ -59,7 +59,7 @@ else {
                 <input type="hidden" name="csrf_token" value="<?php print ($csrf_token); ?>"/>
                 <div class="form-actions highlighted-link invalid">
                     <label class="checkbox hasChild"><input name="hasChild" type="checkbox" value="true" <?php print ($hasChild ? 'checked="checked"' : ''); ?>><i></i><span>A child will be using this account</span></label>
-                    <div class="invalid-only">You must complete all fields before moving on.</div>
+                    <div class="invalid-error">You must complete all fields before moving on.</div>
                     <button type="submit" value="#save-user" class="more"><?php print ($hasChild ? 'Next' : 'Register'); ?></button>
                 </div>
             </form>

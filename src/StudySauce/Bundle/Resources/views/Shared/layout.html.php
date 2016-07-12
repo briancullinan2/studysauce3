@@ -72,8 +72,8 @@ $collection = $router->getRouteCollection();
                 35 => ['#remove-', '/packs/remove', '/command/save/group?remove', '.remove-icon'],
                 52 => ['/logout'],
                 -52 => ['/logout'],
-                99 => ['/account'],
-                -99 => ['/account'],
+                99 => ['/register/child'],
+                -99 => ['/register/child'],
                 17 => ['/?_switch_user=_exit'],
                 -17 => ['/?_switch_user=_exit']
             ],

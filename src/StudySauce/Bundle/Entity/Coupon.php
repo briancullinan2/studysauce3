@@ -35,10 +35,12 @@ class Coupon
     protected $group;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Pack", inversedBy="coupons")
-     * @ORM\JoinColumn(name="pack_id", referencedColumnName="id", nullable=true)
+     * @ORM\ManyToMany(targetEntity="Pack")
+     * @ORM\JoinTable(name="coupon_pack",
+     *      joinColumns={@ORM\JoinColumn(name="pack_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="coupon_id", referencedColumnName="id")})
      */
-    protected $pack;
+    protected $packs;
 
     /**
      * @ORM\Column(type="array", name="options", nullable=true)
@@ -391,5 +393,39 @@ class Coupon
     public function getPack()
     {
         return $this->pack;
+    }
+
+    /**
+     * Add pack
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $pack
+     *
+     * @return Coupon
+     */
+    public function addPack(\StudySauce\Bundle\Entity\Pack $pack)
+    {
+        $this->packs[] = $pack;
+
+        return $this;
+    }
+
+    /**
+     * Remove pack
+     *
+     * @param \StudySauce\Bundle\Entity\Pack $pack
+     */
+    public function removePack(\StudySauce\Bundle\Entity\Pack $pack)
+    {
+        $this->packs->removeElement($pack);
+    }
+
+    /**
+     * Get packs
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPacks()
+    {
+        return $this->packs;
     }
 }

@@ -4,52 +4,47 @@ jQuery(document).ready(function() {
 
     function getHash()
     {
-        var account = jQuery('#register');
-        return account.find('.first-name input').val().trim() + account.find('.last-name input').val().trim() +
-                account.find('.email input').val().trim() + account.find('.password input').val().trim();
+        var account = $(this);
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
+        var hash = '';
+        for(var h in data) {
+            if(data.hasOwnProperty(h)) {
+                hash += data[h];
+            }
+        }
+        return hash;
     }
 
     function accountFunc() {
-        var account = jQuery('#register');
+        var account = $(this);
         var valid = true;
-        if (account.find('.first-name input').val() == '') {
-            account.addClass('first-required');
-        }
-        else {
-            account.removeClass('first-required');
-        }
-        if(account.find('.last-name input').val() == '') {
-            account.addClass('last-required');
-        }
-        else {
-            account.removeClass('last-required');
-        }
-        if(account.find('.email input').val().trim() == '' ||
-            !(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(account.find('.email input').val())) {
-            account.addClass('email-required');
-        }
-        else {
-            account.removeClass('email-required');
-        }
-        if(account.find('.password input').val() == '') {
-            account.addClass('password-required');
-        }
-        else {
-            account.removeClass('password-required');
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast', 'parent', 'year']]);
+        for(var d in data) {
+            if(data.hasOwnProperty(d)) {
+                if(data[d] == '') {
+                    account.find('label.' + d).addClass('invalid');
+                }
+                else {
+                    account.find('label.' + d).removeClass('invalid');
+                }
+                if(d == 'email') {
+                    if(!(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(account.find('.email input').val())) {
+                        account.find('label.' + d).addClass('invalid');
+                    }
+                }
+            }
         }
 
-        if (getHash() == account.data('state') || account.is('.first-required') || account.is('.last-required') ||
-            account.is('.email-required') || account.is('.password-required'))
+        if (getHash.apply(this) == account.data('state') || account.find('label.input.invalid').length > 0)
             account.find('.form-actions').removeClass('valid').addClass('invalid');
         else {
             account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
             account.find('.form-actions .error').remove();
         }
     }
-    body.on('show', '#register', function () {
+    body.on('show', '[id^="register"]', function () {
         if($(this).data('state') == null)
-            $(this).data('state', getHash());
-        accountFunc();
+            $(this).data('state', getHash.apply(this));
     });
 
     body.on('change', '[id^="register"] .hasChild input, #register_child select', function () {
@@ -58,25 +53,33 @@ jQuery(document).ready(function() {
         window.views.render.apply(tab, [tab.attr('id'), {context: tab}]);
     });
 
-    body.on('change keyup keydown', '#register .first-name input, #register .last-name input, #register .email input, #register .password input', accountFunc);
+    body.on('validate', '[id^="register"]', accountFunc);
+
+    body.on('change keyup keydown', '[id^="register"] input, [id^="register"] select, [id^="register"] textarea', standardChangeHandler);
 
     body.on('click', '#register a[href="#sign-in-with-email"]', function (evt) {
         var account = jQuery('#register');
         evt.preventDefault();
         $(this).remove();
         account.find('form').show();
-        accountFunc();
+        accountFunc.apply(this);
     });
 
-    body.on('submit', '#register form', function (evt) {
-        var account = jQuery('#register');
+    body.on('submit', '[id^="register"] form', function (evt) {
+        var account = $(this).parents('.panel-pane');
         evt.preventDefault();
-        var hash = getHash();
+        var hash = getHash.apply(this);
         var data = gatherFields.apply($(this), [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
+        account.trigger('validate');
+        if(account.find('.highlighted-link').is('.invalid')) {
+            account.addClass('invalid has-error');
+        }
+        else {
+            account.removeClass('invalid has-error');
+        }
         standardSave.apply($(this), [data, function () {
             account.data('state', hash);
         }]);
-        $(this).find('.form-actions').removeClass('invalid').addClass('valid');
     });
 
     function resetFunc() {

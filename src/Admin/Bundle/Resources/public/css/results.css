@@ -458,35 +458,35 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     display:inline-block;
 }
 
-.results .invalid-error [class*="-error"] {
+.invalid-error [class*="-error"] {
     display:none;
 }
 
-.results .invalid-error {
+.invalid-error {
     display:none;
     color: #CC2211;
     font-weight:bold;
     vertical-align: middle;
 }
 
-.results.has-error .invalid-error {
+.has-error .invalid-error {
     display:inline-block;
     visibility: visible;
     opacity: 1;
 }
 
-.results [class*="-row"].invalid .invalid textarea,
-.results [class*="-row"].invalid .invalid input,
-.results [class*="-row"].invalid .invalid select {
+.invalid label.input.invalid textarea,
+.invalid label.input.invalid input,
+.invalid label.input.invalid select {
     border-color:#CC2211;
     padding-right:30px;
 }
 
-.results [class*="-row"].invalid .invalid {
+.invalid label.input.invalid {
     position:relative;
 }
 
-.results [class*="-row"].invalid .invalid:after {
+.invalid label.input.invalid:after {
     background: #CC2211;
     color: white;
     content: "!";
@@ -504,7 +504,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     cursor: pointer;
 }
 
-.results [class*="-row"].invalid .invalid.pulsate:after {
+.invalid label.input.invalid.pulsate:after {
     -webkit-animation-name: pulsate;
     -webkit-animation-duration: 1s;
     -webkit-animation-timing-function: ease-in-out;

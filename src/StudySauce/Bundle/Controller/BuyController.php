@@ -39,7 +39,7 @@ class BuyController extends Controller
     ];
 
     public function storeAction() {
-
+        return $this->render('AdminBundle:Admin:store.html.php');
     }
 
     /**

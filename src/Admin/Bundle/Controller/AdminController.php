@@ -49,6 +49,7 @@ class AdminController extends Controller
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted', 'group']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
+        'coupon' => ['id' => ['name', 'description', 'packs']],
         'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content', 'id']
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
@@ -348,6 +349,7 @@ class AdminController extends Controller
                 return $qb;
             }
         }
+        // TODO: move packs code from getPacksForUser
         return $qb;
     }
 

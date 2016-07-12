@@ -229,7 +229,7 @@ $collection->add(
     'register_child',
     new Route(
         '/register/child/{_format}',
-        ['_controller' => 'StudySauceBundle:Account:registerChild', '_format' => 'funnel'],
+        ['_controller' => 'StudySauceBundle:Account:registerChild', '_format' => 'index'],
         ['_format' => 'funnel|tab']
     )
 );
@@ -332,6 +332,14 @@ $collection->add(
     new Route(
         '/packs/{_format}',
         ['_controller' => 'StudySauceBundle:Packs:index', '_format' => 'index'],
+        ['_format' => DASHBOARD_VIEWS]
+    )
+);
+$collection->add(
+    'store',
+    new Route(
+        '/store/{_format}',
+        ['_controller' => 'StudySauceBundle:Buy:store', '_format' => 'index'],
         ['_format' => DASHBOARD_VIEWS]
     )
 );

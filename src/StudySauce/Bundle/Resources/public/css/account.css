@@ -93,8 +93,8 @@ a[href="#sign-in-with-email"]
 #account .new-password label span,
 #account .confirm-password label span,
 #account .email label span,
-#account .first-name label span,
-#account .last-name label span
+#account .first label span,
+#account .last label span
 {
     width:100%;
     display:inline-block;
@@ -107,16 +107,18 @@ a[href="#sign-in-with-email"]
 #account .new-password label input,
 #account .confirm-password label input,
 #account .email label input,
-#account .first-name label input,
-#account .last-name label input
+#account .first label input,
+#account .last label input
 {
     width:50%;
     display:inline-block;
     margin:0 -4px;
 }
 
-[id^="register"] .first-name,
-[id^="register"] .last-name
+[id^="register"] .first,
+[id^="register"] .childFirst,
+[id^="register"] .last,
+[id^="register"] .childLast
 {
     margin: 0 -2px;
     padding-right: 3px;
@@ -126,7 +128,7 @@ a[href="#sign-in-with-email"]
     padding-bottom:5px;
 }
 
-[id^="register"] .last-name
+[id^="register"] .last
 {
     padding-right:0;
     padding-left:2px;
@@ -141,7 +143,7 @@ a[href="#sign-in-with-email"]
 [id^="register"] .highlighted-link:last-child,
 [id^="register"] .parent,
 [id^="register"] .year,
-[id^="register"] .school,
+[id^="register"] ._code,
 #login .email,
 #login .password,
 #login  .highlighted-link:last-child
@@ -189,54 +191,6 @@ a[href="#sign-in-with-email"]
 #account [value="#save-account"]
 {
     display: none;
-}
-
-#reset .form-actions .error,
-#login .form-actions .error,
-[id^="register"] .form-actions .error,
-#account .form-actions .error,
-#account .invalid-only,
-#login .invalid-only,
-[id^="register"] .invalid-only
-{
-    clear: both;
-    position: relative;
-    padding: 2px 3px;
-    border: 2px solid #CC0000;
-    color:#660000;
-    border-radius: 5px;
-}
-
-#login .invalid-only,
-#account .invalid-only,
-[id^="register"] .invalid-only
-{
-    display:none;
-}
-
-#login.invalid-only .invalid-only,
-#account.invalid-only .invalid-only,
-[id^="register"].invalid-only .invalid-only
-{
-    display:inline-block;
-}
-
-#account.invalid-only.password-required .password input,
-#account.invalid-only.new-password-required .new-password input,
-#account.invalid-only.first-required .first-name input,
-#account.invalid-only.last-required .last-name input,
-#account.invalid-only.email-required .email input,
-#account.invalid-only.confirm-required .confirm-password input,
-#login.invalid-only.email-required .email input,
-#login.invalid-only.password-required .password input,
-[id^="register"].invalid-only.first-required .first-name input,
-[id^="register"].invalid-only.last-required .last-name input,
-[id^="register"].invalid-only.email-required .email input,
-[id^="register"].invalid-only.password-required .password input
-{
-    border-bottom:3px solid #CC0000;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
 }
 
 [id^="register"] .form-actions a[href*="/logout"],
@@ -297,7 +251,7 @@ a[href="#sign-in-with-email"]
         padding-top: 40px;
     }
 
-    [id^="register"] .first-name, [id^="register"] .last-name
+    [id^="register"] .first, [id^="register"] .last
     {
         margin:0;
         width:100%;
@@ -310,8 +264,8 @@ a[href="#sign-in-with-email"]
     #account .new-password label span,
     #account .confirm-password label span,
     #account .email label span,
-    #account .first-name label span,
-    #account .last-name label span
+    #account .first label span,
+    #account .last label span
     {
         display:block;
         width:auto;
@@ -323,8 +277,8 @@ a[href="#sign-in-with-email"]
     #account .new-password label input,
     #account .confirm-password label input,
     #account .email label input,
-    #account .first-name label input,
-    #account .last-name label input
+    #account .first label input,
+    #account .last label input
     {
         width:100%;
         margin: 0;

@@ -37,6 +37,11 @@ class Pack
     protected $groups;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Coupon", mappedBy="packs", fetch="EXTRA_LAZY")
+     */
+    protected $coupons;
+
+    /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="packs")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
      */
@@ -788,4 +793,38 @@ class Pack
     }
 
 
+
+    /**
+     * Add coupon
+     *
+     * @param \StudySauce\Bundle\Entity\Coupon $coupon
+     *
+     * @return Pack
+     */
+    public function addCoupon(\StudySauce\Bundle\Entity\Coupon $coupon)
+    {
+        $this->coupons[] = $coupon;
+
+        return $this;
+    }
+
+    /**
+     * Remove coupon
+     *
+     * @param \StudySauce\Bundle\Entity\Coupon $coupon
+     */
+    public function removeCoupon(\StudySauce\Bundle\Entity\Coupon $coupon)
+    {
+        $this->coupons->removeElement($coupon);
+    }
+
+    /**
+     * Get coupons
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCoupons()
+    {
+        return $this->coupons;
+    }
 }
