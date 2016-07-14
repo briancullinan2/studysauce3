@@ -23,10 +23,10 @@ foreach($results['coupon'] as $c) {
 
 $context = !empty($context) ? $context : jQuery($this);
 if(count($cart) > 0) {
-    $context->parents('body')->find('#welcome-message > a[href*="/store/cart"]')->text(count($cart));
+    $context->parents('body')->find('#welcome-message > a[href*="/cart"]')->text(count($cart));
 }
 else {
-    $context->parents('body')->find('#welcome-message > a[href*="/store/cart"]')->html('&nbsp;');
+    $context->parents('body')->find('#welcome-message > a[href*="/cart"]')->html('&nbsp;');
 }
 
 if(!empty($last)) { ?>

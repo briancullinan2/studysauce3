@@ -21,7 +21,7 @@
     background:transparent;
 }
 
-.header a[href*="/store/cart"]:not(.more):not(.btn):not(.cloak) {
+.header a[href*="/cart"]:not(.more):not(.btn):not(.cloak) {
     text-align: center;
     color: #F90;
     padding-left: 12px;

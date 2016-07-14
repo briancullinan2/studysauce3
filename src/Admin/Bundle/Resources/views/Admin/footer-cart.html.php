@@ -26,10 +26,10 @@ $httpRequest->cookies->set('cart', implode(',', $newCart));
 
 $context = !empty($context) ? $context : jQuery($this);
 if(count($cart) > 0) {
-    $context->parents('body')->find('#welcome-message > a[href*="/store/cart"]')->text(count($newCart));
+    $context->parents('body')->find('#welcome-message > a[href*="/cart"]')->text(count($newCart));
 }
 else {
-    $context->parents('body')->find('#welcome-message > a[href*="/store/cart"]')->html('&nbsp;');
+    $context->parents('body')->find('#welcome-message > a[href*="/cart"]')->html('&nbsp;');
 }
 
 ?>
