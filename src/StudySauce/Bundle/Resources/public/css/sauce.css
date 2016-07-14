@@ -217,13 +217,14 @@ h2
 }
 
 fieldset {
-    border: 1px solid #555555;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 1), inset 0 0 5px rgba(0, 0, 0, .25);
-    border-radius: 5px;
-    padding:0 10px 10px;
+    border: 1px solid #BBB;
+    box-shadow: none;
+    border-radius: 1px;
+    padding:0 15px 15px;
     min-width: 0;
     max-width: 100%;
     margin:0;
+    background: #EEE;
 }
 
 legend
@@ -232,10 +233,10 @@ legend
     color: inherit;
     width: auto;
     display: block;
-    border: 1px solid #555;
+    border: 1px solid #BBB;
     padding: 5px;
-    border-radius: 5px;
-    background: #eee;
+    border-radius: 1px;
+    background: #ddd;
     position: relative;
     top: 1px;
 }
