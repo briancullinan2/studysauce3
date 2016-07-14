@@ -43,12 +43,6 @@ jQuery(document).ready(function($) {
         var checkout = $('#checkout');
         var valid = false,
             valid2 = false;
-        if(checkout.find('input[name="reoccurs"]:checked').val().trim() == '') {
-            checkout.addClass('reoccurs-required');
-        }
-        else {
-            checkout.removeClass('reoccurs-required');
-        }
         if(checkout.find('#billing-pane .first-name input').val().trim() == '') {
             checkout.addClass('first-required');
         }
@@ -127,38 +121,6 @@ jQuery(document).ready(function($) {
         }
         else {
             checkout.removeClass('password-required');
-        }
-
-        // checked if everything is blank, that's ok too
-        if(!checkout.find('#gift-pane').is('.shown-by-default') &&
-            checkout.find('#gift-pane .first-name input').val().trim() == '' &&
-            checkout.find('#gift-pane .last-name input').val().trim() == '' &&
-            checkout.find('#gift-pane .email input').val().trim() == '') {
-
-            checkout.removeClass('gift-first-required');
-            checkout.removeClass('gift-last-required');
-            checkout.removeClass('gift-email-required');
-        }
-        else {
-            if(checkout.find('#gift-pane .first-name input').val().trim() == '') {
-                checkout.addClass('gift-first-required');
-            }
-            else {
-                checkout.removeClass('gift-first-required');
-            }
-            if(checkout.find('#gift-pane .last-name input').val().trim() == '') {
-                checkout.addClass('gift-last-required');
-            }
-            else {
-                checkout.removeClass('gift-last-required');
-            }
-            if(checkout.find('#gift-pane .email input').val().trim() == '' ||
-                !(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(checkout.find('#gift-pane .email input').val())) {
-                checkout.addClass('gift-email-required');
-            }
-            else {
-                checkout.removeClass('gift-email-required');
-            }
         }
 
         if(checkout.is('.reoccurs-required, .first-required, .last-required, .email-required, .street-required, ' +
@@ -312,8 +274,8 @@ jQuery(document).ready(function($) {
         checkout.find('.form-actions').removeClass('valid').addClass('invalid');
         loadingAnimation(checkout.find('a[href="#submit-order"]'));
 
-        var data =
-
+        var data = gatherFields.apply(checkout, [['first', 'last']]);
+        debugger;
 
         $.ajax({
             url: Routing.generate('checkout_pay'),

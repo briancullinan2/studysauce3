@@ -37,7 +37,7 @@ if (typeof window.views.__globalVars.view['slots'].output == 'undefined') {
 }
 window.views.slotStack = [];
 window.views.__globalVars.app.getUser = function () {
-    var welcome = $('#welcome-message');
+    var welcome = $('.header');
     var user = $.extend({}, welcome.data('user'));
     var newUser = applyEntityObj(user);
     welcome.data('user', newUser);

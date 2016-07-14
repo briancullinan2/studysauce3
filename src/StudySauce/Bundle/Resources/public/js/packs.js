@@ -600,7 +600,7 @@ $(document).ready(function () {
         pickNextCard(data, packId, id);
 
         $.ajax({
-            url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
+            url: Routing.generate('responses', {user:$('.header').data('user').id}),
             type: 'POST',
             dataType: 'json',
             data: response,
@@ -738,7 +738,7 @@ $(document).ready(function () {
                 }
             }
         }
-        $('#welcome-message').data('user', user);
+        $('.header').data('user', user);
     }
 
     var jPlayer = $('#jquery_jplayer');
@@ -817,7 +817,7 @@ $(document).ready(function () {
 
         // save response
         $.ajax({
-            url: Routing.generate('responses', {user:$('#welcome-message').data('user').id}),
+            url: Routing.generate('responses', {user:$('.header').data('user').id}),
             type: 'POST',
             dataType: 'json',
             data: response,
@@ -875,7 +875,7 @@ $(document).ready(function () {
 
         // save response
         $.ajax({
-            url: Routing.generate('responses', {user: $('#welcome-message').data('user').id}),
+            url: Routing.generate('responses', {user: $('.header').data('user').id}),
             type: 'POST',
             dataType: 'json',
             data: response,

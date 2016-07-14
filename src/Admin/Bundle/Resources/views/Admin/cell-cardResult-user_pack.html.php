@@ -43,7 +43,7 @@ else {
                 if(!$hasUp) {
                     $appUser = $app->getUser();
                     $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
-                    jQuery('#welcome-message')->data('user', $appUser);
+                    jQuery('.header')->data('user', $appUser);
                 }
             }
             $retention = $app->getUser()->getUserPacks()->toArray();

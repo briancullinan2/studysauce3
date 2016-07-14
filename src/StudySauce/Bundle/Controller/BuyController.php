@@ -98,7 +98,7 @@ class BuyController extends Controller
         $coupon = $this->getCoupon($request);
         $option = $request->get('option');
 
-        return $this->render('StudySauceBundle:Buy:checkout.html.php', [
+        return $this->render('AdminBundle:Admin:checkout.html.php', [
                 'email' => $email,
                 'first' => $first,
                 'last' => $last,

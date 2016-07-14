@@ -55,28 +55,41 @@
     display:inline-block;
 }
 
+[id^="checkout"] .highlighted-link td,
 [id^="store"] .highlighted-link td {
     padding:10px;
 }
 
+[id^="checkout"] .highlighted-link td:first-child,
 [id^="store"] .highlighted-link td:first-child {
     text-align: left;
     padding-left:0;
 }
 
+[id^="checkout"] .highlighted-link td:last-child,
 [id^="store"] .highlighted-link td:last-child {
     padding-right:0;
 }
 
+[id^="checkout"] .highlighted-link table,
 [id^="store"] .highlighted-link table {
     width: auto;
     margin-left: auto;
     margin-right: 0;
 }
 
+[id^="checkout"] .highlighted-link tfoot,
 [id^="store"] .highlighted-link tfoot {
     font-weight:bold;
     border-top: 2px solid #555;
+}
+
+[id^="checkout"] .results {
+    display:inline-block;
+}
+
+[id^="checkout"] .results a, [id^="checkout"] .coupon-row, [id^="checkout"] .ss_user-row {
+    display:none;
 }
 
 #checkout #payment-pane,
@@ -175,9 +188,10 @@
     display:block;
 }
 
-#payment-pane .product-option + img
+#payment-pane img
 {
     vertical-align: middle;
+    float:right;
 }
 
 #coupon-pane .coupon-code
@@ -222,7 +236,6 @@
 
 #checkout .form-actions
 {
-    width: 50%;
     margin: 0 -4px 0 2px;
     padding:0;
     display: inline-block;

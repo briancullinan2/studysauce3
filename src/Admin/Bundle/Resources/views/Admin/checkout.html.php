@@ -7,47 +7,57 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 /** @var User $user */
 $user = $app->getUser();
 
+$context = !empty($context) ? $context : jQuery($this);
+$tab = $context->filter('.panel-pane');
+
 $isPartner =
     $app->getSession()->has('parent') || $app->getUser()->hasRole('ROLE_PARENT') ||
     $app->getSession()->has('partner') || $app->getUser()->hasRole('ROLE_PARTNER') ||
     // invite information is autofilled
     !empty($studentfirst);
 
-$view->extend('StudySauceBundle:Shared:dashboard.html.php');
+if($tab->length == 0) {
 
-$view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/buy.css'],[],['output' => 'bundles/studysauce/css/*.css']) as $url): ?>
-    <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
-$view['slots']->stop();
+    $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
-$view['slots']->start('javascripts');
-foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/buy.js'],[],['output' => 'bundles/studysauce/js/*.js']) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
-$view['slots']->stop();
+    $view['slots']->start('stylesheets');
+    foreach ($view['assetic']->stylesheets(['@StudySauceBundle/Resources/public/css/buy.css'], [], ['output' => 'bundles/studysauce/css/*.css']) as $url) { ?>
+        <link type="text/css" rel="stylesheet" href="<?php print ($view->escape($url)); ?>"/>
+    <?php }
+    $view['slots']->stop();
 
-$view['slots']->start('body'); ?>
+    $view['slots']->start('javascripts');
+    foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/buy.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
+        <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
+    <?php }
+    $view['slots']->stop();
+
+    $view['slots']->start('body'); ?>
     <div class="panel-pane funnel" id="checkout">
         <div class="pane-content clearfix">
             <fieldset id="billing-pane">
                 <legend>Billing information</legend>
                 <div class="first-name">
-                    <label class="input"><span>First name</span><input name="first-name" type="text" value="<?php print $first; ?>"></label>
+                    <label class="input"><span>First name</span><input name="first-name" type="text"
+                                                                       value="<?php print ($first); ?>"></label>
                 </div>
                 <div class="last-name">
-                    <label class="input"><span>Last name</span><input name="last-name" type="text" value="<?php print $last; ?>"></label>
+                    <label class="input"><span>Last name</span><input name="last-name" type="text"
+                                                                      value="<?php print ($last); ?>"></label>
                 </div>
                 <div class="email">
-                    <label class="input"><span>E-mail address</span><input name="email" type="text" value="<?php print $email; ?>"></label>
+                    <label class="input"><span>E-mail address</span><input name="email" type="text"
+                                                                           value="<?php print ($email); ?>"></label>
                 </div>
-                <?php if(!is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')) { ?>
+                <?php if (!is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')) { ?>
                     <div class="password">
-                        <label class="input"><span>Password</span><input name="password" type="password" value=""></label>
+                        <label class="input"><span>Password</span><input name="password" type="password"
+                                                                         value=""></label>
                     </div>
                 <?php } ?>
                 <label class="input"><span>Street address</span><input name="street1" type="text" value=""></label>
                 <label class="input"><input name="street2" type="text" value=""></label>
+
                 <div class="city">
                     <label class="input"><span>City</span><input name="city" type="text" value=""></label>
                 </div>
@@ -126,40 +136,48 @@ $view['slots']->start('body'); ?>
                         <option value="Canada">Canada</option>
                         <option value="United States" selected="selected">United States</option>
                     </select></label>
-                <a href="#show-coupon" class="cloak">Have a coupon code? Click <span class="reveal">here</span>.</a>
-                <a href="#show-gift" class="cloak" <?php print ($isPartner ? 'style="display:none;"' : ''); ?>>Are you purchasing as a gift? Click <span class="reveal">here</span>.</a>
             </fieldset>
             <fieldset id="payment-pane">
                 <legend>Payment method</legend>
-                <div class="product-option">
-                    <?php /** @var Coupon $coupon */
-                    if(empty($coupon) || empty($options = $coupon->getOptions())) {
-                        $options = \StudySauce\Bundle\Controller\BuyController::$defaultOptions;
-                    }
-                    $first = true;
-                    foreach($options as $o => $option) {
-                        ?><label class="radio">
-                            <input name="reoccurs" type="radio" value="<?php print $o; ?>" <?php
-                            print ($first || empty($option) || $option == $o ? 'checked="checked"' : ''); ?>>
-                            <i></i>
-                            <span><?php print $option['description']; ?></span>
-                        </label><?php
-                        $first = false;
-                    }
-                    if(!empty($coupon)) {
-                        ?><div class="line-item"><?php print $coupon->getDescription();; ?></div><?php
-                    } ?>
-                </div>
-                <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/money_back_compressed.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
-                    <img src="<?php echo $view->escape($url) ?>" />
-                <?php endforeach; ?>
+                <?php
+                $request = (array)(new stdClass());
+                $request['count-file'] = -1;
+                $request['count-pack'] = -1;
+                $request['count-coupon'] = 0;
+                $request['count-card'] = -1;
+                $request['count-ss_group'] = -1;
+                $request['count-ss_user'] = 1;
+                $request['count-user_pack'] = -1;
+                $request['read-only'] = false;
+                $request['inCartOnly'] = true;
+                $request['tables'] = (array)(new stdClass());
+                $request['tables']['file'] = ['id', 'url'];
+                $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs', 'options']];
+                $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
+                $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
+                $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
+                $request['tables']['card'] = ['id', 'deleted'];
+                $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
+                $request['classes'] = ['tiles', 'summary'];
+                $request['headers'] = false;
+                $request['footers'] = ['coupon' => 'cart'];
+                if ($tab->length == 0) {
+                    print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
+                } ?>
+                <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/money_back_compressed.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url) { ?>
+                    <img src="<?php print ($view->escape($url)); ?>"/>
+                <?php } ?>
                 <div class="cc-number">
                     <label class="input">
                         <span>Card number</span><input name="cc-number" type="text" value="">
+
                         <div class="cards">
-                            <img alt="VISA" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/visa.gif')) ?>" />
-                            <img alt="MC" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/mc.gif')) ?>" />
-                            <img alt="DISC" src="<?php echo $view->escape($view['assets']->getUrl('bundles/studysauce/images/disc.gif')) ?>" />
+                            <img alt="VISA"
+                                 src="<?php print ($view->escape($view['assets']->getUrl('bundles/studysauce/images/visa.gif'))); ?>"/>
+                            <img alt="MC"
+                                 src="<?php print ($view->escape($view['assets']->getUrl('bundles/studysauce/images/mc.gif'))); ?>"/>
+                            <img alt="DISC"
+                                 src="<?php print ($view->escape($view['assets']->getUrl('bundles/studysauce/images/disc.gif'))); ?>"/>
                         </div>
                     </label>
                 </div>
@@ -185,45 +203,24 @@ $view['slots']->start('body'); ?>
                         <select name="cc-year">
                             <?php
                             $isFirst = true;
-                            for($y = 0; $y < 20; $y++)
-                            {
-                                ?><option value="<?php print intval(date('y')) + $y; ?>" <?php print ($isFirst ? 'selected="selected"': ''); ?>><?php print intval(date('Y')) + $y; ?></option><?php
+                            for ($y = 0; $y < 20; $y++) {
+                                ?>
+                                <option
+                                value="<?php print (intval(date('y')) + $y); ?>" <?php print ($isFirst ? 'selected="selected"' : ''); ?>><?php print (intval(date('Y')) + $y); ?></option><?php
                                 $isFirst = false;
                             } ?></select></label>
                 </div>
                 <label class="input"><span>CCV</span><input name="cc-ccv" type="text" value="">
-                    <a href="#ccv-info" data-toggle="modal">What's the CVV?</a>
+                    <a href="#ccv-info" data-toggle="modal">What&rsquo;s the CVV?</a>
                 </label>
             </fieldset>
-            <div class="form-actions highlighted-link invalid"><a href="#submit-order" class="more">Complete order</a></div>
-            <fieldset id="gift-pane" class="<?php print ($isPartner ? 'shown-by-default' : ''); ?>">
-                <legend>Student information</legend>
-                <div class="first-name">
-                    <label class="input"><span>First name</span><input name="first-name" type="text" value="<?php print $studentfirst; ?>"></label>
-                </div>
-                <div class="last-name">
-                    <label class="input"><span>Last name</span><input name="last-name" type="text" value="<?php print $studentlast; ?>"></label>
-                </div>
-                <div class="email">
-                    <label class="input"><span>E-mail address</span><input name="email" type="text" value="<?php print $studentemail; ?>"></label>
-                </div>
-            </fieldset>
-            <fieldset id="coupon-pane">
-                <legend>Coupon discount</legend>
-                <?php if(!empty($coupon)) { ?>
-                        <div class="coupon-code"><strong><?php print $coupon->getName(); ?> - </strong><?php print $coupon->getDescription(); ?></div>
-                        <a href="#coupon-remove" class="more">Remove</a>
-                <?php } else { ?>
-                    <div class="coupon-code">
-                        <label class="input"><input name="coupon-code" type="text" placeholder="Enter code" value=""></label>
-                    </div>
-                    <a href="#coupon-apply" class="more">Apply to order</a>
-                <?php } ?>
-            </fieldset>
+            <div class="form-actions highlighted-link invalid"><a href="#submit-order" class="more">Complete order</a>
+            </div>
         </div>
     </div>
-<?php $view['slots']->stop();
+    <?php $view['slots']->stop();
 
-$view['slots']->start('sincludes');
-echo $view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'ccv-info']), ['strategy' => 'sinclude']);
-$view['slots']->stop();
+    $view['slots']->start('sincludes');
+    print ($view['actions']->render(new ControllerReference('StudySauceBundle:Dialogs:deferred', ['template' => 'ccv-info']), ['strategy' => 'sinclude']));
+    $view['slots']->stop();
+}

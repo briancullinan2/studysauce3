@@ -36,7 +36,7 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
 
 ?>
 <div class="header-wrapper navbar navbar-inverse">
-    <div class="header">
+    <div class="header" data-user="<?php print $view->escape(json_encode(AdminController::toFirewalledEntityArray($user, AdminController::$defaultTables['ss_user'], 1) + ['groups' => $allGroups])); ?>">
         <div id="site-name" class="container navbar-header">
             <a title="Home" href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
@@ -70,7 +70,7 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
         <?php }
 
         if($app->getRequest()->get('_format') != 'funnel') { ?>
-            <div id="welcome-message" data-user="<?php print $view->escape(json_encode(AdminController::toFirewalledEntityArray($user, AdminController::$defaultTables['ss_user'], 1) + ['groups' => $allGroups])); ?>">
+            <div id="welcome-message">
                 <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
                     <ul class="main-menu">
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>
