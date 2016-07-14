@@ -76,8 +76,14 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
                     </ul>
-                <?php }
-                if($user->hasRole('ROLE_ADMIN')) { ?>
+                <?php } ?>
+                <a href="<?php print ($view['router']->generate('store_cart')); ?>"><?php
+                    $cart = explode(',', $app->getRequest()->cookies->get('cart'));
+                    if($cart[0] == '') {
+                        array_splice($cart, 0, 1);
+                    }
+                    print (!empty($cart) ? count($cart) : '&nbsp;'); ?></a>
+                <?php if($user->hasRole('ROLE_ADMIN')) { ?>
                     <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode(AdminController::$defaultMiniTables)); ?>" data-confirm="false" placeholder="Search" /></label>
                 <?php } ?>
                 <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>

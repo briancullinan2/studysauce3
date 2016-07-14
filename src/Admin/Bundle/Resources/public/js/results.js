@@ -133,6 +133,7 @@ window.views.__defaultEntities['ss_group'] = {
     getUsers: function () {return $($(this.users).toArray().map(function (u) { return applyEntityObj(u);}));},
     getGroupPacks: function () {return $($(this.groupPacks).toArray().map(function (u) { return applyEntityObj(u);}));},
     getDeleted: function () {return this.deleted},
+    getPacks: function () {return this.getGroupPacks();},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);}
 };
 window.views.__defaultEntities['invite'] = {
@@ -278,7 +279,7 @@ window.views.__defaultEntities['file'] = {
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getUrl: function () { return this.url },
     getId: function () { return this.id },
-    getUser: function () { return this.user }
+    getUser: function () {return this.user ? applyEntityObj(this.user) : null;}
 };
 window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),
@@ -305,6 +306,32 @@ window.views.__defaultEntities['ss_user'] = {
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getUserPacks: function () {return $($(this.userPacks).toArray().map(function (up) {return applyEntityObj(up);}));},
     getGroups: function () {return $($(this.groups).toArray().map(function (up) {return applyEntityObj(up);}));}
+};
+window.views.__defaultEntities['coupon'] = {
+    packs: $([]),
+    getId: function () {return this.id;},
+    getName: function () {return this.name;},
+    getOptions: function () {return this.options;},
+    getDescription: function () {return this.description;},
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    getGroup: function () {return this.group ? applyEntityObj(this.group) : null;},
+    getPacks: function () {return $($(this.packs).toArray().map(function (u) { return applyEntityObj(u);}));},
+    getLogo: function () {
+        if(this.getGroup() != null) {
+            var logo = this.getGroup().getLogo();
+            if(logo != null) {
+                return logo;
+            }
+        }
+        var packs = this.getPacks().toArray();
+        for(var p in packs) {
+            if(packs.hasOwnProperty(p)) {
+                if(p.getLogo() != null) {
+                    return p.getLogo();
+                }
+            }
+        }
+    }
 };
 window.views.__globalVars.view.exists = window.views.exists;
 window.views.__globalVars.view.render = window.views.render;
@@ -735,7 +762,7 @@ $(document).ready(function () {
             evt.preventDefault();
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');
-            row.find('.pack-icon').trigger('click');
+            row.find('a.pack-icon').trigger('click');
             if(row.is('.edit')) {
                 row.removeClass('edit').addClass('read-only');
             }

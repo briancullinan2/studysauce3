@@ -45,7 +45,7 @@ class Coupon
     /**
      * @ORM\Column(type="array", name="options", nullable=true)
      */
-    protected $options;
+    protected $options = null;
 
     /**
      * @ORM\Column(type="datetime", name="valid_from", nullable=true)
@@ -91,6 +91,19 @@ class Coupon
         $this->created = new \DateTime();
     }
 
+    public function getLogo()
+    {
+        if(!empty($this->getGroup()) && !empty($this->getGroup()->getLogo())) {
+            return $this->getGroup()->getLogo();
+        }
+        foreach($this->getPacks()->toArray() as $p) {
+            /** @var Pack $p */
+            if(!empty($p->getLogo())) {
+                return $p->getLogo();
+            }
+        }
+        return null;
+    }
 
     /**
      * Get id
@@ -373,29 +386,6 @@ class Coupon
     }
 
     /**
-     * Set pack
-     *
-     * @param \StudySauce\Bundle\Entity\Pack $pack
-     * @return Coupon
-     */
-    public function setPack(\StudySauce\Bundle\Entity\Pack $pack = null)
-    {
-        $this->pack = $pack;
-
-        return $this;
-    }
-
-    /**
-     * Get pack
-     *
-     * @return \StudySauce\Bundle\Entity\Pack 
-     */
-    public function getPack()
-    {
-        return $this->pack;
-    }
-
-    /**
      * Add pack
      *
      * @param \StudySauce\Bundle\Entity\Pack $pack
@@ -428,4 +418,5 @@ class Coupon
     {
         return $this->packs;
     }
+
 }

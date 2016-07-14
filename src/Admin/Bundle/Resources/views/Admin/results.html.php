@@ -15,7 +15,8 @@ $resultOutput->children('.views, header, footer, .highlighted-link, [class*="-ro
 
 $subVars = [
     'request' => $request,
-    'results' => $results
+    'results' => $results,
+    'context' => $context,
 ];
 
 $isFresh = false;
@@ -29,14 +30,33 @@ $resultOutput->data('request', $request)->attr('data-request', json_encode($requ
         : '');
 
 // update group listing with every results request
-if(isset($resultsJSON)) {
-    $resultOutput->data('allGroups', $resultsJSON['allGroups'])->attr('data-results', json_encode($resultsJSON['allGroups']));
-}
-// TODO: refresh data before show view?
-//if($isFresh) {
-//    print ($context->html());
-//    return;
+//if(isset($resultsJSON)) {
+//    $resultOutput->data('allGroups', $resultsJSON['allGroups'])->attr('data-results', json_encode($resultsJSON['allGroups']));
 //}
+// TODO: refresh data before show view?
+if($isFresh) {
+    $view['slots']->start('results-output'); ?>
+    <script type="text/javascript">
+        function setup<?php print ($request['requestKey']); ?>() {
+            var resultsObj = (<?php print (json_encode($resultsJSON)); ?>) || {};
+            var results = jQuery(".results[data-request*=\"<?php print ($request['requestKey']); ?>\"]");
+            var request = (<?php print (json_encode($request)); ?>) || {};
+            results.data("results", resultsObj);
+            loadContent.apply(results, [{tables: request.tables, context: results, request: request, results: resultsObj}, "refresh"]);
+        }
+        if(typeof jQuery == "undefined") {
+            window.addEventListener("load", setup<?php print ($request['requestKey']); ?>, false);
+        }
+        else {
+            setup<?php print ($request['requestKey']); ?>();
+        }
+    </script>
+    <?php
+    $view['slots']->stop();
+    $context->append($view['slots']->get('results-output'));
+    print ($context->html());
+    return;
+}
 
 // TODO: bring back search header for list format
 //if (!isset($request['headers'])) {

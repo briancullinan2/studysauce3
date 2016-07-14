@@ -44,7 +44,7 @@ if($tab->length > 0) {
 }
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="store">
+    <div class="panel-pane" id="store_cart">
         <div class="pane-content">
             <?php
                 /* if(count($user->getGroups()->toArray()) > 1) {
@@ -103,6 +103,7 @@ $view['slots']->start('body'); ?>
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
                     $request['read-only'] = false;
+                    $request['inCartOnly'] = true;
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
                     $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs', 'options']];
@@ -112,8 +113,8 @@ $view['slots']->start('body'); ?>
                     $request['tables']['card'] = ['id', 'deleted'];
                     $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
                     $request['classes'] = ['tiles', 'summary'];
-                    $request['headers'] = ['coupon' => 'store'];
-                    $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['coupon' => true] : false;
+                    $request['headers'] = false;
+                    $request['footers'] = ['coupon' => 'cart'];
                 }
                 else {
                     $request['count-file'] = -1;
@@ -124,6 +125,7 @@ $view['slots']->start('body'); ?>
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
                     $request['read-only'] = false;
+                    $request['inCartOnly'] = true;
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
                     $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs', 'options']];

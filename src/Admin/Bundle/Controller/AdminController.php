@@ -49,7 +49,7 @@ class AdminController extends Controller
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted', 'group']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
-        'coupon' => ['id' => ['name', 'description', 'packs']],
+        'coupon' => ['id' => ['id', 'name', 'description', 'packs', 'options']],
         'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content', 'id']
         // TODO: this really generalized template
         //'invite' => ['id', 'code', 'groups', 'users', 'properties', 'actions']
@@ -516,7 +516,8 @@ class AdminController extends Controller
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
         // convert db entity to flat object
-        $tableKeys = array_merge(in_array('application/json', $request->getAcceptableContentTypes()) ? array_keys($searchRequest['tables']) : [], ['allGroups']);
+        $tableKeys = array_merge(array_keys($searchRequest['tables']), ['allGroups']);
+        //$tableKeys = array_merge(in_array('application/json', $request->getAcceptableContentTypes()) ? array_keys($searchRequest['tables']) : [], ['allGroups']);
         foreach ($tableKeys as $table) {
             if (!isset($vars['results'][$table])) {
                 continue;

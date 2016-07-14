@@ -426,7 +426,7 @@ input[type="button"].more
     appearance: none;
     margin: 0;
     text-align: center;
-    padding: 10px 20px;
+    padding: 15px;
     font-weight: 700;
     border-radius: 1px;
     display:inline-block;
@@ -451,6 +451,7 @@ input[type="button"].more
     color: #222222;
     background-color: #FF9900;
     border-color: #FF9900;
+    padding: 15px 25px;
 }
 
 .btn:hover,
@@ -580,7 +581,7 @@ a.subtle:active,
 .invalid button.more:focus,
 .invalid input[type="submit"].more:focus,
 .invalid input[type="reset"].more:focus,
-.invalid input[type="button"].more:focus
+.invalid input[type="button"].more:focus,
 .btn[disabled],
 .btn-default[disabled],
 a.more[disabled],

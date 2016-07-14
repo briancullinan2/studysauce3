@@ -2,6 +2,42 @@
 jQuery(document).ready(function($) {
     var body = $('body');
 
+    body.on('click', '[id^="store"] button, [id^="store"] a[href="#remove-coupon"]', function () {
+        var cart = (Cookies.get('cart') || '').split(',');
+        if(cart[0] == '') {
+            cart.splice(0);
+        }
+        if($(this).is('a[href="#remove-coupon"]')) {
+            var removeI = cart.indexOf($(this).data('value'));
+            if(removeI > -1) {
+                cart.splice(removeI);
+            }
+        }
+        else {
+            cart[cart.length] = $(this).val();
+        }
+        Cookies.set('cart', cart.join(','));
+        var row = $(this).parents('.coupon-row');
+        var results = $(this).parents('.results');
+        var request = results.data('request');
+        var resultsObj = results.data('results');
+        window.views.render.apply(results, ['results', {tables: request.tables, request: request, results: resultsObj, context: results}]);
+    });
+
+    body.on('showing', '[id^="store"]', function () {
+        var results = $(this).find('.results');
+        var request = results.data('request');
+        var resultsObj = results.data('results');
+        if(resultsObj) {
+            window.views.render.apply(results, ['results', {
+                tables: request.tables,
+                request: request,
+                results: resultsObj,
+                context: results
+            }]);
+        }
+    });
+
     function checkoutFunc()
     {
         var checkout = $('#checkout');
@@ -275,6 +311,9 @@ jQuery(document).ready(function($) {
 
         checkout.find('.form-actions').removeClass('valid').addClass('invalid');
         loadingAnimation(checkout.find('a[href="#submit-order"]'));
+
+        var data =
+
 
         $.ajax({
             url: Routing.generate('checkout_pay'),

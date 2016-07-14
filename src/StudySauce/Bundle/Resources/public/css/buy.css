@@ -1,4 +1,83 @@
 
+[id^="store"] .ss_user-row {
+    display:none;
+}
+
+[id^="store"] .tiles.summary [class*="-row"] .pack-icon:after {
+    display:none;
+}
+
+[id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: auto;
+    margin-left: 0;
+    left: auto;
+    margin-top:-35px;
+    padding:0;
+}
+
+[id^="store"] [href="#edit-coupon"] {
+    display:none;
+}
+
+[id^="store"] header h3:not(.big-add) {
+    color: #44AA44;
+    width:100%;
+    position:relative;
+}
+
+[id^="store"] header h3:not(.big-add):before {
+    content: " ";
+    display: block;
+    width: 10%;
+    background: url(../images/green_check.png) no-repeat center center transparent;
+    background-size: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+[id^="store"] header label span {
+    font-weight: normal;
+}
+
+[id^="store"] header label {
+    float: left;
+    padding: 15px;
+    margin-left: 10%;
+
+}
+
+[id^="store"] .coupon-row h3 {
+    display:inline-block;
+}
+
+[id^="store"] .highlighted-link td {
+    padding:10px;
+}
+
+[id^="store"] .highlighted-link td:first-child {
+    text-align: left;
+    padding-left:0;
+}
+
+[id^="store"] .highlighted-link td:last-child {
+    padding-right:0;
+}
+
+[id^="store"] .highlighted-link table {
+    width: auto;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+[id^="store"] .highlighted-link tfoot {
+    font-weight:bold;
+    border-top: 2px solid #555;
+}
 
 #checkout #payment-pane,
 #checkout #billing-pane,

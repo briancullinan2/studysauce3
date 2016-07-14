@@ -256,6 +256,15 @@ $(document).ready(function () {
         return true;
     }
 
+    body.on('show', '.panel-pane', function () {
+        if($(this).is('.funnel')) {
+            body.addClass('funnel');
+        }
+        else if(body.is('.funnel')) {
+            body.removeClass('funnel');
+        }
+    });
+
     body.on('show', '#home', function () {
         // TODO: add mobile check here?
         if (typeof navigator != 'undefined' &&

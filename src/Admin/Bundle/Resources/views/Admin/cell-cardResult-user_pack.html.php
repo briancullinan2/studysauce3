@@ -76,9 +76,9 @@ $view['slots']->start('card-results-page'); ?>
 <?php if($wrong > 0) { ?>
     <h3>Go back through what you missed?</h3>
     <div class="preview-footer">
-        <a href="<?php print ($view['router']->generate('home')); ?>" class="preview-wrong">✘</a>
+        <a href="<?php print ($view['router']->generate('home')); ?>" class="preview-wrong">&#x2717;</a>
         <div class="preview-guess">&nbsp;</div>
-        <a href="<?php print ($view['router']->generate('cards', ['card' => $cardId])); ?>" class="preview-right">&#x2714;︎</a>
+        <a href="<?php print ($view['router']->generate('cards', ['card' => $cardId])); ?>" class="preview-right">&#x2713;︎</a>
     </div>
 <?php }
 else { ?>

@@ -42,6 +42,10 @@ class BuyController extends Controller
         return $this->render('AdminBundle:Admin:store.html.php');
     }
 
+    public function cartAction() {
+        return $this->render('AdminBundle:Admin:cart.html.php');
+    }
+
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response

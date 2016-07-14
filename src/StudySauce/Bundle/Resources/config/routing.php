@@ -344,6 +344,14 @@ $collection->add(
     )
 );
 $collection->add(
+    'store_cart',
+    new Route(
+        '/store/cart/{_format}',
+        ['_controller' => 'StudySauceBundle:Buy:cart', '_format' => 'index'],
+        ['_format' => DASHBOARD_VIEWS]
+    )
+);
+$collection->add(
     'packs_edit',
     new Route(
         '/packs/{pack}/{_format}',

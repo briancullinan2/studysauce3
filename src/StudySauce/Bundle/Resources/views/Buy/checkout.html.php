@@ -28,7 +28,7 @@ foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/b
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>
-    <div class="panel-pane" id="checkout">
+    <div class="panel-pane funnel" id="checkout">
         <div class="pane-content clearfix">
             <fieldset id="billing-pane">
                 <legend>Billing information</legend>

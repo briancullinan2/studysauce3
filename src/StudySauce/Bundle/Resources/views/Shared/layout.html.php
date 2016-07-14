@@ -74,6 +74,8 @@ $collection = $router->getRouteCollection();
                 -52 => ['/logout'],
                 99 => ['/register/child'],
                 -99 => ['/register/child'],
+                100 => ['/store/cart'],
+                -100 => ['/store/cart'],
                 17 => ['/?_switch_user=_exit'],
                 -17 => ['/?_switch_user=_exit']
             ],
@@ -134,8 +136,8 @@ EOCSS;
                     background: url($file) no-repeat left -2px transparent;
                     content: " ";
                     display: block;
-                    height: 24px;
-                    width: 24px;
+                    height: 25px;
+                    width: 25px;
                     margin-top: -12px;
                     position: absolute;
                     left: 2px;

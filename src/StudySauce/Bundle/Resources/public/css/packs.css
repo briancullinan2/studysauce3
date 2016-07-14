@@ -190,83 +190,6 @@
     width:35%;
 }
 
-[id^="packs"] .tiles .pack-row {
-    width:100%;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"] {
-    height:auto;
-    padding:0;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"]:before {
-    content: " ";
-    display: inline-block;
-    padding-bottom: 10%;
-    width: 0;
-    margin-right: -1px;
-    vertical-align: middle;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"] label {
-    display: inline-block;
-    width: 100%;
-    clear: both;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 10px 0 10%;
-    vertical-align: middle;
-    margin-left: -10%;
-    position: static;
-}
-
-[id^="packs"] .tiles .pack-row .pack-icon:after {
-    content: " ";
-    display:block;
-    position:absolute;
-    right:0;
-    margin-top:-20px;
-    top:50%;
-    width: 0;
-    height: 0;
-    border-top: 20px solid transparent;
-    border-bottom: 20px solid transparent;
-    border-left: 20px solid #BBB;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"] label span {
-    margin-left:20px;
-}
-
-[id^="packs"] .tiles .pack-row:hover .pack-icon:after {
-    border-left-color: #09B;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"] label:last-of-type {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    color: #bbb;
-    width: 100%;
-    display: block;
-    top: auto;
-    margin-left: 0;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"] img {
-    width: 10%;
-    left: 0;
-    display: inline-block;
-    vertical-align: middle;
-    max-height: none;
-    position: static;
-    margin-bottom:0;
-}
-
-[id^="packs"] .tiles .pack-row > [class^="id"] .pack-icon {
-    min-height: 80px;
-}
-
 [id^="packs-"] .card-row .input.type {
     margin-right:-100px;
     display:inline-block;
@@ -637,6 +560,13 @@
     line-height: 0;
 }
 
+[id^="cards"] .preview-right,
+[id^="cards"] .preview-wrong,
+[id^="packs-"] .card-row + .expandable .preview-right,
+[id^="packs-"] .card-row + .expandable .preview-wrong {
+    font-weight: bold;
+}
+
 [id^="cards"] .preview-true,
 [id^="cards"] .preview-right,
 [id^="packs-"] .card-row + .expandable .preview-true,
@@ -695,12 +625,16 @@
 }
 
 .study-mode .main-menu a,
+.funnel .main-menu a,
 .study-mode #welcome-message,
-.study-mode .footer {
+.funnel #welcome-message,
+.study-mode .footer,
+.funnel .footer {
     display:none;
 }
 
-body.study-mode {
+body.study-mode,
+body.funnel {
     padding-bottom: 0;
 }
 
@@ -838,6 +772,7 @@ body.study-mode {
     bottom:0;
     background-color:#078600;
     z-index:100;
+    font-weight: bold;
 }
 
 .flash-right span, .flash-wrong span {

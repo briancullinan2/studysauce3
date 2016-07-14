@@ -224,7 +224,7 @@ $view['slots']->start('body'); ?>
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
                     $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['groups', 'cards', 'status']];
-                    $request['classes'] = ['tiles'];
+                    $request['classes'] = ['tiles', 'summary'];
                     $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                     $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                 }
@@ -246,7 +246,7 @@ $view['slots']->start('body'); ?>
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
                     $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['groups', 'cards', 'status']];
-                    $request['classes'] = ['tiles'];
+                    $request['classes'] = ['tiles', 'summary'];
                     $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                     $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                 }

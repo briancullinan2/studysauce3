@@ -753,12 +753,12 @@ $(document).ready(function () {
 
     function doFlash(correct) {
         if(correct) {
-            $('<div class="flash-right"><span>✔︎</span></div>').appendTo(body).animate({opacity: 0}, 1000, function () {
+            $('<div class="flash-right"><span>&#x2713;︎</span></div>').appendTo(body).animate({opacity: 0}, 1000, function () {
                 $(this).remove();
             });
         }
         else {
-            $('<div class="flash-wrong"><span>✘</span></div>').appendTo(body).animate({opacity: 0}, 1000, function () {
+            $('<div class="flash-wrong"><span>&#x2717;</span></div>').appendTo(body).animate({opacity: 0}, 1000, function () {
                 $(this).remove();
             });
         }
