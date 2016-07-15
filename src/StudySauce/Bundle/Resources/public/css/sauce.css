@@ -688,6 +688,7 @@ label
     text-align: left;
     margin:5px 0;
     font-weight: normal;
+    display:block;
 }
 
 header label {

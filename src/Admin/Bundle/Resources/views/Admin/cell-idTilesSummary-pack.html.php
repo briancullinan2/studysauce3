@@ -41,33 +41,6 @@ foreach($retention as $up) {
     /** @var User|Group $ss_group */
     /** @var Pack $pack */
 
-    $groups = [];
-    $groupIds = [];
-    $groupUsers = 0;
-    foreach($pack->getGroups()->toArray() as $g) {
-        /** @var Group $g */
-        if(!$g->getDeleted()) {
-            $groups[count($groups)] = $g;
-            $groupIds[count($groupIds)] = $g->getId();
-            $groupUsers += count($g->getUsers()->toArray());
-        }
-    }
-    /** @var User[] $users */
-    $users = $pack->getUsers()->toArray();
-    // only show the users not included in any groups
-    $diffUsers = [];
-    foreach($users as $u) {
-        $shouldExclude = false;
-        foreach($u->getGroups()->toArray() as $g) {
-            if(in_array($g->getId(), $groupIds)) {
-                $shouldExclude = true;
-            }
-        }
-        if(!$shouldExclude) {
-            $diffUsers[count($diffUsers)] = $u;
-        }
-    }
-
     $cardCount = 0;
     foreach($pack->getCards()->toArray() as $c) {
         /** @var Card $c */
@@ -76,12 +49,7 @@ foreach($retention as $up) {
         }
     }
 
-    if($user->hasRole('ROLE_ADMIN')) { ?>
-        <label><span><?php print (count($groups)); ?> groups / <?php print ($groupUsers + count($diffUsers)); ?> users / <?php print ($cardCount); ?> cards</span></label>
-    <?php }
-    else { ?>
-        <label><span><?php print ($cardCount); ?> cards</span></label>
-    <?php } ?>
+    ?><label><span><?php print ($cardCount); ?> cards</span></label>
 </a>
 
 

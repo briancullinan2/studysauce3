@@ -113,39 +113,45 @@ class BuyController extends Controller
 
     /**
      * @param Request $request
-     * @return Coupon
+     * @return Coupon[]
      */
     private function getCoupon(Request $request)
     {
         if(!empty($request)) {
-            $code = $request->get('coupon');
+            $codes = explode(',', $request->get('coupon'));
             if($request->getSession()->has('coupon')) {
-                $code = $request->getSession()->get('coupon');
+                $codes = explode(',', $request->getSession()->get('coupon'));
             }
         }
-        if(empty($code))
+        if(!empty($codes) && $codes[0] == '') {
+            array_splice($codes, 0, 1);
+        }
+        if(empty($codes))
             return null;
 
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
-        $result = $orm->getRepository('StudySauceBundle:Coupon')->findAll();
-        foreach($result as $i => $c) {
+        $allCodes = $orm->getRepository('StudySauceBundle:Coupon')->createQueryBuilder('c');
+        $result = [];
+        foreach($allCodes as $i => $c) {
             /** @var Coupon $c */
-            if(strtolower(substr($code, 0, strlen($c->getName()))) == strtolower($c->getName())) {
-                // one use coupons should match exactly
-                if($c->getMaxUses() <= 1 && strtolower($code) == strtolower($c->getName()))
-                    return $c;
-
-                // ensure code exists in random value
-                for ($i = 0; $i < $c->getMaxUses(); $i++) {
-                    $compareCode = $c->getName() . substr(md5($c->getSeed() . $i), 0, 6);
-                    if (strtolower($code) == strtolower($compareCode)) {
+            foreach($codes as $code) {
+                if(strtolower(substr($code, 0, strlen($c->getName()))) == strtolower($c->getName())) {
+                    // one use coupons should match exactly
+                    if($c->getMaxUses() <= 1 && strtolower($code) == strtolower($c->getName()))
                         return $c;
+
+                    // ensure code exists in random value
+                    for ($i = 0; $i < $c->getMaxUses(); $i++) {
+                        $compareCode = $c->getName() . substr(md5($c->getSeed() . $i), 0, 6);
+                        if (strtolower($code) == strtolower($compareCode)) {
+                            $result[] = $c;
+                        }
                     }
                 }
             }
         }
-        return null;
+        return $result;
     }
 
     /**
@@ -154,25 +160,18 @@ class BuyController extends Controller
      */
     public function applyCouponAction(Request $request)
     {
-        if(!empty($request->get('remove'))) {
-            $coupon = $this->getCoupon($request);
-            $request->getSession()->remove('coupon');
-            if(!empty($coupon) && !empty($coupon->getGroup())) {
-                $request->getSession()->remove('organization');
-            }
-            return $this->forward('StudySauceBundle:Buy:checkout', ['_format' => 'tab']);
-        }
-        $code = $request->get('coupon');
         $coupon = $this->getCoupon($request);
         if(!empty($coupon)) {
-            // store coupon in session for use at checkout
-            $request->getSession()->set('coupon', $code);
-            if(!empty($coupon->getGroup())) {
-                $request->getSession()->set('organization', $coupon->getGroup()->getName());
+            if(!empty($request->get('remove'))) {
+                $request->getSession()->remove('coupon');
             }
+            else {
+                $request->getSession()->set('coupon', implode(',', array_map(function (Coupon $c) {return $c->getName();}, $coupon)));
+            }
+
             return $this->forward('StudySauceBundle:Buy:checkout', ['_format' => 'tab']);
         }
-        throw new NotFoundHttpException('Coupon not found ' . $code);
+        throw new NotFoundHttpException('Coupon not found.');
     }
 
     /**
@@ -186,24 +185,28 @@ class BuyController extends Controller
         /** @var $userManager UserManager */
         $userManager = $this->get('fos_user.user_manager');
 
-        $option = $request->get('reoccurs');
+        $option = $request->get('option');
+
         // apply coupon if it exists
         $coupon = $this->getCoupon($request);
-        $options = empty($coupon) || empty($coupon->getOptions()) ? self::$defaultOptions : $coupon->getOptions();
+        $price = 0;
 
         // create a new payment entity
         $payment = new Payment();
-        $payment->setAmount($options[$option]['price']);
+        foreach($coupon as $c) {
+            $payment->addCoupon($c);
+            foreach($c->getOptions() as $i => $o) {
+                $price += $o['price'];
+            }
+        }
+        $payment->setAmount($price);
         $payment->setFirst($request->get('first'));
         $payment->setLast($request->get('last'));
         $payment->setProduct($option);
-        if(!empty($coupon)) {
-            $payment->setCoupon($coupon);
-        }
 
         try {
             $sale = new \AuthorizeNetAIM(self::AUTHORIZENET_API_LOGIN_ID, self::AUTHORIZENET_TRANSACTION_KEY);
-            $sale->setField('amount', $options[$option]['price']);
+            $sale->setField('amount', $price);
             $sale->setField('card_num', $request->get('number'));
             $sale->setField('exp_date', $request->get('month') . '/' . $request->get('year'));
             $sale->setField('first_name', $request->get('first'));
@@ -230,40 +233,6 @@ class BuyController extends Controller
                 $payment->setPayment($aimResponse->transaction_id);
             } else {
                 $error = $aimResponse->response_reason_text;
-            }
-
-            // only set up reoccurring if the term is greater than zero
-            if(isset($options[$option]['reoccurs']) && !empty($reoccurs = intval($options[$option]['reoccurs'])) && $reoccurs < 12) {
-                $subscription = new \AuthorizeNet_Subscription();
-                $subscription->name = 'Study Sauce ' . ucfirst($option) . ' Plan';
-                $subscription->intervalLength = $reoccurs;
-                $subscription->intervalUnit = 'months';
-                $subscription->startDate = date_add(new \DateTime(), new \DateInterval('P' . $reoccurs . 'M'))->format('Y-m-d');
-                $subscription->amount = $options[$option]['price'];
-                $subscription->creditCardCardNumber = $request->get('number');
-                $subscription->creditCardExpirationDate = '20' . $request->get('year') . '-' . $request->get('month');
-                $subscription->creditCardCardCode = $request->get('ccv');
-                $subscription->billToFirstName = $request->get('first');
-                $subscription->billToLastName = $request->get('last');
-                $subscription->billToAddress = $request->get('street1') .
-                    (empty(trim($request->get('street2'))) ? '' : ("\n" . $request->get('street2')));
-                $subscription->billToCity = $request->get('city');
-                $subscription->billToZip = $request->get('zip');
-                $subscription->billToState = $request->get('state');
-                $subscription->billToCountry = $request->get('country');
-                $subscription->totalOccurrences = 9999;
-
-                // TODO: if there is a duplicate subscription, increase the price
-
-                // Create the subscription.
-                $arbRequest = new \AuthorizeNetARB(self::AUTHORIZENET_API_LOGIN_ID, self::AUTHORIZENET_TRANSACTION_KEY);
-                $arbRequest->setSandbox(false);
-                $arbResponse = $arbRequest->createSubscription($subscription);
-                if ($arbResponse->isOk()) {
-                    $payment->setSubscription($arbResponse->getSubscriptionId());
-                } else {
-                    $error = $arbResponse->getMessageText();
-                }
             }
 
         } catch(\AuthorizeNetException $ex) {
@@ -293,10 +262,13 @@ class BuyController extends Controller
         // update paid status
         $user->addRole('ROLE_PAID');
         // set group for coupon is necessary
+        // TODO: set pack for selected user
         if(!empty($coupon) && !empty($coupon->getGroup()) && !$user->hasGroup($coupon->getGroup()->getName())) {
             $user->addGroup($coupon->getGroup());
         }
         $userManager->updateUser($user);
+
+        // redirect parents and partners to thank you page
         if($user->hasRole('ROLE_PARENT') || $user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER')) {
             $response = $this->redirect($this->generateUrl('thanks', ['_format' => 'funnel']));
         }
@@ -316,75 +288,9 @@ class BuyController extends Controller
         $emails->setContainer($this->container);
         $emails->invoiceAction($user, $payment, $address);
 
-        // send partner prepay emails if needed
-        $this->sendPartnerPrepay($user, $request);
-
         $loginManager = $this->get('fos_user.security.login_manager');
         $loginManager->loginUser('main', $user, $response);
         return $response;
-    }
-
-    /**
-     * @param User $user
-     * @param Request $request
-     */
-    private function sendPartnerPrepay(User $user, Request $request)
-    {
-        $session = $request->getSession();
-        if(($session->has('organization') && $session->get('organization') == 'Torch And Laurel') ||
-            $user->hasGroup('Torch And Laurel')) {
-            $email = new TorchEmailsController();
-            $email->setContainer($this->container);
-        }
-        else {
-            $email = new EmailsController();
-            $email->setContainer($this->container);
-        }
-
-        /** @var $userManager UserManager */
-        $userManager = $this->get('fos_user.user_manager');
-
-        /** @var Invite $invite */
-        /** @var User $student */
-        if(!empty($invite = $user->getStudentInvites()->first())) {
-            /** @var StudentInvite $invite */
-            $student = $invite->getStudent();
-            if(empty($student)) {
-                $studentEmail = $invite->getEmail();
-                $studentFirst = $invite->getFirst();
-                $studentLast = $invite->getLast();
-            }
-        }
-        else if ($user->hasRole('ROLE_PARENT')) {
-            // find connected students
-            /** @var ParentInvite $invite */
-            $invite = $user->getInvitedParents()->first();
-            $student = $invite->getUser();
-            if(empty($student)) {
-                $studentEmail = $invite->getFromEmail();
-                $studentFirst = $invite->getFromFirst();
-                $studentLast = $invite->getFromLast();
-            }
-        }
-        else if($user->hasRole('ROLE_PARTNER')) {
-            // find connected students
-            /** @var Invite $invite */
-            $invite = $user->getInvitedPartners()->first();
-            $student = $invite->getUser();
-        }
-
-        // maybe the parent just invited their student
-        if(!empty($invite)) {
-            // TODO: update student account after registration
-            if(!empty($student) && !empty($student->getEmail())) {
-                $student->addRole('ROLE_PAID');
-                $userManager->updateUser($student);
-                $email->parentPrepayAction($user, $student->getEmail(), $student->getFirst(), $student->getLast(), $invite->getCode());
-            }
-            elseif(!empty($studentEmail) && !empty($studentFirst) && !empty($studentLast)) {
-                $email->parentPrepayAction($user, $studentEmail, $studentFirst, $studentLast, $invite->getCode());
-            }
-        }
     }
 
     /**
@@ -411,12 +317,9 @@ class BuyController extends Controller
             $invite->setFirst($request->get('invite')['first']);
             $invite->setLast($request->get('invite')['last']);
             $invite->setEmail($request->get('invite')['email']);
-            $invite->setFromFirst($request->get('first'));
-            $invite->setFromLast($request->get('last'));
-            $invite->setFromEmail($request->get('email'));
             $invite->setCode(md5(microtime()));
             if(!empty($inviteUser))
-                $invite->setStudent($inviteUser);
+                $invite->setInvitee($inviteUser);
             $orm->persist($invite);
             $orm->flush();
         }
@@ -438,7 +341,7 @@ class BuyController extends Controller
             // change invite owner to the actual user
             if(isset($invite)) {
                 $invite->setUser($user);
-                $user->addStudentInvite($invite);
+                $user->addInvite($invite);
                 $orm->merge($invite);
             }
             $orm->flush();

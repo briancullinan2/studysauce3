@@ -78,7 +78,7 @@ class Coupon
     protected $deleted = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Payment", mappedBy="coupon")
+     * @ORM\ManyToMany(targetEntity="Payment", mappedBy="coupon", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"created" = "DESC"})
      */
     protected $payments;

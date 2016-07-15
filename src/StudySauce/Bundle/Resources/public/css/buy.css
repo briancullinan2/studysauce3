@@ -48,7 +48,6 @@
     float: left;
     padding: 15px;
     margin-left: 10%;
-
 }
 
 [id^="store"] .coupon-row h3 {
@@ -97,10 +96,12 @@
 #checkout #coupon-pane,
 #checkout #gift-pane
 {
-    width:50%;
-    display:inline-block;
+    width: 49%;
+    display: inline-block;
     vertical-align: top;
-    margin: 0 -4px 10px;
+    margin-left: 0px;
+    margin-right: 1%;
+    margin-bottom: 10px;
 }
 
 #checkout #gift-pane,
@@ -111,10 +112,27 @@
     clear:left;
 }
 
+#checkout.invalid label.input.number.invalid:after,
+#checkout.invalid label.input.year.invalid:after,
+#checkout.invalid label.input.month.invalid:after,
+
+#checkout.invalid label.input.first.invalid:after,
+#checkout.invalid label.input.last.invalid:after,
+#checkout.invalid label.input.email.invalid:after,
+#checkout.invalid label.input.street1.invalid:after,
+#checkout.invalid label.input.country.invalid:after,
+#checkout.invalid label.input.state.invalid:after,
+#checkout.invalid label.input.city.invalid:after,
+#checkout.invalid label.input.zip.invalid:after
+{
+    top:75%;
+}
+
 #checkout #payment-pane
 {
-    float:right;
-    clear:right;
+    margin-left: 0px;
+    margin-right: 0;
+    width: 50%;
 }
 
 #checkout #gift-pane,
@@ -131,47 +149,6 @@
     opacity: 1;
     visibility: visible;
     display: inline-block;
-}
-
-#checkout .invalid-only,
-#checkout .form-actions .error
-{
-    clear: both;
-    position: relative;
-    padding: 2px 3px;
-    border: 2px solid #CC0000;
-    color:#660000;
-    border-radius: 5px;
-}
-
-#checkout .invalid-only
-{
-    display:none;
-}
-
-#checkout.invalid-only .invalid-only
-{
-    display:inline-block;
-}
-
-#checkout.invalid-only.reoccurs-required #billing-pane .reoccurs,
-#checkout.invalid-only.first-required #billing-pane .first-name input,
-#checkout.invalid-only.last-required #billing-pane .last-name input,
-#checkout.invalid-only.email-required #billing-pane .email input,
-#checkout.invalid-only.street-required #billing-pane input[name="street1"],
-#checkout.invalid-only.city-required #billing-pane .city input,
-#checkout.invalid-only.zip-required #billing-pane .zip input,
-#checkout.invalid-only.state-required #billing-pane select[name="state"],
-#checkout.invalid-only.country-required #billing-pane select[name="country"],
-#checkout.invalid-only.cc-number-required #payment-pane .cc-number input,
-#checkout.invalid-only.cc-ccv-required #payment-pane input[name="cc-ccv"],
-#checkout.invalid-only.cc-month-required #payment-pane select[name="cc-month"],
-#checkout.invalid-only.cc-year-required #payment-pane select[name="cc-year"],
-#checkout.invalid-only.gift-first-required #gift-pane .first-name input,
-#checkout.invalid-only.gift-last-required #gift-pane .last-name input,
-#checkout.invalid-only.gift-email-required #gift-pane .email input
-{
-    border-bottom:3px solid #CC0000;
 }
 
 #payment-pane .product-option
@@ -218,12 +195,12 @@
     vertical-align: middle;
 }
 
-#payment-pane .cc-year,
-#payment-pane .cc-month,
-#gift-pane .first-name,
-#gift-pane .last-name,
-#billing-pane .first-name,
-#billing-pane .last-name,
+#payment-pane .year,
+#payment-pane .month,
+#gift-pane .first,
+#gift-pane .last,
+#billing-pane .first,
+#billing-pane .last,
 #billing-pane .city,
 #billing-pane .zip
 {
@@ -234,21 +211,13 @@
     vertical-align: bottom;
 }
 
-#checkout .form-actions
-{
-    margin: 0 -4px 0 2px;
-    padding:0;
-    display: inline-block;
-    vertical-align: top;
-    float:right;
-}
-
-#payment-pane .cc-number
+#payment-pane .number
 {
     position: relative;
+    display:block;
 }
 
-#payment-pane .cc-number .cards
+#payment-pane .number .cards
 {
     display: inline-block;
     vertical-align: bottom;
@@ -263,17 +232,17 @@
     pointer-events:none;
 }
 
-#payment-pane .cc-number input:focus ~ .cards {
+#payment-pane .number input:focus ~ .cards {
     opacity: .9;
 }
 
-#payment-pane .cc-number img
+#payment-pane .number img
 {
     float:right;
     border-radius: 1px;
 }
 
-#payment-pane .cc-number input
+#payment-pane .number input
 {
     padding-right: 160px;
 }
@@ -342,13 +311,13 @@
         display:block;
     }
 
-    #payment-pane .cc-number .cards,
-    #payment-pane .cc-number input:focus ~ .cards
+    #payment-pane .number .cards,
+    #payment-pane .number input:focus ~ .cards
     {
         display:none;
     }
 
-    #payment-pane .cc-number input
+    #payment-pane .number input
     {
         padding-right:5px;
     }

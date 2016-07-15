@@ -61,10 +61,12 @@ class Payment
     protected $subscription;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Coupon", inversedBy="payments")
-     * @ORM\JoinColumn(name="coupon_id", referencedColumnName="id", nullable=true)
+     * @ORM\ManyToMany(targetEntity="Coupon")
+     * @ORM\JoinTable(name="payment_coupon",
+     *      joinColumns={@ORM\JoinColumn(name="coupon_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="payment_id", referencedColumnName="id")})
      */
-    protected $coupon;
+    protected $coupons;
 
     /**
      * @ORM\Column(type="datetime", name="created")
@@ -326,29 +328,6 @@ class Payment
     }
 
     /**
-     * Set coupon
-     *
-     * @param \StudySauce\Bundle\Entity\Coupon $coupon
-     * @return Payment
-     */
-    public function setCoupon(\StudySauce\Bundle\Entity\Coupon $coupon = null)
-    {
-        $this->coupon = $coupon;
-
-        return $this;
-    }
-
-    /**
-     * Get coupon
-     *
-     * @return \StudySauce\Bundle\Entity\Coupon 
-     */
-    public function getCoupon()
-    {
-        return $this->coupon;
-    }
-
-    /**
      * Set pack
      *
      * @param \StudySauce\Bundle\Entity\Pack $pack
@@ -369,5 +348,46 @@ class Payment
     public function getPack()
     {
         return $this->pack;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->coupons = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add coupon
+     *
+     * @param \StudySauce\Bundle\Entity\Coupon $coupon
+     *
+     * @return Payment
+     */
+    public function addCoupon(\StudySauce\Bundle\Entity\Coupon $coupon)
+    {
+        $this->coupons[] = $coupon;
+
+        return $this;
+    }
+
+    /**
+     * Remove coupon
+     *
+     * @param \StudySauce\Bundle\Entity\Coupon $coupon
+     */
+    public function removeCoupon(\StudySauce\Bundle\Entity\Coupon $coupon)
+    {
+        $this->coupons->removeElement($coupon);
+    }
+
+    /**
+     * Get coupons
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCoupons()
+    {
+        return $this->coupons;
     }
 }

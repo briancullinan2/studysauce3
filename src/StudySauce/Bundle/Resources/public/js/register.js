@@ -42,6 +42,7 @@ jQuery(document).ready(function() {
             account.find('.form-actions .error').remove();
         }
     }
+
     body.on('show', '[id^="register"]', function () {
         if($(this).data('state') == null)
             $(this).data('state', getHash.apply(this));
@@ -77,6 +78,7 @@ jQuery(document).ready(function() {
         else {
             account.removeClass('invalid has-error');
         }
+
         standardSave.apply($(this), [data, function () {
             account.data('state', hash);
         }]);

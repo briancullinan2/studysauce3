@@ -1033,12 +1033,13 @@ $(document).ready(function () {
     });
 
     function gotoError () {
-        var invalid = $(this).parents('.results').find('.invalid .invalid:has(input, select, textarea)').first();
+        var invalid = $(this).closest('form,.results,.pane-content').find('.invalid:has(input, select, textarea)').first();
         invalid.scrollintoview(DASHBOARD_MARGINS).addClass('pulsate');
         invalid.find('input, select, textarea').focus().one('change', function () {
             $(this).parents('.pulsate').removeClass('pulsate');
         });
     }
+    window.gotoError = gotoError;
 
     body.on('click', 'a[href="#goto-error"]', function (evt) {
         evt.preventDefault();
