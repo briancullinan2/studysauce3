@@ -33,7 +33,7 @@ else {
 }
 
 ?>
-<div class="highlighted-link form-actions">
+<div class="highlighted-link invalid form-actions">
     <table><tbody>
         <tr><td>Subtotal (<?php print (count($newCart)); ?> items):</td><td>&#36;<?php print ($subTotal); ?></td></tr>
         <tr><td>Tax</td><td>&#36;<?php print (round($subTotal * .0795, 2)); ?></td></tr>
@@ -42,5 +42,5 @@ else {
         <tr><td>Total</td><td>&#36;<?php print ($subTotal + round($subTotal * .0795, 2)); ?></td></tr>
         </tfoot>
     </table>
-    <a class="more" href="<?php print ($view['router']->generate('checkout')); ?>">Place order</a>
+    <button type="submit" class="btn btn-primary" value="#save-cart">Place order</button>
 </div>

@@ -147,7 +147,7 @@ if ($tab->length == 0) {
                     $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];
                     $request['tables']['card'] = ['id', 'deleted'];
                     $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
-                    $request['classes'] = ['tiles', 'summary'];
+                    $request['classes'] = [];
                     $request['headers'] = false;
                     $request['footers'] = ['coupon' => 'cart'];
                     if ($tab->length == 0) {
@@ -188,8 +188,7 @@ if ($tab->length == 0) {
                         <select name="year">
                             <option value="" selected="selected">- Select year -</option>
                             <?php
-                            for ($y = 0; $y < 20; $y++) {
-                                ?>
+                            for ($y = 0; $y < 20; $y++) { ?>
                                 <option
                                 value="<?php print (intval(date('y')) + $y); ?>"><?php print (intval(date('Y')) + $y); ?></option><?php
                             } ?></select></label>

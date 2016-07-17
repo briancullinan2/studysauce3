@@ -42,11 +42,11 @@ class AdminController extends Controller
     /** @var array $defaultTables A list of all available fields, firewall */
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
-        'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted']],
+        'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted', 'invites']],
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
-        'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created'], 'actions' => ['deleted', 'group']],
+        'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created', 'invitee'], 'actions' => ['deleted', 'group']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
         'coupon' => ['id' => ['id', 'name', 'description', 'packs', 'options']],

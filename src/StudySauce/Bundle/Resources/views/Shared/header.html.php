@@ -36,7 +36,7 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
 
 ?>
 <div class="header-wrapper navbar navbar-inverse">
-    <div class="header" data-user="<?php print $view->escape(json_encode(AdminController::toFirewalledEntityArray($user, AdminController::$defaultTables['ss_user'], 1) + ['groups' => $allGroups])); ?>">
+    <div class="header" data-user="<?php print $view->escape(json_encode(AdminController::toFirewalledEntityArray($user, AdminController::$defaultTables, 2) + ['groups' => $allGroups])); ?>">
         <div id="site-name" class="container navbar-header">
             <a title="Home" href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>

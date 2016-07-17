@@ -46,6 +46,7 @@ if($tab->length > 0) {
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="store_cart">
         <div class="pane-content">
+            <form action="<?php print ($view['router']->generate('checkout_coupon')); ?>" method="POST">
             <?php
                 $request = (array)(new stdClass());
                 $request['count-file'] = -1;
@@ -71,6 +72,7 @@ $view['slots']->start('body'); ?>
                 if ($tab->length == 0) {
                     print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
                 } ?>
+            </form>
         </div>
     </div>
 <?php $view['slots']->stop(); ?>

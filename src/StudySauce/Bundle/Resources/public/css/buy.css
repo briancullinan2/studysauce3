@@ -14,7 +14,7 @@
     width: auto;
     margin-left: 0;
     left: auto;
-    margin-top:-35px;
+    margin-top:-15px;
     padding:0;
 }
 
@@ -52,6 +52,7 @@
 
 [id^="store"] .coupon-row h3 {
     display:inline-block;
+    margin:0;
 }
 
 [id^="checkout"] .highlighted-link td,
@@ -72,9 +73,9 @@
 
 [id^="checkout"] .highlighted-link table,
 [id^="store"] .highlighted-link table {
-    width: auto;
     margin-left: auto;
     margin-right: 0;
+    width: 250px;
 }
 
 [id^="checkout"] .highlighted-link tfoot,
@@ -89,6 +90,24 @@
 
 [id^="checkout"] .results a, [id^="checkout"] .coupon-row, [id^="checkout"] .ss_user-row {
     display:none;
+}
+
+[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label {
+    width: 40%;
+    position: static;
+    display: inline-block;
+    padding: 0 2px;
+    margin: 0 -2px;
+}
+
+[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label.child
+{
+    width:20%;
+}
+
+[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label:last-of-type {
+    width:30%;
+    padding-right:15%;
 }
 
 #checkout #payment-pane,

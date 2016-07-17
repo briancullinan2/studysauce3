@@ -169,7 +169,7 @@ class BuyController extends Controller
                 $request->getSession()->set('coupon', implode(',', array_map(function (Coupon $c) {return $c->getName();}, $coupon)));
             }
 
-            return $this->forward('StudySauceBundle:Buy:checkout', ['_format' => 'tab']);
+            return $this->redirect($this->generateUrl('checkout'));
         }
         throw new NotFoundHttpException('Coupon not found.');
     }

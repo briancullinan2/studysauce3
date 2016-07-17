@@ -138,12 +138,14 @@ window.views.__defaultEntities['ss_group'] = {
 };
 window.views.__defaultEntities['invite'] = {
     group: null,
+    invitee: null,
     getCode: function () {return this.code;},
     getFirst: function () {return this.first;},
     getLast: function () {return this.last;},
     getEmail: function () {return this.email;},
     getGroup: function () {return this.group ? applyEntityObj(this.group) : null;},
-    getCreated: function () {return !(this.created) ? null : new Date(this.created);}
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    getInvitee: function () {return this.invitee ? applyEntityObj(this.invitee) : null;}
 };
 window.views.__defaultEntities['pack'] = {
     user: null,
@@ -284,6 +286,7 @@ window.views.__defaultEntities['file'] = {
 window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),
     groups: $([]),
+    invites: $([]),
     getFirst: function () {return this.first;},
     getLast: function () {return this.last;},
     getId: function () {return this.id;},
@@ -302,6 +305,7 @@ window.views.__defaultEntities['ss_user'] = {
             }
         }
     },
+    getInvites: function () {return $($(this.invites).toArray().map(function (up) {return applyEntityObj(up);}));},
     getLastVisit: function () {return !(this.lastVisit) ? null : new Date(this.lastVisit);},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getUserPacks: function () {return $($(this.userPacks).toArray().map(function (up) {return applyEntityObj(up);}));},

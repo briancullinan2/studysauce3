@@ -2,7 +2,7 @@
 jQuery(document).ready(function($) {
     var body = $('body');
 
-    body.on('click', '[id^="store"] button, [id^="store"] a[href="#remove-coupon"]', function () {
+    body.on('click', '[id^="store"] button:not([type="submit"]), [id^="store"] a[href="#remove-coupon"]', function () {
         var cart = (Cookies.get('cart') || '').split(',');
         if(cart[0] == '') {
             cart.splice(0);
@@ -38,6 +38,45 @@ jQuery(document).ready(function($) {
         }
     });
 
+    function cartFunc() {
+        var account = $(this);
+        var valid = true;
+        account.find('.coupon-row').each(function () {
+            var data = gatherFields.apply(account, [['child']]);
+            if(data.child == '') {
+                valid = false;
+                $(this).addClass('invalid');
+            }
+            else {
+                $(this).removeClass('invalid');
+            }
+        });
+        if(!valid) {
+            account.find('.form-actions').removeClass('valid').addClass('invalid');
+        }
+        else {
+            account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
+        }
+    }
+
+    body.on('validate', '[id^="store_cart"]', cartFunc);
+    body.on('change keyup keydown', '[id^="store_cart"] input, [id^="store_cart"] select, [id^="store_cart"] textarea', standardChangeHandler);
+    body.on('submit', '#store_cart form', function (evt) {
+        var account = $(this).parents('.panel-pane');
+        evt.preventDefault();
+        var data = gatherFields.apply(account, [['child']]);
+        account.trigger('validate');
+        if(account.find('.highlighted-link').is('.invalid')) {
+            account.addClass('invalid has-error');
+        }
+        else {
+            account.removeClass('invalid has-error');
+        }
+        gotoError.apply(this);
+        standardSave.apply(this, [data, function () {
+
+        }]);
+    });
 
     function checkoutFunc() {
         var account = $(this);
@@ -69,80 +108,6 @@ jQuery(document).ready(function($) {
 
     body.on('validate', '[id^="checkout"]', checkoutFunc);
     body.on('change keyup keydown', '[id^="checkout"] input, [id^="checkout"] select, [id^="checkout"] textarea', standardChangeHandler);
-
-    body.on('click', '#checkout a[href="#show-coupon"]', function (evt) {
-        var checkout = $('#checkout');
-        evt.preventDefault();
-        $(this).hide();
-        checkout.find('#coupon-pane')
-            .css('display', 'inline-block')
-            .css('visibility', 'visible')
-            .animate({opacity:1,height: 100});
-    });
-
-    body.on('click', '#checkout a[href="#show-gift"]', function (evt) {
-        var checkout = $('#checkout');
-        evt.preventDefault();
-        $(this).hide();
-        checkout.find('#gift-pane')
-            .css('display', 'inline-block')
-            .css('visibility', 'visible')
-            .animate({opacity:1,height: 166});
-    });
-
-    body.on('click', '#checkout a[href="#coupon-apply"]', function (evt) {
-        var checkout = $('#checkout');
-        evt.preventDefault();
-        checkout.find('.form-actions .error').remove();
-        $.ajax({
-            url: Routing.generate('checkout_coupon'),
-            type: 'POST',
-            dataType: 'text',
-            data: {
-                coupon: checkout.find('.coupon-code input').val().trim()
-            },
-            success: function (data) {
-                var content = $(data);
-                if (typeof data.error != 'undefined') {
-                    checkout.find('.form-actions').prepend($('<span class="error">' + data.error + '</span>'));
-                }
-                else {
-                    // set new line item
-                    checkout.find('.product-option').replaceWith(content.find('.product-option'));
-
-                    // update coupon pane
-                    checkout.find('#coupon-pane').html(content.find('#coupon-pane').html());
-                }
-            }
-        });
-    });
-
-    body.on('click', '#checkout a[href="#coupon-remove"]', function (evt) {
-        var checkout = $('#checkout');
-        evt.preventDefault();
-        checkout.find('.form-actions .error').remove();
-        $.ajax({
-            url: Routing.generate('checkout_coupon'),
-            type: 'POST',
-            dataType: 'text',
-            data: {
-                remove: true
-            },
-            success: function (data) {
-                var content = $(data);
-                if (typeof data.error != 'undefined') {
-                    checkout.find('.form-actions').prepend($('<span class="error">' + data.error + '</span>'));
-                }
-                else {
-                    // set new line item
-                    checkout.find('.product-option').replaceWith(content.find('.product-option'));
-
-                    // update coupon pane
-                    checkout.find('#coupon-pane').html(content.find('#coupon-pane').html());
-                }
-            }
-        });
-    });
 
     body.on('submit', '#checkout form', function (evt) {
         var account = $(this).parents('.panel-pane');
