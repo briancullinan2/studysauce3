@@ -330,8 +330,8 @@ window.views.__defaultEntities['coupon'] = {
         var packs = this.getPacks().toArray();
         for(var p in packs) {
             if(packs.hasOwnProperty(p)) {
-                if(p.getLogo() != null) {
-                    return p.getLogo();
+                if(packs[p].getLogo() != null) {
+                    return packs[p].getLogo();
                 }
             }
         }
