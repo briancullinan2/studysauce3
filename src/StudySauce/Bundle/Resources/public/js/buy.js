@@ -5,12 +5,12 @@ jQuery(document).ready(function($) {
     body.on('click', '[id^="store"]:not(#store_cart) button, [id^="store"] a[href="#remove-coupon"]', function () {
         var cart = (Cookies.get('cart') || '').split(',');
         if(cart[0] == '') {
-            cart.splice(0);
+            cart.splice(0, 1);
         }
         if($(this).is('a[href="#remove-coupon"]')) {
             var removeI = cart.indexOf($(this).parents('.coupon-row').find('[name="coupon"]').val());
             if(removeI > -1) {
-                cart.splice(removeI);
+                cart.splice(removeI, 1);
             }
         }
         else {
