@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
             cart.splice(0);
         }
         if($(this).is('a[href="#remove-coupon"]')) {
-            var removeI = cart.indexOf($(this).data('value'));
+            var removeI = cart.indexOf($(this).parents('.coupon-row').find('[name="coupon"]').val());
             if(removeI > -1) {
                 cart.splice(removeI);
             }
@@ -64,7 +64,6 @@ jQuery(document).ready(function($) {
     body.on('submit', '#store_cart form', function (evt) {
         var account = $(this).parents('.panel-pane');
         evt.preventDefault();
-        var data = gatherFields.apply(account, [['child']]);
         account.trigger('validate');
         if(account.find('.highlighted-link').is('.invalid')) {
             account.addClass('invalid has-error');
@@ -72,6 +71,12 @@ jQuery(document).ready(function($) {
         else {
             account.removeClass('invalid has-error');
         }
+        var data = {coupon: '', child: {}};
+        account.find('.coupon-row').each(function () {
+            var couponData = gatherFields.apply(account, [['child', 'coupon']]);
+            data.coupon += (data.coupon != '' ? ',' : '') + couponData.coupon;
+            data.child[couponData.child] = couponData.coupon;
+        });
         gotoError.apply(this);
         standardSave.apply(this, [data, function () {
 

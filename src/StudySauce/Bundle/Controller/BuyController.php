@@ -118,28 +118,31 @@ class BuyController extends Controller
     private function getCoupon(Request $request)
     {
         if(!empty($request)) {
-            $codes = explode(',', $request->get('coupon'));
             if($request->getSession()->has('coupon')) {
                 $codes = explode(',', $request->getSession()->get('coupon'));
+            }
+            if(!empty($request->get('coupon'))) {
+                $codes = explode(',', $request->get('coupon'));
             }
         }
         if(!empty($codes) && $codes[0] == '') {
             array_splice($codes, 0, 1);
         }
+
+        $result = [];
         if(empty($codes))
-            return null;
+            return $result;
 
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
-        $allCodes = $orm->getRepository('StudySauceBundle:Coupon')->createQueryBuilder('c');
-        $result = [];
+        $allCodes = $orm->getRepository('StudySauceBundle:Coupon')->createQueryBuilder('c')->getQuery()->getResult();
         foreach($allCodes as $i => $c) {
             /** @var Coupon $c */
             foreach($codes as $code) {
                 if(strtolower(substr($code, 0, strlen($c->getName()))) == strtolower($c->getName())) {
                     // one use coupons should match exactly
                     if($c->getMaxUses() <= 1 && strtolower($code) == strtolower($c->getName()))
-                        return $c;
+                        $result[] = $c;
 
                     // ensure code exists in random value
                     for ($i = 0; $i < $c->getMaxUses(); $i++) {
@@ -164,9 +167,11 @@ class BuyController extends Controller
         if(!empty($coupon)) {
             if(!empty($request->get('remove'))) {
                 $request->getSession()->remove('coupon');
+                $request->getSession()->remove('coupon_child');
             }
             else {
                 $request->getSession()->set('coupon', implode(',', array_map(function (Coupon $c) {return $c->getName();}, $coupon)));
+                $request->getSession()->set('coupon_child', $request->get('child'));
             }
 
             return $this->redirect($this->generateUrl('checkout'));
@@ -239,17 +244,6 @@ class BuyController extends Controller
             throw new BadRequestHttpException($ex->getMessage(), $ex);
         }
 
-        $user = $this->getUser();
-        $payment->setUser($user);
-        $user->addPayment($payment);
-        $payment->setEmail($user->getEmail());
-
-        if (isset($error)) {
-            $orm->persist($payment);
-            $orm->flush();
-            throw new BadRequestHttpException($error);
-        }
-
         // successful payment!
 
         // find or create user from checkout form
@@ -261,10 +255,31 @@ class BuyController extends Controller
 
         // update paid status
         $user->addRole('ROLE_PAID');
+
+        if (isset($error)) {
+            $orm->persist($payment);
+            $orm->flush();
+            throw new BadRequestHttpException($error);
+        }
+
         // set group for coupon is necessary
-        // TODO: set pack for selected user
-        if(!empty($coupon) && !empty($coupon->getGroup()) && !$user->hasGroup($coupon->getGroup()->getName())) {
-            $user->addGroup($coupon->getGroup());
+        $invites = !empty($user) ? $user->getInvites()->toArray() : [];
+        foreach($coupon as $c) {
+            $assignee = $user;
+            // set pack for selected user
+            if(($key = array_search($c->getName(), $request->getSession()->get('coupon_child'))) !== false) {
+                foreach ($invites as $invite) {
+                    /** @var Invite $invite */
+                    if(!empty($invite->getInvitee()) && $invite->getInvitee()->getId() == $key) {
+                        $assignee = $invite->getInvitee();
+                        break;
+                    }
+                }
+            }
+            if(!empty($c->getGroup()) && !$assignee->hasGroup($c->getGroup()->getName())) {
+                $user->addGroup($c->getGroup());
+                $userManager->updateUser($assignee);
+            }
         }
         $userManager->updateUser($user);
 
@@ -278,7 +293,7 @@ class BuyController extends Controller
             $response = $this->redirect($this->generateUrl($route, $options));
         }
 
-        // send receipt
+        // send email receipt
         $address = $request->get('street1') .
             (empty(trim($request->get('street2'))) ? '' : ("<br />" . $request->get('street2'))) . '<br />' .
             $request->get('city') . ' ' . $request->get('state') . '<br />' .

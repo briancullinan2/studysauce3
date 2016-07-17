@@ -88,7 +88,7 @@
     display:inline-block;
 }
 
-[id^="checkout"] .results a, [id^="checkout"] .coupon-row, [id^="checkout"] .ss_user-row {
+[id^="checkout"] .results button, [id^="checkout"] .coupon-row, [id^="checkout"] .ss_user-row {
     display:none;
 }
 

@@ -39,6 +39,7 @@ if(!is_array($cart)) {
                 <option value="<?php print ($user->getId()); ?>"><?php print (implode('', [$user->getFirst(), ' ', $user->getLast()])); ?></option>
             </select>
         </label>
+        <input type="hidden" name="coupon" value="<?php print ($view->escape($coupon->getName())); ?>" />
     <?php }
     print ($view->render('AdminBundle:Admin:cell-id-coupon.html.php', ['coupon' => $coupon]));
     print ($view->render('AdminBundle:Admin:cell-title.html.php', ['entity' => $coupon, 'fields' => ['description']]));
@@ -62,7 +63,7 @@ if(!is_array($cart)) {
             foreach ($coupon->getOptions() as $o) {
                 if (empty($o['description'])) {
                     if(!empty($request['inCartOnly'])) { ?>
-                        <a href="#remove-coupon" data-value="<?php print ($view->escape($coupon->getName())); ?>">Remove</a>&nbsp;&nbsp;&nbsp;<h3><strong><?php print (implode('', ['&#36;' , $o['price']])); ?></strong></h3>
+                        <a href="#remove-coupon">Remove</a>&nbsp;&nbsp;&nbsp;<h3><strong><?php print (implode('', ['&#36;' , $o['price']])); ?></strong></h3>
                     <?php }
                     else {
                         ?>
