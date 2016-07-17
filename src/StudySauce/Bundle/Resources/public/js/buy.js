@@ -2,7 +2,7 @@
 jQuery(document).ready(function($) {
     var body = $('body');
 
-    body.on('click', '[id^="store"] button:not([type="submit"]), [id^="store"] a[href="#remove-coupon"]', function () {
+    body.on('click', '[id^="store"]:not(#store_cart) button, [id^="store"] a[href="#remove-coupon"]', function () {
         var cart = (Cookies.get('cart') || '').split(',');
         if(cart[0] == '') {
             cart.splice(0);
