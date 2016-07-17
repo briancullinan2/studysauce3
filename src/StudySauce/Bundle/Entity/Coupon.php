@@ -37,8 +37,8 @@ class Coupon
     /**
      * @ORM\ManyToMany(targetEntity="Pack")
      * @ORM\JoinTable(name="coupon_pack",
-     *      joinColumns={@ORM\JoinColumn(name="pack_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="coupon_id", referencedColumnName="id")})
+     *      joinColumns={@ORM\JoinColumn(name="coupon_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="pack_id", referencedColumnName="id")})
      */
     protected $packs;
 

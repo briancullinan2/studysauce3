@@ -63,8 +63,8 @@ class Payment
     /**
      * @ORM\ManyToMany(targetEntity="Coupon")
      * @ORM\JoinTable(name="payment_coupon",
-     *      joinColumns={@ORM\JoinColumn(name="coupon_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="payment_id", referencedColumnName="id")})
+     *      joinColumns={@ORM\JoinColumn(name="payment_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="coupon_id", referencedColumnName="id")})
      */
     protected $coupons;
 
