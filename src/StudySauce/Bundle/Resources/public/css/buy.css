@@ -95,10 +95,14 @@
 
 [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label {
     width: 40%;
-    position: static;
+    position: relative;
     display: inline-block;
     padding: 0 2px;
     margin: 0 -2px;
+    top:0;
+    left:0;
+    bottom:auto;
+    right:auto;
 }
 
 [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label.child
