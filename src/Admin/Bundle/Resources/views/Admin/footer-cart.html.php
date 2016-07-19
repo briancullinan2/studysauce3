@@ -35,11 +35,12 @@ else {
 ?>
 <div class="highlighted-link invalid form-actions">
     <table><tbody>
-        <tr><td>Subtotal (<?php print (count($newCart)); ?> items):</td><td>&#36;<?php print ($subTotal); ?></td></tr>
-        <tr><td>Tax</td><td>&#36;<?php print (round($subTotal * .0795, 2)); ?></td></tr>
+        <input type="hidden" name="purchase_token" value="" />
+        <tr><td>Subtotal (<?php print (count($newCart)); ?> items):</td><td>&#36;<?php print (number_format($subTotal, 2)); ?></td></tr>
+        <tr><td>Tax</td><td>&#36;<?php print (number_format(round($subTotal * .0795, 2), 2)); ?></td></tr>
         </tbody>
         <tfoot>
-        <tr><td>Total</td><td>&#36;<?php print ($subTotal + round($subTotal * .0795, 2)); ?></td></tr>
+        <tr><td>Total</td><td>&#36;<?php print (number_format(round($subTotal + round($subTotal * .0795, 2), 2), 2)); ?></td></tr>
         </tfoot>
     </table>
     <button type="submit" class="btn btn-primary" value="#save-cart">Place order</button>

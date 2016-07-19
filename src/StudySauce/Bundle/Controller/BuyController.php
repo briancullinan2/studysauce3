@@ -5,6 +5,8 @@ namespace StudySauce\Bundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use FOS\UserBundle\Doctrine\UserManager;
+use Stripe\Charge;
+use Stripe\Stripe;
 use StudySauce\Bundle\Entity\Card;
 use StudySauce\Bundle\Entity\Coupon;
 use StudySauce\Bundle\Entity\Invite;
@@ -205,43 +207,24 @@ class BuyController extends Controller
             }
         }
         $payment->setAmount($price);
-        $payment->setFirst($request->get('first'));
-        $payment->setLast($request->get('last'));
+        $payment->setFirst($request->get('first') ?: '');
+        $payment->setLast($request->get('last') ?: '');
         $payment->setProduct($option);
 
-        try {
-            $sale = new \AuthorizeNetAIM(self::AUTHORIZENET_API_LOGIN_ID, self::AUTHORIZENET_TRANSACTION_KEY);
-            $sale->setField('amount', $price);
-            $sale->setField('card_num', $request->get('number'));
-            $sale->setField('exp_date', $request->get('month') . '/' . $request->get('year'));
-            $sale->setField('first_name', $request->get('first'));
-            $sale->setField('last_name', $request->get('last'));
-            $sale->setField(
-                'address',
-                $request->get('street1') .
-                (empty(trim($request->get('street2'))) ? '' : ("\n" . $request->get('street2')))
-            );
-            $sale->setField('city', $request->get('city'));
-            $sale->setField('zip', $request->get('zip'));
-            $sale->setField('state', $request->get('state'));
-            $sale->setField('country', $request->get('country'));
-            $sale->setField('card_code', $request->get('ccv'));
-            $sale->setField('recurring_billing', true);
-            if($this->container->getParameter('authorize_test_mode'))
-                $sale->setField('test_request', true);
-            else
-                $sale->setField('test_request', false);
-            $sale->setField('duplicate_window', 120);
-            $sale->setSandbox(false);
-            $aimResponse = $sale->authorizeAndCapture();
-            if ($aimResponse->approved) {
-                $payment->setPayment($aimResponse->transaction_id);
-            } else {
-                $error = $aimResponse->response_reason_text;
-            }
+        Stripe::setApiKey($this->container->getParameter('stripe_api_key'));
 
-        } catch(\AuthorizeNetException $ex) {
-            throw new BadRequestHttpException($ex->getMessage(), $ex);
+        // Create the charge on Stripe's servers - this will charge the user's card
+        try {
+            $charge = Charge::create(array(
+                "amount" => round($price * 100), // amount in cents, again
+                "currency" => "usd",
+                "source" => $request->get('purchase_token'),
+                "description" => "Pack Bundle"
+            ));
+            $payment->setPayment($request->get('purchase_token'));
+        } catch(\Stripe\Error\Card $e) {
+            // The card has been declined
+            throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
         // successful payment!
@@ -255,19 +238,14 @@ class BuyController extends Controller
 
         // update paid status
         $user->addRole('ROLE_PAID');
-
-        if (isset($error)) {
-            $orm->persist($payment);
-            $orm->flush();
-            throw new BadRequestHttpException($error);
-        }
+        $orm->persist($payment);
 
         // set group for coupon is necessary
         $invites = !empty($user) ? $user->getInvites()->toArray() : [];
         foreach($coupon as $c) {
             $assignee = $user;
             // set pack for selected user
-            if(($key = array_search($c->getName(), $request->getSession()->get('coupon_child'))) !== false) {
+            if(($key = array_search($c->getName(), $request->get('child'))) !== false) {
                 foreach ($invites as $invite) {
                     /** @var Invite $invite */
                     if(!empty($invite->getInvitee()) && $invite->getInvitee()->getId() == $key) {

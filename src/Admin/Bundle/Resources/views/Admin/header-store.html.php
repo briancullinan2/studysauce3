@@ -32,6 +32,6 @@ else {
 if(!empty($last)) { ?>
 <header><h3 class="highlighted-link">
         <label>Added to cart: <span><?php print ($last->getDescription()); ?></span></label>
-        <strong>&#36;<?php print ($subTotal); ?></strong>
+        <strong>&#36;<?php print (number_format($subTotal, 2)); ?></strong>
         <a href="<?php print ($view['router']->generate('store_cart')); ?>" class="more">Checkout</a></h3></header>
 <?php } ?>

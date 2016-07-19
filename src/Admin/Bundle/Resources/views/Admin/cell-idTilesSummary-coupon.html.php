@@ -63,12 +63,12 @@ if(!is_array($cart)) {
             foreach ($coupon->getOptions() as $o) {
                 if (empty($o['description'])) {
                     if(!empty($request['inCartOnly'])) { ?>
-                        <a href="#remove-coupon">Remove</a>&nbsp;&nbsp;&nbsp;<h3><strong><?php print (implode('', ['&#36;' , $o['price']])); ?></strong></h3>
+                        <a href="#remove-coupon">Remove</a>&nbsp;&nbsp;&nbsp;<h3><strong><?php print (implode('', ['&#36;' , number_format($o['price'], 2)])); ?></strong></h3>
                     <?php }
                     else {
                         ?>
                     <button type="submit" class="btn" <?php print (in_array($coupon->getName(), $cart) ? 'disabled="disabled"' : ''); ?> value="<?php print ($coupon->getName()); ?>">
-                        <?php print (in_array($coupon->getName(), $cart) ? 'In cart' : implode('', ['&#36;', $o['price'], ' Buy'])); ?></button><?php
+                        <?php print (in_array($coupon->getName(), $cart) ? 'In cart' : implode('', ['&#36;', number_format($o['price'], 2), ' Buy'])); ?></button><?php
                     }
                 }
             }

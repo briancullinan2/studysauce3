@@ -436,7 +436,7 @@ $(document).ready(function () {
         var footer = tab.find('.results .cardResult');
         var user = window.views.__globalVars.app.getUser();
         footer.find('*').remove();
-        var up = $.extend(user.getUserPack({id: request['pack-id']}), {user: user});
+        var up = $.extend(user.getUserPack(applyEntityObj({table: 'pack', id: request['pack-id']})), {user: user});
         window.views.render('cell-cardResult-user_pack', {
             context: footer,
             request: request,
@@ -474,7 +474,7 @@ $(document).ready(function () {
             context: footer,
             request: request,
             card: applyEntityObj({table: 'card', id: cardId}),
-            results: {user_pack: [$.extend(user.getUserPack({id: request['pack-id']}), {user: user})]}
+            results: {user_pack: [$.extend(user.getUserPack(applyEntityObj({table: 'pack', id: request['pack-id']})), {user: user})]}
         });
 
         // remove read-only from the last time it was saved
@@ -586,7 +586,7 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var up = user.getUserPack({id: packId});
+        var up = user.getUserPack(applyEntityObj({table: 'pack', id: packId}));
         up.retention[id][2] = !correct;
         up.retention[id][3] = response.created;
 
@@ -796,7 +796,7 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var up = user.getUserPack({id: packId});
+        var up = user.getUserPack(applyEntityObj({table: 'pack', id: packId}));
         up.retention[id][2] = !correct;
         up.retention[id][3] = response.created;
 
@@ -854,7 +854,7 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var up = user.getUserPack({id: packId});
+        var up = user.getUserPack(applyEntityObj({table: 'pack', id: packId}));
         up.retention[id][2] = !correct;
         up.retention[id][3] = response.created;
 

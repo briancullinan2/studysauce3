@@ -24,6 +24,7 @@ jQuery(document).ready(function($) {
         window.views.render.apply(results, ['results', {tables: request.tables, request: request, results: resultsObj, context: results}]);
     });
 
+    var checkoutHandler;
     body.on('showing', '[id^="store"]', function () {
         var results = $(this).find('.results');
         var request = results.data('request');
@@ -35,6 +36,21 @@ jQuery(document).ready(function($) {
                 results: resultsObj,
                 context: results
             }]);
+        }
+        if($(this).is('#store_cart') && !$(this).is('.loaded')) {
+            var tab = $(this).addClass('loaded');
+            checkoutHandler = StripeCheckout.configure({
+                key: window.stripe_public_key,
+                image: '/bundles/studysauce/images/studysauce-icon-120x120.png',
+                locale: 'auto',
+                zipCode: true,
+                token: function(token) {
+                    // You can access the token ID with `token.id`.
+                    // Get the token ID to your server-side code for use.
+                    tab.find('[name="purchase_token"]').val(token.id);
+                    tab.find('form').submit();
+                }
+            });
         }
     });
 
@@ -61,6 +77,28 @@ jQuery(document).ready(function($) {
 
     body.on('validate', '[id^="store_cart"]', cartFunc);
     body.on('change keyup keydown', '[id^="store_cart"] input, [id^="store_cart"] select, [id^="store_cart"] textarea', standardChangeHandler);
+    body.on('click', '#store_cart [value*="#save-"]', function (e) {
+        var tab = $(this).parents('.panel-pane');
+        var products = tab.find('.coupon-row label span').map(function () {return $(this).text();}).toArray();
+        var tabStr = products.join(',');
+        var amount = parseInt(tab.find('.highlighted-link tfoot td:last-child').text().replace('$', '').replace('.', ''));
+        if(tabStr.length > 100) {
+            tabStr = tabStr.substr(0, 100) + '...';
+        }
+        if(products.length > 3) {
+            tabStr = tabStr + ', etc.';
+        }
+        checkoutHandler.open({
+            name: 'StudySauce.com',
+            description: 'Pack Bundles (' + tabStr + ')',
+            amount: amount
+        });
+        e.preventDefault();
+    });
+    $(window).on('popstate', function(e) {
+        checkoutHandler.close();
+    });
+
     body.on('submit', '#store_cart form', function (evt) {
         var account = $(this).parents('.panel-pane');
         evt.preventDefault();
@@ -71,7 +109,7 @@ jQuery(document).ready(function($) {
         else {
             account.removeClass('invalid has-error');
         }
-        var data = {coupon: '', child: {}};
+        var data = $.extend({coupon: '', child: {}}, gatherFields.apply(account, [['purchase_token']]));
         account.find('.coupon-row').each(function () {
             var couponData = gatherFields.apply(account, [['child', 'coupon']]);
             data.coupon += (data.coupon != '' ? ',' : '') + couponData.coupon;

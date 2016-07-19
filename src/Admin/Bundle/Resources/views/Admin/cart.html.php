@@ -35,8 +35,12 @@ if($tab->length == 0) {
     $view['slots']->start('javascripts');
     foreach ($view['assetic']->javascripts(['@StudySauceBundle/Resources/public/js/buy.js'], [], ['output' => 'bundles/studysauce/js/*.js']) as $url) { ?>
         <script type="text/javascript" src="<?php print ($view->escape($url)); ?>"></script>
-    <?php }
-    $view['slots']->stop();
+    <?php } ?>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
+    <script type="application/javascript">
+        window.stripe_public_key = <?php print (json_encode($this->container->getParameter('stripe_public_key'))); ?>;
+    </script>
+    <?php $view['slots']->stop();
 }
 
 if($tab->length > 0) {
@@ -46,7 +50,7 @@ if($tab->length > 0) {
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="store_cart">
         <div class="pane-content">
-            <form action="<?php print ($view['router']->generate('checkout_coupon')); ?>" method="POST">
+            <form action="<?php print ($view['router']->generate('checkout_pay')); ?>" method="POST">
             <?php
                 $request = (array)(new stdClass());
                 $request['count-file'] = -1;

@@ -328,28 +328,86 @@ class AdminController extends Controller
      * @param QueryBuilder $qb
      * @param array $joins
      * @param User $user
-     * @return Criteria
+     * @return QueryBuilder
      * @throws Query\QueryException
      */
     public static function firewallCollection($table, QueryBuilder $qb, $joins = [], User $user) {
         if($table == 'ss_user') {
             if(!$user->hasRole('ROLE_ADMIN')) {
-                if(!in_array('invitees', $joins)) {
-                    $qb = $qb->leftJoin('ss_user.invitees', 'invitees');
+                if(!in_array('ss_user_inviteesinvite', $joins)) {
+                    $qb = $qb->leftJoin('ss_user.invitees', 'ss_user_inviteesinvite');
                 }
-                $qb = $qb->addCriteria(Criteria::create()->where(Criteria::expr()->eq('invitees.user', $user))->orWhere(Criteria::expr()->eq('ss_user', $user)));
+                $qb->andWhere('ss_user_inviteesinvite.user=:current_user OR ss_user=:current_user')
+                    ->setParameter('current_user', $user);
                 return $qb;
             }
         }
         else if ($table == 'ss_group') {
             if(!$user->hasRole('ROLE_ADMIN')) {
-                $groups = $user->getGroups()->toArray();
-                $qb = $qb->addCriteria(Criteria::create()->where(Criteria::expr()->in('ss_group.parent', $groups))
-                    ->orWhere(Criteria::expr()->in('ss_group', $groups)));
+                if(!in_array('ss_group_usersss_user', $joins)) {
+                    $qb = $qb->leftJoin('ss_group.users', 'ss_group_usersss_user');
+                }
+                if(!in_array('ss_group_parentss_group', $joins)) {
+                    $qb = $qb->leftJoin('ss_group.parent', 'ss_group_parentss_group');
+                }
+                if(!in_array('ss_group_parentss_group_usersss_user', $joins)) {
+                    $qb = $qb->leftJoin('ss_group_parentss_group.users', 'ss_group_parentss_group_usersss_user');
+                }
+                $qb = $qb
+                    ->andWhere('ss_group_usersss_user=:current_user OR ss_group_parentss_group_usersss_user=:current_user')
+                    ->setParameter('current_user', $user);
                 return $qb;
             }
         }
-        // TODO: move packs code from getPacksForUser
+        else if ($table == 'pack') {
+            if(!in_array('pack_userPacksuser_pack', $joins)) {
+                $qb = $qb->leftJoin('pack.userPacks', 'pack_userPacksuser_pack');
+            }
+            if(!in_array('pack_userPacksuser_pack_userss_user', $joins)) {
+                $qb = $qb->leftJoin('pack_userPacksuser_pack.user', 'pack_userPacksuser_pack_userss_user');
+            }
+            if(!in_array('pack_userPacksuser_pack_userss_user_inviteesinvite', $joins)) {
+                $qb = $qb->leftJoin('pack_userPacksuser_pack_userss_user.invitees', 'pack_userPacksuser_pack_userss_user_inviteesinvite');
+            }
+            if(!in_array('pack_groupsss_group', $joins)) {
+                $qb = $qb->leftJoin('pack.groups', 'pack_groupsss_group');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group.users', 'pack_groupsss_group_usersss_user');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_inviteesinvite', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user.invitees', 'pack_groupsss_group_usersss_user_inviteesinvite');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_inviteesinvite_userss_user', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_inviteesinvite.user', 'pack_groupsss_group_usersss_user_inviteesinvite_userss_user');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_paymentspayment', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user.payments', 'pack_groupsss_group_usersss_user_paymentspayment');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_inviteesinvite_userss_user.payments', 'pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_paymentspayment_couponscoupon', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_paymentspayment.coupons', 'pack_groupsss_group_usersss_user_paymentspayment_couponscoupon');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment.coupons', 'pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_paymentspayment_couponscoupon.packs', 'pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack');
+            }
+            if(!in_array('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon_packspack', $joins)) {
+                $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon.packs', 'pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon_packspack');
+            }
+            $qb = $qb
+                ->andWhere('pack.status=\'PUBLIC\'
+                OR pack_userPacksuser_pack.user=:current_user
+                OR pack_userPacksuser_pack_userss_user_inviteesinvite.user=:current_user
+                OR (pack_groupsss_group_usersss_user=:current_user AND (pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))
+                OR (pack_groupsss_group_usersss_user_inviteesinvite.user=:current_user AND (pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))')
+                ->setParameter('current_user', $user);
+            return $qb;
+        }
         return $qb;
     }
 
@@ -1164,6 +1222,7 @@ var implode = function (sep, arr) {return (arr || []).join(sep);};
 var preg_replace = function (needle, replacement, subject) {
     return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g'), replacement);
 };
+var number_format = function (num, digits) { return num.toFixed(digits);};
 var preg_match = function (needle, subject, matches) {
     var result = (new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])).exec(subject);
     if(result == null) {

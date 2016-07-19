@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Command;
 
+use Admin\Bundle\Controller\AdminController;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use StudySauce\Bundle\Controller\EmailsController;
@@ -138,8 +139,6 @@ EOF
             ->where('u.devices IS NOT NULL AND u.devices != \'\'')
             ->getQuery()->getResult();
 
-        $controller = new PacksController();
-        $controller->setContainer($this->getContainer());
         $emails = new EmailsController();
         $emails->setContainer($this->getContainer());
 
@@ -151,7 +150,11 @@ EOF
                 continue;
             }
 
-            $packs = $controller->getPacksForUser($u);
+            /** @var Pack[] $packs */
+            $joins = [];
+            $packs = AdminController::firewallCollection('pack', $orm->getRepository('StudySauceBundle:Pack')
+                ->createQueryBuilder('pack'), $joins, $u)->getQuery()
+                ->getResult();
 
             $notify = [];
             // loop through packs and determine if they have already been downloaded by the user

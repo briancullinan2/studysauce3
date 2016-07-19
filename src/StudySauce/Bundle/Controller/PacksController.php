@@ -154,71 +154,6 @@ class PacksController extends Controller
         return $this->forward('AdminBundle:Admin:results', $searchRequest);
     }
 
-    /**
-     * @param null $user
-     * @return \StudySauce\Bundle\Entity\Pack[]
-     */
-    public function getPacksForUser($user = null) {
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
-        /** @var User $user */
-        if ($user == null) {
-            $user = $this->getUser();
-        }
-
-        return array_values(array_filter($orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('p')
-            ->select('p')
-            ->getQuery()
-            ->getResult(), function (Pack $p) use ($user) {
-            /** @var UserPack $up */
-            $hasPack = $p->getUser() == $user
-                || $user->getUserPacks()
-                    ->filter(function (UserPack $up) use ($p) {
-                        return $up->getPack()->getId() == $p->getId();
-                    })->count() > 0
-                || $user->getInvites()->exists(function ($_, Invite $x) use ($p) {
-                    return !empty($x->getInvitee())
-                    && $x->getInvitee()->getUserPacks()->filter(function (UserPack $up) use ($p) {
-                        return $up->getPack()->getId() == $p->getId();
-                    })->count() > 0;
-                });
-            $packGroups = $p->getGroups()->map(function (Group $g) {
-                return $g->getId();
-            })->toArray();
-            $hasGroups = count(array_intersect($packGroups, $user->getGroups()
-                    ->map(function (Group $g) {
-                        return $g->getId();
-                    })->toArray())) > 0
-                || $user->getInvites()->exists(function ($_, Invite $x) use ($packGroups) {
-                    return !empty($x->getInvitee())
-                    && count(array_intersect($packGroups, $x->getInvitee()->getGroups()
-                        ->map(function (Group $g) {
-                            return $g->getId();
-                        })->toArray())) > 0;
-                });
-            if (($p->getStatus() == 'DELETED' || $p->getStatus() == 'UNPUBLISHED' || empty($p->getStatus()))) {
-                if ($hasPack) {
-                    return true;
-                }
-                return false;
-            }
-            if ($p->getStatus() == 'UNLISTED' && $hasPack) {
-                return true;
-            }
-            if ($p->getStatus() == 'GROUP' && ($hasGroups || $hasPack)) {
-                // || $user->getInvitees()->exists(function ($_, Invite $i) use ($p)
-                //    return !empty($i->getUser()) && $i->getUser()->hasGroup($p->getGroup()->getName());
-                return true;
-            }
-            if ($p->getStatus() == 'PUBLIC') {
-                return true;
-            }
-            return false;
-        }));
-    }
-
-
     // TODO: use results API instead
     /**
      * @param User|null $user
@@ -226,7 +161,8 @@ class PacksController extends Controller
      */
     public function listAction(User $user = null)
     {
-
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
 
         if(!$this->getUser()->hasRole('ROLE_ADMIN') || $user == null) {
             $user = $this->getUser();
@@ -241,7 +177,10 @@ class PacksController extends Controller
         }
 
         /** @var QueryBuilder $qb */
-        $packs = self::getPacksForUser($user);
+        $joins = [];
+        $packs = AdminController::firewallCollection('pack', $orm->getRepository('StudySauceBundle:Pack')
+            ->createQueryBuilder('pack'), $joins, $user)->getQuery()
+            ->getResult();
         $response = new JsonResponse(array_map(function (Pack $x) use ($user) {
 
             $users = $x->getChildUsers($user);
@@ -422,7 +361,10 @@ class PacksController extends Controller
             $since = intval($request->get('since'));
         }
         // only sync responses for specific pack
-        $packs = self::getPacksForUser($currentUser);
+        $joins = [];
+        $packs = AdminController::firewallCollection('pack', $orm->getRepository('StudySauceBundle:Pack')
+            ->createQueryBuilder('pack'), $joins, $currentUser)->getQuery()
+            ->getResult();
         $packs = array_filter($packs, function (Pack $x) {return !($x->getStatus() == 'DELETED' || $x->getStatus() == 'UNPUBLISHED' || empty($x->getStatus()) || $x->getProperty('schedule') > new \DateTime());});
         if (!empty($request->get('pack'))) {
             $up = $user->getUserPackById($request->get('pack'));
