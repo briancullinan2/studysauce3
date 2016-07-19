@@ -37,6 +37,9 @@ jQuery(document).ready(function($) {
                 context: results
             }]);
         }
+    });
+
+    body.on('show', '#store_cart', function () {
         if($(this).is('#store_cart') && !$(this).is('.loaded')) {
             var tab = $(this).addClass('loaded');
             checkoutHandler = StripeCheckout.configure({
