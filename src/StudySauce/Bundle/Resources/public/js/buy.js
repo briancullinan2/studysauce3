@@ -58,7 +58,7 @@ jQuery(document).ready(function($) {
     });
 
     function cartFunc() {
-        var account = $(this);
+        var account = $(this).closest('.panel-pane');
         var valid = true;
         account.find('.coupon-row').each(function () {
             var data = gatherFields.apply(account, [['child']]);
