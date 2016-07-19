@@ -61,7 +61,7 @@ jQuery(document).ready(function($) {
         var account = $(this).closest('.panel-pane');
         var valid = true;
         account.find('.coupon-row').each(function () {
-            var data = gatherFields.apply(account, [['child']]);
+            var data = gatherFields.apply(this, [['child']]);
             if(data.child == '') {
                 valid = false;
                 $(this).addClass('invalid');
