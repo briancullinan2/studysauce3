@@ -11,6 +11,8 @@ $row = !empty($context) ? $context : jQuery($this);
 
 $httpRequest = $app->getRequest();
 
+/** @var UserPack $user_pack */
+
 $total = 0;
 $wrong = 0;
 $cardId = 0;
@@ -29,23 +31,6 @@ else {
             $retention = array_merge($retention, $user_pack->getUser()->getUserPacks()->toArray());
         }
         if($app->getUser()->getId() == $user_pack->getUser()->getId()) {
-            foreach($retention as $r => $up) {
-                /** @var UserPack $up */
-                $hasUp = false;
-                $allUserPacks = $app->getUser()->getUserPacks()->toArray();
-                foreach($allUserPacks as $ur => $upr) {
-                    /** @var UserPack $upr */
-                    if($up->getPack()->getId() == $upr->getPack()->getId()) {
-                        $upr->setRetention($up->getRetention());
-                        $hasUp = true;
-                    }
-                }
-                if(!$hasUp) {
-                    $appUser = $app->getUser();
-                    $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
-                    jQuery('.header')->data('user', $appUser);
-                }
-            }
             $retention = $app->getUser()->getUserPacks()->toArray();
         }
     }
@@ -56,6 +41,19 @@ foreach($retention as $up) {
     /** @var UserPack $up */
     if ($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED') {
         continue;
+    }
+    $hasUp = false;
+    $allUserPacks = $app->getUser()->getUserPacks()->toArray();
+    foreach($allUserPacks as $ur => $upr) {
+        /** @var UserPack $upr */
+        if($up->getPack()->getId() == $upr->getPack()->getId()) {
+            $upr->setRetention($up->getRetention());
+            $hasUp = true;
+        }
+    }
+    if(!$hasUp) {
+        $appUser = $app->getUser();
+        $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
     }
     $retentionObj[count($retentionObj)] = AdminController::toFirewalledEntityArray($up, $request['tables'], 1);
     foreach ($up->getRetention() as $id => $r) {
