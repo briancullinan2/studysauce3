@@ -74,7 +74,7 @@ jQuery(document).ready(function($) {
             account.find('.form-actions').removeClass('valid').addClass('invalid');
         }
         else {
-            account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
+            account.removeClass('invalid has-error').find('.form-actions').removeClass('invalid').addClass('valid');
         }
     }
 
@@ -85,7 +85,7 @@ jQuery(document).ready(function($) {
         checkoutHandler.close();
     });
 
-    function openStripeDialog(e) {
+    function openStripeDialog() {
         var tab = $(this).parents('.panel-pane');
         var products = tab.find('.coupon-row label span').map(function () {return $(this).text();}).toArray();
         var tabStr = products.join(',');
@@ -101,7 +101,6 @@ jQuery(document).ready(function($) {
             description: 'Pack Bundles (' + tabStr + ')',
             amount: amount
         });
-        e.preventDefault();
     }
 
     body.on('submit', '#store_cart form', function (evt) {
@@ -118,7 +117,8 @@ jQuery(document).ready(function($) {
 
         // cancel if invalid
         var saveButton = account.find('.highlighted-link [href^="#save-"], .highlighted-link [value^="#save-"]').first();
-        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *') || isLoading) {
+        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *')) {
+            gotoError.apply(this);
             return;
         }
 
@@ -131,7 +131,6 @@ jQuery(document).ready(function($) {
             data.coupon += (data.coupon != '' ? ',' : '') + couponData.coupon;
             data.child[couponData.child] = couponData.coupon;
         });
-        gotoError.apply(this);
         standardSave.apply(this, [data, function () {
 
         }]);
