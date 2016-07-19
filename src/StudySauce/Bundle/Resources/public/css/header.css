@@ -46,20 +46,52 @@
 .header a[href="#right-panel"]:before {
     content: " ";
     display: block;
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 15px solid #EEE;
-    top: 50%;
     position: absolute;
-    margin-top: -10px;
     left: 50%;
+    margin-top: -1px;
     margin-left: -10px;
+    top: 50%;
+    width: 20px;
+    border-top: 1px solid #eee;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 3px solid #eee;
+    height: 9px;
+    transition: .15s ease-in-out;
 }
 
+.header a[href="#right-panel"]:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    left: 50%;
+    margin-top: -11px;
+    margin-left: -10px;
+    top: 50%;
+    width: 20px;
+    border-top: 3px solid #eee;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 2px solid #eee;
+    height: 10px;
+    transition: .15s ease-in-out;
+}
+
+.right-menu .header a[href="#right-panel"]:before,
 .header a[href="#right-panel"]:hover:before {
+    height:0;
+    border:0 solid transparent;
+}
+
+.right-menu .header a[href="#right-panel"]:after,
+.header a[href="#right-panel"]:hover:after {
+    height: 0;
+    border-right:0;
+    margin-top:-10px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
     border-top: 15px solid #FFF;
+    border-bottom: 0 solid transparent;
 }
 
 .header .selectize-dropdown {

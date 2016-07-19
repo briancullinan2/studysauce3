@@ -34,7 +34,7 @@ if(isset($request['notInGroup'])) {
     }
 }
 
-if(isset($results['ss_user'][0])) {
+if(isset($results['ss_user']) && isset($results['ss_user'][0])) {
     $user = $results['ss_user'][0];
     $up = $user->getUserPack($pack);
     if(empty($up) || $up->getRemoved()) {
