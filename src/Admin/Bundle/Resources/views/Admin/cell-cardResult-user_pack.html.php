@@ -14,21 +14,21 @@ $httpRequest = $app->getRequest();
 $total = 0;
 $wrong = 0;
 $cardId = 0;
-$retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
+$retention = [$user_pack];
 $remaining = [];
 
 $isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
 if($isSummary) {
-    $retentionDate = $httpRequest->cookies->get(implode('', ['retention_', $card->getPack()->getId()]));
+    $retentionDate = $httpRequest->cookies->get(implode('', ['retention_', $user_pack->getPack()->getId()]));
 }
 else {
     $retentionDate = $httpRequest->cookies->get('retention');
     if(empty($request['skipRetention']) && $httpRequest->cookies->get('retention_shuffle') == 'true') {
         // TODO: count all cards
-        if(isset($results['user_pack'][0])) {
-            $retention = array_merge($retention, $results['user_pack'][0]->getUser()->getUserPacks()->toArray());
+        if(isset($user_pack)) {
+            $retention = array_merge($retention, $user_pack->getUser()->getUserPacks()->toArray());
         }
-        if($app->getUser()->getId() == $results['user_pack'][0]->getUser()->getId()) {
+        if($app->getUser()->getId() == $user_pack->getUser()->getId()) {
             foreach($retention as $r => $up) {
                 /** @var UserPack $up */
                 $hasUp = false;

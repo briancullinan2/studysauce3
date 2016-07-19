@@ -28,7 +28,6 @@ else {
         if(isset($results['user_pack'][0])) {
             $retention = array_merge($retention, $results['user_pack'][0]->getUser()->getUserPacks()->toArray());
         }
-        debugger;
         if($app->getUser()->getId() == $results['user_pack'][0]->getUser()->getId()) {
             foreach($retention as $r => $up) {
                 /** @var UserPack $up */
