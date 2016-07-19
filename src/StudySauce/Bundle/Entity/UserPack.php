@@ -335,7 +335,7 @@ class UserPack
      */
     public function getRemoved()
     {
-        return $this->removed;
+        return $this->getPack()->getStatus() == 'DELETED' ? true : $this->removed;
     }
 
     /**

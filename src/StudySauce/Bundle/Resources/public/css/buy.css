@@ -3,10 +3,6 @@
     display:none;
 }
 
-[id^="store"] .tiles.summary [class*="-row"] .pack-icon:after {
-    display:none;
-}
-
 [id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link {
     position: absolute;
     right: 0;
@@ -16,6 +12,7 @@
     left: auto;
     margin-top:-15px;
     padding:0;
+    z-index: 10;
 }
 
 [id^="store"] [href="#edit-coupon"] {

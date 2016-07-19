@@ -162,26 +162,54 @@
     position: static;
 }
 
-.tiles.summary [class*="-row"] .pack-icon:after {
+.tiles.summary [class*="-row"] a.pack-icon:before {
     content: " ";
-    display:block;
-    position:absolute;
-    right:0;
-    margin-top:-20px;
-    top:50%;
-    width: 0;
+    display: block;
+    position: absolute;
+    right: 5px;
+    margin-top: 0;
+    top: 50%;
+    width: 25px;
+    border-top: 2px solid #bbb;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 4px solid #bbb;
+    height: 14px;
+    transition: .15s ease-in-out;
+}
+
+.tiles.summary [class*="-row"] a.pack-icon:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    right: 5px;
+    margin-top: -14px;
+    top: 50%;
+    width: 25px;
+    border-top: 4px solid #bbb;
+    border-left: 0 solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 2px solid #bbb;
+    height: 14px;
+    transition: .15s ease-in-out;
+}
+
+.tiles.summary [class*="-row"]:hover a.pack-icon:before {
+    height:0;
+    border:0 solid transparent;
+}
+
+.tiles.summary [class*="-row"]:hover a.pack-icon:after {
     height: 0;
+    border-right:0;
+    margin-top:-20px;
     border-top: 20px solid transparent;
     border-bottom: 20px solid transparent;
-    border-left: 20px solid #BBB;
+    border-left: 25px solid #09B;
 }
 
 .tiles.summary [class*="-row"] > [class^="id"] label span {
     margin-left:20px;
-}
-
-.tiles.summary [class*="-row"]:hover .pack-icon:after {
-    border-left-color: #09B;
 }
 
 .tiles.summary [class*="-row"] > [class^="id"] label:last-of-type {

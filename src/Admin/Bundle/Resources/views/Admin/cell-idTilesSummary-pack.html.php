@@ -41,15 +41,7 @@ foreach($retention as $up) {
     /** @var User|Group $ss_group */
     /** @var Pack $pack */
 
-    $cardCount = 0;
-    foreach($pack->getCards()->toArray() as $c) {
-        /** @var Card $c */
-        if(!$c->getDeleted()) {
-            $cardCount += 1;
-        }
-    }
-
-    ?><label><span><?php print ($cardCount); ?> cards</span></label>
+    ?><label><span><?php print ($pack->getCardCount()); ?> cards</span></label>
 </a>
 
 

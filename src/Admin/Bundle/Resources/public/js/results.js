@@ -153,6 +153,8 @@ window.views.__defaultEntities['pack'] = {
     groups: $([]),
     cards: $([]),
     properties: {},
+    cardCount: 0,
+    getCardCount: function () {return this.cardCount;},
     getDeleted: function () {return this.status == 'DELETED';},
     getProperty: function (name) {return this.properties.hasOwnProperty(name) ? this.properties[name] : null;},
     getStatus: function () {return this.status},

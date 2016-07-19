@@ -207,6 +207,10 @@ class Pack
                 ->count() == 0;
     }
 
+    public function getCardCount() {
+        return $this->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count();
+    }
+
     public function getChildUsers(User $user)
     {
         $this->userPacks->toArray();
@@ -642,7 +646,7 @@ class Pack
      */
     public function getCards()
     {
-        return $this->cards;
+        return $this->getStatus() == 'DELETED' ? new ArrayCollection([]) : $this->cards;
     }
 
     /**
