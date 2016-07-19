@@ -80,7 +80,12 @@ jQuery(document).ready(function($) {
 
     body.on('validate', '[id^="store_cart"]', cartFunc);
     body.on('change keyup keydown', '[id^="store_cart"] input, [id^="store_cart"] select, [id^="store_cart"] textarea', standardChangeHandler);
-    body.on('click', '#store_cart [value*="#save-"]', function (e) {
+
+    $(window).on('popstate', function(e) {
+        checkoutHandler.close();
+    });
+
+    function openStripeDialog(e) {
         var tab = $(this).parents('.panel-pane');
         var products = tab.find('.coupon-row label span').map(function () {return $(this).text();}).toArray();
         var tabStr = products.join(',');
@@ -97,22 +102,30 @@ jQuery(document).ready(function($) {
             amount: amount
         });
         e.preventDefault();
-    });
-    $(window).on('popstate', function(e) {
-        checkoutHandler.close();
-    });
+    }
 
     body.on('submit', '#store_cart form', function (evt) {
         var account = $(this).parents('.panel-pane');
         evt.preventDefault();
         account.trigger('validate');
-        if(account.find('.highlighted-link').is('.invalid')) {
+        if (account.find('.highlighted-link').is('.invalid')) {
             account.addClass('invalid has-error');
         }
         else {
             account.removeClass('invalid has-error');
         }
         var data = $.extend({coupon: '', child: {}}, gatherFields.apply(account, [['purchase_token']]));
+
+        // cancel if invalid
+        var saveButton = account.find('.highlighted-link [href^="#save-"], .highlighted-link [value^="#save-"]').first();
+        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *') || isLoading) {
+            return;
+        }
+
+        if (data.purchase_token == '') {
+            openStripeDialog.apply(this);
+            return;
+        }
         account.find('.coupon-row').each(function () {
             var couponData = gatherFields.apply(account, [['child', 'coupon']]);
             data.coupon += (data.coupon != '' ? ',' : '') + couponData.coupon;
