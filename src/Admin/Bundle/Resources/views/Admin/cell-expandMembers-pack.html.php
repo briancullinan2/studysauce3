@@ -5,6 +5,13 @@ use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 use StudySauce\Bundle\Entity\UserPack;
 
+$context = !empty($context) ? $context : jQuery($this);
+$expandMembers = $context->find('.expandMembers');
+if($expandMembers->length == 0) {
+    // skip for now, this will be activated on hover
+    return;
+}
+
 /** @var Pack $pack */
 
 $entityIds = [];

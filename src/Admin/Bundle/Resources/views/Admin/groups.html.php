@@ -157,13 +157,11 @@ $view['slots']->start('body'); ?>
                     $tables = (array)(new stdClass());
                     $tables['ss_group'] = ['id', 'deleted'];
                     $tables['ss_user'] = ['first', 'last', 'email', 'id', 'deleted', 'groups'];
-                    $tables['user_pack'] = ['user', 'pack', 'removed', 'downloaded'];
-                    $tables['card'] = ['id', 'deleted'];
-                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cards'], 'expandMembers' => ['groups', 'users', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
+                    $tables['user_pack'] = ['user', 'removed', 'downloaded'];
+                    $tables['pack'] = ['0' => 'id', 'title' => ['title', 'logo', 'cardCount'], 'expandMembers' => ['groups', 'userPacks'], 'actionsGroup' => ['status'] /* search field but don't display a template */];
                     $request = [
                         'count-pack' => $isNew ? -1 : 0,
                         'count-ss_group' => 1,
-                        'count-card' => -1,
                         'count-ss_user' => -1,
                         'count-user_pack' => -1,
                         'ss_group-deleted' => $entity->getDeleted(),

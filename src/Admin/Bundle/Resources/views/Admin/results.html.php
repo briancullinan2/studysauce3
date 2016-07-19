@@ -50,6 +50,9 @@ if($isFresh) {
     print ($context->html());
     return;
 }
+else {
+    $resultOutput->data('results', $results);
+}
 
 // TODO: bring back search header for list format
 //if (!isset($request['headers'])) {

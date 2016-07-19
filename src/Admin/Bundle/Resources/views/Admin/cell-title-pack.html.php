@@ -35,13 +35,7 @@ if (isset($request['pack-id']) && $pack->getId() == $request['pack-id']) {
         $userCount = $userGroupCount;
     }
 
-    $cardCount = 0;
-    foreach($pack->getCards()->toArray() as $c) {
-        /** @var Card $c */
-        $cardCount += !$c->getDeleted() ? 1 : 0;
-    }
-
-    print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => [$pack->getTitle(), $userCount, $cardCount]]));
+    print ($view->render('AdminBundle:Admin:cell-label.html.php', ['fields' => [$pack->getTitle(), $userCount, $pack->getCardCount()]]));
     ?>
     </a>
 <?php }

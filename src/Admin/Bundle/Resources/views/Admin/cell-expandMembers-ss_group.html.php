@@ -4,6 +4,14 @@ use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 
+
+$context = !empty($context) ? $context : jQuery($this);
+$expandMembers = $context->find('.expandMembers');
+if($expandMembers->length == 0) {
+    // skip for now, this will be activated on hover
+    return;
+}
+
 /** @var Group $ss_group */
 
 $entityIds = [];

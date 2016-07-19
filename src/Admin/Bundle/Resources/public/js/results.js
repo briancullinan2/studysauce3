@@ -556,10 +556,11 @@ $(document).ready(function () {
                 }
 
                 var request = getDataRequest.apply(subTab);
+                data = $.extend(true, data, save || {});
                 data = $.extend(data, {requestKey: request.requestKey});
 
                 // loading animation from CTA or activating field
-                standardSave.apply(subTab, [data, function (data) {
+                standardSave.apply(field, [data, function (data) {
                     loadContent.apply(subTab, [data, 'saved']);
                 }]);
 
@@ -823,6 +824,24 @@ $(document).ready(function () {
         }
         if (command.is('.showing-' + table) && (heading.is('.collapsed') || !heading.is(':visible')) || command.is('.empty')) {
             resetHeader();
+        }
+    });
+
+    body.on('mouseover', '[class*="-row"]', function () {
+        var members;
+        if((members = $(this).find('[class*="expandMembers"]:not(.loaded)')).length > 0) {
+            var type = (/(.*)-row/i).exec($(this).attr('class'))[1];
+            var row = $(this);
+            var results = row.parents('.results');
+            var request = results.data('request');
+            var resultsObj = results.data('results');
+            var rowId = getRowId.apply(this);
+            var resultType = (/results-(.*?)(\s|$)/i).exec($(this).attr('class'))[1];
+            var entity = resultsObj[resultType].filter(function (i) {return i._tableValue == type + '-' + rowId;})[0];
+            var params = {table: type, tables: request.tables, request: request, results: resultsObj, context: results};
+            params[type] = entity;
+            var expand = window.views.render.apply(row, ['cell-expandMembers-' + type, params]);
+            members.addClass('loaded').append(expand);
         }
     });
 

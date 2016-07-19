@@ -208,7 +208,6 @@ $view['slots']->start('body'); ?>
                 if(empty($entity)) {
                     $request['count-file'] = -1;
                     $request['count-pack'] = 0;
-                    $request['count-card'] = -1;
                     $request['count-ss_group'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
@@ -230,7 +229,6 @@ $view['slots']->start('body'); ?>
                 else {
                     $request['count-file'] = -1;
                     $request['count-pack'] = 0;
-                    $request['count-card'] = -1;
                     $request['count-ss_group'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
