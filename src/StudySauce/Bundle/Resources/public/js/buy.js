@@ -64,10 +64,10 @@ jQuery(document).ready(function($) {
             var data = gatherFields.apply(this, [['child']]);
             if(data.child == '') {
                 valid = false;
-                $(this).addClass('invalid');
+                $(this).addClass('invalid').find('.input.child').addClass('invalid');
             }
             else {
-                $(this).removeClass('invalid');
+                $(this).removeClass('invalid').removeClass('invalid');
             }
         });
         if(!valid) {
