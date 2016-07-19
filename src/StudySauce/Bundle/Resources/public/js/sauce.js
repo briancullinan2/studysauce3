@@ -645,31 +645,29 @@ $(document).ready(function () {
     window.activatePanel = activatePanel;
 
     // show the already visible tabs
-    setTimeout(function () {
-        var panel = body.find('.panel-pane').first();
-        if(panel.length > 0) {
-            var key = panel.attr('id').replace(/-[a-z]+[0-9]+$/ig, '');
-            if (Routing.getRoute(key)) {
-                var path = Routing.generate(key),
-                    item = body.find('.main-menu a[href^="' + path + '"]').first();
+    var panel = body.find('.panel-pane').first();
+    if(panel.length > 0) {
+        var key = panel.attr('id').replace(/-[a-z]+[0-9]+$/ig, '');
+        if (Routing.getRoute(key)) {
+            var path = Routing.generate(key),
+                item = body.find('.main-menu a[href^="' + path + '"]').first();
 
-                if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
-                    item.parents('nav').find('ul.collapse.in').removeClass('in');
-                item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
-                var host;
-                body.find('#welcome-message .main-menu a').each(function () {
-                    var parts = $(this).attr('href').split('/');
-                    parts[parts.length-1] = path.substr(1);
-                    $(this).attr('href', parts.join('/'));
-                });
-                if(!(host = body.find('#welcome-message .main-menu a[href*="' + window.location.hostname +  '"]')).is('.active')) {
-                    host.addClass('active');
-                }
+            if (item.parents('nav').find('ul.collapse.in') != item.parents('ul.collapse.in'))
+                item.parents('nav').find('ul.collapse.in').removeClass('in');
+            item.addClass('active').parents('ul.collapse').addClass('in').css('height', '');
+            var host;
+            body.find('#welcome-message .main-menu a').each(function () {
+                var parts = $(this).attr('href').split('/');
+                parts[parts.length-1] = path.substr(1);
+                $(this).attr('href', parts.join('/'));
+            });
+            if(!(host = body.find('#welcome-message .main-menu a[href*="' + window.location.hostname +  '"]')).is('.active')) {
+                host.addClass('active');
             }
-            ssMergeStyles(body);
-            activatePanel.apply(body, [panel]);
         }
-    }, 50);
+        ssMergeStyles(body);
+        activatePanel.apply(body, [panel]);
+    }
 
 });
 

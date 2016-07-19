@@ -37,18 +37,11 @@ $resultOutput->data('request', $request)->attr('data-request', json_encode($requ
 if($isFresh) {
     $view['slots']->start('results-output'); ?>
     <script type="text/javascript">
-        function setup<?php print ($request['requestKey']); ?>() {
-            var resultsObj = (<?php print (json_encode($resultsJSON)); ?>) || {};
-            var results = jQuery(".results[data-request*=\"<?php print ($request['requestKey']); ?>\"]");
-            var request = (<?php print (json_encode($request)); ?>) || {};
-            results.data("results", resultsObj);
-            loadContent.apply(results, [{tables: request.tables, context: results, request: request, results: resultsObj}, "refresh"]);
+        if(typeof window.setupRequest == "undefined") {
+            window.setupRequest = {};
         }
-        if(typeof jQuery == "undefined") {
-            window.addEventListener("load", setup<?php print ($request['requestKey']); ?>, false);
-        }
-        else {
-            setup<?php print ($request['requestKey']); ?>();
+        window.setupRequest["setup<?php print ($request['requestKey']); ?>"] = function () {
+            return (<?php print (json_encode($resultsJSON)); ?>) || {};
         }
     </script>
     <?php

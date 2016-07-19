@@ -940,6 +940,17 @@ $(document).ready(function () {
 
     //body.on('mouseover click', '.results [class*="-row"]', resetHeader);
 
+    body.on('showing', '.panel-pane', function () {
+        $(this).find('.results:not(.loaded)').each(function () {
+            var results = $(this);
+            results.addClass('loaded');
+            var request = results.data('request');
+            var resultsObj = window.setupRequest['setup' + request.requestKey]();
+            results.data("results", resultsObj);
+            loadContent.apply(results, [{tables: request.tables, context: results, request: request, results: resultsObj}, "refresh"]);
+        });
+    });
+
     body.on('change', '.paginate input', function () {
         var results = $(this).parents('.results');
         var paginate = $(this).closest('.paginate');
