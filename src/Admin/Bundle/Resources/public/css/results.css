@@ -475,6 +475,9 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     opacity: 1;
 }
 
+[class*="-row"].invalid .invalid textarea,
+[class*="-row"].invalid .invalid input,
+[class*="-row"].invalid .invalid select,
 .invalid label.input.invalid textarea,
 .invalid label.input.invalid input,
 .invalid label.input.invalid select {
@@ -482,10 +485,12 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     padding-right:30px;
 }
 
+[class*="-row"].invalid .invalid label,
 .invalid label.input.invalid {
     position:relative;
 }
 
+[class*="-row"].invalid .invalid label:after,
 .invalid label.input.invalid:after {
     background: #CC2211;
     color: white;
@@ -504,6 +509,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     cursor: pointer;
 }
 
+[class*="-row"].invalid.pulsate .invalid label:after,
 .invalid label.input.invalid.pulsate:after {
     animation-name: pulsate;
     animation-duration: 1s;
