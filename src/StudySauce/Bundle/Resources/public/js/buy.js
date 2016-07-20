@@ -140,28 +140,7 @@ jQuery(document).ready(function($) {
         var account = $(this);
         var valid = true;
         var data = gatherFields.apply(account, [['first', 'last', 'password', 'street1', 'city', 'zip', 'state', 'country', 'number', 'month', 'year', 'ccv']]);
-        for(var d in data) {
-            if(data.hasOwnProperty(d)) {
-                if(data[d] == '') {
-                    account.find('label.' + d).addClass('invalid');
-                }
-                else {
-                    account.find('label.' + d).removeClass('invalid');
-                }
-                if(d == 'email') {
-                    if(!(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(account.find('.email input').val())) {
-                        account.find('label.' + d).addClass('invalid');
-                    }
-                }
-            }
-        }
 
-        if (account.find('label.input.invalid').length > 0)
-            account.find('.form-actions').removeClass('valid').addClass('invalid');
-        else {
-            account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
-            account.find('.form-actions .error').remove();
-        }
     }
 
     body.on('validate', '[id^="checkout"]', checkoutFunc);

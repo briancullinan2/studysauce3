@@ -17,30 +17,8 @@ jQuery(document).ready(function() {
 
     function accountFunc() {
         var account = $(this);
-        var valid = true;
         var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast', 'parent', 'year']]);
-        for(var d in data) {
-            if(data.hasOwnProperty(d)) {
-                if(data[d] == '') {
-                    account.find('label.' + d).addClass('invalid');
-                }
-                else {
-                    account.find('label.' + d).removeClass('invalid');
-                }
-                if(d == 'email') {
-                    if(!(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(account.find('.email input').val())) {
-                        account.find('label.' + d).addClass('invalid');
-                    }
-                }
-            }
-        }
-
-        if (getHash.apply(this) == account.data('state') || account.find('label.input.invalid').length > 0)
-            account.find('.form-actions').removeClass('valid').addClass('invalid');
-        else {
-            account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
-            account.find('.form-actions .error').remove();
-        }
+        standardValidation.apply(account, [data]);
     }
 
     body.on('show', '[id^="register"]', function () {

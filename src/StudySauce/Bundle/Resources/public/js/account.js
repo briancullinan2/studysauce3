@@ -4,63 +4,25 @@ jQuery(document).ready(function() {
 
     function getHash()
     {
-        var account = jQuery('#account');
-        return account.find('.first-name input').val().trim() + account.find('.last-name input').val().trim() +
-            account.find('.email input').val().trim() + account.find('.password input').val() +
-            account.find('.new-password input').val();
+        var account = $(this);
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', 'new-password']]);
+        var hash = '';
+        for(var h in data) {
+            if(data.hasOwnProperty(h)) {
+                hash += data[h];
+            }
+        }
+        return hash;
     }
 
     function accountFunc() {
-        var account = jQuery('#account');
-        var valid = true;
-
-        if (account.find('.password input').val() == '') {
-            account.addClass('password-required');
+        var account = $(this);
+        var fields = ['first', 'last', 'email', 'password', 'csrf_token'];
+        if(account.find('.new-password:visible').length > 0) {
+            fields = $.merge(fields, ['new-password', 'confirm-password']);
         }
-        else {
-            account.removeClass('password-required');
-        }
-        if(account.find('.new-password').css('visibility') != 'hidden' && account.find('.new-password input').val().trim() == '') {
-            account.addClass('new-password-required');
-        }
-        else {
-            account.removeClass('new-password-required');
-        }
-        if(account.find('.new-password').css('visibility') != 'hidden' &&
-            account.find('.new-password input').val() != account.find('.confirm-password input').val()) {
-            account.addClass('confirm-required');
-        }
-        else {
-            account.removeClass('confirm-required');
-        }
-        if(account.find('.first-name input').val() == '') {
-            account.addClass('first-required');
-        }
-        else {
-            account.removeClass('first-required');
-        }
-        if(account.find('.last-name input').val() == '') {
-            account.addClass('last-required');
-        }
-        else {
-            account.removeClass('last-required');
-        }
-        if(account.find('.email input').val().trim() == '' ||
-            !(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i).test(account.find('.email input').val())) {
-            account.addClass('email-required');
-        }
-        else {
-            account.removeClass('email-required');
-        }
-
-        if (getHash() == account.data('state') || account.is('.password-required') || account.is('.new-password-required') ||
-            account.is('.first-required') || account.is('.last-required') || account.is('.email-required') || account.is('.confirm-required')) {
-            account.find('.form-actions').removeClass('valid').addClass('invalid');
-        }
-        else {
-            account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
-            account.find('.form-actions .error').remove();
-        }
+        var data = gatherFields.apply(account, fields);
+        standardValidation.apply(account, [data]);
     }
 
     body.on('show', '#account', function () {

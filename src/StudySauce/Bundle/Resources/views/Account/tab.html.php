@@ -27,22 +27,22 @@ $view['slots']->stop();
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="account">
         <div class="pane-content">
-            <h2>Account settings</h2>
+            <h2>Basic information</h2>
             <form action="<?php print $view['router']->generate('account_update'); ?>" method="post">
                 <div class="account-info read-only">
-                    <div class="first-name">
+                    <div class="first">
                         <label class="input"><span>First name</span>
-                            <input type="text" placeholder="First name" value="<?php print $user->getFirst(); ?>">
+                            <input name="first" type="text" placeholder="First name" value="<?php print $user->getFirst(); ?>">
                         </label>
                     </div>
-                    <div class="last-name">
+                    <div class="last">
                         <label class="input"><span>Last name</span>
-                            <input type="text" placeholder="Last name" value="<?php print $user->getLast(); ?>">
+                            <input name="last" type="text" placeholder="Last name" value="<?php print $user->getLast(); ?>">
                         </label>
                     </div>
                     <div class="email">
                         <label class="input"><span>E-mail address</span>
-                            <input type="text" placeholder="Email" value="<?php print $user->getEmail(); ?>" autocomplete="off">
+                            <input name="email" type="text" placeholder="Email" value="<?php print $user->getEmail(); ?>" autocomplete="off">
                         </label>
                     </div>
                 </div>
@@ -60,17 +60,17 @@ $view['slots']->start('body'); ?>
                 </div>
                 <div class="password">
                     <label class="input"><span>Current password</span>
-                        <input type="password" placeholder="Enter password" value="">
+                        <input name="password" type="password" placeholder="Enter password" value="">
                     </label>
                 </div>
                 <div class="new-password">
                     <label class="input"><span>New password</span>
-                        <input type="password" placeholder="New password" value="">
+                        <input name="new-password" type="password" placeholder="New password" value="">
                     </label>
                 </div>
                 <div class="confirm-password">
                     <label class="input"><span>Confirm password</span>
-                        <input type="password" placeholder="Confirm password" value="">
+                        <input name="confirm-password" type="password" placeholder="Confirm password" value="">
                     </label>
                 </div>
                 <div class="highlighted-link">
@@ -80,12 +80,14 @@ $view['slots']->start('body'); ?>
                         <a href="<?php print $view['router']->generate('reset'); ?>">Forgot password</a>
                     </div>
                     <div class="form-actions">
-                        <div class="invalid-only">You must complete all fields before moving on.</div>
+                        <div class="invalid-error">You must complete all fields before moving on.</div>
                         <button type="submit" value="#save-account" class="more">Save</button>
                     </div>
                 </div>
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>"/>
             </form>
+            <h2>Child information</h2>
+
         </div>
     </div>
 <?php $view['slots']->stop(); ?>

@@ -11,6 +11,7 @@
     transition: width linear .15s;
     box-sizing: border-box;
     z-index: 1900;
+    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
 }
 
 #right-panel,
@@ -64,7 +65,6 @@
     overflow-y:auto;
     height: 100%;
     width: 100%;
-    background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
 }
 
 #left-panel a[href="#collapse"],
