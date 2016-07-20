@@ -51,7 +51,7 @@ class AccountController extends Controller
         }
 
         return $this->render(
-            'StudySauceBundle:Account:tab.html.php',
+            'AdminBundle:Admin:account.html.php',
             [
                 'user' => $user,
                 'csrf_token' => $csrfToken,
