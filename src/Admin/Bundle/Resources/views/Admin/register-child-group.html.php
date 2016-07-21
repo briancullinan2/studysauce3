@@ -28,21 +28,17 @@ if(isset($invites)) {
         do {
             $publicGroups[count($publicGroups)] = $group;
             $hasParent = true;
+            $visited[count($visited)] = $group->getId();
             if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $invite->getGroup()->getId()) {
                 $yearVal = $group->getParent()->getId();
             }
             if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $yearVal) {
                 $parentVal = $group->getParent()->getId();
             }
-
             if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
                 $hasParent = false;
-                if (!$group->getDeleted() && !in_array($group->getId(), $visited)) {
-                    $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '"' , $parentVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
-                }
             }
-            $visited[count($visited)] = $group->getId();
-            if (!empty($group->getParent()) && $group->getParent()->getId() != $group->getId()) {
+            else {
                 $group = $group->getParent();
             }
         } while ($hasParent && !in_array($group->getId(), $visited));
@@ -55,9 +51,12 @@ $visited = [];
 $codes = [];
 foreach($publicGroups as $group) {
     /** @var Group $group */
-    if(!empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getId(), $visited)) {
+    if(!$group->getDeleted() && !empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getId(), $visited)) {
 
         $visited[count($visited)] = $group->getId();
+        if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
+            $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '"' , $parentVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
+        }
         if($group->getParent()->getId() == $parentVal) {
             $yearStr = implode('', [$yearStr, '<option value="' , $group->getId() , '" ' , $yearVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
         }
