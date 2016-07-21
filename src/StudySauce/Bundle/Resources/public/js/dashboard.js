@@ -241,9 +241,15 @@ $(document).ready(function () {
         return true;
     }
 
+    body.on('mouseenter', 'a[href="#right-panel"]', handleLink);
+    body.on('mouseleave', '#right-panel, .header', collapseMenu);
+
     function collapseMenu(evt) {
-        if ($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]') || $(this).is('[href="#right-panel"]'))
+        if ($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]'))
             evt.preventDefault();
+        if(($(evt.toElement).is('#right-panel, #right-panel *') || $(evt.toElement).is('.header, .header *') || $(this).is('[href="#right-panel"]')) && body.is('.right-menu')) {
+            return true;
+        }
         if (body.is('.left-menu') || body.is('.right-menu')) {
             // collapse menus
             body.removeClass('right-menu left-menu');
