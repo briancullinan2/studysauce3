@@ -108,9 +108,9 @@ if($tab->length == 0) {
                 $request['ss_user-id'] = $user->getId();
                 $request['invitee-ss_user-id'] = '!NULL';
                 $request['tables'] = (array)(new stdClass());
-                $request['tables']['invite'] = ['idTilesSummary' => ['id', 'first', 'last', 'user', 'invitee', 'email', 'group']];
+                $request['tables']['invite'] = ['idTilesSummary' => ['id', 'first', 'last', 'user', 'invitee', 'email', 'group', 'code']];
                 $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'groups']];
-                $request['tables']['invite-1'] = ['id' => ['code', 'group', 'properties']];
+                $request['tables']['invite-1'] = ['id' => ['id', 'code', 'group', 'properties']];
                 $request['tables']['ss_group'] = ['id' => ['name', 'id', 'parent', 'deleted']];
                 $request['classes'] = ['tiles', 'summary'];
                 $request['headers'] = false;
