@@ -34,6 +34,7 @@ if(!empty($token)) {
 <aside id="right-panel" class="collapsed">
     <nav>
         <ul class="main-menu">
+            <li><a href="#collapse">Hide</a>&nbsp;</li>
             <?php
             if (!empty($user) && $view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
                 <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($p) ? 'Switch back' : implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
@@ -50,7 +51,6 @@ if(!empty($token)) {
                 </li>
             <?php }
              ?>
-            <li><a href="#collapse">Hide</a><h3></h3></li>
             <li><a href="<?php print ($view['router']->generate('register_child')); ?>"><span>&nbsp;</span>Add Child</a></li>
             <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Account settings</a></li>
             <li><a href="<?php print ($view['router']->generate('logout')); ?>"><span>&nbsp;</span>Logout</a></li>

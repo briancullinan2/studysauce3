@@ -9,7 +9,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 /** @var $view TimedPhpEngine */
 /** @var $user User */
 $user = $app->getUser();
-/** @var Payment $payment */
 $context = !empty($context) ? $context : jQuery($this);
 $tab = $context->filter('.panel-pane');
 

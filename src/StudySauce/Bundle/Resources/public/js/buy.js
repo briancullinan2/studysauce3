@@ -12,6 +12,9 @@ jQuery(document).ready(function($) {
             if(removeI > -1) {
                 cart.splice(removeI, 1);
             }
+            if(cart.length == 0) {
+                activateMenu(Routing.generate('store'));
+            }
         }
         else {
             cart[cart.length] = $(this).val();
@@ -82,7 +85,9 @@ jQuery(document).ready(function($) {
     body.on('change keyup keydown', '[id^="store_cart"] input, [id^="store_cart"] select, [id^="store_cart"] textarea', standardChangeHandler);
 
     $(window).on('popstate', function(e) {
-        checkoutHandler.close();
+        if(checkoutHandler) {
+            checkoutHandler.close();
+        }
     });
 
     function openStripeDialog() {
@@ -96,11 +101,16 @@ jQuery(document).ready(function($) {
         if(products.length > 3) {
             tabStr = tabStr + ', etc.';
         }
-        checkoutHandler.open({
-            name: 'StudySauce.com',
-            description: 'Pack Bundles (' + tabStr + ')',
-            amount: amount
-        });
+        if(amount > 0) {
+            checkoutHandler.open({
+                name: 'StudySauce.com',
+                description: 'Pack Bundles (' + tabStr + ')',
+                amount: amount
+            });
+        }
+        else {
+            tab.find('form').submit();
+        }
     }
 
     body.on('submit', '#store_cart form', function (evt) {

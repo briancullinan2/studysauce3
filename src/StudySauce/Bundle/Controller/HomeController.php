@@ -31,10 +31,6 @@ class HomeController extends Controller
 
         $templateVars = ['_format' => $request->get('_format')];
 
-        list($route, $options) = self::getUserRedirect($user);
-        if($route != 'home' && $route != 'results')
-            return $this->redirect($this->generateUrl($route, $options));
-
         // display the currently logged in user
         if(!empty($user) && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
             $templateVars['email'] = $user->getEmail();
@@ -83,12 +79,17 @@ class HomeController extends Controller
             $userManager->updateUser($user);
         }
 
-        if(in_array('application/json', $request->getAcceptableContentTypes())) {
-            return new JsonResponse($templateVars);
-        }
         if(empty($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')) {
             throw new AccessDeniedHttpException();
         }
+        if(in_array('application/json', $request->getAcceptableContentTypes())) {
+            return new JsonResponse($templateVars);
+        }
+
+        list($route, $options) = self::getUserRedirect($user);
+        if($route != 'home' && $route != 'results')
+            return $this->redirect($this->generateUrl($route, $options));
+
         return $this->render('AdminBundle:Admin:home.html.php', $templateVars);
     }
 

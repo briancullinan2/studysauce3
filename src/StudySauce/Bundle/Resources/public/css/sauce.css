@@ -203,7 +203,6 @@ h2
     font-size:35px;
 }
 
-.squiggle,
 .squiggle
 {
     background-color: #0099BB;
@@ -686,7 +685,7 @@ img, video, canvas, svg
 label
 {
     text-align: left;
-    margin:0 0 10px;
+    margin:0 0 5px;
     font-weight: normal;
     display:block;
 }

@@ -167,6 +167,10 @@
     position: static;
 }
 
+.tiles.summary [class*="-row"] a.pack-icon .squiggle {
+    bottom:-10px;
+}
+
 .tiles.summary [class*="-row"] a.pack-icon:before {
     content: " ";
     display: block;

@@ -219,6 +219,24 @@
     position: relative;
 }
 
+#welcome-message:after {
+    content: " ";
+    display:block;
+    position:absolute;
+    right:0;
+    top:0;
+    left:auto;
+    width:0;
+    transition: width .15s linear;
+    bottom:0;
+    z-index:-1;
+    background:#EEE;
+}
+
+.right-menu #welcome-message:after {
+    width:220px;
+}
+
 #welcome-message > strong {
     display: inline;
     position: relative;
@@ -237,8 +255,8 @@
 .header nav
 {
     width:100%;
-    margin:0 -40% 0 -356px;
-    padding: 0 40% 0 356px;
+    margin:0 -40% 0 -359px;
+    padding: 0 40% 0 359px;
     display:inline-block;
     vertical-align: top;
 }

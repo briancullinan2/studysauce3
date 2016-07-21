@@ -82,6 +82,10 @@
     border-top: 2px solid #555;
 }
 
+[id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link button {
+    width:160px;
+}
+
 [id^="checkout"] .results {
     display:inline-block;
 }

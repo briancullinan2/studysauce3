@@ -314,6 +314,12 @@ window.views.__defaultEntities['ss_user'] = {
     getUserPacks: function () {return $($(this.userPacks).toArray().map(function (up) {return applyEntityObj(up);}));},
     getGroups: function () {return $($(this.groups).toArray().map(function (up) {return applyEntityObj(up);}));}
 };
+window.views.__defaultEntities['payment'] = {
+    coupons: $([]),
+    getCreated: function () {return !(this.created) ? null : new Date(this.created);},
+    getCoupons: function () {return $($(this.coupons).toArray().map(function (u) { return applyEntityObj(u);}));},
+    getId: function () {return this.id;}
+};
 window.views.__defaultEntities['coupon'] = {
     packs: $([]),
     getId: function () {return this.id;},
@@ -361,6 +367,7 @@ window.views.__globalVars.view['slots'].get = function (name) {
 window.views.__globalVars.view['slots'].output = function (name) {
     return window.views.__output += window.views.__globalVars.view['slots'].output[name];
 };
+Date.prototype.getTimestamp = Date.prototype.getTime;
 Date.prototype.format = function (format) {
     if (format == 'r') {
         return moment(this).formatPHP('ddd, DD MMM YYYY HH:mm:ss ZZ');

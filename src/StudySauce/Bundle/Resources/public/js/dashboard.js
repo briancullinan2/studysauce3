@@ -213,7 +213,7 @@ $(document).ready(function () {
         }
         if ($(this).is('[href="#collapse"]'))
             return collapseMenu();
-        if ($(this).is('[href="#expand"]'))
+        if ($(this).is('[href="#expand"]') || $(this).is('[href="#right-panel"]'))
             evt.preventDefault();
         if (parent.length > 0 && parent.width() < 150) {
             // record this special case where its not a link, everything else is recorded automatically
@@ -245,7 +245,7 @@ $(document).ready(function () {
     body.on('mouseleave', '#right-panel, .header', collapseMenu);
 
     function collapseMenu(evt) {
-        if ($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]'))
+        if ($(this).is('[href="#collapse"]') || $(this).is('[href="#expand"]') || $(this).is('[href="#right-panel"]'))
             evt.preventDefault();
         if(($(evt.toElement).is('#right-panel, #right-panel *') || $(evt.toElement).is('.header, .header *') || $(this).is('[href="#right-panel"]')) && body.is('.right-menu')) {
             return true;

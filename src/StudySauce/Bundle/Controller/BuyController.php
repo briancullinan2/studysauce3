@@ -44,7 +44,11 @@ class BuyController extends Controller
         return $this->render('AdminBundle:Admin:store.html.php');
     }
 
-    public function cartAction() {
+    public function cartAction(Request $request) {
+        if(empty($request->cookies->get('cart'))) {
+            return $this->redirect($this->generateUrl('store'));
+        }
+
         return $this->render('AdminBundle:Admin:cart.html.php');
     }
 
@@ -359,7 +363,7 @@ class BuyController extends Controller
         if(!empty($request->getSession()->get('signup'))) {
             return $this->render('StudySauceBundle:Business:thanks.html.php');
         }
-        return $this->render('StudySauceBundle:Buy:thanks.html.php');
+        return $this->render('AdminBundle:Admin:thanks.html.php');
     }
 
     /**

@@ -24,9 +24,12 @@ $(document).ready(function () {
     });
 
     key('enter, return', function () {
-        var tab = $('[id*="cards-card"]:visible');
-        if(tab.find('.type-sa input')) {
+        var tab = $('[id*="cards-card"]:not(.hiding):visible, [id*="cards-answer"]:not(.hiding):visible');
+        if(tab.find('.type-sa input').length > 0) {
             tab.find('.type-sa a[href="#done"]').trigger('click');
+        }
+        if(tab.find('.card-row .preview-card:not([class*="type-"]), .card-row .preview-card.preview-answer[class*="type-"]').length > 0) {
+            tab.find('.card-row .preview-card:not([class*="type-"]), .card-row .preview-card.preview-answer[class*="type-"]').trigger('click');
         }
     });
 

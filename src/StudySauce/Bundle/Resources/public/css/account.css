@@ -30,7 +30,10 @@
 }
 
 [id^="register"] .results [class*="-row"] > .idSingleCoupon:nth-child(1) {
-    width:100%;
+    width:auto;
+    padding:0;
+    margin:0;
+    display:block;
 }
 
 #login .pane-content
@@ -176,17 +179,17 @@ a[href="#sign-in-with-email"]
 [id^="register"] .email,
 [id^="register"] .password,
 [id^="register"] .highlighted-link:last-child,
-[id^="register"] .parent,
-[id^="register"] .year,
-[id^="register"] ._code,
+[id^="register"] [class*="-row"] > * .parent,
+[id^="register"] [class*="-row"] > * .year,
+[id^="register"] [class*="-row"] > * ._code,
 #login .email,
 #login .password,
 #login  .highlighted-link:last-child
 {
     width: auto;
-    margin: 0 auto;
     max-width: 600px;
     display:block;
+    margin: 0 auto 5px;
 }
 
 #account .password,
