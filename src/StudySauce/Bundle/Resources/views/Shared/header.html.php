@@ -41,7 +41,7 @@ $userJson = AdminController::toFirewalledEntityArray($user, ['ss_user' => ['id',
 
 // get invites if in parents account
 $invitesJson = [];
-$invites = !(empty($user) ? $user->getInvites() : [];
+$invites = !empty($user) ? $user->getInvites() : [];
 foreach($invites as $i) {
     $invitesJson[count($invitesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
 }
