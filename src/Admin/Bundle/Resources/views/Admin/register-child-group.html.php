@@ -15,7 +15,7 @@ $schoolVal = $school->val();
 
 /** @var Invite $invite */
 if(!empty($invite)) {
-    $parentVal = $invite->getGroup()->getParent()->getId();
+    $parentVal = !empty($invite->getGroup()->getParent()) ? $invite->getGroup()->getParent()->getId() : $invite->getGroup()->getId();
     $yearVal = $invite->getGroup()->getId();
     $schoolVal = $invite->getCode();
 }
