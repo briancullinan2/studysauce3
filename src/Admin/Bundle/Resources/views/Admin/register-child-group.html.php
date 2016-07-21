@@ -28,13 +28,13 @@ if(isset($invites)) {
         do {
             $publicGroups[count($publicGroups)] = $group;
             $hasParent = true;
-            if(!empty($invite) && $group->getId() == $invite->getGroup()->getId()) {
+            if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $invite->getGroup()->getId()) {
                 $yearVal = $group->getParent()->getId();
             }
-            if(!empty($invite) && $group->getId() == $yearVal) {
+            if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $yearVal) {
                 $parentVal = $group->getParent()->getId();
             }
-            
+
             if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
                 $hasParent = false;
                 if (!$group->getDeleted() && !in_array($group->getId(), $visited)) {
