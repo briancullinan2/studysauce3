@@ -17,86 +17,11 @@ $httpRequest = $app->getRequest();
 $cookie = $httpRequest->cookies->get('hasChild');
 $hasChild = !empty($cookie) && $cookie == 'true';
 
-if(isset($invites)) {
-    $publicGroups = [];
-    $inviteObj = [];
-    $visited = [];
-    $groupStr = '';
-    foreach ($invites as $invite) {
-        /** @var Invite $invite */
-        $group = $invite->getGroup();
-        $inviteObj[count($inviteObj)] = AdminController::toFirewalledEntityArray($invite, ['ss_group' => AdminController::$defaultTables['ss_group'], 'invite' => AdminController::$defaultTables['invite']]);
-        do {
-            $publicGroups[count($publicGroups)] = AdminController::toFirewalledEntityArray($group, ['ss_group' => AdminController::$defaultTables['ss_group']], 1);
-            $hasParent = true;
-            if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
-                $hasParent = false;
-                if (!$group->getDeleted() && !in_array($group->getId(), $visited)) {
-                    $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '">' , $group->getName() , '</option>']);
-                }
-            }
-            $visited[count($visited)] = $group->getId();
-            if (!empty($group->getParent()) && $group->getParent()->getId() != $group->getId()) {
-                $group = $group->getParent();
-            }
-        } while ($hasParent && !in_array($group->getId(), $visited));
-    }
-}
-
 // update existing tab
+
 if($tab->length > 0) {
     $tab->find('[type="submit"]')->text($hasChild ? 'Next' : 'Done');
-
-    $parentVal = $tab->find('.parent select')->val();
-    $year = $tab->find('.year select');
-    $yearVal = $year->val();
-    $school = $tab->find('._code select');
-    $schoolVal = $school->val();
-
-    $publicGroups = $tab->data('groups');
-    $invites = $tab->data('invites');
-    $yearStr = '';
-    $schoolStr = '';
-    $visited = [];
-    $codes = [];
-    foreach($publicGroups as $g) {
-        /** @var Group $group */
-        $group = applyEntityObj($g);
-        if(!empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getId(), $visited)) {
-
-            $visited[count($visited)] = $group->getId();
-            if($group->getParent()->getId() == $parentVal) {
-                $yearStr = implode('', [$yearStr, '<option value="' , $group->getId() , '">' , $group->getName() , '</option>']);
-            }
-            if($group->getParent()->getId() == $yearVal) {
-                $code = $group->getId();
-                foreach($invites as $i) {
-                    /** @var Invite $invite */
-                    $invite = applyEntityObj($i);
-                    if($invite->getGroup()->getId() == $group->getId()) {
-                        $code = $invite->getCode();
-                        break;
-                    }
-                }
-                $codes[count($codes)] = $code;
-                $schoolStr = implode('', [$schoolStr, '<option value="' , $code , '">' , $group->getName() , '</option>']);
-            }
-        }
-    }
-    foreach($invites as $i) {
-        $invite = applyEntityObj($i);
-        /** @var Invite $invite */
-        if($invite->getGroup()->getId() == $yearVal && !in_array($invite->getCode(), $codes)) {
-            $schoolStr = implode('', [$schoolStr, '<option value="' , $invite->getCode() , '">' , $invite->getGroup()->getName() , '</option>']);
-        }
-    }
-
-    // update list of groups
-    $year->find('option:not(:first-of-type)')->remove();
-    $year->append($yearStr)->val($yearVal);
-
-    $school->find('option:not(:first-of-type)')->remove();
-    $school->append($schoolStr)->val($schoolVal);
+    $view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'results' => $results]);
 }
 else {
 
@@ -116,7 +41,7 @@ else {
 
     $view['slots']->start('body'); ?>
 
-    <div class="panel-pane" id="register_child" data-groups="<?php print ($view->escape(json_encode($publicGroups))); ?>" data-invites="<?php print ($view->escape(json_encode($inviteObj))); ?>">
+    <div class="panel-pane" id="register_child">
         <div class="pane-content">
             <h2>Register a child</h2>
             <form action="<?php print ($view['router']->generate('account_create')); ?>" method="post">
@@ -129,17 +54,7 @@ else {
                 <label class="input childLast"><input type="text" name="childLast" placeholder="Child last name"
                                                       value="<?php print (isset($last) ? $last : ''); ?>"></label>
                 <input type="hidden" name="csrf_token" value="<?php print ($csrf_token); ?>"/>
-                <label class="input parent"><select name="parent">
-                        <option value="">- Select child&rsquo;s school system -</option>
-                        <?php print ($groupStr); ?>
-                    </select></label>
-                <label class="input year"><select name="year">
-                        <option value="">- Select child&rsquo;s school year -</option>
-                    </select></label>
-                <label class="input _code"><select name="_code">
-                        <option value="">- Select child&rsquo;s school name -</option>
-                    </select>
-                </label>
+                <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['results' => $results])); ?>
                 <div class="form-actions highlighted-link invalid">
                     <label class="checkbox hasChild"><input name="hasChild" type="checkbox" value="true" <?php print ($hasChild ? 'checked="checked"' : ''); ?>><i></i><span>Register another child</span></label>
                     <div class="invalid-error">You must complete all fields before moving on.</div>

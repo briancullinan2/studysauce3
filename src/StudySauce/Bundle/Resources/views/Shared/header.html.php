@@ -34,13 +34,31 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
 
 $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
 $tables = [
-    'ss_user' => ['id', 'first', 'last', 'email', 'roles', 'invites'],
+    'ss_user' => ['id', 'first', 'last', 'email', 'roles'],
     'invite' => ['first', 'last', 'invitee', 'email']
-]
+];
+$userJson = AdminController::toFirewalledEntityArray($user, ['ss_user' => ['id', 'first', 'last', 'email', 'roles']], 1);
 
+// get invites if in parents account
+$invitesJson = [];
+$invites = $user->getInvites();
+foreach($invites as $i) {
+    $invitesJson[count($invitesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
+}
+
+// get invitees if in child account
+$tables = [
+    'ss_user' => ['id', 'first', 'last', 'email', 'roles'],
+    'invite' => ['first', 'last', 'user', 'email']
+];
+$inviteesJson = [];
+$invites = $user->getInvitees();
+foreach($invites as $i) {
+    $inviteesJson[count($inviteesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
+}
 ?>
 <div class="header-wrapper navbar navbar-inverse">
-    <div class="header" data-user="<?php print $view->escape(json_encode(AdminController::toFirewalledEntityArray($user, $tables, 1) + ['groups' => $allGroups])); ?>">
+    <div class="header" data-user="<?php print $view->escape(json_encode($userJson + ['invites' => $invitesJson] + ['groups' => $allGroups])); ?>">
         <div id="site-name" class="container navbar-header">
             <a title="Home" href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
@@ -96,7 +114,7 @@ $tables = [
                 <a href="<?php print $view['router']->generate('logout'); ?>" title="Log out">logout</a></div>
                  */
                 ?>
-                <a href="#right-panel" title="Show/Hide menu">&nbsp;</a></div>
+                <a href="#right-panel">&nbsp;</a></div>
             <div id="jquery_jplayer" style="width: 0; height: 0;"></div>
         <?php } ?>
     </div>

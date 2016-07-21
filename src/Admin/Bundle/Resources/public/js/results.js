@@ -139,6 +139,7 @@ window.views.__defaultEntities['ss_group'] = {
 window.views.__defaultEntities['invite'] = {
     group: null,
     invitee: null,
+    getId: function () {return this.id;},
     getCode: function () {return this.code;},
     getFirst: function () {return this.first;},
     getLast: function () {return this.last;},
@@ -796,8 +797,7 @@ $(document).ready(function () {
             evt.preventDefault();
             var results = $(this).parents('.results');
             var row = $(this).closest('[class*="-row"]');
-            row.find('a.pack-icon').trigger('click');
-            if(row.is('.edit')) {
+            if(row.find('a.pack-icon').trigger('click').length > 0 && row.is('.edit')) {
                 row.removeClass('edit').addClass('read-only');
             }
         }

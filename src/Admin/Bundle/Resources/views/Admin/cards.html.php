@@ -47,7 +47,7 @@ $view['slots']->start('body'); ?>
             <h2><?php print($view->escape($card->getPack()->getTitle())); ?></h2>
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType']];
+            $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType', 'responseContent']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id', 'status', 'cards'];
             $tables['user_pack'] = ['id' => ['pack', 'retention', 'removed']];
@@ -91,7 +91,7 @@ $view['slots']->start('body'); ?>
             <h2><?php print($view->escape($card->getPack()->getTitle())); ?></h2>
             <?php
             $tables = (array)(new stdClass());
-            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType']];
+            $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType', 'responseContent']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
             $tables['pack'] = ['id', 'status'];
             $tables['user_pack'] = ['id' => ['pack', 'retention', 'removed']];

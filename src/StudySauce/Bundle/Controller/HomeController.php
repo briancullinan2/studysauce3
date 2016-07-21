@@ -117,6 +117,8 @@ class HomeController extends Controller
             // TODO: split this in to separate pages
         elseif($user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER') || $user->hasRole('ROLE_MASTER_ADVISER'))
             return ['userlist', []];
+        elseif(empty($user->getProperty('first_time')))
+            return ['packs_intro', []];
         return ['home', []];
     }
 }

@@ -33,8 +33,8 @@ if($tab->length == 0) {
     <div class="panel-pane" id="account">
         <div class="pane-content">
             <form action="<?php print ($view['router']->generate('account_update')); ?>" method="post">
-                <h2>Basic information</h2>
 
+                <h2>Basic information</h2>
                 <div class="account-info read-only">
                     <div class="first">
                         <label class="input"><span>First name</span>
@@ -100,12 +100,18 @@ if($tab->length == 0) {
                 <?php
                 $request['count-invite'] = 0;
                 $request['count-ss_user'] = -1;
+                $request['invite-1invite-properties'] = 's:13:"public_school";b:1;';
+                $request['invite-1ss_group-id'] = '!NULL';
+                $request['invite-1ss_group-deleted'] = '!1';
+                $request['invite-1parent-ss_group-deleted'] = '!1';
+                $request['count-ss_group'] = -1;
                 $request['ss_user-id'] = $user->getId();
                 $request['invitee-ss_user-id'] = '!NULL';
-                $request['read-only'] = false;
                 $request['tables'] = (array)(new stdClass());
-                $request['tables']['invite'] = ['idTilesSummary' => ['id', 'first', 'last', 'user', 'invitee', 'email']];
-                $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last']];
+                $request['tables']['invite'] = ['idTilesSummary' => ['id', 'first', 'last', 'user', 'invitee', 'email', 'group']];
+                $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'groups']];
+                $request['tables']['invite-1'] = ['id' => ['code', 'group', 'properties']];
+                $request['tables']['ss_group'] = ['id' => ['name', 'id', 'parent', 'deleted']];
                 $request['classes'] = ['tiles', 'summary'];
                 $request['headers'] = false;
                 $request['footers'] = false;

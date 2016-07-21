@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use FOS\UserBundle\Doctrine\UserManager;
 use StudySauce\Bundle\Command\CronSauceCommand;
 use StudySauce\Bundle\Entity\Answer;
 use StudySauce\Bundle\Entity\Card;
@@ -40,8 +41,35 @@ class PacksController extends Controller
         return $this->render('AdminBundle:Admin:packs.html.php', ['entity' => $pack]);
     }
 
+    public function introAction() {
+        $user = $this->getUser();
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
+        /** @var Pack|null $intro */
+        $intro = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('pack')
+            ->select('pack')
+            ->where('pack.title LIKE \'%Study Sauce Introduction%\'')
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult();
+
+        if(empty($user->getProperty('first_time')))
+        {
+            /** @var $userManager UserManager */
+            $userManager = $this->get('fos_user.user_manager');
+            $user->setProperty('first_time', true);
+            $userManager->updateUser($user);
+        }
+
+        if(!empty($intro) && !empty($intro->getCards()->count())) {
+            return $this->redirect($this->generateUrl('cards', ['card' => $intro->getCards()->first()->getId()]));
+        }
+        return $this->redirect($this->generateUrl('home'));
+    }
+
     public function cardAction(Card $card)
     {
+        /** @var User $user */
+
         return $this->render('AdminBundle:Admin:cards.html.php', ['card' => $card]);
     }
 

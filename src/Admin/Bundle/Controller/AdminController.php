@@ -46,7 +46,7 @@ class AdminController extends Controller
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user', 'cardCount'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted']],
-        'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created', 'invitee', 'user'], 'actions' => ['deleted', 'group']],
+        'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created', 'invitee', 'user'], 'actions' => ['deleted', 'group', 'properties']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
         'coupon' => ['id' => ['id', 'name', 'description', 'packs', 'options']],
@@ -62,7 +62,7 @@ class AdminController extends Controller
         'file' => ['id', 'url', 'user', 'deleted']
     ];
 
-    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
+    public static $defaultSearch = ['tables' => ['ss_user', 'ss_group'], 'invite-deleted' => false, 'user_pack-removed' => false, 'ss_user-enabled' => true, 'ss_group-deleted' => false, 'parent-ss_group-deleted' => null, 'pack-status' => '!DELETED', 'card-deleted' => false];
 
     public static function createEntity($table)
     {

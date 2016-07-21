@@ -65,29 +65,7 @@ class AccountController extends Controller
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_create')
             : null;
 
-        /** @var $orm EntityManager */
-        $orm = $this->get('doctrine')->getManager();
-
-        if(AdminController::$allTableClasses == null) {
-            AdminController::setUpClasses($orm);
-        }
-
-        $invites = $orm->getRepository('StudySauceBundle:Invite')->createQueryBuilder('i')
-            ->where('i.properties LIKE \'%s:13:"public_school";b:1;%\'')
-            ->andWhere('i.group IS NOT NULL')
-            ->getQuery()->getResult();
-
-        $allGroups = [];
-        foreach($invites as $i) {
-            /** @var Invite $i */
-            $group = $i->getGroup();
-            do {
-                $allGroups[] = $group;
-                $group = $group->getParent();
-            } while (!empty($group) && $group->getParent() != $group && !in_array($group, $allGroups));
-        }
-
-        return $this->render('AdminBundle:Admin:register-child.html.php', ['invites' => $invites, 'csrf_token' => $csrfToken]);
+        return $this->render('AdminBundle:Admin:register-child.html.php', ['csrf_token' => $csrfToken]);
     }
 
     /**

@@ -35,6 +35,10 @@ if(!empty($token)) {
     <nav>
         <ul class="main-menu">
             <?php
+            if (!empty($user) && $view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
+                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($p) ? 'Switch back' : implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
+            <?php }
+
             foreach ($invites as $invite) {
                 /** @var Invite $invite */
                 if (empty($invite->getInvitee())) {
@@ -45,9 +49,7 @@ if(!empty($token)) {
                     <a href="<?php print ($view['router']->generate('_welcome', ['_switch_user' => $invite->getInvitee()->getEmail()])); ?>"><?php print (implode('', [$invite->getInvitee()->getFirst(), ' ', $invite->getInvitee()->getLast()])); ?></a>
                 </li>
             <?php }
-            if (!empty($user) && $view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
-                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($p) ? 'Switch back' : implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
-            <?php } ?>
+             ?>
             <li><a href="#collapse">Hide</a><h3></h3></li>
             <li><a href="<?php print ($view['router']->generate('register_child')); ?>"><span>&nbsp;</span>Add Child</a></li>
             <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Account settings</a></li>

@@ -1,3 +1,28 @@
+
+[id^="account"] .results-invite-1 {
+    display:none;
+}
+
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label {
+    margin-left:0;
+    padding-left:0;
+    margin-bottom:10px;
+}
+
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.highlighted-link {
+    margin-bottom:0;
+}
+
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.parent,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.year,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label._code
+{
+    margin: 0 -2px;
+    padding: 0 2px;
+    display:inline-block;
+    width:33.33%
+}
+
 [id^="register"] .pane-content
 {
     text-align: center;
@@ -87,12 +112,15 @@ a[href="#sign-in-with-email"]
     vertical-align: middle;
 }
 
+
 #account .social-login label span,
 #account .type label span,
 #account .password label span,
 #account .new-password label span,
 #account .confirm-password label span,
 #account .email label span,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label span,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label span,
 #account .first label span,
 #account .last label span
 {
@@ -107,6 +135,8 @@ a[href="#sign-in-with-email"]
 #account .new-password label input,
 #account .confirm-password label input,
 #account .email label input,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.last input,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.first input,
 #account .first label input,
 #account .last label input
 {
@@ -160,11 +190,6 @@ a[href="#sign-in-with-email"]
 #account .confirm-password
 {
     visibility:hidden;
-}
-
-#account .highlighted-link
-{
-    margin-top: 20px;
 }
 
 #account .edit-icons

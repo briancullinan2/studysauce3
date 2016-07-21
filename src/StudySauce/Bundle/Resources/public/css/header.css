@@ -21,15 +21,22 @@
     background:transparent;
 }
 
-.header a[href*="/cart"]:not(.more):not(.btn):not(.cloak) {
+#welcome-message > a[href*="/cart"]:not(.more):not(.btn):not(.cloak) {
     text-align: center;
     color: #F90;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 2px;
+    padding-right: 0px;
     vertical-align: top;
     padding-bottom: 10px;
     line-height: 30px;
+    width: 50px;
 }
+
+#welcome-message > a[href^="/cart"]:not(.more):not(.btn):not(.cloak):before {
+    left: 50%;
+    margin-left:-12px;
+}
+
 
 .header-wrapper,
 #partner-message a

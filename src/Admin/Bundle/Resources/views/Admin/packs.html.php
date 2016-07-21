@@ -164,7 +164,7 @@ $view['slots']->start('body'); ?>
                         'ss_user' => ['id' => ['id', 'userPacks']],
                         'user_pack' => ['pack', 'removed', 'retention'],
                         'pack' => ['id', 'status', 'logo', 'title'],
-                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'logo'], 'packList' => ['parent', 'groupPacks'], 'actions' => ['deleted']]
+                        'ss_group' => ['idTilesPack' => ['created', 'id', 'name', 'logo', 'deleted'], 'packList' => ['parent', 'groupPacks']]
                     ];
                     if (empty($entity)) {
                         $request = [

@@ -94,7 +94,7 @@ $view['slots']->start('body'); ?>
                         'file' => ['id', 'url'],
                         'ss_user' => ['id'],
                         'pack' => ['id', 'status', 'logo'],
-                        'ss_group' => ['idTiles' => ['created', 'id', 'name', 'logo'], 'groupList' => ['groupPacks', 'parent', 'users', 'packs', 'subgroups'], 'actions' => ['deleted']]];
+                        'ss_group' => ['idTiles' => ['created', 'id', 'name', 'logo'], 'groupList' => ['groupPacks', 'parent', 'users', 'packs', 'subgroups', 'deleted']]];
                     if (empty($entity)) {
                         $request = [
                             'tables' => $tiles,
