@@ -31,9 +31,6 @@ if(isset($invites)) {
             if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $invite->getGroup()->getId()) {
                 $yearVal = $group->getParent()->getId();
             }
-            if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $yearVal) {
-                $parentVal = $group->getParent()->getId();
-            }
             if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
                 $hasParent = false;
             }
@@ -52,6 +49,9 @@ foreach($publicGroups as $group) {
     /** @var Group $group */
     if($group->getDeleted()) {
         continue;
+    }
+    if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $yearVal) {
+        $parentVal = $group->getParent()->getId();
     }
     if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
         $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '"' , $parentVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
