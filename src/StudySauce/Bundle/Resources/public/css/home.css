@@ -56,9 +56,9 @@
     width: 100%;
 }
 
-.user-shuffle header label {
+.user-shuffle header label:not(.big-add) {
     border-bottom: 2px solid #555;
-    margin:0 -2px;
+    margin:0 -4px;
     padding: 0 2px;
     width:50%;
 }
