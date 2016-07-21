@@ -15,7 +15,6 @@ $schoolVal = $school->val();
 
 /** @var Invite $invite */
 if(!empty($invite)) {
-    $parentVal = !empty($invite->getGroup()->getParent()) ? $invite->getGroup()->getParent()->getId() : $invite->getGroup()->getId();
     $yearVal = $invite->getGroup()->getId();
     $schoolVal = $invite->getCode();
 }
@@ -38,6 +37,9 @@ if(isset($invites)) {
             }
             $visited[count($visited)] = $group->getId();
             if (!empty($group->getParent()) && $group->getParent()->getId() != $group->getId()) {
+                if(!empty($invite) && $group->getId() == $yearVal) {
+                    $parentVal = $group->getParent()->getId();
+                }
                 $group = $group->getParent();
             }
         } while ($hasParent && !in_array($group->getId(), $visited));
