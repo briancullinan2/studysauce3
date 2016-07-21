@@ -37,11 +37,11 @@ $tables = [
     'ss_user' => ['id', 'first', 'last', 'email', 'roles'],
     'invite' => ['first', 'last', 'invitee', 'email']
 ];
-$userJson = AdminController::toFirewalledEntityArray($user, ['ss_user' => ['id', 'first', 'last', 'email', 'roles']], 1);
+$userJson = !empty($user) ? AdminController::toFirewalledEntityArray($user, ['ss_user' => ['id', 'first', 'last', 'email', 'roles']], 1) : (array)(new stdClass());
 
 // get invites if in parents account
 $invitesJson = [];
-$invites = !empty($user) ? $user->getInvites() : [];
+$invites = !empty($user) ? $user->getInvites()->toArray() : [];
 foreach($invites as $i) {
     $invitesJson[count($invitesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
 }
@@ -52,7 +52,7 @@ $tables = [
     'invite' => ['first', 'last', 'user', 'email']
 ];
 $inviteesJson = [];
-$invites = $user->getInvitees();
+$invites = !empty($user) ? $user->getInvitees()->toArray() : [];
 foreach($invites as $i) {
     $inviteesJson[count($inviteesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
 }
