@@ -268,7 +268,7 @@ $collection->add(
     new Route(
         '/thanks/{_format}',
         ['_controller' => 'StudySauceBundle:Buy:thanks', '_format' => 'funnel'],
-        ['_format' => 'funnel',]
+        ['_format' => 'funnel|tab',]
     )
 );
 $collection->add(

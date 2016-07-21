@@ -42,7 +42,7 @@ if(!is_array($cart)) {
             /** @var Invite $publicInvite */
             if($publicInvite->getGroup()->getId() == $g->getId()) { ?>
             <div>
-                <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['invite' => $publicInvite, 'invites' => $results['invite-1']])); ?>
+                <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'invite' => $publicInvite, 'invites' => $results['invite-1']])); ?>
             </div>
             <?php
             }

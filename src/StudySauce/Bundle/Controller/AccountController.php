@@ -472,8 +472,7 @@ class AccountController extends Controller
             $response = $this->redirect($this->generateUrl('register_child'));
         }
         else {
-            list($route, $options) = HomeController::getUserRedirect($user);
-            $response = $this->redirect($this->generateUrl($route, $options));
+            $response = $this->redirect($this->generateUrl('home'));
         }
 
         if ($login) {

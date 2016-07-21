@@ -1,4 +1,5 @@
 
+[id^="register"] .results-invite-1,
 [id^="account"] .results-invite-1 {
     display:none;
 }
@@ -26,6 +27,10 @@
 [id^="register"] .pane-content
 {
     text-align: center;
+}
+
+[id^="register"] .results [class*="-row"] > .idSingleCoupon:nth-child(1) {
+    width:100%;
 }
 
 #login .pane-content
@@ -181,7 +186,6 @@ a[href="#sign-in-with-email"]
     width: auto;
     margin: 0 auto;
     max-width: 600px;
-    padding-bottom:5px;
     display:block;
 }
 

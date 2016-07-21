@@ -1,0 +1,1 @@
+<?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'invites' => $results['invite-1']])); ?>

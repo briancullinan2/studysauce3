@@ -4,13 +4,12 @@ use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Invite;
 
 $context = !empty($context) ? $context : jQuery($this);
-$tab = $context->filter('.panel-pane');
 
 
-$parentVal = $tab->find('.parent select')->val();
-$year = $tab->find('.year select');
+$parentVal = $context->find('.parent select')->val();
+$year = $context->find('.year select');
 $yearVal = $year->val();
-$school = $tab->find('._code select');
+$school = $context->find('._code select');
 $schoolVal = $school->val();
 
 /** @var Invite $invite */
@@ -25,9 +24,11 @@ if(isset($invites)) {
         /** @var Invite $i */
         $group = $i->getGroup();
         do {
-            $publicGroups[count($publicGroups)] = $group;
+            if(!in_array($group->getId(), $visited)) {
+                $publicGroups[count($publicGroups)] = $group;
+                $visited[count($visited)] = $group->getId();
+            }
             $hasParent = true;
-            $visited[count($visited)] = $group->getId();
             if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $invite->getGroup()->getId()) {
                 $yearVal = $group->getParent()->getId();
             }

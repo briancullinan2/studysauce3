@@ -710,7 +710,9 @@ if(typeof window.jqAjax == 'undefined') {
                 var a = document.createElement('a');
                 a.href = data.redirect;
                 if (typeof window.handleLink == 'undefined' || window.handleLink.apply(a, [jQuery.Event('click')])) {
-                    window.location = data.redirect;
+                    if (window.location.pathname != data.redirect) {
+                        window.location = data.redirect;
+                    }
                 }
             }
             if (typeof success != 'undefined')
