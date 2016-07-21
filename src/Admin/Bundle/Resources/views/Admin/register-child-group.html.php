@@ -40,6 +40,12 @@ if(isset($invites)) {
         } while ($hasParent && !in_array($group->getId(), $visited));
     }
 }
+foreach($publicGroups as $group) {
+    /** @var Group $group */
+    if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $yearVal) {
+        $parentVal = $group->getParent()->getId();
+    }
+}
 
 $groupStr = '';
 $yearStr = '';
@@ -49,9 +55,6 @@ foreach($publicGroups as $group) {
     /** @var Group $group */
     if($group->getDeleted()) {
         continue;
-    }
-    if(!empty($invite) && !empty($group->getParent()) && $group->getId() == $yearVal) {
-        $parentVal = $group->getParent()->getId();
     }
     if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
         $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '"' , $parentVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
