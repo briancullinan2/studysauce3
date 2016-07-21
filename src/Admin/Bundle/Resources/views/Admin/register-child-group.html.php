@@ -21,7 +21,6 @@ if(!empty($invite)) {
 if(isset($invites)) {
     $publicGroups = [];
     $visited = [];
-    $groupStr = '';
     foreach ($invites as $i) {
         /** @var Invite $i */
         $group = $i->getGroup();
@@ -45,18 +44,22 @@ if(isset($invites)) {
     }
 }
 
+$groupStr = '';
 $yearStr = '';
 $schoolStr = '';
 $visited = [];
 $codes = [];
 foreach($publicGroups as $group) {
     /** @var Group $group */
-    if(!$group->getDeleted() && !empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getId(), $visited)) {
+    if($group->getDeleted()) {
+        continue;
+    }
+    if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
+        $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '"' , $parentVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
+    }
+    if(!empty($group->getParent()) && !$group->getParent()->getDeleted() && !in_array($group->getId(), $visited)) {
 
         $visited[count($visited)] = $group->getId();
-        if (empty($group->getParent()) || $group->getParent()->getId() == $group->getId()) {
-            $groupStr = implode('', [$groupStr, '<option value="' , $group->getId() , '"' , $parentVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
-        }
         if($group->getParent()->getId() == $parentVal) {
             $yearStr = implode('', [$yearStr, '<option value="' , $group->getId() , '" ' , $yearVal == $group->getId() ? 'selected="selected"' : '' , '>' , $group->getName() , '</option>']);
         }
