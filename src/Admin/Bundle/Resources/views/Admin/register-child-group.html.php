@@ -36,10 +36,10 @@ if(isset($invites)) {
             }
             $visited[count($visited)] = $group->getId();
             if (!empty($group->getParent()) && $group->getParent()->getId() != $group->getId()) {
-                if(!empty($invite) && $group->getId() == $yearVal) {
+                if(!empty($invite) && $group->getId() == $invite->getGroup()->getId()) {
                     $yearVal = $group->getParent()->getId();
                 }
-                if(!empty($invite) && $group->getId() == $invite->getGroup()->getId()) {
+                if(!empty($invite) && $group->getId() == $yearVal) {
                     $parentVal = $group->getParent()->getId();
                 }
                 $group = $group->getParent();
