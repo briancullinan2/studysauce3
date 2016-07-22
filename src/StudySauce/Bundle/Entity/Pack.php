@@ -225,7 +225,7 @@ class Pack
                     return $i->getInvitee();
                 })->toArray()),
             function (User $u) {
-                return ($this->getUser() == $u && $this->getStatus() != 'DELETED' && $this->getStatus() != 'GROUP')
+                return ($this->getUser() == $u && $this->getStatus() != 'DELETED' && $this->getStatus() != 'GROUP' && $this->getStatus() != 'PUBLIC')
                 || $this->userPacks->matching(Criteria::create()
                     ->where(Criteria::expr()
                         // TODO: should this be or NULL?
@@ -234,7 +234,7 @@ class Pack
                         ->eq('user', $u)))->count() > 0
                 || $this->groups->matching(Criteria::create()
                     ->where(Criteria::expr()
-                        ->in('name', $u->getGroupNames())))->count() > 0 && $this->getStatus() == 'GROUP';
+                        ->in('name', $u->getGroupNames())))->count() > 0 && ($this->getStatus() == 'GROUP' || $this->getStatus() == 'PUBLIC');
             });
     }
 
