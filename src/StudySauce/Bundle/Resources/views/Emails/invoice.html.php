@@ -23,21 +23,21 @@ $subTotal += $price;
 ?>
 <tr>
 <td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;"><?php print ($c->getDescription()); ?></td>
-<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">&#36;<?php print (number_format($price, 2)); ?></td>
+<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; text-align: right;">&#36;<?php print (number_format($price, 2)); ?></td>
 </tr>
 <?php } ?>
 <tr><td colspan="3"><hr /></td></tr>
 <tr>
 <td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">Subtotal (<?php print (count($payment->getCoupons()->toArray())); ?> items):</td>
-<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">&#36;<?php print (number_format($subTotal, 2)); ?></td>
+<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; text-align: right;">&#36;<?php print (number_format($subTotal, 2)); ?></td>
 </tr>
 <tr>
 <td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">Tax:</td>
-<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">&#36;<?php print (number_format(round($subTotal * .0795, 2), 2)); ?></td>
+<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; text-align: right;">&#36;<?php print (number_format(round($subTotal * .0795, 2), 2)); ?></td>
 </tr>
 <tr>
 <td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;"><strong>Order Total:</strong></td>
-<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">&#36;<?php print (number_format(round($subTotal + round($subTotal * .0795, 2), 2), 2)); ?></td>
+<td style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; text-align: right;">&#36;<?php print (number_format(round($subTotal + round($subTotal * .0795, 2), 2), 2)); ?></td>
 </tr>
 </table>
 <?php $view['slots']->stop(); ?>

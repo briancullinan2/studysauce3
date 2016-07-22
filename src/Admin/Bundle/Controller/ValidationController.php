@@ -76,10 +76,9 @@ class ValidationController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
 
         /** @var $user User */
@@ -113,7 +112,7 @@ class ValidationController extends Controller
         throw new NotFoundHttpException();
     }
 
-    public function refreshAction(Request $request)
+    public function refreshAction()
     {
 
         /** @var $user User */

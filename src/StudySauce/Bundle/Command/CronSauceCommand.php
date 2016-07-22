@@ -3,6 +3,7 @@
 namespace StudySauce\Bundle\Command;
 
 use Admin\Bundle\Controller\AdminController;
+use Admin\Bundle\Controller\ValidationController;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use StudySauce\Bundle\Controller\EmailsController;
@@ -20,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpFoundation\Request;
 use WhiteOctober\SwiftMailerDBBundle\Spool\DatabaseSpool;
 
 /**
@@ -69,7 +71,13 @@ EOF
                 null,
                 InputOption::VALUE_NONE,
                 'If set, cron will only notify pack changes'
-            );;
+            )
+            ->addOption(
+                'validate',
+                null,
+                InputOption::VALUE_NONE,
+                'If set, cron will only run validation tests'
+            );
     }
 
     private function sendReminders()
@@ -333,7 +341,44 @@ EOF
                 $error = $e;
             }
         }
+        if(!empty($options['validate'])) {
+            $this->runValidation();
+        }
         if(!empty($error))
             throw $error;
+    }
+
+    private function runValidation()
+    {
+        $validation = new ValidationController();
+        $validation->setContainer($this->getContainer());
+        $refresh = json_decode($validation->refreshAction()->getContent());
+        // TODO: get the most recent log file
+        $nextTest = null;
+        $lastLog = 0;
+        foreach($refresh->nodes as $i => $n) {
+            if($nextTest == null) {
+                $nextTest = $n->id;
+            }
+            if(!empty($n->results) && ($currentLog = max(array_map(function ($r) {
+                return date_timestamp_get(new \DateTime($r->created));
+            }, $n->results))) > $lastLog) {
+                $lastLog = $currentLog;
+                if($i < count($refresh->nodes)-1) {
+                    $nextTest = $refresh->nodes[$i + 1]->id;
+                }
+                else {
+                    $nextTest = $refresh->nodes[0]->id;
+                }
+            }
+        }
+
+
+        // run the next test
+        if(!empty($nextTest)) {
+            $validation->testAction(new Request(['suite' => 'acceptance', 'test' => $nextTest, 'browser' => 'chrome', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '71.36.230.6']));
+        }
+
+        // TODO: send results email
     }
 }
