@@ -356,23 +356,19 @@ EOF
         $nodes = array_filter($nodes, function ($n) {
             return $n['id'] != 'tryInstall' && $n['id'] != 'tryPushToProduction' && $n['id'] != 'tryDeploy';
         });
-        // TODO: get the most recent log file
+        // get the oldest log file, and run that test, including zero log files
         $nextTest = null;
-        $lastLog = 0;
+        $lastLog = time();
         foreach($nodes as $i => $n) {
             if($nextTest == null) {
                 $nextTest = $n['id'];
             }
-            if(!empty($n['results']) && ($currentLog = max(array_map(function ($r) {
+            $currentLog = 0;
+            if(empty($n['results']) || ($currentLog = max(array_map(function ($r) {
                 return date_timestamp_get(new \DateTime($r['created']));
-            }, $n['results']))) > $lastLog) {
+            }, $n['results']))) < $lastLog) {
                 $lastLog = $currentLog;
-                if($i < count($nodes)-1) {
-                    $nextTest = $nodes[$i + 1]['id'];
-                }
-                else {
-                    $nextTest = $nodes[0]['id'];
-                }
+                $nextTest = $n['id'];
             }
         }
 
