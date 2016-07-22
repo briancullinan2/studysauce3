@@ -403,8 +403,8 @@ class AdminController extends Controller
             $qb = $qb
                 ->andWhere('pack_userPacksuser_pack.user=:current_user
                 OR pack_userPacksuser_pack_userss_user_inviteesinvite.user=:current_user
-                OR (pack_groupsss_group_usersss_user=:current_user AND (pack.status=\'PUBLIC\' || pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))
-                OR (pack_groupsss_group_usersss_user_inviteesinvite.user=:current_user AND (pack.status=\'PUBLIC\' || pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))')
+                OR (pack_groupsss_group_usersss_user=:current_user AND (pack.status=\'PUBLIC\' OR pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))
+                OR (pack_groupsss_group_usersss_user_inviteesinvite.user=:current_user AND (pack.status=\'PUBLIC\' OR pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))')
                 ->setParameter('current_user', $user);
             return $qb;
         }
