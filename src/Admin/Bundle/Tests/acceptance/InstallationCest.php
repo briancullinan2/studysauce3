@@ -203,11 +203,13 @@ ReYNnyicsbkqWletNw+vHX/bvZ8=
 mkdir /var/www
 cd /var/www
 yum update -y
-yum install -y mysql-server httpd24 php55 php55-mysqlnd php55-pdo mod24_ssl openssl php55-mbstring php55-mcrypt php55-common php55-gd php55-xml libjpeg libpng git fontconfig libXrender libXext icu xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi freetype libpng zlib libjpeg-turbo openssl
+yum install -y mysql-server httpd24 php55 php55-mysqlnd php55-pdo mod24_ssl openssl php55-mbstring php55-mcrypt php55-common php-apc php55-gd php55-xml libjpeg libpng git fontconfig libXrender libXext icu xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi freetype libpng zlib libjpeg-turbo openssl
 cd /tmp/
 wget --no-check-certificate http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-centos6-amd64.rpm
 rpm -ivh /tmp/wkhtmltox-0.12.2.1_linux-centos6-amd64.rpm
 ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
+
+wget --no-check-certificate -O - https://curl.haxx.se/ca/cacert.pem > /etc/pki/tls/certs/ca-bundle.crt
 
 export GIT_SSL_NO_VERIFY=true
 cd /var/www/

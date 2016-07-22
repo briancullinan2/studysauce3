@@ -120,6 +120,12 @@ class ValidationController extends Controller
         if (!$user->hasRole('ROLE_ADMIN')) {
             throw new AccessDeniedHttpException();
         }
+        list($nodes, $edges) = $this->getNodesEdges();
+
+        return new JsonResponse(['nodes' => $nodes, 'edges' => array_values($edges)]);
+    }
+
+    public function getNodesEdges() {
         self::setupThis();
         $nodes = [];
         $edges = [];
@@ -225,7 +231,7 @@ class ValidationController extends Controller
             }
         }
 
-        return new JsonResponse(['nodes' => $nodes, 'edges' => array_values($edges)]);
+        return [$nodes, $edges];
     }
 
     /**

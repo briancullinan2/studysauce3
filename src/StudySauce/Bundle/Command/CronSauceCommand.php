@@ -352,11 +352,11 @@ EOF
     {
         $validation = new ValidationController();
         $validation->setContainer($this->getContainer());
-        $refresh = json_decode($validation->refreshAction()->getContent());
+        list($nodes, $edges) = $validation->getNodesEdges();
         // TODO: get the most recent log file
         $nextTest = null;
         $lastLog = 0;
-        foreach($refresh->nodes as $i => $n) {
+        foreach($nodes as $i => $n) {
             if($nextTest == null) {
                 $nextTest = $n->id;
             }
@@ -364,11 +364,11 @@ EOF
                 return date_timestamp_get(new \DateTime($r->created));
             }, $n->results))) > $lastLog) {
                 $lastLog = $currentLog;
-                if($i < count($refresh->nodes)-1) {
-                    $nextTest = $refresh->nodes[$i + 1]->id;
+                if($i < count($nodes)-1) {
+                    $nextTest = $nodes[$i + 1]->id;
                 }
                 else {
-                    $nextTest = $refresh->nodes[0]->id;
+                    $nextTest = $nodes[0]->id;
                 }
             }
         }
