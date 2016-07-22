@@ -364,7 +364,7 @@ class PacksController extends Controller
             }
 
             $response = new Response();
-            $response->setValue($r['value']);
+            $response->setValue(isset($r['value']) ? $r['value'] : '');
             $response->setUser($user);
             $user->addResponse($response);
             $response->setCard($card);

@@ -79,15 +79,12 @@ class HomeController extends Controller
             $userManager->updateUser($user);
         }
 
-        if(empty($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO')) {
-            throw new AccessDeniedHttpException();
-        }
         if(in_array('application/json', $request->getAcceptableContentTypes())) {
             return new JsonResponse($templateVars);
         }
 
         list($route, $options) = self::getUserRedirect($user);
-        if($route != 'home' && $route != 'results')
+        if($route != 'home' && $route != 'results' && $route != 'packs_intro')
             return $this->redirect($this->generateUrl($route, $options));
 
         return $this->render('AdminBundle:Admin:home.html.php', $templateVars);
