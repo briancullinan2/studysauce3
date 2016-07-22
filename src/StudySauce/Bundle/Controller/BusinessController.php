@@ -55,10 +55,6 @@ class BusinessController extends Controller
         $user = $this->getUser();
 
         // save the invite
-        $contact = new ContactMessage();
-        if($user != 'anon.' && !$user->hasRole('ROLE_GUEST') && !$user->hasRole('ROLE_DEMO')) {
-            $contact->setUser($user);
-        }
         $fields = [
             'Organization' => $request->get('organization'),
             'Street' => $request->get('street1') . (!empty($request->get('street2')) ? ("<br />\n" . $request->get('street2')) : ''),
@@ -79,16 +75,9 @@ class BusinessController extends Controller
             $body .= '<strong>' . $i . ':</strong> ' . $x . "<br >\n";
         }
 
-        $contact->setName($request->get('organization'));
-        $contact->setEmail($request->get('email'));
-        $contact->setMessage($body);
-        //$contact->setMessage($this->render('StudySauceBundle:Emails:signup.html.php', )->getContent());
-        $orm->persist($contact);
-        $orm->flush();
-
         $email = new EmailsController();
         $email->setContainer($this->container);
-        $email->contactMessageAction($user, $contact);
+        $email->contactMessageAction($user, $fields['First'], $fields['Email'], $body);
 
         $request->getSession()->set('signup', true);
 

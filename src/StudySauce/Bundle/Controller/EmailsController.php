@@ -4,16 +4,10 @@ namespace StudySauce\Bundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Entity\Card;
-use StudySauce\Bundle\Entity\ContactMessage;
-use StudySauce\Bundle\Entity\Deadline;
 use StudySauce\Bundle\Entity\Group;
-use StudySauce\Bundle\Entity\GroupInvite;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Pack;
-use StudySauce\Bundle\Entity\ParentInvite;
-use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\Payment;
-use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
 use Swift_Message;
 use Swift_Mime_Message;

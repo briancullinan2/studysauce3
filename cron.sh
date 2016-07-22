@@ -28,6 +28,8 @@ testCron:
 if ps -ef | grep -v grep | grep test\.studysauce | grep cron\/validate ; then
         goto end;
 else
+        cd /var/www/studysauce3/
+        git pull
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron/validate &
         goto end;
 fi
