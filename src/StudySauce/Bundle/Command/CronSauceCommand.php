@@ -353,6 +353,9 @@ EOF
         $validation = new ValidationController();
         $validation->setContainer($this->getContainer());
         list($nodes, $edges) = $validation->getNodesEdges();
+        $nodes = array_filter($nodes, function ($n) {
+            return $n['id'] != 'tryInstall' && $n['id'] != 'tryPushToProduction' && $n['id'] != 'tryDeploy';
+        });
         // TODO: get the most recent log file
         $nextTest = null;
         $lastLog = 0;

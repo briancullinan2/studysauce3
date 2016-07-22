@@ -31,7 +31,7 @@ else
         cd /var/www/studysauce3/
         if ! git pull | grep "Already up to date" ; then
             ./update_test.sh
-        if
+        fi
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron/validate &
         goto end;
 fi
