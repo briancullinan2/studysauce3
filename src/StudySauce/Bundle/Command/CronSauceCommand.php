@@ -358,17 +358,17 @@ EOF
         $lastLog = 0;
         foreach($nodes as $i => $n) {
             if($nextTest == null) {
-                $nextTest = $n->id;
+                $nextTest = $n['id'];
             }
-            if(!empty($n->results) && ($currentLog = max(array_map(function ($r) {
-                return date_timestamp_get(new \DateTime($r->created));
-            }, $n->results))) > $lastLog) {
+            if(!empty($n['results']) && ($currentLog = max(array_map(function ($r) {
+                return date_timestamp_get(new \DateTime($r['created']));
+            }, $n['results']))) > $lastLog) {
                 $lastLog = $currentLog;
                 if($i < count($nodes)-1) {
-                    $nextTest = $nodes[$i + 1]->id;
+                    $nextTest = $nodes[$i + 1]['id'];
                 }
                 else {
-                    $nextTest = $nodes[0]->id;
+                    $nextTest = $nodes[0]['id'];
                 }
             }
         }
