@@ -353,9 +353,9 @@ EOF
         $validation = new ValidationController();
         $validation->setContainer($this->getContainer());
         list($nodes, $edges) = $validation->getNodesEdges();
-        $nodes = array_filter($nodes, function ($n) {
-            return $n['id'] != 'tryInstall' && $n['id'] != 'tryPushToProduction' && $n['id'] != 'tryDeploy';
-        });
+        $nodes = array_values(array_filter($nodes, function ($n) {
+            return $n['suite'] == 'acceptance' && $n['id'] != 'tryInstall' && $n['id'] != 'tryPushToProduction' && $n['id'] != 'tryDeploy';
+        }));
         // get the oldest log file, and run that test, including zero log files
         $nextTest = null;
         $nextSuite = '';
