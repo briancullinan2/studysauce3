@@ -358,6 +358,7 @@ EOF
         });
         // get the oldest log file, and run that test, including zero log files
         $nextTest = null;
+        $nextSuite = '';
         $lastLog = time();
         foreach($nodes as $i => $n) {
             if($nextTest == null) {
@@ -369,13 +370,14 @@ EOF
             }, $n['results']))) < $lastLog) {
                 $lastLog = $currentLog;
                 $nextTest = $n['id'];
+                $nextSuite = $n['suite'];
             }
         }
 
 
         // run the next test
         if(!empty($nextTest)) {
-            $validation->testAction(new Request(['suite' => 'acceptance', 'test' => $nextTest, 'browser' => 'chrome', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '71.36.230.6']));
+            $validation->testAction(new Request(['suite' => $nextSuite, 'test' => $nextTest, 'browser' => 'chrome', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '71.36.230.6']));
         }
 
         // TODO: send results email
