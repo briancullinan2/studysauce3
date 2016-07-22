@@ -218,17 +218,19 @@ class BuyController extends Controller
         Stripe::setApiKey($this->container->getParameter('stripe_api_key'));
 
         // Create the charge on Stripe's servers - this will charge the user's card
-        try {
-            $charge = Charge::create(array(
-                "amount" => round($price * 100), // amount in cents, again
-                "currency" => "usd",
-                "source" => $request->get('purchase_token'),
-                "description" => "Pack Bundle"
-            ));
-            $payment->setPayment($request->get('purchase_token'));
-        } catch(\Stripe\Error\Card $e) {
-            // The card has been declined
-            throw new BadRequestHttpException($e->getMessage(), $e);
+        if($price > 0) {
+            try {
+                $charge = Charge::create(array(
+                    "amount" => round($price * 100), // amount in cents, again
+                    "currency" => "usd",
+                    "source" => $request->get('purchase_token'),
+                    "description" => "Pack Bundle"
+                ));
+                $payment->setPayment($request->get('purchase_token'));
+            } catch(\Stripe\Error\Card $e) {
+                // The card has been declined
+                throw new BadRequestHttpException($e->getMessage(), $e);
+            }
         }
 
         // successful payment!

@@ -3,6 +3,7 @@
     display:none;
 }
 
+[id^="thanks"] .tiles.summary .pack-row [class^="id"] .highlighted-link,
 [id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link {
     position: absolute;
     right: 0;
@@ -10,9 +11,13 @@
     width: auto;
     margin-left: 0;
     left: auto;
-    margin-top:-15px;
+    margin-top:-25px;
     padding:0;
     z-index: 10;
+}
+
+[id^="store_cart"] .tiles.summary .coupon-row [class^="id"] .highlighted-link {
+    margin-top:-15px;
 }
 
 [id^="store"] [href="#edit-coupon"] {
@@ -82,6 +87,8 @@
     border-top: 2px solid #555;
 }
 
+[id^="store"] .tiles.summary .highlighted-link a.more,
+[id^="thanks"] .tiles.summary .pack-row [class^="id"] .highlighted-link button,
 [id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link button {
     width:160px;
 }
@@ -285,6 +292,10 @@
     position:absolute;
     bottom: 10px;
     left: 10px;
+}
+
+#thanks .payment-row {
+    display:none;
 }
 
 #thanks h1:before

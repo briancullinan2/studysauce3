@@ -294,7 +294,7 @@ class EmailsController extends Controller
         /** @var Swift_Mime_Message $message */
         $message = Swift_Message::newInstance()
             ->setSubject('Thank you for your purchase!')
-            ->setFrom('brian@studysauce.com')
+            ->setFrom('admin@studysauce.com')
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:invoice.html.php', [
                         'user' => $user,

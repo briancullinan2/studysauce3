@@ -212,9 +212,7 @@ window.views.__defaultEntities['user_pack'] = {
     getRemoved: function () {
         return this.removed
     },
-    getUser: function () {
-        return applyEntityObj(this.user);
-    },
+    getUser: function () {return applyEntityObj(this.user);},
     getPack: function () {
         return applyEntityObj(this.pack);
     },
@@ -316,6 +314,7 @@ window.views.__defaultEntities['ss_user'] = {
 };
 window.views.__defaultEntities['payment'] = {
     coupons: $([]),
+    getUser: function () {return applyEntityObj(this.user);},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getCoupons: function () {return $($(this.coupons).toArray().map(function (u) { return applyEntityObj(u);}));},
     getId: function () {return this.id;}

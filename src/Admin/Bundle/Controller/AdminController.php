@@ -556,7 +556,7 @@ class AdminController extends Controller
             $qb = $qb
                 ->select($table)
                 ->distinct(true);
-            if (isset($t['id']) && is_array($t['id']) && !empty($t['id']) && in_array($t, $allFields)) {
+            if (isset($t['id']) && is_array($t['id']) && !empty($t['id']) && in_array($t['id'][0], $allFields)) {
                 $qb = $qb->orderBy($table . '.' . $t['id'][0], 'DESC');
             }
             $query = $qb->setFirstResult($resultOffset);

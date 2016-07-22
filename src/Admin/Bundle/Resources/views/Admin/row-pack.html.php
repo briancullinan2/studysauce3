@@ -42,6 +42,23 @@ if(isset($results['ss_user']) && isset($results['ss_user'][0])) {
     }
 }
 
+if(isset($results['payment']) && isset($results['payment'][0])) {
+    $packInPayment = false;
+    $user = $results['payment'][0]->getUser();
+    foreach($results['payment'][0]->getCoupons()->toArray() as $c) {
+        /** @var @var Coupon $c */
+        foreach($c->getPacks()->toArray() as $p) {
+            /** @var Pack $p */
+            if($p->getId() == $pack->getId()) {
+                $packInPayment = true;
+            }
+        }
+    }
+    if(!$packInPayment) {
+        return;
+    }
+}
+
 $rowHtml = $view->render('AdminBundle:Admin:row.html.php', [
     'tableId' => $tableId,
     'classes' => $classes,
