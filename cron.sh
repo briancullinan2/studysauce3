@@ -29,7 +29,9 @@ if ps -ef | grep -v grep | grep test\.studysauce | grep cron\/validate ; then
         goto end;
 else
         cd /var/www/studysauce3/
-        git pull
+        if ! git pull | grep "Already up to date" ; then
+            ./update_test.sh
+        if
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron/validate &
         goto end;
 fi
