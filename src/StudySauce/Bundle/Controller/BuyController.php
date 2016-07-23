@@ -215,10 +215,9 @@ class BuyController extends Controller
         $payment->setLast($request->get('last') ?: '');
         $payment->setProduct($option);
 
-        Stripe::setApiKey($this->container->getParameter('stripe_api_key'));
-
         // Create the charge on Stripe's servers - this will charge the user's card
         if($price > 0) {
+            Stripe::setApiKey($this->container->getParameter('stripe_api_key'));
             try {
                 $charge = Charge::create(array(
                     "amount" => round($price * 100), // amount in cents, again
