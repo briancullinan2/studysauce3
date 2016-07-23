@@ -599,8 +599,14 @@ $(document).ready(function () {
             }
         }
 
-        if (account.find('label.input.invalid').length > 0)
+        var invalid;
+        if ((invalid = account.find('label.invalid:has(input, select, textarea)')).length > 0) {
             account.find('.form-actions').removeClass('valid').addClass('invalid');
+            var description;
+            if((description = account.find('.invalid-error')).length > 0) {
+                description.text('Invalid ' + invalid.first().find('input, select, textarea').attr('placeholder'));
+            }
+        }
         else {
             account.removeClass('invalid has-error').find('.form-actions').removeClass('invalid').addClass('valid');
             account.find('.form-actions .error').remove();

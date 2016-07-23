@@ -229,7 +229,7 @@ $collection->add(
     'register_child',
     new Route(
         '/register/child/{_format}',
-        ['_controller' => 'StudySauceBundle:Account:registerChild', '_format' => 'index'],
+        ['_controller' => 'StudySauceBundle:Account:registerChild', '_format' => 'funnel'],
         ['_format' => 'funnel|tab']
     )
 );

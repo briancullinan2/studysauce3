@@ -29,6 +29,10 @@
     text-align: center;
 }
 
+[id^="register"] h2 {
+    text-align: center;
+}
+
 [id^="register"] .results [class*="-row"] > .idSingleCoupon:nth-child(1) {
     width:auto;
     padding:0;

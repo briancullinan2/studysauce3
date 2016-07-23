@@ -10,8 +10,6 @@ Thank you for your recent purchase.  You can find the details of your order belo
 <p style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555;">
     <strong>Order Information:</strong><br />
     <?php print $payment->getUser()->getFirst(); ?> <?php print $payment->getUser()->getLast(); ?><br /><br />
-    <strong>E-mail Address:</strong><br />
-    <a style="color:#FF9900;" href="mailto:<?php print $user->getEmail(); ?>"><?php print $user->getEmail(); ?></a>
 </p>
 <table border="0" style="border:0; width:100%;">
 <?php

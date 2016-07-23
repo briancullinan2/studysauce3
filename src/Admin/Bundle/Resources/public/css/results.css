@@ -128,7 +128,7 @@ table.results > tbody > tr > td .checkbox {
 table.results > tbody > tr > td > *
 {
     vertical-align: top;
-    line-height: 100%;
+    line-height: 110%;
 }
 
 .results [class*="-row"] > * label,
@@ -530,6 +530,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     top:0;
     left:0;
     text-align: center;
+    position:static;
 }
 
 .results [class^="id"] .pack-icon:hover ~ * a {

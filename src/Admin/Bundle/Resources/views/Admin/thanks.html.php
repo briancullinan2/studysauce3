@@ -50,7 +50,7 @@ if($tab->length == 0) {
             $request['tables'] = (array)(new stdClass());
             $request['tables']['payment'] = ['id' => ['created', 'id', 'user', 'coupons', ]];
             $request['tables']['coupon'] = ['id' => ['id', 'code', 'packs']];
-            $request['tables']['pack'] = ['idThanksSummary' => ['id', 'title', 'logo']];
+            $request['tables']['pack'] = ['idThanksSummary' => ['id', 'title', 'logo', 'cardCount']];
             $request['tables']['file'] = ['id' => ['id', 'url']];
             $request['tables']['invite'] = ['id' => ['id', 'first', 'last', 'user', 'invitee', 'email', 'group', 'code']];
             $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'groups', 'userPacks']];

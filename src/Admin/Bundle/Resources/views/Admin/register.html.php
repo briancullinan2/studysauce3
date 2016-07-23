@@ -13,7 +13,7 @@ $tab = $context->filter('.panel-pane');
 
 $httpRequest = $app->getRequest();
 $cookie = $httpRequest->cookies->get('hasChild');
-$hasChild = (empty($cookie) && $cookie !== 'false') || $cookie == 'true';
+$hasChild = $tab->length == 0 || (empty($cookie) && $cookie !== 'false') || $cookie == 'true';
 
 // update existing tab
 if($tab->length > 0) {
@@ -41,9 +41,9 @@ else {
 
     <div class="panel-pane" id="register">
         <div class="pane-content">
-            <h2>Welcome, let&rsquo;s get started.</h2>
-
             <form action="<?php print ($view['router']->generate('account_create')); ?>" method="post">
+                <h2>Welcome, let&rsquo;s get started.</h2>
+
                 <?php if (!empty($code)) { ?>
                     <input type="hidden" name="_code" value="<?php print ($code); ?>"/>
                 <?php } ?>
@@ -52,9 +52,9 @@ else {
                                             value="<?php print (isset($first) ? $first : ''); ?>"></label>
                 <label class="input last"><input type="text" name="last" placeholder="<?php print ($hasChild ? 'Parent last' : 'Last'); ?> name"
                                             value="<?php print (isset($last) ? $last : ''); ?>"></label>
-                <label class="input email"><input type="text" name="email" placeholder="Email"
+                <label class="input email"><input type="text" name="email" placeholder="Email address"
                                             value="<?php print (isset($email) ? $email : ''); ?>"></label>
-                <label class="input password"><input type="password" name="pass" placeholder="Enter password"
+                <label class="input password"><input type="password" name="password" placeholder="Password"
                                             value=""></label>
                 <input type="hidden" name="csrf_token" value="<?php print ($csrf_token); ?>"/>
                 <div class="form-actions highlighted-link invalid">

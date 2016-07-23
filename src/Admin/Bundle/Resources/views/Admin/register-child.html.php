@@ -15,7 +15,7 @@ $tab = $context->filter('.panel-pane');
 
 $httpRequest = $app->getRequest();
 $cookie = $httpRequest->cookies->get('hasChild');
-$hasChild = !empty($cookie) && $cookie == 'true';
+$hasChild = $tab->length > 0 && !empty($cookie) && $cookie == 'true';
 
 // update existing tab
 
@@ -46,8 +46,9 @@ else {
 
     <div class="panel-pane" id="register_child">
         <div class="pane-content">
-            <h2>Register a child</h2>
             <form action="<?php print ($view['router']->generate('account_create')); ?>" method="post">
+                <h2>Register a child</h2>
+
                 <?php if (!empty($code)) { ?>
                     <input type="hidden" name="_code" value="<?php print ($code); ?>"/>
                 <?php } ?>

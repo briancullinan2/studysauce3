@@ -54,6 +54,14 @@ jQuery(document).ready(function() {
         else {
             account.removeClass('invalid has-error');
         }
+
+        // cancel if invalid
+        var saveButton = account.find('.highlighted-link [href^="#save-"], .highlighted-link [value^="#save-"]').first();
+        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *')) {
+            gotoError.apply(this);
+            return;
+        }
+
         standardSave.apply($(this), [data, function () {
             account.data('state', hash);
         }]);
