@@ -10,7 +10,7 @@
     padding-bottom: 30px;
     transition: width linear .15s;
     box-sizing: border-box;
-    z-index: 1900;
+    z-index: 2010;
     background: url("../images/noise_gray.png") repeat scroll 0 0 #EEEEEE;
 }
 
@@ -21,13 +21,7 @@
 {
     width: 220px;
     white-space: normal;
-    padding-top: 40px;
-}
-
-#right-panel.expanded h3,
-#left-panel.expanded h3,
-#right-panel.expanded .main-menu {
-    display:block;
+    padding-top: 0;
 }
 
 #left-panel.expanded a:not([href]) span,
@@ -67,38 +61,6 @@
     width: 100%;
 }
 
-#left-panel a[href="#collapse"],
-#right-panel a[href="#collapse"]
-{
-    position:absolute;
-    display:none;
-    height:45px;
-    width:70px;
-    left:0;
-    top:-6px;
-    background:url(../images/menu_new_compressed.png) no-repeat left -102px transparent;
-    font-size:14px;
-    color:#555555;
-    font-weight: bold;
-    padding-top:12px;
-    padding-left:35px;
-    z-index:10;
-}
-
-#right-panel.expanded .main-menu a[href="#collapse"]:hover
-{
-    border:0;
-    background-color:transparent;
-    padding-left:0;
-}
-
-#left-panel.expanded .main-menu a[href="#collapse"]:hover
-{
-    border:0;
-    background-color:transparent;
-    padding-left: 35px;
-}
-
 .main-menu li.complete {
     text-decoration: line-through;
 }
@@ -111,24 +73,11 @@
 
 #right-panel a[href="#collapse"]
 {
-    padding-right:35px;
-    padding-left:0;
-    text-align: right;
-    background-position: right -202px;
-}
+    display:inline-block;
+    width:40px;
+    padding:0;
+    margin:0;
 
-#left-panel a[href="#collapse"]:hover
-{
-    color:#0099BB;
-    background-position: left -402px;
-    background-color: #DDDDDD;
-}
-
-#right-panel a[href="#collapse"]:hover
-{
-    color:#0099BB;
-    background-position: right -502px;
-    background-color: #DDDDDD;
 }
 
 #right-panel h3,
@@ -137,11 +86,20 @@
     border-bottom:3px solid #555555;
     margin:0;
     padding:5px 15px;
+    font-size:16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #right-panel h3
 {
     text-align: right;
+    padding-right:44px;
+    display: inline-block;
+    width: 100%;
+    vertical-align: middle;
+    margin-right:-44px;
 }
 
 #right-panel
@@ -339,6 +297,15 @@ a[href*="/redirect/facebook"]:focus
     transition:background-color ease-in-out .15s, color ease-in-out .15s;
     color: #0099BB;
     font-weight: bold;
+}
+
+
+#left-panel.expanded .main-menu li a:hover,
+#right-panel.expanded .main-menu li a:hover,
+#left-panel a[href="#collapse"]:hover,
+#right-panel a[href="#collapse"]:hover
+{
+    background: transparent;
 }
 
 /*
@@ -580,27 +547,6 @@ a[href*="/redirect/facebook"]:focus
 
 @media all and (max-width: 1300px), (max-height: 700px)
 {
-
-    #left-panel a[href="#expand"],
-    #right-panel a[href="#expand"],
-    #left-panel.expanded a[href="#collapse"],
-    #right-panel.expanded a[href="#collapse"]
-    {
-        /*display:block;*/
-    }
-
-    #left-panel a[href="#collapse"],
-    #right-panel a[href="#collapse"]
-    {
-        display:none;
-    }
-
-    #right-panel h3, #left-panel h3,
-    #right-panel .main-menu
-    {
-        display:none;
-    }
-
     #left-panel .main-menu a:not([href]) span
     {
         display:block;
@@ -679,17 +625,6 @@ a[href*="/redirect/facebook"]:focus
 }
 
 @media all and (max-width: 700px) {
-
-    #left-panel nav,
-    #left-panel.expanded nav,
-    #left-panel:not(.collapsed) nav,
-    #right-panel nav,
-    #right-panel.expanded nav,
-    #right-panel:not(.collapsed) nav
-    {
-        background: #555 none;
-    }
-
 
     #left-panel.expanded a[href="#collapse"],
     #right-panel.expanded a[href="#collapse"],
@@ -854,6 +789,7 @@ a[href*="/redirect/facebook"]:focus
         padding-top:0;
         width:0;
         z-index: 2100;
+        background: #555 none;
     }
 
     #left-panel,          #right-panel,

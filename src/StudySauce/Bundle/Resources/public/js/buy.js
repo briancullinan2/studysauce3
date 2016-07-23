@@ -165,7 +165,7 @@ jQuery(document).ready(function($) {
         }
         gotoError.apply(this);
         standardSave.apply(this, [data, function () {
-
+            Cookies.set('cart', '');
         }]);
     });
 

@@ -17,8 +17,10 @@ use StudySauce\Bundle\Entity\Payment;
 use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -267,14 +269,9 @@ class BuyController extends Controller
         $userManager->updateUser($user);
 
         // redirect parents and partners to thank you page
-        if($user->hasRole('ROLE_PARENT') || $user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER')) {
-            $response = $this->redirect($this->generateUrl('thanks', ['_format' => 'funnel']));
-        }
-        // redirect to user area
-        else {
-            list($route, $options) = HomeController::getUserRedirect($user);
-            $response = $this->redirect($this->generateUrl($route, $options));
-        }
+        $response = $this->redirect($this->generateUrl('thanks'));
+        $cookie = new Cookie('cart', '');
+        $response->headers->setCookie($cookie);
 
         // send email receipt
         $address = $request->get('street1') .
@@ -289,6 +286,11 @@ class BuyController extends Controller
         $loginManager = $this->get('fos_user.security.login_manager');
         $loginManager->loginUser('main', $user, $response);
         return $response;
+    }
+
+    public function purchaseAction() {
+        // TODO: response to web-hook
+        return new Response('');
     }
 
     /**

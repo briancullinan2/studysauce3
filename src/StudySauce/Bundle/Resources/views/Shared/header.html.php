@@ -108,13 +108,13 @@ foreach($invites as $i) {
                 <?php if($user->hasRole('ROLE_ADMIN')) { ?>
                     <label class="input"><input type="text" name="search" data-tables="<?php print $view->escape(json_encode(AdminController::$defaultMiniTables)); ?>" data-confirm="false" placeholder="Search" /></label>
                 <?php } ?>
-                <strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>
+
                 <?php
                 /*
                 <a href="<?php print $view['router']->generate('logout'); ?>" title="Log out">logout</a></div>
                  */
                 ?>
-                <a href="#right-panel">&nbsp;</a></div>
+                <a href="#right-panel"><strong><?php print (!empty($user) ? $user->getFirst() : ''); ?></strong>&nbsp;</a></div>
             <div id="jquery_jplayer" style="width: 0; height: 0;"></div>
         <?php } ?>
     </div>

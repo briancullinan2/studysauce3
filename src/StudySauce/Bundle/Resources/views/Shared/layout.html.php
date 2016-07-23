@@ -76,6 +76,8 @@ $collection = $router->getRouteCollection();
                 -99 => ['/register/child'],
                 100 => ['/cart'],
                 -100 => ['/cart'],
+                25 => ['/account'],
+                -25 => ['/account'],
                 17 => ['/?_switch_user=_exit'],
                 -17 => ['/?_switch_user=_exit']
             ],

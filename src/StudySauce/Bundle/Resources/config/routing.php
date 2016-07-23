@@ -352,6 +352,13 @@ $collection->add(
     )
 );
 $collection->add(
+    'store_cart',
+    new Route(
+        '/purchase',
+        ['_controller' => 'StudySauceBundle:Buy:purchase']
+    )
+);
+$collection->add(
     'packs_edit',
     new Route(
         '/packs/{pack}/{_format}',

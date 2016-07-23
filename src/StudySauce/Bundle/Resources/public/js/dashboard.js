@@ -212,7 +212,7 @@ $(document).ready(function () {
             parent = $('#right-panel');
         }
         if ($(this).is('[href="#collapse"]'))
-            return collapseMenu();
+            return collapseMenu.apply(this, [evt]);
         if ($(this).is('[href="#expand"]') || $(this).is('[href="#right-panel"]'))
             evt.preventDefault();
         if (parent.length > 0 && parent.width() < 150) {
