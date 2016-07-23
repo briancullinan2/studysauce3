@@ -64,6 +64,7 @@ jQuery(document).ready(function() {
 
         standardSave.apply($(this), [data, function () {
             account.data('state', hash);
+            account.find('.childFirst input, .childLast input, .parent select, .year select, ._code select').val('');
         }]);
     });
 
