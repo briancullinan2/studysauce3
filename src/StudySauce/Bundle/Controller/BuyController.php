@@ -16,6 +16,7 @@ use StudySauce\Bundle\Entity\PartnerInvite;
 use StudySauce\Bundle\Entity\Payment;
 use StudySauce\Bundle\Entity\StudentInvite;
 use StudySauce\Bundle\Entity\User;
+use StudySauce\Bundle\Entity\UserPack;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -265,6 +266,15 @@ class BuyController extends Controller
                 $user->addGroup($c->getGroup());
                 $userManager->updateUser($assignee);
             }
+            /*foreach ($c->getPacks()->toArray() as $p) {
+                /** @var Pack $p
+                $up = new UserPack();
+                $up->setUser($assignee);
+                $assignee->addUserPack($up);
+                $up->setPack($p);
+                $p->addUserPack($up);
+                $orm->persist($up);
+            }*/
         }
         $userManager->updateUser($user);
 

@@ -400,9 +400,26 @@ class AdminController extends Controller
             if(!in_array('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon_packspack', $joins)) {
                 $qb = $qb->leftJoin('pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon.packs', 'pack_groupsss_group_usersss_user_inviteesinvite_userss_user_paymentspayment_couponscoupon_packspack');
             }
+            if(!in_array('pack_coupons', $joins)) {
+                $qb = $qb->leftJoin('pack.coupons', 'pack_coupons');
+            }
+            if(!in_array('pack_couponscoupon_payments', $joins)) {
+                $qb = $qb->leftJoin('pack_coupons.payments', 'pack_couponscoupon_payments');
+            }
+            if(!in_array('pack_couponscoupon_paymentspayment_user', $joins)) {
+                $qb = $qb->leftJoin('pack_couponscoupon_payments.user', 'pack_couponscoupon_paymentspayment_user');
+            }
+            if(!in_array('pack_couponscoupon_paymentspayment_userss_user_invitees', $joins)) {
+                $qb = $qb->leftJoin('pack_couponscoupon_paymentspayment_user.invitees', 'pack_couponscoupon_paymentspayment_userss_user_invitees');
+            }
+            if(!in_array('pack_couponscoupon_paymentspayment_userss_user_inviteesinvite_user', $joins)) {
+                $qb = $qb->leftJoin('pack_couponscoupon_paymentspayment_userss_user_invitees.user', 'pack_couponscoupon_paymentspayment_userss_user_inviteesinvite_user');
+            }
             $qb = $qb
                 ->andWhere('pack_userPacksuser_pack.user=:current_user
                 OR pack_userPacksuser_pack_userss_user_inviteesinvite.user=:current_user
+                OR pack_couponscoupon_paymentspayment_user=:current_user
+                OR pack_couponscoupon_paymentspayment_userss_user_inviteesinvite_user=:current_user
                 OR (pack_groupsss_group_usersss_user=:current_user AND (pack.status=\'PUBLIC\' OR pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))
                 OR (pack_groupsss_group_usersss_user_inviteesinvite.user=:current_user AND (pack.status=\'PUBLIC\' OR pack.status=\'GROUP\' AND pack_groupsss_group_usersss_user_paymentspayment_couponscoupon_packspack=pack))')
                 ->setParameter('current_user', $user);

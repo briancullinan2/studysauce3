@@ -35,8 +35,8 @@
 #welcome-message > a[href^="/cart"]:not(.more):not(.btn):not(.cloak):before {
     left: 50%;
     margin-left:-12px;
+    margin-top:-10px;
 }
-
 
 .header-wrapper,
 #partner-message a
