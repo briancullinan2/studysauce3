@@ -13,7 +13,7 @@
     vertical-align: top;
     margin-bottom:0;
     border-radius: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.8);
     cursor: pointer;
 }
 
@@ -354,8 +354,8 @@
     }
 
     .header nav {
-        margin-right: -40px;
-        padding-right: 40px;
+        margin-right: -100px;
+        padding-right: 100px;
         margin-left: -206px;
         padding-left: 206px;
     }
@@ -366,7 +366,7 @@
     }
 
     #welcome-message {
-        width:40px;
+        width:100px;
         height:40px;
     }
 

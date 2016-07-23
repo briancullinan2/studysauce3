@@ -163,7 +163,6 @@
     text-overflow: ellipsis;
     padding: 0 0 0 10%;
     vertical-align: middle;
-    margin-left: -10%;
     position: static;
 }
 
@@ -238,12 +237,22 @@
     display: inline-block;
     vertical-align: middle;
     max-height: none;
-    position: static;
+    position: absolute;
     margin-bottom:0;
     margin-right:-5px;
+    top: 0;
 }
 
-.tiles.summary [class*="-row"] > [class^="id"] .pack-icon {
-    min-height: 80px;
-}
+@media all and (max-width:700px) {
 
+    .tiles.summary [class*="-row"] > [class^="id"] .pack-icon > label:last-of-type {
+        position:static;
+        margin-top:10px;
+        display:block;
+    }
+
+    .tiles.summary [class*="-row"] > [class^="id"] .pack-icon > label:last-of-type:after {
+        content: " ";
+        display:inline-block;
+    }
+}

@@ -117,12 +117,17 @@
 {
     width:20%;
     padding-right:0;
+    margin-right:10%;
 }
 
 [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label:last-of-type {
-    width:30%;
     padding-right:15%;
     margin-left: 30%;
+    width:70%;
+}
+
+[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] img {
+    left:20%;
 }
 
 #checkout #payment-pane,
@@ -287,13 +292,6 @@
     padding-left: 300px;
 }
 
-#thanks a[href*="/home"]
-{
-    position:absolute;
-    bottom: 10px;
-    left: 10px;
-}
-
 #thanks .payment-row {
     display:none;
 }
@@ -319,6 +317,7 @@
     text-align: center;
     margin-bottom: 30px;
     font-weight: bold;
+    line-height: 100%;
 }
 
 #thanks h2
@@ -383,6 +382,14 @@
         float:none;
         clear:both;
         height:auto !important;
+    }
+
+    [id^="thanks"] .tiles.summary .pack-row [class^="id"] .highlighted-link,
+    [id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link
+    {
+        position:static;
+        margin-top:10px;
+        display:block;
     }
 }
 
