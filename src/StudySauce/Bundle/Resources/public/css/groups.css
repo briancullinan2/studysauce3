@@ -40,8 +40,8 @@
 }
 
 [id^="groups-"] .group-edit {
-    margin:-30px -100px 40px;
-    padding: 30px 100px 20px;
+    margin:-30px -10px 40px;
+    padding: 30px 10px 20px;
     background-color: #BBB;
 }
 
@@ -167,4 +167,86 @@
 .list-packs .pack-row .highlighted-link > [value^="#save-"]
 {
     display:none !important;
+}
+
+@media (min-width: 1300px) {
+    [id^="groups-"] .group-edit {
+        padding-left:100px;
+        padding-right:100px;
+        margin-left:-100px;
+        margin-right:-100px;
+    }
+}
+
+@media all and (max-width:700px) {
+
+    .group-edit .ss_group-row .invite, .group-edit .ss_group-row .invites,
+    .group-edit .ss_group-row > .parent,
+    .group-edit .ss_group-row > .name {
+        width: 80%;
+        padding-left: 150px;
+        margin-right: 0;
+        display:block;
+        margin-left:auto;
+    }
+
+    [class*="-edit"] header label:nth-child(3),
+    [class*="-edit"] header label:nth-child(2),
+    [class*="-edit"] header label:nth-child(1)
+    {
+        width:80%;
+        display:block;
+        padding-left:20%;
+    }
+
+    [class*="-edit"] [class*="-row"] > [class^="id"] {
+        width:20%;
+    }
+
+    .empty-members {
+        display:none;
+    }
+
+    .last-right-expand [class*="-row"] .title {
+        width:85%;
+        margin-right:-44px;
+        padding-right:44px;
+    }
+
+    .last-right-expand [class*="-row"] > [class^="id"] {
+        width:15%;
+    }
+
+    .results header > [class*="actions"], [class*="-row"] > [class*="actions"]:nth-last-child(2) {
+        width:40px;
+    }
+
+    .last-right-expand > footer > label:nth-of-type(1), .last-right-expand > header > label:nth-of-type(1) {
+        width: 58%;
+        padding-left: 15%;
+        margin-left: 0;
+    }
+
+    .last-right-expand > footer > label:nth-of-type(3), .last-right-expand > header > label:nth-of-type(3),
+    .last-right-expand > footer > label:nth-of-type(2), .last-right-expand > header > label:nth-of-type(2) {
+        width:20%;
+    }
+
+    .last-right-expand header > .big-add {
+        padding-left:15%;
+    }
+
+    .last-right-expand header > .big-add span {
+        left:7.5%;
+    }
+
+    .last-right-expand [class*="Members"] header > .big-add span {
+        left:1.5%;
+    }
+
+    .last-right-expand [class*="-row"] > [class*="expand"] {
+        height:auto;
+        overflow:auto;
+    }
+
 }

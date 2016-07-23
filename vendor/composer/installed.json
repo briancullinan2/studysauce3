@@ -385,7 +385,8 @@
             "http client",
             "rest",
             "web service"
-        ]
+        ],
+        "abandoned": "guzzlehttp/guzzle"
     },
     {
         "name": "phpdocumentor/reflection-docblock",
@@ -2360,51 +2361,6 @@
         ]
     },
     {
-        "name": "facebook/webdriver",
-        "version": "1.1.1",
-        "version_normalized": "1.1.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/facebook/php-webdriver.git",
-            "reference": "1c98108ba3eb435b681655764de11502a0653705"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/1c98108ba3eb435b681655764de11502a0653705",
-            "reference": "1c98108ba3eb435b681655764de11502a0653705",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.19"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "4.6.*"
-        },
-        "suggest": {
-            "phpdocumentor/phpdocumentor": "2.*"
-        },
-        "time": "2015-12-31 15:58:49",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Facebook\\WebDriver\\": "lib/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "Apache-2.0"
-        ],
-        "description": "A PHP client for WebDriver",
-        "homepage": "https://github.com/facebook/php-webdriver",
-        "keywords": [
-            "facebook",
-            "php",
-            "selenium",
-            "webdriver"
-        ]
-    },
-    {
         "name": "sebastian/version",
         "version": "1.0.6",
         "version_normalized": "1.0.6.0",
@@ -3266,7 +3222,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/def27463609e24af410b2606f0062de46fab5662",
+            "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/16b04c49af05dd3fb381e4abe04f0e5e231ac76d",
             "reference": "16b04c49af05dd3fb381e4abe04f0e5e231ac76d",
             "shasum": ""
         },
@@ -3337,7 +3293,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/evernote/evernote-cloud-sdk-php/zipball/b6f1a418e882c68c8c727380af208a50b10b2749",
+            "url": "https://api.github.com/repos/evernote/evernote-cloud-sdk-php/zipball/7a3357fa8b8d7a0a943c634283ee7f7edafd4d8a",
             "reference": "7a3357fa8b8d7a0a943c634283ee7f7edafd4d8a",
             "shasum": ""
         },
@@ -4327,6 +4283,109 @@
             "crawler",
             "dom",
             "html"
+        ]
+    },
+    {
+        "name": "stripe/stripe-php",
+        "version": "v3.17.0",
+        "version_normalized": "3.17.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/stripe/stripe-php.git",
+            "reference": "982b90dcbc9cfd59057db8819a247c6db18df6cd"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/982b90dcbc9cfd59057db8819a247c6db18df6cd",
+            "reference": "982b90dcbc9cfd59057db8819a247c6db18df6cd",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "ext-json": "*",
+            "ext-mbstring": "*",
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.0",
+            "satooshi/php-coveralls": "~0.6.1",
+            "squizlabs/php_codesniffer": "~2.0"
+        },
+        "time": "2016-07-14 17:36:41",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Stripe\\": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Stripe and contributors",
+                "homepage": "https://github.com/stripe/stripe-php/contributors"
+            }
+        ],
+        "description": "Stripe PHP Library",
+        "homepage": "https://stripe.com/",
+        "keywords": [
+            "api",
+            "payment processing",
+            "stripe"
+        ]
+    },
+    {
+        "name": "facebook/webdriver",
+        "version": "1.1.2",
+        "version_normalized": "1.1.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/facebook/php-webdriver.git",
+            "reference": "0b889d7de7461439f8a3bbcca46e0f696cb27986"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/0b889d7de7461439f8a3bbcca46e0f696cb27986",
+            "reference": "0b889d7de7461439f8a3bbcca46e0f696cb27986",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": ">=5.3.19"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "4.6.*"
+        },
+        "suggest": {
+            "phpdocumentor/phpdocumentor": "2.*"
+        },
+        "time": "2016-06-04 00:02:34",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Facebook\\WebDriver\\": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Apache-2.0"
+        ],
+        "description": "A PHP client for WebDriver",
+        "homepage": "https://github.com/facebook/php-webdriver",
+        "keywords": [
+            "facebook",
+            "php",
+            "selenium",
+            "webdriver"
         ]
     }
 ]

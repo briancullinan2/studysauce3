@@ -10,6 +10,7 @@
     z-index: 0;
     line-height:27px;
     margin-top:1px;
+    left:0;
 }
 
 [class*="-edit"] header label:nth-child(3),
