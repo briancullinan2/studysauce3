@@ -60,7 +60,7 @@ foreach($invites as $i) {
 <div class="header-wrapper navbar navbar-inverse">
     <div class="header" data-user="<?php print $view->escape(json_encode($userJson + ['invites' => $invitesJson] + ['groups' => $allGroups])); ?>">
         <div id="site-name" class="container navbar-header">
-            <a title="Home" href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
+            <a href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
                     <img width="48" height="48" src="<?php echo $view->escape($url) ?>" alt="LOGO" />
                 <?php endforeach; ?><span>Study Sauce</span></a>

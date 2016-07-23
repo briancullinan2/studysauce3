@@ -68,7 +68,8 @@ else {
                 $request['invite-1parent-ss_group-deleted'] = '!1';
                 $request['count-ss_group'] = -1;
                 $request['new'] = ['invite'];
-                $request['edit'] = ['invite'];
+                $request['edit'] = false;
+                $request['read-only'] = false;
                 $request['tables'] = (array)(new stdClass());
                 $request['tables']['invite'] = ['idSingleCoupon' => ['id', 'first', 'last', 'user', 'invitee', 'email', 'group', 'code']];
                 $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'groups']];

@@ -15,21 +15,19 @@ jQuery(document).ready(function() {
         return hash;
     }
 
-    function accountFunc() {
-        var account = $(this);
-        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast', 'parent', 'year']]);
+    function accountFunc(evt) {
+        var account = $(this).closest('.panel-pane');
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', '_code', 'childFirst', 'childLast', 'parent', 'year']]);
+        if($(evt.target).is('.hasChild input, #register_child select')) {
+            Cookies.set('hasChild', account.find('.hasChild input').is(':checked') ? 'true' : 'false');
+            window.views.render.apply(account, [account.attr('id'), {context: account}]);
+        }
         standardValidation.apply(account, [data]);
     }
 
     body.on('show', '[id^="register"]', function () {
         if($(this).data('state') == null)
             $(this).data('state', getHash.apply(this));
-    });
-
-    body.on('change', '[id^="register"] .hasChild input, #register_child select', function () {
-        var tab = $(this).parents('.panel-pane');
-        Cookies.set('hasChild', $(this).is(':checked') ? 'true' : 'false');
-        window.views.render.apply(tab, [tab.attr('id'), {context: tab}]);
     });
 
     body.on('validate', '[id^="register"]', accountFunc);
@@ -56,7 +54,6 @@ jQuery(document).ready(function() {
         else {
             account.removeClass('invalid has-error');
         }
-
         standardSave.apply($(this), [data, function () {
             account.data('state', hash);
         }]);

@@ -582,7 +582,7 @@ $(document).ready(function () {
     window.resultsSave = resultsSave;
 
     function standardValidation(data) {
-        var account = $(this);
+        var account = $(this).closest('.panel-pane, .results');
         for(var d in data) {
             if(data.hasOwnProperty(d)) {
                 if(data[d] == '') {
@@ -602,7 +602,7 @@ $(document).ready(function () {
         if (account.find('label.input.invalid').length > 0)
             account.find('.form-actions').removeClass('valid').addClass('invalid');
         else {
-            account.removeClass('invalid-only').find('.form-actions').removeClass('invalid').addClass('valid');
+            account.removeClass('invalid has-error').find('.form-actions').removeClass('invalid').addClass('valid');
             account.find('.form-actions .error').remove();
         }
     }

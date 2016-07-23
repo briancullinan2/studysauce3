@@ -461,8 +461,8 @@
 {
     position: absolute;
     bottom: 10px;
-    right: 10px;
-    left: 10px;
+    right: 20px;
+    left: 20px;
 }
 
 [id^="cards"] .preview-card.type-mc:not(.preview-answer) .preview-footer,
