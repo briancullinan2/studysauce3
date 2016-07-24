@@ -251,8 +251,8 @@ EOF
                         }
                         else {
                             print "\t" . 'You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce';
-                            $this->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
-                                . '" on Study Sauce', count($unique), str_replace([' ', '<', '>'], '', $d));
+                            //$this->sendNotification('You have a new pack "' . $alerting[0]->getTitle()
+                            //    . '" on Study Sauce', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                     }
                 }
@@ -262,7 +262,7 @@ EOF
                         continue;
                     }
                     print "\t" . 'We have added ' . $emailing[0]->getTitle() . ' to Study Sauce';
-                    $emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($childUser) ? $childUser : null);
+                    //$emails->sendNewPacksNotification($u, $emailing, !empty($groupInvite) ? $groupInvite : null, !empty($childUser) ? $childUser : null);
                 }
             }
         }
