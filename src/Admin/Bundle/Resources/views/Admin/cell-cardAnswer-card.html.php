@@ -56,7 +56,7 @@ if (2 != $template->length) {
             </div>
             <div class="preview-footer">
                 <a href="#wrong" class="preview-wrong">&#x2717;</a>
-                <div class="preview-guess">Did you guess correctly?</div>
+                <div class="preview-guess">Did you answer correctly?</div>
                 <a href="#right" class="preview-right">&#x2713;︎</a>
                 <?php print ($view->render('AdminBundle:Admin:cell-cardFooter-card.html.php', ['results' => $results, 'request' => $request, 'card' => $card])); ?>
             </div>

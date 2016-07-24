@@ -246,8 +246,8 @@ EOF
                     foreach($u->getDevices() as $d) {
                         if (!empty($groupInvite)) {
                             print "\t" . $groupInvite->getName() . ' added a new pack, "' . $childPack->getTitle() . '"';
-                            $this->sendNotification($groupInvite->getName() . ' added a new pack, "'
-                                . $childPack->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
+                            //$this->sendNotification($groupInvite->getName() . ' added a new pack, "'
+                            //    . $childPack->getTitle() . '"', count($unique), str_replace([' ', '<', '>'], '', $d));
                         }
                         else {
                             print "\t" . 'You have a new pack "' . $alerting[0]->getTitle() . '" on Study Sauce';
@@ -327,7 +327,7 @@ EOF
         }
         if($empty || !empty($options['emails'])) {
             try {
-                $this->sendReminders();
+                //$this->sendReminders();
                 //$this->send3DayMarketing();
             }
             catch (\Exception $e) {
