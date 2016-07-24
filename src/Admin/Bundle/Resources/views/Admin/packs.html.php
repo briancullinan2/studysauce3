@@ -214,6 +214,7 @@ $view['slots']->start('body'); ?>
                     $request['notInGroup'] = true;
                     $request['ss_user-id'] = $user->getId();
                     $request['user_pack-removed'] = false;
+                    $request['userPacks-user_pack-removed'] = null;
                     $request['read-only'] = false;
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
@@ -233,6 +234,7 @@ $view['slots']->start('body'); ?>
                     $request['count-user_pack'] = -1;
                     $request['read-only'] = false;
                     $request['ss_user-id'] = $user->getId();
+                    $request['userPacks-user_pack-removed'] = null;
                     $request['ss_group-id'] = $entity->getId();
                     $request['tables'] = (array)(new stdClass());
                     $request['tables']['file'] = ['id', 'url'];
