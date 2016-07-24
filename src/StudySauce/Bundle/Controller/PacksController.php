@@ -68,8 +68,6 @@ class PacksController extends Controller
 
     public function cardAction(Card $card)
     {
-        /** @var User $user */
-
         return $this->render('AdminBundle:Admin:cards.html.php', ['card' => $card]);
     }
 
@@ -415,13 +413,4 @@ class PacksController extends Controller
         return new JsonResponse(['ids' => $ids, 'retention' => $retention]);
     }
 
-    /**
-     * @param Pack $pack
-     * @param User $user
-     * @param bool $refresh
-     * @return mixed
-     */
-    public static function getRetention(Pack $pack, User $user, $refresh = false) {
-
-    }
 }

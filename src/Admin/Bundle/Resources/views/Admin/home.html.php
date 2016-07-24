@@ -31,7 +31,7 @@ $view['slots']->start('body'); ?>
             <?php
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'userPacks']];
-            $tables['pack'] = ['titleNew' => ['id', 'title', 'status']];
+            $tables['pack'] = ['titleNew' => ['id', 'title', 'status', 'cardCount']];
             $tables['user_pack'] = ['pack', 'removed', 'retention'];
             $request = [
                 'tables' => $tables,
