@@ -227,6 +227,8 @@ window.views.__defaultEntities['user_pack'] = {
 };
 window.views.__defaultEntities['card'] = {
     answers: [],
+    content: '',
+    responseContent: '',
     getDeleted: function () {return this.deleted},
     getId: function () {return this.id},
     getCorrect: function () {

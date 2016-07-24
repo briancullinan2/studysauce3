@@ -1256,7 +1256,7 @@ var ucfirst = function (str) {return (str || '').substr(0, 1).toLocaleUpperCase(
 var str_replace = function (needle, replacement, haystack) {return (haystack || '').replace(new RegExp(RegExp.escape(needle), 'g'), replacement);};
 var call_user_func_array = function (context, params) {return context[0][context[1]].apply(context[0], params);};
 var print = function (s) { window.views.__output += s };
-var strtolower = function(s) { return s.toLocaleLowerCase(); };
+var strtolower = function(s) { return (s || '').toLocaleLowerCase(); };
 var empty = function(s) { return typeof s == 'undefined' || ('' + s).trim() == '' || s === false || s === 'false' || s == null || (typeof s == 'object' && s.constructor == Array && s.length == 0) ; };
 var json_encode = JSON.stringify;
 var method_exists = function (s,m) { return typeof s == 'object' && typeof s[m] == 'function'; };
