@@ -34,14 +34,6 @@ if(isset($request['notInGroup'])) {
     }
 }
 
-if(isset($results['ss_user']) && isset($results['ss_user'][0])) {
-    $user = $results['ss_user'][0];
-    $up = $user->getUserPack($pack);
-    if(empty($up) || $up->getRemoved()) {
-        return;
-    }
-}
-
 if(isset($results['payment']) && isset($results['payment'][0])) {
     $packInPayment = false;
     $user = $results['payment'][0]->getUser();
@@ -77,8 +69,8 @@ if(isset($request['user_pack-removed'])) {
     /** @var User $user */
     $user = $results['ss_user'][0];
     if (strpos($rowHtml, '<label>0</label>') !== false
-        || empty($up = $user->getUserPack($pack)) || $up->getRemoved()
-        || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED'
+        || (!empty($up = $user->getUserPack($pack)) && $up->getRemoved())
+        || $pack->getStatus() == 'DELETED' || $pack->getStatus() == 'UNPUBLISHED'
     ) {
         return;
     }
