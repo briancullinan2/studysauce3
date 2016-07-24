@@ -165,7 +165,8 @@ class PacksController extends Controller
         }
         if (!empty($request->get('card')) && empty($searchRequest['pack-id'])) {
             if(!empty($newPack->getId())) {
-                if($newPack->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() > 0) {
+                $p = $newPack instanceof Card ? $newPack->getPack() : $newPack;
+                if($p->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count() > 0) {
                     $searchRequest['new'] = false;
                     $searchRequest['count-card'] = 0;
                 }
