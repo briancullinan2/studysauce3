@@ -464,7 +464,6 @@ $(document).ready(function () {
             request['tables']['ss_user'] = ['id'];
             delete request['skipRetention'];
             tab.find('.results').data('request', request);
-
             updateUserRetention.apply(this);
         }
 
