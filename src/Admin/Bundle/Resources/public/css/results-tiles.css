@@ -217,6 +217,8 @@
 }
 
 .tiles.summary [class*="-row"] > [class^="id"] .pack-icon > label span {
+    padding-left: 20px;
+    display: inline-block;
 }
 
 .tiles.summary [class*="-row"] > [class^="id"] .pack-icon > label:last-of-type {
