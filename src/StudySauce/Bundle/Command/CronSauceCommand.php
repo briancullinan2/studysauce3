@@ -203,11 +203,11 @@ EOF
             if (count($difference) > 0) {
                 print "\n" . $u->getEmail();
 
-                $u->setProperty('notified', array_unique(array_merge(array_map(function ($n) {
+                //$u->setProperty('notified', array_unique(array_merge(array_map(function ($n) {
                     /** @var Pack $p */
-                    list($p) = $n;
-                    return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
-                $this->getContainer()->get('fos_user.user_manager')->updateUser($u);
+                //    list($p) = $n;
+                //    return $p->getId(); }, $notify), $u->getProperty('notified') ?: [])));
+                //$this->getContainer()->get('fos_user.user_manager')->updateUser($u);
 
                 /** @var Pack[] $alerting */
                 $alerting = [];
