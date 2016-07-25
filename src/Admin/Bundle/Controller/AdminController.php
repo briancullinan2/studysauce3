@@ -888,7 +888,7 @@ class AdminController extends Controller
                                 }
                                 if (!empty($childEntity->newId)) {
                                     $orm->persist($childEntity);
-                                } else if(!empty($value)) {
+                                } else if(!empty($childEntity)) {
                                     $orm->merge($childEntity);
                                 }
                             }

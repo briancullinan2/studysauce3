@@ -174,8 +174,10 @@ class Group extends BaseGroup implements GroupInterface
      */
     public function addUser(\StudySauce\Bundle\Entity\User $users)
     {
-        $this->users[] = $users;
-
+        if(!in_array($users, $this->getUsers()->toArray())) {
+            $this->getUsers()->add($users);
+            $users->addGroup($this);
+        }
         return $this;
     }
 

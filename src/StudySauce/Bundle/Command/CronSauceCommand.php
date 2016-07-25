@@ -144,7 +144,9 @@ EOF
         $orm = $this->getContainer()->get('doctrine')->getManager();
 
         $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
+            ->select(['u', 'ups'])
             ->where('u.devices IS NOT NULL AND u.devices != \'\'')
+            ->leftJoin('u.userPacks', 'ups')
             ->leftJoin('u.invitees', 'inv')
             ->leftJoin('inv.user', 'invu')
             // don't send to child accounts unless they have set their own email address
