@@ -97,6 +97,7 @@ $school->append($schoolStr)->val($schoolVal);
 <label class="input parent"><select name="parent" placeholder="School system">
         <option value="">- Select child&rsquo;s school system -</option>
         <?php print ($groupStr); ?>
+        <option value="_">Other</option>
     </select></label>
 <label class="input year"><select name="year" placeholder="School year">
         <option value="">- Select child&rsquo;s school year -</option>

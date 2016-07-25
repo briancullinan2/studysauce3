@@ -145,6 +145,10 @@ EOF
 
         $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
             ->where('u.devices IS NOT NULL AND u.devices != \'\'')
+            ->leftJoin('u.invitees', 'inv')
+            ->leftJoin('inv.user', 'invu')
+            // don't send to child accounts unless they have set their own email address
+            ->andWhere('invu.email IS NULL OR u.email LIKE concat(invu.email, \'_%\')')
             ->getQuery()->getResult();
 
         $emails = new EmailsController();
@@ -152,11 +156,7 @@ EOF
 
         foreach($users as $u) {
             /** @var User $u */
-            // don't send to child accounts unless they have set their own email address
-            if($u->getInvitees()->filter(function (Invite $i) use ($u) {
-                    return $i->getUser()->getEmail() . '_' == substr($u->getEmail(), 0, strlen($i->getUser()->getEmail()) + 1);})->count() > 0) {
-                continue;
-            }
+            print 'Checking: ' . $u->getEmail() . "\n";
 
             /** @var Pack[] $packs */
             $joins = [];

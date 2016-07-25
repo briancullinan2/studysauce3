@@ -138,7 +138,8 @@ jQuery(document).ready(function($) {
             data.child[couponData.child] = couponData.coupon;
         });
         standardSave.apply(this, [data, function () {
-
+            Cookies.set('cart', '');
+            body.find('#welcome-message > a[href*="/cart"]').html('&nbsp;');
         }]);
     });
 
@@ -165,7 +166,7 @@ jQuery(document).ready(function($) {
         }
         gotoError.apply(this);
         standardSave.apply(this, [data, function () {
-            Cookies.set('cart', '');
+
         }]);
     });
 
