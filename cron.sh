@@ -15,32 +15,31 @@ fi
 
 if  dig test.studysauce.com | grep '^[^;].*IN\sA' | grep "$myip" ; then
     echo "This is test."
+    cd /var/www/studysauce3/
+    if ! git pull | grep "Already up-to-date" ; then
+        echo "Updating..."
+        ./update_test.sh
+    fi
+
+    export DISPLAY=:10
+    export PATH=$PATH:/home/ec2-user/firefox
+    cd /home/ec2-user/
+    if ps -ef | grep -v grep | grep displaybuffer ; then
+        echo "Display already running."
+    else
+        echo "Starting display server."
+#        screen -dDRmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
+    fi
 
     # check to see if cron validation is running, which is always should be
     if ps -ef | grep -v grep | grep cron\/validate ; then
         echo "Cron already running."
     else
-        cd /var/www/studysauce3/
-        if ! git pull | grep "Already up-to-date" ; then
-            echo "Updating..."
-            ./update_test.sh
-        fi
-
-        export DISPLAY=:10
-        export PATH=$PATH:/home/ec2-user/firefox
-        cd /home/ec2-user/
-        if ps -ef | grep -v grep | grep displaybuffer ; then
-            echo "Display already running."
-        else
-            echo "Starting display server."
-    #            screen -dDRmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
-        fi
-
         echo "Starting validation."
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron/validate &
     fi
 
-    if ps -ef | grep -v grep | grep test\.studysauce ; then
+    if ps -ef | grep -v grep | grep test\.studysauce\.com\/cron ; then
         echo "Cron already running."
     else
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron &
