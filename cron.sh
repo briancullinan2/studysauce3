@@ -15,7 +15,7 @@ fi
 
 
 if  dig test.studysauce.com | grep '^[^;].*IN\sA' | grep "$myip" ; then
-echo "This is test"
+echo "This is test."
 
 # check to see if cron validation is running, which is always should be
 if ps -ef | grep -v grep | grep cron\/validate ; then
@@ -23,6 +23,7 @@ if ps -ef | grep -v grep | grep cron\/validate ; then
 else
         cd /var/www/studysauce3/
         if ! git pull | grep "Already up-to-date" ; then
+            echo "Updating..."
             ./update_test.sh
         fi
 
@@ -30,12 +31,15 @@ else
         export PATH=$PATH:/home/ec2-user/firefox
         cd /home/ec2-user/
         if ps -ef | grep -v grep | grep displaybuffer ; then
+            echo "Display already running."
             goto startvalidate
         else
-            screen -S displaybuffer -d xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
+            echo "Starting display server."
+            screen -dRmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
         fi
 
         startvalidate:
+        echo "Starting validation."
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron/validate &
         goto test
 fi
