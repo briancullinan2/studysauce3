@@ -244,7 +244,7 @@ chkconfig httpd on
 
 $update
 
-cd /home/ec2-user/
+mkdir /home/public/
 curl -X GET -o RPM-GPG-KEY-lambda-epll https://lambda-linux.io/RPM-GPG-KEY-lambda-epll
 sudo rpm --import RPM-GPG-KEY-lambda-epll
 curl -X GET -o epll-release-2016.03-1.1.ll1.noarch.rpm https://lambda-linux.io/epll-release-2016.03-1.1.ll1.noarch.rpm
@@ -253,6 +253,10 @@ sudo yum -y --enablerepo=epll install xorg-x11-server-Xvfb fluxbox firefox-compa
 wget http://releases.mozilla.org/pub/firefox/releases/45.0.1/linux-x86_64/en-US/firefox-45.0.1.tar.bz2
 tar -jxvf firefox-45.0.1.tar.bz2
 wget http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
+chgrp apache -R /home/public/firefox
+chgrp apache /home/public/selenium-server-standalone-2.53.1.jar
+chgrp apache /home/public
+chmod a+x selenium-server-standalone-2.53.1.jar
 
 EOSH;
 

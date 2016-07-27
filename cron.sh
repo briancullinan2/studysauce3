@@ -23,7 +23,7 @@ if  dig test.studysauce.com | grep '^[^;].*IN\sA' | grep "$myip" ; then
 
     export DISPLAY=:10
     export PATH=$PATH:/home/ec2-user/firefox
-    cd /home/ec2-user/
+    cd /home/public/
     if ps -ef | grep -v grep | grep displaybuffer ; then
         echo "Display already running."
     else
