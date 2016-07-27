@@ -379,6 +379,8 @@ EOF
 
         // run the next test
         if(!empty($nextTest)) {
+            print $nextTest . "\n";
+            //$validation->testAction(new Request(['suite' => $nextSuite, 'test' => $nextTest, 'browser' => 'chrome', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '71.36.230.6']));
             $validation->testAction(new Request(['suite' => $nextSuite, 'test' => $nextTest, 'browser' => 'firefox', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '127.0.0.1']));
         }
 
