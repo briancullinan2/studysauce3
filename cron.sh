@@ -28,7 +28,7 @@ if  dig test.studysauce.com | grep '^[^;].*IN\sA' | grep "$myip" ; then
         echo "Display already running."
     else
         echo "Starting display server."
-#        screen -dDRmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
+        screen -dmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
     fi
 
     # check to see if cron validation is running, which is always should be
