@@ -47,6 +47,7 @@ class DialogsController extends Controller
     {
         /** @var $user \StudySauce\Bundle\Entity\User */
         $user = $this->getUser();
+        $user = $user->getParent();
 
         $email = new EmailsController();
         $email->setContainer($this->container);

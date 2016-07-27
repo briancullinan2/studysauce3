@@ -54,19 +54,6 @@ if($tab->length == 0) {
                         </label>
                     </div>
                 </div>
-                <div class="social-login">
-                    <?php foreach ($services as $o => $url) {
-                        $getter = implode('', ['get' , ucfirst($o) , 'AccessToken']);
-                        ?>
-                        <label><span><?php print ($o == 'gcal' ? 'Google Calendar' : ucfirst($o)); ?> account</span>
-                        <?php if (!empty($user->$getter())) { ?>
-                            Connected <a href="#remove-<?php print ($o); ?>"></a>
-                        <?php } else { ?>
-                            <a href="<?php print ($url); ?>?_target=<?php print ($view['router']->generate('account')); ?>"
-                               class="more">Connect</a></label>
-                        <?php }
-                    } ?>
-                </div>
                 <div class="password">
                     <label class="input"><span>Current password</span>
                         <input name="password" type="password" placeholder="Enter password" value="">
@@ -90,6 +77,7 @@ if($tab->length == 0) {
                     </div>
                     <div class="form-actions">
                         <div class="invalid-error">You must complete all fields before moving on.</div>
+                        <a href="#cancel-edit">Cancel</a>
                         <button type="submit" value="#save-account" class="more">Save</button>
                     </div>
                 </div>

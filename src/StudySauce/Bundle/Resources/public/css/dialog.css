@@ -472,14 +472,14 @@ body.right-menu #bookmark
 
 .modal-header .close
 {
-    color: #FFF;
+    color: #BBB;
     opacity: .9;
     font-size: 40px;
     top: 0;
     right: 0;
     position: absolute;
     height: 100%;
-    background-color: #BBB;
+    background-color: #EEE;
     border-top-right-radius: 1px;
     width:50px;
     transition: background-color ease-in-out .15s, color ease-in-out .15s;

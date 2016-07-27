@@ -318,7 +318,7 @@ class AccountController extends Controller
 
             /** @var LoginManager $loginManager */
             $loginManager = $this->get('fos_user.security.login_manager');
-            $loginManager->loginUser('main', $user, $response);
+            $loginManager->logInUser('main', $user, $response);
 
             return $response;
         } elseif (!empty($request->get('email'))) {
@@ -484,7 +484,7 @@ class AccountController extends Controller
 
             /** @var LoginManager $loginManager */
             $loginManager = $this->get('fos_user.security.login_manager');
-            $loginManager->loginUser('main', $user, $response);
+            $loginManager->logInUser('main', $user, $response);
         }
 
         if ($email) {

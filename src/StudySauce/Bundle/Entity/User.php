@@ -169,8 +169,19 @@ class User extends BaseUser implements EncoderAwareInterface
     /**
      * @return Invite|User
      */
-    public function getPartnerOrAdviser()
+    public function getParent()
     {
+
+        // purchase with parent account
+        foreach($this->getInvitees()->toArray() as $i) {
+            /** @var Invite $i */
+            if(substr($this->getUsername(), 0, strlen($i->getUser()->getUsername()) + 1) == $i->getUser()->getUsername() . '_') {
+                return $i->getUser();
+                break;
+            }
+        }
+        return $this;
+
         /** @var Invite $partner */
         $partner = $this->getPartnerInvites()->first();
         $advisers = array_values($this->getGroups()

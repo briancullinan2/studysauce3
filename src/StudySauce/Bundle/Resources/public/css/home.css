@@ -45,6 +45,7 @@
     margin-left:40%;
     max-height: 100%;
     margin-bottom:40px; /* even out menu spacing with footer */
+    min-height: 250px;
 }
 
 .user-shuffle .ss_user-row {

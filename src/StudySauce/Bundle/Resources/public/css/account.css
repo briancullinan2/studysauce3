@@ -8,20 +8,11 @@
     margin-left:0;
     padding-left:0;
     margin-bottom:5px;
+    display:block;
 }
 
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.highlighted-link {
     margin-bottom:0;
-}
-
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label.parent,
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label.year,
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label._code
-{
-    margin: 0 -2px;
-    padding: 0 2px;
-    display:inline-block;
-    width:33.33%
 }
 
 [id^="register"] .pane-content
@@ -124,7 +115,9 @@ a[href="#sign-in-with-email"]
     vertical-align: middle;
 }
 
-
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.parent span,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.year span,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label._code span,
 #account .social-login label span,
 #account .type label span,
 #account .password label span,
@@ -140,8 +133,12 @@ a[href="#sign-in-with-email"]
     display:inline-block;
     margin-right:-50%;
     padding-right:50%;
+    font-weight: bold;
 }
 
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.parent select,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.year select,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label._code select,
 #account .social-login label input,
 #account .password label input,
 #account .new-password label input,
@@ -196,6 +193,13 @@ a[href="#sign-in-with-email"]
     margin: 0 auto 5px;
 }
 
+[id^="register"] [class*="-row"] > * .parent span,
+[id^="register"] [class*="-row"] > * .year span,
+[id^="register"] [class*="-row"] > * ._code span
+{
+    display:none;
+}
+
 #account .password,
 #account .new-password,
 #account .confirm-password
@@ -206,12 +210,6 @@ a[href="#sign-in-with-email"]
 #account .edit-icons
 {
     text-align: left;
-}
-
-#account .highlighted-link > *,
-#account .edit-icons > *
-{
-    vertical-align: bottom;
 }
 
 #account a[href*="/reset"],

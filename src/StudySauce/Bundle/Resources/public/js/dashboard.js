@@ -165,6 +165,7 @@ $(document).ready(function () {
                         });
                         panes.hide().insertBefore(body.find('.footer'));
                         content.not(panes).insertBefore(body.find('.footer'));
+                        panes.add(content).filter('[id]').trigger('loaded');
                     }
 
                     // show the new panel

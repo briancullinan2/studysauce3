@@ -46,6 +46,7 @@ security:
                 domain:   ~ # Defaults to the current domain from $_SERVER
                 always_remember_me: true
                 user_provider: fos_userbundle
+                token_provider: doctrine_token_provider
             oauth:
                 remember_me: true
                 resource_owners:
@@ -78,7 +79,7 @@ security:
         - { path: ^/cron,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         # landing pages
         - { path: ^/js/routing,             roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
-        - { path: ^/command/template,             roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/command/template,       roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/parents,                roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/students,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/partners,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }

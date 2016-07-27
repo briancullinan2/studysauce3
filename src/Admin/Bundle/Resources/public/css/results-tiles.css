@@ -235,11 +235,11 @@
 }
 
 .tiles.summary [class*="-row"] > [class^="id"] img {
-    width: 10%;
+    max-width: 10%;
     left: 0;
     display: inline-block;
     vertical-align: middle;
-    max-height: none;
+    max-height: 100%;
     position: absolute;
     margin-bottom:0;
     margin-right:-5px;

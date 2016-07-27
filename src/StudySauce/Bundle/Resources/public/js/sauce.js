@@ -666,7 +666,10 @@ $(document).ready(function () {
             }
         }
         ssMergeStyles(body);
-        activatePanel.apply(body, [panel]);
+        setTimeout(function () {
+            body.find('> *[id]').trigger('loaded');
+            activatePanel.apply(body, [panel]);
+        }, 20);
     }
 
 });

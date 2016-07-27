@@ -11,11 +11,32 @@ use DateTime as Date;
 $httpRequest = $app->getRequest();
 // check if we need to update or create template
 $row = !empty($context) ? $context : jQuery($this);
+$appUser = $app->getUser();
 
 $total = [];
 $remaining = [];
 $index = 1;
-$retention = isset($results['user_pack'][0]) ? [$results['user_pack'][0]] : [];
+if(isset($results['user_pack'][0])) {
+    $retention = [$results['user_pack'][0]];
+
+    // add to user data storage
+    $hasUp = false;
+    $allUserPacks = $appUser->getUserPacks()->toArray();
+    foreach($allUserPacks as $ur => $upr) {
+        /** @var UserPack $upr */
+        if($results['user_pack'][0]->getPack()->getId() == $upr->getPack()->getId() && !empty($results['user_pack'][0]->getRetention())) {
+            $upr->setRetention($results['user_pack'][0]->getRetention());
+            $hasUp = true;
+        }
+    }
+    if(!$hasUp) {
+        $appUser->userPacks = array_merge($appUser->getUserPacks()->toArray(), [$results['user_pack'][0]]);
+    }
+    $appUser->userPacks = $allUserPacks;
+}
+else {
+    $retention = [];
+}
 
 $isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
 if($isSummary) {
@@ -28,28 +49,30 @@ else {
         if(isset($results['user_pack'][0])) {
             $retention = array_merge($retention, $results['user_pack'][0]->getUser()->getUserPacks()->toArray());
         }
-        if($app->getUser()->getId() == $results['user_pack'][0]->getUser()->getId()) {
+
+        if($appUser->getId() == $results['user_pack'][0]->getUser()->getId()) {
+            // add to user data storage
             foreach($retention as $r => $up) {
                 /** @var UserPack $up */
                 $hasUp = false;
-                $allUserPacks = $app->getUser()->getUserPacks()->toArray();
+                $allUserPacks = $appUser->getUserPacks()->toArray();
                 foreach($allUserPacks as $ur => $upr) {
                     /** @var UserPack $upr */
-                    if($up->getPack()->getId() == $upr->getPack()->getId()) {
+                    if($up->getPack()->getId() == $upr->getPack()->getId() && !empty($up->getRetention())) {
                         $upr->setRetention($up->getRetention());
                         $hasUp = true;
                     }
                 }
                 if(!$hasUp) {
-                    $appUser = $app->getUser();
-                    $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
-                    jQuery('.header')->data('user', $appUser);
+                    $appUser->userPacks = array_merge($appUser->getUserPacks()->toArray(), [$up]);
                 }
+                $appUser->userPacks = $allUserPacks;
             }
-            $retention = $app->getUser()->getUserPacks()->toArray();
+            $retention = $appUser->getUserPacks()->toArray();
         }
     }
 }
+jQuery('.header')->data('user', $appUser);
 
 $retentionObj = [];
 foreach($retention as $up) {

@@ -139,6 +139,7 @@ window.views.__defaultEntities['ss_group'] = {
 window.views.__defaultEntities['invite'] = {
     group: null,
     invitee: null,
+    user: null,
     getId: function () {return this.id;},
     getCode: function () {return this.code;},
     getFirst: function () {return this.first;},
@@ -146,7 +147,8 @@ window.views.__defaultEntities['invite'] = {
     getEmail: function () {return this.email;},
     getGroup: function () {return this.group ? applyEntityObj(this.group) : null;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
-    getInvitee: function () {return this.invitee ? applyEntityObj(this.invitee) : null;}
+    getInvitee: function () {return this.invitee ? applyEntityObj(this.invitee) : null;},
+    getUser: function () {return this.user ? applyEntityObj(this.user) : null;}
 };
 window.views.__defaultEntities['pack'] = {
     user: null,
@@ -290,6 +292,7 @@ window.views.__defaultEntities['ss_user'] = {
     userPacks: $([]),
     groups: $([]),
     invites: $([]),
+    invitees: $([]),
     getFirst: function () {return this.first;},
     getLast: function () {return this.last;},
     getId: function () {return this.id;},
@@ -309,6 +312,7 @@ window.views.__defaultEntities['ss_user'] = {
         }
     },
     getInvites: function () {return $($(this.invites).toArray().map(function (up) {return applyEntityObj(up);}));},
+    getInvitees: function () {return $($(this.invitees).toArray().map(function (up) {return applyEntityObj(up);}));},
     getLastVisit: function () {return !(this.lastVisit) ? null : new Date(this.lastVisit);},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getUserPacks: function () {return $($(this.userPacks).toArray().map(function (up) {return applyEntityObj(up);}));},
@@ -1002,7 +1006,7 @@ $(document).ready(function () {
 
     //body.on('mouseover click', '.results [class*="-row"]', resetHeader);
 
-    body.on('showing', '.panel-pane', function () {
+    body.on('loaded', '.panel-pane', function () {
         $(this).find('.results:not(.loaded)').each(function () {
             var results = $(this);
             results.addClass('loaded');

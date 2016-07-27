@@ -6,7 +6,6 @@ imports:
 parameters:
     authorize_test_mode: true
     defer_all_emails: "studymarketing@mailinator.com"
-    security.authentication.switchuser_listener.class: StudySauce\Bundle\Security\SwitchListener
 
 services:
     pdo:
@@ -19,9 +18,6 @@ services:
             - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
     cache:
         class: Doctrine\Common\Cache\ApcCache
-
-    security.authentication.rememberme.services.persistent.main:
-        alias: security.authentication.rememberme.services.simplehash.main
 
     session.handler.pdo:
         class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
@@ -43,11 +39,21 @@ services:
         tags:
             - {name: "kernel.fragment_renderer"}
 
+    doctrine_token_provider:
+        class: Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider
+        arguments: ["@doctrine.dbal.default_connection"]
+
     security.authentication.listener.anonymous:
         class: StudySauce\Bundle\EventListener\AnonymousAuthenticationListener
         tags:
             - {name: monolog.logger, channel: security}
         arguments: ["@security.context", "", "@?logger", "@service_container"]
+
+    security.authentication.switchuser_listener:
+        class: StudySauce\Bundle\Security\SwitchListener
+        tags:
+            - {name: monolog.logger, channel: security}
+        arguments: ["@security.token_storage", "", "@security.user_checker", "", "@security.access.decision_manager", "@?logger", "_switch_user", "", "@?event_dispatcher", "@security.authentication.rememberme.services.persistent.main"]
 
     kernel.listener.redirect:
         class: StudySauce\Bundle\EventListener\RedirectListener

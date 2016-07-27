@@ -258,23 +258,26 @@ $(document).ready(function () {
             if(data.content == '' && (typeof data.correct == 'undefined' || data.correct == '') && (typeof data.answers == 'undefined' || data.answers == '')) {
                 row.removeClass('invalid').addClass('empty valid');
             }
-            else if (data.content == '' || data.correct == '' || data.answers == '') {
-                row.removeClass('valid empty').addClass('invalid');
+            else {
                 if (data.content == '') {
                     row.find('.content').addClass('invalid');
                 }
                 else {
                     row.find('.content').removeClass('invalid');
                 }
-                if (data.correct == '' || data.answers == '') {
+                if (data.correct == '' || (data.responseType == 'mc' && data.answers == '')) {
                     row.find('.correct').addClass('invalid');
                 }
                 else {
                     row.find('.correct').removeClass('invalid');
                 }
-            }
-            else {
-                row.removeClass('invalid empty').addClass('valid');
+
+                if (data.content == '' || data.correct == '' || (data.responseType == 'mc' && data.answers == '')) {
+                    row.removeClass('valid empty').addClass('invalid');
+                }
+                else {
+                    row.removeClass('invalid empty').addClass('valid');
+                }
             }
 
             // update line number
@@ -588,9 +591,15 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var up = user.getUserPack(applyEntityObj({table: 'pack', id: packId}));
-        up.retention[id][2] = !correct;
-        up.retention[id][3] = response.created;
+        var ups = user.getUserPacks().toArray();
+        for(var up in ups) {
+            if(ups.hasOwnProperty(up) && ups[up].getPack().getId() == packId) {
+                ups[up].retention[id][2] = !correct;
+                ups[up].retention[id][3] = response.created;
+            }
+        }
+        user.userPacks = ups;
+        jQuery('.header').data('user', user);
 
         body.one('hiding', '[id^="cards"]', function () {
             $(this).stop().hide();
@@ -798,9 +807,15 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var up = user.getUserPack(applyEntityObj({table: 'pack', id: packId}));
-        up.retention[id][2] = !correct;
-        up.retention[id][3] = response.created;
+        var ups = user.getUserPacks();
+        for(var up in ups) {
+            if(ups.hasOwnProperty(up) && ups[up].getPack().getId() == packId) {
+                ups[up].retention[id][2] = !correct;
+                ups[up].retention[id][3] = response.created;
+            }
+        }
+        user.userPacks = ups;
+        jQuery('.header').data('user', user);
 
         // do transition
         body.one('hiding', '[id^="cards"]', function () {
@@ -856,9 +871,16 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var up = user.getUserPack(applyEntityObj({table: 'pack', id: packId}));
-        up.retention[id][2] = !correct;
-        up.retention[id][3] = response.created;
+        var ups = user.getUserPacks();
+        for(var up in ups) {
+            if(ups.hasOwnProperty(up) && ups[up].getPack().getId() == packId) {
+                ups[up].retention[id][2] = !correct;
+                ups[up].retention[id][3] = response.created;
+            }
+        }
+        user.userPacks = ups;
+        jQuery('.header').data('user', user);
+
 
         // do transition
         body.one('hiding', '[id^="cards"]', function () {

@@ -45,7 +45,7 @@ if(!empty($token)) {
             <li><h3><?php print ($user->getFirst()); ?> <?php print ($user->getLast()); ?></h3><a href="#collapse">&nbsp;</a></li>
             <?php
             if (!empty($user) && $view['security']->isGranted('ROLE_PREVIOUS_ADMIN')) { ?>
-                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($parentUser) || empty($p) || $parentUser->getId() != $p->getUser()->getId() ? 'Switch back' : implode('', [$parentUser->getFirst(), ' ', $parentUser->getLast()])); ?></a></li>
+                <li><a href="<?php print $view['router']->generate('_welcome'); ?>?_switch_user=_exit"><?php print (empty($p) || $p->getUser()->getId() != $p->getUser()->getId() ? 'Switch back' : implode('', [$p->getUser()->getFirst(), ' ', $p->getUser()->getLast()])); ?></a></li>
             <?php }
 
             foreach ($invites as $invite) {

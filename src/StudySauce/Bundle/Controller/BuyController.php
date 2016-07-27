@@ -366,6 +366,8 @@ class BuyController extends Controller
             $session->set('_security_main', serialize($token));
         }
 
+        $user = $user->getParent();
+
         return $user;
     }
 

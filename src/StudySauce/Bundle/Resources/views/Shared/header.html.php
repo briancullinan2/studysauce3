@@ -34,31 +34,35 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
 
 $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
 $tables = [
-    'ss_user' => ['id', 'first', 'last', 'email', 'roles'],
-    'invite' => ['first', 'last', 'invitee', 'email']
+    'ss_user' => ['id', 'first', 'last', 'email', 'roles', 'userPacks'],
+    'invite' => ['first', 'last', 'invitee', 'email'],
+    'user_pack' => ['pack'],
+    'pack' => ['id']
 ];
-$userJson = !empty($user) ? AdminController::toFirewalledEntityArray($user, ['ss_user' => ['id', 'first', 'last', 'email', 'roles']], 1) : (array)(new stdClass());
+$userJson = !empty($user) ? AdminController::toFirewalledEntityArray($user, $tables, 2) : (array)(new stdClass());
 
 // get invites if in parents account
 $invitesJson = [];
 $invites = !empty($user) ? $user->getInvites()->toArray() : [];
 foreach($invites as $i) {
-    $invitesJson[count($invitesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
+    $invitesJson[count($invitesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 3);
 }
 
 // get invitees if in child account
 $tables = [
-    'ss_user' => ['id', 'first', 'last', 'email', 'roles'],
-    'invite' => ['first', 'last', 'user', 'email']
+    'ss_user' => ['id', 'first', 'last', 'email', 'roles', 'invites', 'userPacks'],
+    'invite' => ['first', 'last', 'user', 'email', 'invitee'],
+    'user_pack' => ['pack'],
+    'pack' => ['id']
 ];
 $inviteesJson = [];
 $invites = !empty($user) ? $user->getInvitees()->toArray() : [];
 foreach($invites as $i) {
-    $inviteesJson[count($inviteesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 1);
+    $inviteesJson[count($inviteesJson)] = AdminController::toFirewalledEntityArray($i, $tables, 5);
 }
 ?>
 <div class="header-wrapper navbar navbar-inverse">
-    <div class="header" data-user="<?php print $view->escape(json_encode($userJson + ['invites' => $invitesJson] + ['groups' => $allGroups])); ?>">
+    <div class="header" data-user="<?php print $view->escape(json_encode($userJson + ['invites' => $invitesJson, 'invitees' => $inviteesJson, 'groups' => $allGroups])); ?>">
         <div id="site-name" class="container navbar-header">
             <a href="<?php print $view['router']->generate($home[0], $home[1]); ?>">
                 <?php foreach ($view['assetic']->image(['@StudySauceBundle/Resources/public/images/Study_Sauce_Logo.png'], [], ['output' => 'bundles/studysauce/images/*']) as $url): ?>
@@ -75,8 +79,10 @@ foreach($invites as $i) {
                     <li><a href="<?php print $view['router']->generate('home'); ?>"><span>&nbsp;</span>Home</a></li>
                     <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
                     <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
+                    <?php }
+                    if(count($user->getUserPacks()->toArray())) { ?>
+                        <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
                     <?php } ?>
-                    <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
                     <li><a href="<?php print $view['router']->generate('store'); ?>"><span>&nbsp;</span>Store</a></li>
                     <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
                     <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>

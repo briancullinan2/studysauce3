@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 /** @var User $user */
 $user = $app->getUser();
-$invites = !empty($user) ? $user->getInvites()->toArray() : [];
 
 /** @var Coupon $coupon */
 
@@ -22,21 +21,66 @@ if(!is_array($cart)) {
     $cart = [];
 }
 
+$alreadyHas = true;
+foreach($coupon->getPacks()->toArray() as $p) {
+    if(empty($user->getUserPack($p))) {
+        $alreadyHas = false;
+    }
+}
 ?>
 <div class="pack-icon"><?php
     if(!empty($request['inCartOnly'])) { ?>
         <label class="input child">
             <select name="child">
                 <option value="">- Select student -</option>
-                <?php foreach ($invites as $invite) {
-                    /** @var Invite $invite */
-                    if (empty($invite->getInvitee())) {
-                        continue;
+                <option value="<?php print ($user->getId()); ?>" <?php print ($alreadyHas ? 'disabled="disabled"' : ''); ?>>
+                    <?php print (implode('', [$user->getFirst(), ' ', $user->getLast()])); ?><?php print ($alreadyHas ? ' (Already assigned)' : ''); ?></option>
+                <?php
+                if(!empty($user)) {
+                    foreach($user->getInvites()->toArray() as $childInvite) {
+                        /** @var Invite $childInvite */
+                        if (empty($childInvite->getInvitee())) {
+                            continue;
+                        }
+                        $alreadyHas = true;
+                        foreach($coupon->getPacks()->toArray() as $p) {
+                            if(empty($childInvite->getInvitee()->getUserPack($p))) {
+                                $alreadyHas = false;
+                            }
+                        }
+                        ?><option value="<?php print ($childInvite->getInvitee()->getId()); ?>" <?php print ($alreadyHas ? 'disabled="disabled"' : ''); ?>>
+                        <?php print (implode('', [$childInvite->getInvitee()->getFirst(), ' ', $childInvite->getInvitee()->getLast()])); ?><?php print ($alreadyHas ? ' (Already assigned)' : ''); ?></option><?php
                     }
-                    ?>
-                    <option value="<?php print ($invite->getInvitee()->getId()); ?>"><?php print (implode('', [$invite->getInvitee()->getFirst(), ' ', $invite->getInvitee()->getLast()])); ?></option>
-                <?php } ?>
-                <option value="<?php print ($user->getId()); ?>"><?php print (implode('', [$user->getFirst(), ' ', $user->getLast()])); ?></option>
+                    foreach($user->getInvitees()->toArray() as $parentInvite) {
+                        /** @var Invite $parentInvite */
+                        if (empty($parentInvite->getUser())) {
+                            continue;
+                        }
+                        foreach($parentInvite->getUser()->getInvites()->toArray() as $in) {
+                            /** @var Invite $in */
+                            if(empty($in->getInvitee()) || $in->getInvitee()->getId() == $user->getId()) {
+                                continue;
+                            }
+                            $alreadyHas = true;
+                            foreach($coupon->getPacks()->toArray() as $p) {
+                                if(empty($in->getInvitee()->getUserPack($p))) {
+                                    $alreadyHas = false;
+                                }
+                            }
+                            ?><option value="<?php print ($in->getInvitee()->getId()); ?>" <?php print ($alreadyHas ? 'disabled="disabled"' : ''); ?>>
+                            <?php print (implode('', [$in->getInvitee()->getFirst(), ' ', $in->getInvitee()->getLast()])); ?><?php print ($alreadyHas ? ' (Already assigned)' : ''); ?></option><?php
+                        }
+                        $alreadyHas = true;
+                        foreach($coupon->getPacks()->toArray() as $p) {
+                            if(empty($parentInvite->getUser()->getUserPack($p))) {
+                                $alreadyHas = false;
+                            }
+                        }
+                        ?><option value="<?php print ($parentInvite->getUser()->getId()); ?>" <?php print ($alreadyHas ? 'disabled="disabled"' : ''); ?>>
+                        <?php print (implode('', [$parentInvite->getUser()->getFirst(), ' ', $parentInvite->getUser()->getLast()])); ?><?php print ($alreadyHas ? ' (Already assigned)' : ''); ?></option><?php
+                    }
+                }
+                ?>
             </select>
         </label>
         <input type="hidden" name="coupon" value="<?php print ($view->escape($coupon->getName())); ?>" />

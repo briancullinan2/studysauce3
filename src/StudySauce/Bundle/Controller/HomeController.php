@@ -84,7 +84,7 @@ class HomeController extends Controller
         }
 
         list($route, $options) = self::getUserRedirect($user);
-        if($route != 'home' && $route != 'results' && $route != 'packs_intro')
+        if($route != 'home' && $route != 'results')
             return $this->redirect($this->generateUrl($route, $options));
 
         return $this->render('AdminBundle:Admin:home.html.php', $templateVars);

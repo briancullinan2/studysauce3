@@ -11,6 +11,8 @@
 namespace StudySauce\Bundle\Security;
 
 
+use FOS\UserBundle\Security\EmailUserProvider;
+use FOS\UserBundle\Security\LoginManager;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -27,6 +29,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -38,7 +41,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchListener extends SwitchUserListener
 {
+    /** @var RememberMeServicesInterface $loginManager */
+    private $loginManager;
     private $tokenStorage;
+    /** @var EmailUserProvider $provider */
     private $provider;
     private $userChecker;
     private $providerKey;
@@ -48,12 +54,13 @@ class SwitchListener extends SwitchUserListener
     private $logger;
     private $dispatcher;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, RememberMeServicesInterface $loginManager)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
+        $this->loginManager = $loginManager;
         $this->tokenStorage = $tokenStorage;
         $this->provider = $provider;
         $this->userChecker = $userChecker;
@@ -81,7 +88,12 @@ class SwitchListener extends SwitchUserListener
         }
 
         if ('_exit' === $request->get($this->usernameParameter)) {
-            $this->tokenStorage->setToken($this->attemptExitUser($request));
+            try {
+                $this->tokenStorage->setToken($this->attemptExitUser($request));
+            }
+            catch (AuthenticationException $e) {
+
+            }
         } else {
             try {
                 $this->tokenStorage->setToken($this->attemptSwitchUser($request));
@@ -96,6 +108,12 @@ class SwitchListener extends SwitchUserListener
         $response = new RedirectResponse($request->getUri(), 302);
 
         $event->setResponse($response);
+        /** @var LoginManager $loginManager */
+        $this->provider->refreshUser($this->tokenStorage->getToken()->getUser());
+        $request->query->set('_remember_me', true);
+        $this->loginManager->loginSuccess($request, $response, $this->tokenStorage->getToken());
+        //$loginManager = $this->get('fos_user.security.login_manager');
+        //$loginManager->logInUser('main', $user, $response);
     }
 
     /**

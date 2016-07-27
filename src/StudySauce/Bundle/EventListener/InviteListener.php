@@ -96,7 +96,7 @@ class InviteListener implements EventSubscriberInterface
                     $response = new RedirectResponse($this->container->get('router')->generate('home', ['_code' => $invite->getCode()]));
                     /** @var LoginManager $loginManager */
                     $loginManager = $this->container->get('fos_user.security.login_manager');
-                    $loginManager->loginUser('main', $user, $response);
+                    $loginManager->logInUser('main', $user, $response);
                     $event->setResponse($response);
                 }
             }

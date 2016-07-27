@@ -42,6 +42,7 @@ class PacksController extends Controller
     }
 
     public function introAction() {
+        /** @var User $user */
         $user = $this->getUser();
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
@@ -52,18 +53,24 @@ class PacksController extends Controller
             ->setMaxResults(1)
             ->getQuery()->getOneOrNullResult();
 
+        if(empty($intro) || empty($intro->getCards()->count())) {
+            return $this->redirect($this->generateUrl('home'));
+        }
+
         if(empty($user->getProperty('first_time')))
         {
             /** @var $userManager UserManager */
             $userManager = $this->get('fos_user.user_manager');
             $user->setProperty('first_time', true);
+            $up = new UserPack();
+            $up->setUser($user);
+            $user->addUserPack($up);
+            $up->setPack($intro);
+            $intro->addUserPack($up);
+            $orm->persist($up);
             $userManager->updateUser($user);
         }
-
-        if(!empty($intro) && !empty($intro->getCards()->count())) {
-            return $this->redirect($this->generateUrl('cards', ['card' => $intro->getCards()->first()->getId()]));
-        }
-        return $this->redirect($this->generateUrl('home'));
+        return $this->redirect($this->generateUrl('cards', ['card' => $intro->getCards()->first()->getId()]));
     }
 
     public function cardAction(Card $card)

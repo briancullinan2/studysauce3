@@ -15,6 +15,11 @@ jQuery(document).ready(function() {
         return hash;
     }
 
+    body.on('show', '[id^="register"]', function () {
+        if($(this).data('state') == null)
+            $(this).data('state', getHash.apply(this));
+    });
+
     function accountFunc(evt) {
         var account = $(this).closest('.panel-pane');
         var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', '_code', 'childFirst', 'childLast', 'parent', 'year']]);
@@ -25,13 +30,7 @@ jQuery(document).ready(function() {
         standardValidation.apply(account, [data]);
     }
 
-    body.on('show', '[id^="register"]', function () {
-        if($(this).data('state') == null)
-            $(this).data('state', getHash.apply(this));
-    });
-
     body.on('validate', '[id^="register"]', accountFunc);
-
     body.on('change keyup keydown', '[id^="register"] input, [id^="register"] select, [id^="register"] textarea', standardChangeHandler);
 
     body.on('click', '#register a[href="#sign-in-with-email"]', function (evt) {

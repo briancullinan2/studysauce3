@@ -28,14 +28,15 @@ if($tab->length == 0) {
         <div class="pane-content clearfix">
             <h1>Thank you for your purchase</h1>
 
-            <h2>We have notified your student of the purchase. Please feel free to contact us if you have any questions.
-                Thank you.<br/>
-                <br/>- The Study Sauce Team</h2>
-
+            <h2>We have added the new study packs to your account. Please feel free to contact us if you have any questions. Thank you.</h2>
             <div class="highlighted-link">
                 <a href="<?php print ($view['router']->generate('home')); ?>" class="more">Go home</a>
+                <br />
+                <br />
             </div>
+            <h2>- The Study Sauce Team</h2>
             <?php
+            /*
             $request['count-payment'] = 1;
             $request['count-coupon'] = -1;
             $request['count-pack'] = 0;
@@ -62,6 +63,7 @@ if($tab->length == 0) {
             if ($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
             }
+            */
             ?>
         </div>
     </div>

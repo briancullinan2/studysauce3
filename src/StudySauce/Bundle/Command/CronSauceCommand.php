@@ -144,7 +144,7 @@ EOF
         $orm = $this->getContainer()->get('doctrine')->getManager();
 
         $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
-            ->select(['u', 'ups'])
+            ->select(['u', 'ups', 'inv', 'invu'])
             ->where('u.devices IS NOT NULL AND u.devices != \'\'')
             ->leftJoin('u.userPacks', 'ups')
             ->leftJoin('u.invitees', 'inv')
@@ -379,7 +379,7 @@ EOF
 
         // run the next test
         if(!empty($nextTest)) {
-            $validation->testAction(new Request(['suite' => $nextSuite, 'test' => $nextTest, 'browser' => 'chrome', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '71.36.230.6']));
+            $validation->testAction(new Request(['suite' => $nextSuite, 'test' => $nextTest, 'browser' => 'firefox', 'url' => 'https://test.studysauce.com', 'wait' => 1, 'host' => '127.0.0.1']));
         }
 
         // TODO: send results email

@@ -36,21 +36,29 @@ if(!is_array($cart)) {
         <input type="text" name="last" value="<?php print ($invite->getInvitee()->getLast()); ?>" />
     </label>
     </div>
-    <?php foreach($invite->getInvitee()->getGroups()->toArray() as $g) {
+    <?php
+    $atLeastOne = false;
+    foreach($invite->getInvitee()->getGroups()->toArray() as $g) {
         /** @var Group $g */
         foreach($results['invite-1'] as $publicInvite) {
             /** @var Invite $publicInvite */
-            if($publicInvite->getGroup()->getId() == $g->getId()) { ?>
+            if($publicInvite->getGroup()->getId() == $g->getId()) {
+                $atLeastOne = true; ?>
             <div>
                 <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'invite' => $publicInvite, 'invites' => $results['invite-1']])); ?>
             </div>
             <?php
             }
         }
-    } ?>
-
+    }
+    if(!$atLeastOne) { ?>
+        <div>
+            <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'invites' => $results['invite-1']])); ?>
+        </div>
+    <?php } ?>
     <label class="highlighted-link">
         <a href="#edit-group" class="edit-icon">&nbsp;</a>
+        <a href="#cancel-edit">Cancel</a>
         <button type="submit" value="#save-group" class="more">Save</button>
     </label>
 </div>

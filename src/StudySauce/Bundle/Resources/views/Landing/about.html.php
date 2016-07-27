@@ -25,9 +25,9 @@ $view['slots']->start('body'); ?>
 <div class="panel-pane" id="about">
     <div class="pane-content">
         <div class="inner-wrapper">
-            <h3>Our Mission:</h3>
+            <h2>Our Mission:</h2>
             <p>We are obsessed with helping you remember whatever you think is important!  You spend so much time studying, so why not use the most effective methods and remember for the long term?</p>
-            <h3>The Science:</h3>
+            <h2>The Science:</h2>
             <p>Study Sauce is based on three core findings of study research.</p>
             <ul><li>Spaced Repetition - if you don’t revisit what you study periodically, you will not retain it.</li>
                 <li>Self-testing - forcing yourself to answer questions has been proven over and over again to help you learn.</li>

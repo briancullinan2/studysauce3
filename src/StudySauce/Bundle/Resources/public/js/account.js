@@ -15,22 +15,33 @@ jQuery(document).ready(function() {
         return hash;
     }
 
-    function accountFunc() {
+    function accountFunc(evt) {
         var account = $(this);
+        var results = account.find('.results');
         var fields = ['first', 'last', 'email', 'password', 'csrf_token'];
         if(account.find('.new-password:visible').length > 0) {
             fields = $.merge(fields, ['new-password', 'confirm-password']);
         }
         var data = gatherFields.apply(account, fields);
         standardValidation.apply(account, [data]);
+        account.find('.invite-row.edit').each(function () {
+            var account = $(this);
+            var data = gatherFields.apply(account, [['_code', 'childFirst', 'childLast', 'parent', 'year']]);
+            if($(evt.target).is('.invite-row select')) {
+                var newInvite = window.views.render('AdminBundle:Admin:cell-idSingleCoupon-invite.html.php', {'context' : account, 'results' : results.data('results'), 'request' : results.data('request')});
+                account.find('.idSingleCoupon > *').remove();
+                account.find('.idSingleCoupon').append(newInvite);
+            }
+            standardValidation.apply(account, [data]);
+        });
     }
 
     body.on('show', '#account', function () {
         $(this).data('state', getHash());
-        accountFunc();
     });
 
-    body.on('change keyup keydown', '#account input', accountFunc);
+    body.on('validate', '[id^="account"]', accountFunc);
+    body.on('change keyup keydown', '#account input, #account select, #account textarea', standardChangeHandler);
 
     body.on('click', '#account a[href="#edit-account"]', function (evt) {
         var account = jQuery('#account');
