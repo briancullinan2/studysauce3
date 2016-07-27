@@ -25,6 +25,17 @@ else
         if ! git pull | grep "Already up-to-date" ; then
             ./update_test.sh
         fi
+
+        export DISPLAY=:10
+        export PATH=$PATH:/home/ec2-user/firefox
+        cd /home/ec2-user/
+        if ps -ef | grep -v grep | grep displaybuffer ; then
+            goto startvalidate
+        else
+            screen -S displaybuffer -d xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
+        fi
+
+        startvalidate:
         wget --no-check-certificate -O /dev/null -o /dev/null https://test.studysauce.com/cron/validate &
         goto test
 fi

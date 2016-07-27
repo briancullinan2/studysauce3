@@ -211,10 +211,6 @@ ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
 
 wget --no-check-certificate -O - https://curl.haxx.se/ca/cacert.pem > /etc/pki/tls/certs/ca-bundle.crt
 
-export GIT_SSL_NO_VERIFY=true
-cd /var/www/
-git clone https://bjcullinan:Da1ddy23@bitbucket.org/StudySauce/studysauce3.git
-
 chown -R mysql:mysql /var/lib/mysql
 service mysqld start
 /usr/bin/mysqladmin -u root password '9MiIsEf42mnEXx0n'
@@ -237,6 +233,9 @@ sed -i "s/^#SSLCACertificateFile/SSLCACertificateFile/" /etc/httpd/conf.d/ssl.co
 sed -i "s/^SSLCertificateKeyFile/#SSLCertificateKeyFile/" /etc/httpd/conf.d/ssl.conf |grep "SSLCertificateKeyFile" /etc/httpd/conf.d/ssl.conf
 echo "$cert" > /etc/pki/tls/certs/localhost.crt
 echo "$bundle" >> /etc/pki/tls/certs/ca-bundle.crt
+
+cd /var/www/
+git clone https://bjcullinan:Da1ddy23@bitbucket.org/StudySauce/studysauce3.git
 rm -R /var/www/html
 ln -s /var/www/studysauce3/web /var/www/html
 
@@ -244,6 +243,17 @@ service httpd restart
 chkconfig httpd on
 
 $update
+
+cd /home/ec2-user/
+curl -X GET -o RPM-GPG-KEY-lambda-epll https://lambda-linux.io/RPM-GPG-KEY-lambda-epll
+sudo rpm --import RPM-GPG-KEY-lambda-epll
+curl -X GET -o epll-release-2016.03-1.1.ll1.noarch.rpm https://lambda-linux.io/epll-release-2016.03-1.1.ll1.noarch.rpm
+sudo yum -y install epll-release-2016.03-1.1.ll1.noarch.rpm
+sudo yum -y --enablerepo=epll install xorg-x11-server-Xvfb fluxbox firefox-compat
+wget http://releases.mozilla.org/pub/firefox/releases/45.0.1/linux-x86_64/en-US/firefox-45.0.1.tar.bz2
+tar -jxvf firefox-45.0.1.tar.bz2
+wget http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
+
 EOSH;
 
         $I->fillField('textarea', $bash);
