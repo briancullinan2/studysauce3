@@ -35,7 +35,7 @@ else
             goto startvalidate
         else
             echo "Starting display server."
-            screen -dRmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
+#            screen -dDRmS displaybuffer xvfb-run java -jar selenium-server-standalone-2.53.1.jar -port 4443
         fi
 
         startvalidate:
