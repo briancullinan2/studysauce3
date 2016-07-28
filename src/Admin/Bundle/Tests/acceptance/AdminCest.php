@@ -42,8 +42,7 @@ class AdminCest
         $I->wantTo('check for an admin account');
         /** @var User $admin */
         /** @var EntityManager $em */
-        $em = $this->getModule('Doctrine2')->em;
-        $admin = $em->getRepository('StudySauceBundle\Entity\User')->findOneBy(['email' => 'brian@studysauce.com']);
+        $admin = $I->grabFrom('User', ['email' => 'brian@studysauce.com']);
         if(empty($admin)) {
             $I->wantTo('sign up for an admin account');
             $I->seeAmOnPage('/register');
@@ -54,7 +53,7 @@ class AdminCest
             $I->seeLink('Save');
             $I->click('Save');
             $I->wait(5);
-            $admin = $I->grabFromRepository('User', 'email', array('email' => 'brian@studysauce.com'));
+            $admin = $I->grabFrom('User', ['email' => 'brian@studysauce.com']);
             if(!empty($admin)) {
                 $admin->addRole('ROLE_ADMIN');
                 $em->merge($admin);

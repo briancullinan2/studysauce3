@@ -7,6 +7,7 @@ namespace Admin\Bundle\Tests\Codeception\Module;
 use Codeception\Module\WebDriver;
 use Codeception\TestCase;
 use Codeception\TestCase\Cest;
+use Doctrine\ORM\EntityManager;
 use PHPUnit_Framework_TestResult;
 use PHPUnit_Framework_TestSuite;
 
@@ -66,5 +67,15 @@ class AcceptanceHelper extends \Codeception\Module
         {
             $driver->seeInCurrentUrl($url);
         }
+    }
+
+    public function grabFrom($entity, $fields) {
+        // we need to store to database...
+        /** @var EntityManager $em */
+        $em = $this->getModule('Doctrine2')->em;
+        $em->flush();
+        $qb = $em->getRepository($entity)->findOneBy($fields);
+        return $qb;
+
     }
 }
