@@ -2,6 +2,7 @@
 namespace Admin\Bundle\Tests;
 
 use Codeception\Module\Doctrine2;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 use StudySauce\Bundle\Entity\Event;
 use StudySauce\Bundle\Entity\User;
 use WebDriver;
@@ -41,14 +42,14 @@ class PageLoaderCest
         $I->seeAmOnPage('/');
         $I->seeInTitle('StudySauce');
         $I->wait(3);
-        $I->executeInSelenium(function (WebDriver $driver) {
+        $I->executeInSelenium(function (RemoteWebDriver $driver) {
             $driver->switchTo()->defaultContent();
             $driver->switchTo()->frame($driver->findElement(WebDriverBy::cssSelector('iframe[src*="youtube.com"]')));
         });
         $I->wait(2);
         $I->click('[class*="play"]');
         $I->wait(2);
-        $I->executeInSelenium(function (WebDriver $driver) {
+        $I->executeInSelenium(function (RemoteWebDriver $driver) {
             $driver->switchTo()->window($driver->getWindowHandle());
         });
         $I->click('a[href="#yt-pause"]');
@@ -143,7 +144,7 @@ class PageLoaderCest
         $I->waitForText('a minute ago', 60*5);
         $I->seeLink('Contact Us');
         $I->click('//a[contains(.,"Contact Us")]');
-        $I->executeInSelenium(function (WebDriver $driver) {
+        $I->executeInSelenium(function (RemoteWebDriver $driver) {
             $driver->switchTo()->defaultContent();
             $driver->switchTo()->frame($driver->findElement(WebDriverBy::cssSelector('iframe[name="rendermail"]')));
         });
