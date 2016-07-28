@@ -50,8 +50,9 @@ class AdminCest
             $I->fillField('input[name="last"]', 'Houghton');
             $I->fillField('input[name="email"]', 'stephen@studysauce.com');
             $I->fillField('input[name="password"]', 'password');
-            $I->seeLink('Save');
-            $I->click('Save');
+            $I->uncheckOption('[name="hasChild"]');
+            $I->seeLink('Next');
+            $I->click('Next');
             $I->wait(5);
             $admin = $I->grabFrom('StudySauceBundle:User', ['email' => 'stephen@studysauce.com']);
             if(!empty($admin)) {
