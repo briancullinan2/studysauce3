@@ -4,6 +4,7 @@ namespace Admin\Bundle\Tests;
 use Admin\Bundle\Controller\ValidationController;
 use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
+use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\User;
@@ -40,7 +41,9 @@ class AdminCest
     public function tryCreateAdmin(AcceptanceTester $I) {
         $I->wantTo('check for an admin account');
         /** @var User $admin */
-        $admin = $I->grabFromRepository('User', 'email', array('email' => 'brian@studysauce.com'));
+        /** @var EntityManager $em */
+        $em = $this->getModule('Doctrine2')->em;
+        $admin = $em->getRepository('StudySauceBundle\Entity\User')->findOneBy(['email' => 'brian@studysauce.com']);
         if(empty($admin)) {
             $I->wantTo('sign up for an admin account');
             $I->seeAmOnPage('/register');
@@ -54,8 +57,8 @@ class AdminCest
             $admin = $I->grabFromRepository('User', 'email', array('email' => 'brian@studysauce.com'));
             if(!empty($admin)) {
                 $admin->addRole('ROLE_ADMIN');
-                $I->mergeEntity($admin);
-                $I->flushToDatabase();
+                $em->merge($admin);
+                $em->flush();
             }
         }
 
