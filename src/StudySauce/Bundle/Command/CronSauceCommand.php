@@ -376,7 +376,10 @@ EOF
             }
         }
 
-
+        if($lastLog > date_timestamp_get(date_time_set(new \DateTime(), 2, 0, 0))) {
+            print 'Nothing more to test.';
+            return;
+        }
         // run the next test
         if(!empty($nextTest)) {
             print $nextTest . "\n";
