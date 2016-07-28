@@ -343,6 +343,9 @@ EOF
                 $error = $e;
             }
         }
+        // TODO: People with no groups after a month get the demo group automatically
+        // insert into ss_user_group (user_id,group_id) select ss_user.id,8 as group_id from ss_user left join ss_user_group on ss_user_group.user_id=ss_user.id where ss_user_group.group_id IS NULL;
+
         if(!empty($options['validate'])) {
             $this->runValidation();
         }
@@ -376,8 +379,9 @@ EOF
             }
         }
 
-        if($lastLog > date_timestamp_get(date_time_set(new \DateTime(), 2, 0, 0))) {
-            print 'Nothing more to test.';
+        if($lastLog > date_timestamp_get(date_time_set(new \DateTime(), 4, 0, 0))) {
+            print 'Nothing more to test.
+';
             return;
         }
         // run the next test

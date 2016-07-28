@@ -209,7 +209,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         // (cancelCookie does other things too for some RememberMeServices
         // so we should still call it at the start of this method)
         $request->attributes->remove(self::COOKIE_ATTR_NAME);
-
+        $cookie = $request->getSession()->get('_security_main');
         $this->onLoginSuccess($request, $response, $token);
     }
 

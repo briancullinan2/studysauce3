@@ -203,19 +203,28 @@ ReYNnyicsbkqWletNw+vHX/bvZ8=
 mkdir /var/www
 cd /var/www
 yum update -y
+
+
+# install php, mysql, and modules
 yum install -y mysql-server httpd24 php55 php55-mysqlnd php55-pdo mod24_ssl openssl php55-mbstring php55-mcrypt php55-common php-apc php55-gd php55-xml libjpeg libpng git fontconfig libXrender libXext icu xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi freetype libpng zlib libjpeg-turbo openssl
 cd /tmp/
 wget --no-check-certificate http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-centos6-amd64.rpm
 rpm -ivh /tmp/wkhtmltox-0.12.2.1_linux-centos6-amd64.rpm
 ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
 
+
+# TODO: download certificate from secure secure server?
 wget --no-check-certificate -O - https://curl.haxx.se/ca/cacert.pem > /etc/pki/tls/certs/ca-bundle.crt
 
+
+# do database migration and setup
 chown -R mysql:mysql /var/lib/mysql
 service mysqld start
 /usr/bin/mysqladmin -u root password '9MiIsEf42mnEXx0n'
 echo "CREATE DATABASE studysauce3; GRANT ALL ON studysauce3.* TO 'study2'@'localhost' IDENTIFIED BY 'itekIO^#(1234';" | mysql -u root --password=9MiIsEf42mnEXx0n -h localhost
 
+
+# add cron to run every minute
 echo "* * * * * root /var/www/studysauce3/cron.sh" >> /etc/crontab
 chmod a+x /var/www/studysauce3/cron.sh
 echo "
@@ -227,6 +236,9 @@ echo "
     AllowOverride All
 </Directory>
 " >> /etc/httpd/conf/httpd.conf
+
+
+# install SSL certificates for httpd
 sed -i "s/^;date.timezone =$/date.timezone = \"US\/Arizona\"/" /etc/php.ini |grep "^timezone" /etc/php.ini
 sed -i "s/^memory_limit = 128M$/memory_limit = 256M/" /etc/php.ini |grep "^memory_limit" /etc/php.ini
 sed -i "s/^#SSLCACertificateFile/SSLCACertificateFile/" /etc/httpd/conf.d/ssl.conf |grep "SSLCACertificateFile" /etc/httpd/conf.d/ssl.conf
@@ -234,6 +246,8 @@ sed -i "s/^SSLCertificateKeyFile/#SSLCertificateKeyFile/" /etc/httpd/conf.d/ssl.
 echo "$cert" > /etc/pki/tls/certs/localhost.crt
 echo "$bundle" >> /etc/pki/tls/certs/ca-bundle.crt
 
+
+# checkout repository
 cd /var/www/
 git clone https://bjcullinan:Da1ddy23@bitbucket.org/StudySauce/studysauce3.git
 rm -R /var/www/html
@@ -242,8 +256,11 @@ ln -s /var/www/studysauce3/web /var/www/html
 service httpd restart
 chkconfig httpd on
 
+
+#run Symfony update script
 $update
 
+# install firefox on AMI Linux
 mkdir /home/public/
 curl -X GET -o RPM-GPG-KEY-lambda-epll https://lambda-linux.io/RPM-GPG-KEY-lambda-epll
 sudo rpm --import RPM-GPG-KEY-lambda-epll

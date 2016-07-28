@@ -4,6 +4,9 @@ $user = $app->getUser();
 <div class="footer">
     <?php
     if($view['slots']->get('classes') == 'landing-home') { ?>
+        <ul class="menu secondary-menu">
+            <li><a href="#contact-support" data-toggle="modal">Contact us</a></li>
+        </ul>
         <span><?php print 'Copyright ' . date('Y'); ?></span>
     <?php } else if($app->getRequest()->get('_format') == 'funnel') { ?>
         <ul class="menu secondary-menu">
