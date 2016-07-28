@@ -6,6 +6,7 @@ use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Response;
+use StudySauce\Bundle\Entity\User;
 use WebDriver;
 use WebDriverBy;
 use WebDriverKeys;
@@ -33,6 +34,34 @@ class AdminCest
     }
 
     // tests
+    /**
+     * @param AcceptanceTester $I
+     */
+    public function tryCreateAdmin(AcceptanceTester $I) {
+        $I->wantTo('check for an admin account');
+        /** @var User $admin */
+        $admin = Doctrine2::$em->getRepository('StudySauceBundle:User')->findOneBy(['username' => 'brian@studysauce.com']);
+        if(empty($admin)) {
+            $I->wantTo('sign up for an admin account');
+            $I->seeAmOnPage('/register');
+            $I->fillField('input[name="first"]', 'Brian');
+            $I->fillField('input[name="last"]', 'Cullinan');
+            $I->fillField('input[name="email"]', 'brian@studysauce.com');
+            $I->fillField('input[name="password"]', 'password');
+            $I->seeLink('Save');
+            $I->click('Save');
+            $I->wait(5);
+            $admin = Doctrine2::$em->getRepository('StudySauceBundle:User')->findOneBy(['username' => 'brian@studysauce.com']);
+            if(!empty($admin)) {
+                $admin->addRole('ROLE_ADMIN');
+                Doctrine2::$em->merge($admin);
+                Doctrine2::$em->flush();
+            }
+        }
+
+        $I->test('tryAdminLogin');
+    }
+
     /**
      * @param AcceptanceTester $I
      */

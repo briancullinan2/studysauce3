@@ -105,22 +105,8 @@ class PageLoaderCest
     public function tryGuestCheckout(AcceptanceTester $I)
     {
         $I->wantTo('complete the checkout');
-        $I->seeAmOnPage('/checkout');
-        $I->fillField('input[name="first-name"]', 'test');
-        $last = 'tester' . substr(md5(microtime()), -5);
-        $I->fillField('input[name="last-name"]', $last);
-        $I->fillField('input[name="email"]', 'test' . $last . '@mailinator.com');
-        $I->fillField('input[name="password"]', 'password');
-        $I->fillField('input[name="street1"]', '6934 E sandra ter');
-        $I->fillField('input[name="city"]', 'scottsdale');
-        $I->fillField('input[name="zip"]', '85254');
-        $I->selectOption('select[name="state"]', 'Arizona');
-        $I->selectOption('select[name="country"]', 'United States');
-        $I->fillField('input[name="cc-number"]', '4007000000027');
-        $I->selectOption('select[name="cc-month"]', '09');
-        $I->selectOption('select[name="cc-year"]', '2019');
-        $I->fillField('input[name="cc-ccv"]', '123');
-        $I->seeLink('Complete order');
+        $I->seeAmOnPage('/cart');
+
         $I->click('Complete order');
         $I->wait(10);
     }

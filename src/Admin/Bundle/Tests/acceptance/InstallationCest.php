@@ -216,7 +216,7 @@ service mysqld start
 /usr/bin/mysqladmin -u root password '9MiIsEf42mnEXx0n'
 echo "CREATE DATABASE studysauce3; GRANT ALL ON studysauce3.* TO 'study2'@'localhost' IDENTIFIED BY 'itekIO^#(1234';" | mysql -u root --password=9MiIsEf42mnEXx0n -h localhost
 
-echo "* * * * * apache /var/www/studysauce3/cron.sh" >> /etc/crontab
+echo "* * * * * root /var/www/studysauce3/cron.sh" >> /etc/crontab
 chmod a+x /var/www/studysauce3/cron.sh
 echo "
 127.0.0.1  studysauce.com
