@@ -56,8 +56,8 @@ class AdminCest
             $admin = $I->grabFrom('StudySauceBundle:User', ['email' => 'stephen@studysauce.com']);
             if(!empty($admin)) {
                 $admin->addRole('ROLE_ADMIN');
-                $em->merge($admin);
-                $em->flush();
+                $I->persistEntity($admin);
+                $I->flushToDatabase();
             }
         }
 
