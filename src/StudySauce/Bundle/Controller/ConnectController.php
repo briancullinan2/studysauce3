@@ -88,7 +88,7 @@ class ConnectController extends BaseController
         // TODO: Show confirmation page?
         $target = $session->get('_security.main.target_path');
         if (empty($target)) {
-            list($route, $options) = HomeController::getUserRedirect($currentUser);
+            list($route, $options) = HomeController::getUserRedirect($currentUser, $this->container);
 
             return new RedirectResponse($this->container->get('router')->generate($route, $options));
         } else {

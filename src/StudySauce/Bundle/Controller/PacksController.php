@@ -41,24 +41,14 @@ class PacksController extends Controller
         return $this->render('AdminBundle:Admin:packs.html.php', ['entity' => $pack]);
     }
 
-    public function introAction() {
+    public function cardAction(Card $card)
+    {
         /** @var User $user */
         $user = $this->getUser();
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
-        /** @var Pack|null $intro */
-        $intro = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('pack')
-            ->select('pack')
-            ->where('pack.title LIKE \'%Study Sauce Introduction%\'')
-            ->setMaxResults(1)
-            ->getQuery()->getOneOrNullResult();
 
-        if(empty($intro) || empty($intro->getCards()->count())) {
-            return $this->redirect($this->generateUrl('home'));
-        }
-
-        if(empty($user->getProperty('first_time')))
-        {
+        if(strpos($card->getPack()->getTitle(), 'Study Sauce Introduction') !== false && empty($user->getProperty('first_time'))) {
             /** @var $userManager UserManager */
             $userManager = $this->get('fos_user.user_manager');
             $user->setProperty('first_time', true);
@@ -70,11 +60,7 @@ class PacksController extends Controller
             $orm->persist($up);
             $userManager->updateUser($user);
         }
-        return $this->redirect($this->generateUrl('cards', ['card' => $intro->getCards()->first()->getId()]));
-    }
 
-    public function cardAction(Card $card)
-    {
         return $this->render('AdminBundle:Admin:cards.html.php', ['card' => $card]);
     }
 

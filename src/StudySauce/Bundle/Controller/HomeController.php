@@ -2,11 +2,14 @@
 
 namespace StudySauce\Bundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use FOS\UserBundle\Doctrine\UserManager;
 use HWI\Bundle\OAuthBundle\Templating\Helper\OAuthHelper;
 use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -83,7 +86,7 @@ class HomeController extends Controller
             return new JsonResponse($templateVars);
         }
 
-        list($route, $options) = self::getUserRedirect($user);
+        list($route, $options) = self::getUserRedirect($user, $this->container);
         if($route != 'home' && $route != 'results')
             return $this->redirect($this->generateUrl($route, $options));
 
@@ -106,17 +109,32 @@ class HomeController extends Controller
 
     /**
      * @param User|null $user
+     * @param ContainerInterface $container
      * @return array|string
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public static function getUserRedirect($user)
+    public static function getUserRedirect($user, ContainerInterface $container)
     {
         if($user == 'anon.' || !is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO'))
             return ['_welcome', []];
             // TODO: split this in to separate pages
         elseif($user->hasRole('ROLE_PARTNER') || $user->hasRole('ROLE_ADVISER') || $user->hasRole('ROLE_MASTER_ADVISER'))
             return ['userlist', []];
-        elseif(empty($user->getProperty('first_time')))
-            return ['packs_intro', []];
+        elseif(empty($user->getProperty('first_time'))) {
+            /** @var EntityManager $orm */
+            $orm = $container->get('doctrine')->getManager();
+            /** @var Pack|null $intro */
+            $intro = $orm->getRepository('StudySauceBundle:Pack')->createQueryBuilder('pack')
+                ->select('pack')
+                ->where('pack.title LIKE \'%Study Sauce Introduction%\'')
+                ->setMaxResults(1)
+                ->getQuery()->getOneOrNullResult();
+
+            if(empty($intro) || empty($intro->getCards()->count())) {
+                return ['home', []];
+            }
+            return ['cards', ['card' => $intro->getCards()->first()->getId()]];
+        }
         return ['home', []];
     }
 }

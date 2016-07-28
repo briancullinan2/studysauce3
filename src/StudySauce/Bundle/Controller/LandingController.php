@@ -31,7 +31,7 @@ class LandingController extends Controller
         $session = $request->getSession();
 
         // check if we have a user and redirect accordingly.
-        list($route, $options) = HomeController::getUserRedirect($user);
+        list($route, $options) = HomeController::getUserRedirect($user, $this->container);
         if($route != '_welcome')
             return $this->redirect($this->generateUrl($route, $options));
 

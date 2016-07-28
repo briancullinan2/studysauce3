@@ -390,13 +390,6 @@ $collection->add(
     )
 );
 $collection->add(
-    'packs_intro',
-    new Route(
-        '/packs/intro',
-        ['_controller' => 'StudySauceBundle:Packs:intro']
-    )
-);
-$collection->add(
     'packs_list',
     new Route(
         '/packs/list/{user}',

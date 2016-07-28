@@ -32,7 +32,7 @@ if(!empty($user) && $user->hasGroup('Torch And Laurel') ||
     return;
 }
 
-$home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user);
+$home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user, $this->container);
 $tables = [
     'ss_user' => ['id', 'first', 'last', 'email', 'roles', 'userPacks'],
     'invite' => ['first', 'last', 'invitee', 'email'],

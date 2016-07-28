@@ -196,7 +196,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
 
             }
 
-            list($route, $options) = HomeController::getUserRedirect($user);
+            list($route, $options) = HomeController::getUserRedirect($user, $this->container);
             $response = new RedirectResponse($router->generate($route, $options));
             /** @var LoginManager $loginManager */
             $loginManager = $this->container->get('fos_user.security.login_manager');

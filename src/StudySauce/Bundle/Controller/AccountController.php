@@ -313,7 +313,7 @@ class AccountController extends Controller
             $context->setToken($token);
             $session = $request->getSession();
             $session->set('_security_main', serialize($token));
-            list($route, $options) = HomeController::getUserRedirect($user);
+            list($route, $options) = HomeController::getUserRedirect($user, $this->container);
             $response = $this->redirect($this->generateUrl($route, $options));
 
             /** @var LoginManager $loginManager */
