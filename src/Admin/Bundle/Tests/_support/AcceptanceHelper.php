@@ -60,10 +60,14 @@ class AcceptanceHelper extends \Codeception\Module
         $driver = $this->getModule('WebDriver');
         // if already on this page, don't do any navigation
         if($driver->webDriver->getCurrentURL() == 'about:blank') {
-            $driver->amOnPage($driver->_getUrl());
+            if(strpos($url, '://') !== false) {
+                $driver->amOnPage($url);
+            }
+            else {
+                $driver->amOnPage($driver->_getUrl() . $url);
+            }
         }
-
-        if(strcmp($driver->_getCurrentUri(), $url) !== 0)
+        else if(strcmp($driver->_getCurrentUri(), $url) !== 0)
         {
             $driver->amOnPage($url);
         }
