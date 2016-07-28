@@ -476,7 +476,11 @@ class ValidationController extends Controller
                             //Get width and height of the element
                             $steps[$x->getTest()->getName()] .= '<span class="step">I <strong>' . $x->getStep(
                                 )->getAction() . '</strong> <a target="_blank" href="/bundles/admin/results/debug/' .
-                                $ss . '.png"><img style="max-width:300px;" src="/bundles/admin/results/debug/' . $ss . '.png" /></a></span>';
+                                $ss . '.png">' . str_replace(
+                                    '"',
+                                    '',
+                                    $x->getStep()->getArguments(true)
+                                ) . '<img style="max-width:300px;" src="/bundles/admin/results/debug/' . $ss . '.png" /></a></span>';
                         } else {
                             $steps[$x->getTest()->getName()] .= '<span class="step">I <strong>' . $x->getStep(
                                 )->getAction() . '</strong> ' . str_replace(

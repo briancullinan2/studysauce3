@@ -73,7 +73,7 @@ class EmailsCest
         $I->amOnUrl('http://mailinator.com');
         $I->fillField('.input-append input', 'studymarketing');
         $I->click('.input-append btn');
-        $I->waitForText('a minute ago', 60*5);
+        $I->waitForText('moments ago', 60*5);
     }
 
 }
