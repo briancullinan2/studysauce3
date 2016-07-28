@@ -42,18 +42,18 @@ class AdminCest
         $I->wantTo('check for an admin account');
         /** @var User $admin */
         /** @var EntityManager $em */
-        $admin = $I->grabFrom('StudySauceBundle:User', ['email' => 'brian@studysauce.com']);
+        $admin = $I->grabFrom('StudySauceBundle:User', ['email' => 'stephen@studysauce.com']);
         if(empty($admin)) {
             $I->wantTo('sign up for an admin account');
             $I->seeAmOnPage('/register');
-            $I->fillField('input[name="first"]', 'Brian');
-            $I->fillField('input[name="last"]', 'Cullinan');
-            $I->fillField('input[name="email"]', 'brian@studysauce.com');
+            $I->fillField('input[name="first"]', 'Stephen');
+            $I->fillField('input[name="last"]', 'Houghton');
+            $I->fillField('input[name="email"]', 'stephen@studysauce.com');
             $I->fillField('input[name="password"]', 'password');
             $I->seeLink('Save');
             $I->click('Save');
             $I->wait(5);
-            $admin = $I->grabFrom('StudySauceBundle:User', ['email' => 'brian@studysauce.com']);
+            $admin = $I->grabFrom('StudySauceBundle:User', ['email' => 'stephen@studysauce.com']);
             if(!empty($admin)) {
                 $admin->addRole('ROLE_ADMIN');
                 $em->merge($admin);
