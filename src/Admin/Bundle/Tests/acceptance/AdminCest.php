@@ -40,7 +40,7 @@ class AdminCest
     public function tryCreateAdmin(AcceptanceTester $I) {
         $I->wantTo('check for an admin account');
         /** @var User $admin */
-        $admin = Doctrine2::$em->getRepository('StudySauceBundle:User')->findOneBy(['username' => 'brian@studysauce.com']);
+        $admin = $I->grabFromRepository('User', 'email', array('email' => 'brian@studysauce.com'));
         if(empty($admin)) {
             $I->wantTo('sign up for an admin account');
             $I->seeAmOnPage('/register');
@@ -51,11 +51,11 @@ class AdminCest
             $I->seeLink('Save');
             $I->click('Save');
             $I->wait(5);
-            $admin = Doctrine2::$em->getRepository('StudySauceBundle:User')->findOneBy(['username' => 'brian@studysauce.com']);
+            $admin = $I->grabFromRepository('User', 'email', array('email' => 'brian@studysauce.com'));
             if(!empty($admin)) {
                 $admin->addRole('ROLE_ADMIN');
-                Doctrine2::$em->merge($admin);
-                Doctrine2::$em->flush();
+                $I->mergeEntity($admin);
+                $I->flushToDatabase();
             }
         }
 

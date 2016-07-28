@@ -13,7 +13,8 @@ modules:
         - Symfony2
         - Filesystem
         - Asserts
-#        - Doctrine2
+        - Doctrine2
+             connection_callback: [Admin\Bundle\Controller\ValidationController, getEntityManager]
     config:
 #        PhpBrowser:
 #            url: 'http://localhost/myapp/'

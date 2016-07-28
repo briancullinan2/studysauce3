@@ -3040,6 +3040,30 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
+     * Switch to iframe or frame on the page.
+     *
+     * Example:
+     * ``` html
+     * <iframe name="another_frame" src="http://example.com">
+     * ```
+     *
+     * ``` php
+     * <?php
+     * # switch to iframe
+     * $I->switchToIframe("another_frame");
+     * ```
+     *
+     * @param string $name
+     * @see \Codeception\Lib\InnerBrowser::switchToIframe()
+     */
+    public function switchToIframe($name) {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('switchToIframe', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
      * Enters a directory In local filesystem.
      * Project root directory is used by default
      *

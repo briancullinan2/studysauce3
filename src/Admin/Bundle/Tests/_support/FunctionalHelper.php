@@ -5,7 +5,6 @@ namespace Admin\Bundle\Tests\Codeception\Module;
 // all public methods declared in helper class will be available in $I
 
 use Admin\Bundle\Controller\EmailsController;
-use Codeception\TestCase;
 use Codeception\TestCase\Cest;
 use PHPUnit_Framework_TestResult;
 use PHPUnit_Framework_TestSuite;
@@ -24,7 +23,7 @@ class FunctionalHelper extends \Codeception\Module
     /**
      * @param Cest $test
      */
-    public function _before(TestCase $test)
+    public function _before(Cest $test)
     {
         $this->result = $test->getTestResultObject();
     }

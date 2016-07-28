@@ -6,6 +6,7 @@ php app/console doctrine:generate:entities StudySauceBundle;
 php app/console doctrine:schema:update --force --env=test;
 php app/console assets:install --env=test --symlink;
 php app/console assetic:dump --env=test;
+php vendor/codeception/codeception/codecept build --config src/Admin/Bundle/codeception.yml
 chown apache:apache -R app/cache/
 chown apache:apache -R app/logs/
 chown apache:apache -R src/Admin/Bundle/Tests

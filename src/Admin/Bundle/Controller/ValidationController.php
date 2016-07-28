@@ -51,8 +51,13 @@ class ValidationController extends Controller
     public static $dispatcher;
     private static $config = [];
     public static $settings;
+    private static $doctrine;
 
-    private static function setupThis()
+    public static function getEntityManager() {
+        return self::$doctrine->getManager();
+    }
+
+    private static function setupThis($container)
     {
         if (!defined('PHPUNIT_TESTSUITE')) {
             define('PHPUNIT_TESTSUITE', true);
@@ -72,7 +77,7 @@ class ValidationController extends Controller
             self::$config['tests'][$suite] = $testLoader->getTests();
             self::$config['tests'][$suite] = array_combine(array_map(function (Cest $t) { return $t->getName();}, self::$config['tests'][$suite]), self::$config['tests'][$suite]);
         }
-
+        self::$doctrine = $container->get('doctrine');
     }
 
     /**
@@ -87,7 +92,7 @@ class ValidationController extends Controller
             throw new AccessDeniedHttpException();
         }
 
-        self::setupThis();
+        self::setupThis($this->container);
 
         return $this->render('AdminBundle:Validation:tab.html.php', self::$config);
     }
@@ -100,7 +105,7 @@ class ValidationController extends Controller
         if (!$user->hasRole('ROLE_ADMIN')) {
             throw new AccessDeniedHttpException();
         }
-        self::setupThis();
+        self::setupThis($this->container);
 
         foreach(scandir(codecept_log_dir()) as $file) {
             $fpath = codecept_log_dir() . DIRECTORY_SEPARATOR . $file;
@@ -126,7 +131,7 @@ class ValidationController extends Controller
     }
 
     public function getNodesEdges() {
-        self::setupThis();
+        self::setupThis($this->container);
         $nodes = [];
         $edges = [];
         $edgeIndex = [];
@@ -383,7 +388,7 @@ class ValidationController extends Controller
     {
         set_time_limit(0);
 
-        self::setupThis();
+        self::setupThis($this->container);
 
         $steps = [];
         if (!empty(static::$settings = self::$config[$suite = $request->get('suite')])) {
