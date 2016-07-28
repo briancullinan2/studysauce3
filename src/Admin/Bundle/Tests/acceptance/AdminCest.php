@@ -76,7 +76,6 @@ class AdminCest
     }
 
     /**
-     * @depends tryAdminLogin
      * @param AcceptanceTester $I
      */
     public function tryCreateTestGroup(AcceptanceTester $I) {
@@ -101,8 +100,6 @@ class AdminCest
     }
 
     /**
-     * @depends tryAdminLogin
-     * @depends tryCreateTestGroup
      * @param AcceptanceTester $I
      */
     public function tryInviteTestUser(AcceptanceTester $I) {
@@ -120,9 +117,6 @@ class AdminCest
     }
 
     /**
-     * @depends tryAdminLogin
-     * @depends tryCreateTestGroup
-     * @depends tryInviteTestUser
      * @param AcceptanceTester $I
      */
     public function tryAcceptInvite(AcceptanceTester $I) {
@@ -149,10 +143,6 @@ class AdminCest
     }
 
     /**
-     * @depends tryAdminLogin
-     * @depends tryCreateTestGroup
-     * @depends tryInviteTestUser
-     * @depends tryAcceptInvite
      * @param AcceptanceTester $I
      */
     public function tryAllHomeCards(AcceptanceTester $I) {
@@ -227,7 +217,6 @@ class AdminCest
     }
 
     /**
-     * @depends tryAdminLogin
      * @param AcceptanceTester $I
      */
     public function tryGroupInvite(AcceptanceTester $I)
