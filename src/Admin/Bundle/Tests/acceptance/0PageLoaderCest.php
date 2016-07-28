@@ -141,7 +141,7 @@ class PageLoaderCest
         $I->amOnUrl('http://mailinator.com');
         $I->fillField('#inboxfield', 'studymarketing');
         $I->click('Go!');
-        $I->waitForText('a minute ago', 60*5);
+        $I->waitForText('moments ago', 60*5);
         $I->seeLink('Contact Us');
         $I->click('//a[contains(.,"Contact Us")]');
         $I->executeInSelenium(function (RemoteWebDriver $driver) {

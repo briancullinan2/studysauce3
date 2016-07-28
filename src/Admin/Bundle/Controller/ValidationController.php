@@ -645,7 +645,7 @@ class ValidationController extends Controller
             $this->suiteManager->getSuite()->setBackupGlobals(false);
             $this->suiteManager->getSuite()->setBackupStaticAttributes(false);
             $this->suiteManager->loadTests(null);
-            session_write_close();
+            session_write_close(); // allow symfony to respond to other requests while tests are running
             $this->suiteManager->run($runner, $result, $options);
         }
 
