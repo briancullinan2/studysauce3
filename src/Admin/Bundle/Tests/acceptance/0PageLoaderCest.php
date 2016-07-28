@@ -145,7 +145,7 @@ class PageLoaderCest
         $I->click('//div[contains(@class,"innermail") and contains(.,"Contact Us")]');
         $I->executeInSelenium(function (RemoteWebDriver $driver) {
             $driver->switchTo()->defaultContent();
-            $driver->switchTo()->frame($driver->findElement(WebDriverBy::cssSelector('iframe[name="rendermail"]')));
+            $driver->switchTo()->frame($driver->findElement(WebDriverBy::cssSelector('#publicshowmaildivcontent')));
         });
         $I->see('Organization:');
     }
