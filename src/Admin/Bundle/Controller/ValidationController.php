@@ -630,7 +630,7 @@ class ValidationController extends Controller
             $this->suiteManager = new SuiteManager(self::$dispatcher, $suite, static::$settings);
             $this->suiteManager->initialize();
             // add Symfony2 module back in without initializing, setting the correct kernel for the current instance
-            static::$settings['modules']['enabled'] = ['Symfony2'];
+            static::$settings['modules']['enabled'][] = 'Symfony2';
             /** @var Symfony2 $symfony */
             //$config = Configuration::modules(static::$settings);
             //if(isset($config['Symfony2'])) {
