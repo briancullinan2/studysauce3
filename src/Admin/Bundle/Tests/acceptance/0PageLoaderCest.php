@@ -139,7 +139,7 @@ class PageLoaderCest
         $I->wantTo('visit mailinator and check for organization email');
         $I->amOnPage('/cron/emails');
         $I->amOnUrl('http://mailinator.com');
-        $I->fillField('.input-append input', 'studymarketing');
+        $I->fillField('#inboxfield', 'studymarketing');
         $I->click('.input-append btn');
         $I->waitForText('a minute ago', 60*5);
         $I->seeLink('Contact Us');
