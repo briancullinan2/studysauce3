@@ -84,6 +84,24 @@ class AcceptanceHelper extends \Codeception\Module
         $em->flush();
         $qb = $em->getRepository($entity)->findOneBy($fields);
         return $qb;
+    }
 
+    function seePageHas($element)
+    {
+        try {
+            $this->getModule('WebDriver')->see($element);
+        } catch (\PHPUnit_Framework_AssertionFailedError $f) {
+            return false;
+        }
+        return true;
+    }
+    function seePageHasElement($element)
+    {
+        try {
+            $this->getModule('WebDriver')->seeElement($element);
+        } catch (\PHPUnit_Framework_AssertionFailedError $f) {
+            return false;
+        }
+        return true;
     }
 }
