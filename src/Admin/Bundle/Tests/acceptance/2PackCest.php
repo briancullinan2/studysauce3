@@ -45,13 +45,18 @@ class PackCest
             $I->test('tryAdminLogin');
         }
         $I->seeAmOnPage('/packs');
-        $I->click('Packs');
         $I->test('tryDeleteTestPack');
         $I->click('a[href*="packs/0"]');
         $I->fillField('.pack-row input[name="title"]', 'TestPack' . $last);
         $I->click('Save');
         $I->wait(3);
         $I->seeInField('input[name="name"]', 'TestGroup' . $last);
+
+        // enter test cards
+        $I->fillField('.card-row input[name="content"]', 'Prompt');
+        $I->fillField('.card-row input[name="correct"]', 'Correct');
+        $I->click('Save');
+        $I->wait(3);
     }
 
     /**

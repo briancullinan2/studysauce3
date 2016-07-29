@@ -481,7 +481,7 @@ class ValidationController extends Controller
                                     '"',
                                     '',
                                     $x->getStep()->getArguments(true)
-                                ) . '<img style="max-width:300px;" src="/bundles/admin/results/debug/' . $ss . '.png" /></a></span>';
+                                ) . ' <img style="max-width:300px;" src="/bundles/admin/results/debug/' . $ss . '.png" /></a></span>';
                         } else {
                             $steps[$x->getTest()->getName()] .= '<span class="step">I <strong>' . $x->getStep(
                                 )->getAction() . '</strong> ' . str_replace(

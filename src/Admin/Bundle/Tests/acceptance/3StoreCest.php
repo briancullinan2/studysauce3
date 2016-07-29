@@ -18,7 +18,7 @@ use WebDriverKeys;
  * @backupGlobals false
  * @backupStaticAttributes false
  */
-class GroupCest
+class StoreCest
 {
     /**
      * @param AcceptanceTester $I
@@ -37,32 +37,21 @@ class GroupCest
     /**
      * @param AcceptanceTester $I
      */
-    public function tryCreateTestGroup(AcceptanceTester $I) {
-        $last = substr(md5(microtime()), -5);
-        $I->wantTo('Create a group (TestGroup' . $last . ') that contains users for testing');
-        $I->seeAmOnPage('/groups');
+    public function tryAddFreeToCart(AcceptanceTester $I) {
+        $I->wantTo('Add a free product to the cart and checkout');
+        $I->seeAmOnPage('/store');
         if($I->seePageHas('Access denied.')) {
             $I->test('tryAdminLogin');
         }
-        $I->seeAmOnPage('/groups');
-        $I->click('Groups');
-        $I->test('tryDeleteTestGroup');
-        $I->click('a[href*="groups/0"]');
-        $I->fillField('.ss_group-row input[name="name"]', 'TestGroup' . $last);
-        $I->click('Save');
+        $I->seeAmOnPage('/store');
+        $I->click('Free');
+        $I->click('a[href*="/store/cart"]');
         $I->wait(3);
-        $I->seeInField('input[name="name"]', 'TestGroup' . $last);
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     */
-    public function tryDeleteTestGroup(AcceptanceTester $I) {
-        $I->wantTo('Delete the existing test groups');
-        //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
-        $I->seeAmOnPage('/groups');
-        $I->click('Groups');
-
+        $value = $I->grabAttributeFrom('.coupon-row select option:not([value=""]):not([disabled])', 'value');
+        $I->selectOption('.coupon-row select', $value);
+        $I->click('Place order');
+        $I->wait(3);
+        $I->see('Thank you');
     }
 
 }

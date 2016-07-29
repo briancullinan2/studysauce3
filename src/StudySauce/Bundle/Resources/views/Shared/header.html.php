@@ -80,7 +80,7 @@ foreach($invites as $i) {
                     <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
                     <li><a href="<?php print $view['router']->generate('groups'); ?>"><span>&nbsp;</span>Groups</a></li>
                     <?php }
-                    if(count($user->getUserPacks()->toArray())) { ?>
+                    if(count($user->getUserPacks()->toArray()) || (!empty($user) && $user->hasRole('ROLE_ADMIN'))) { ?>
                         <li><a href="<?php print $view['router']->generate('packs'); ?>"><span>&nbsp;</span>Packs</a></li>
                     <?php } ?>
                     <li><a href="<?php print $view['router']->generate('store'); ?>"><span>&nbsp;</span>Store</a></li>
@@ -101,6 +101,7 @@ foreach($invites as $i) {
             <div id="welcome-message">
                 <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
                     <ul class="main-menu">
+                        <li><a href="https://testing.studysauce.com/"><span>&nbsp;</span>Testing</a></li>
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
                     </ul>
