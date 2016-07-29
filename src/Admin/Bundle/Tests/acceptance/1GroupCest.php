@@ -42,7 +42,7 @@ class GroupCest
         $last = substr(md5(microtime()), -5);
         $I->wantTo('Create a group (TestGroup' . $last . ') that contains users for testing');
         $I->seeAmOnPage('/groups');
-        if($I->canSee('Access denied')) {
+        if($I->canSee('Access denied.')) {
             $I->test('tryAdminLogin');
         }
         $I->seeAmOnPage('/groups');
