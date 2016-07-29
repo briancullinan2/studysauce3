@@ -18,7 +18,7 @@ use WebDriverKeys;
  * @backupGlobals false
  * @backupStaticAttributes false
  */
-class GroupCest
+class PackCest
 {
     /**
      * @param AcceptanceTester $I
