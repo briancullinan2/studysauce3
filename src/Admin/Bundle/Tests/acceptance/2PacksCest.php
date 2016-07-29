@@ -37,18 +37,18 @@ class GroupCest
     /**
      * @param AcceptanceTester $I
      */
-    public function tryCreateTestGroup(AcceptanceTester $I) {
+    public function tryCreateTestPack(AcceptanceTester $I) {
         $last = substr(md5(microtime()), -5);
-        $I->wantTo('Create a group (TestGroup' . $last . ') that contains users for testing');
-        $I->seeAmOnPage('/groups');
+        $I->wantTo('Create a pack (TestPack' . $last . ') that contains cards for testing');
+        $I->seeAmOnPage('/packs');
         if($I->seePageHas('Access denied.')) {
             $I->test('tryAdminLogin');
         }
-        $I->seeAmOnPage('/groups');
-        $I->click('Groups');
-        $I->test('tryDeleteTestGroup');
-        $I->click('a[href*="groups/0"]');
-        $I->fillField('.group-row input[name="name"]', 'TestGroup' . $last);
+        $I->seeAmOnPage('/packs');
+        $I->click('Packs');
+        $I->test('tryDeleteTestPack');
+        $I->click('a[href*="packs/0"]');
+        $I->fillField('.pack-row input[name="title"]', 'TestPack' . $last);
         $I->click('Save');
         $I->wait(3);
         $I->seeInField('input[name="name"]', 'TestGroup' . $last);
@@ -57,11 +57,11 @@ class GroupCest
     /**
      * @param AcceptanceTester $I
      */
-    public function tryDeleteTestGroup(AcceptanceTester $I) {
-        $I->wantTo('Delete the existing test groups');
+    public function tryDeleteTestPack(AcceptanceTester $I) {
+        $I->wantTo('Delete the existing test packs');
         //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
-        $I->seeAmOnPage('/groups');
-        $I->click('Groups');
+        $I->seeAmOnPage('/packs');
+        $I->click('Packs');
 
     }
 
