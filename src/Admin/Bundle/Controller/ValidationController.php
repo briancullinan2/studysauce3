@@ -140,11 +140,12 @@ class ValidationController extends Controller
         $since = date_sub(new \DateTime(), new \DateInterval('P1D'));
         foreach(scandir(codecept_log_dir()) as $file) {
             $fpath = codecept_log_dir() . DIRECTORY_SEPARATOR . $file;
-            $ftime = filectime($fpath);
+            $ftime = filemtime($fpath);
             if($ftime < $since->getTimestamp() ||
                 substr($file, 0, strlen('TestResults-')) != 'TestResults-')
                 continue;
 
+            // use test name from file as key
             $results[substr($file, strlen('TestResults-PASS-'), -10)][] = [
                 'status' => substr($file, strlen('TestResults-'), 4),
                 'created' => date_timestamp_set(new \DateTime(), $ftime)->format('r'),
