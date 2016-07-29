@@ -559,16 +559,16 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
 }
 
 .results > .views {
-    position:absolute;
+    position:fixed;
     display:none;
     opacity: .3;
     z-index: 1000;
     overflow: visible;
     left:0;
-    right:100%;
+    top:40px;
     min-height:42px;
-    padding:inherit;
-    margin:inherit;
+    padding:0;
+    margin:0;
 }
 
 .results > .views ul {
@@ -588,6 +588,7 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
 
 .results > .views:hover {
     opacity: 1;
+    z-index:1010;
 }
 
 .results > .views:hover ul {
