@@ -80,30 +80,6 @@ class AdminCest
     /**
      * @param AcceptanceTester $I
      */
-    public function tryCreateTestGroup(AcceptanceTester $I) {
-        $last = substr(md5(microtime()), -5);
-        $I->wantTo('Create a group (TestGroup' . $last . ') that contains users for testing');
-        $I->seeAmOnPage('/command');
-        $I->click('Groups');
-        $I->test('tryDeleteTestGroup');
-        $I->click('a[href="#add-group"]');
-        $I->fillField('#groups input[name="groupName"]', 'TestGroup' . $last);
-        $I->click('Create group');
-        $I->wait(3);
-        $I->seeInField('input[name="groupName"]', 'TestGroup' . $last);
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     */
-    public function tryDeleteTestGroup(AcceptanceTester $I) {
-        $I->wantTo('Delete the existing test groups');
-        //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     */
     public function tryInviteTestUser(AcceptanceTester $I) {
         $last = substr(md5(microtime()), -5);
         $I->wantTo('Invite a test user (TestInvite' . $last . ') to download the app and register');
