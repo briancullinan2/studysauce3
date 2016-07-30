@@ -103,7 +103,9 @@ class PacksController extends Controller
             if(empty($up)) {
                 $up = new UserPack();
                 $up->setUser($this->getUser());
+                $this->getUser()->addUserPack($up);
                 $up->setPack($newPack);
+                $newPack->addUserPack($up);
                 $orm->persist($up);
             }
             $orm->merge($newPack);
