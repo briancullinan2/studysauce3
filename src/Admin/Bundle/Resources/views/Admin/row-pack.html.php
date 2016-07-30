@@ -72,7 +72,7 @@ if(isset($request['user_pack-removed'])) {
     if (strpos($rowHtml, '<label>0</label>') !== false
         || (!empty($up = $user->getUserPack($pack)) && $up->getRemoved())
         || $pack->getStatus() == 'DELETED'
-        || ((empty($pack->getUser()) || $pack->getUser()->getId() != $user->getId()) && $pack->getStatus() == 'UNPUBLISHED')
+        || ($pack->getOwnerId() != $user->getId() && $pack->getStatus() == 'UNPUBLISHED')
     ) {
         return;
     }

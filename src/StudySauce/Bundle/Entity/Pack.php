@@ -211,6 +211,10 @@ class Pack
         return $this->getCards()->filter(function (Card $c) {return !$c->getDeleted();})->count();
     }
 
+    public function getOwnerId() {
+        return $this->getUser() != null ? $this->getUser()->getId() : 0;
+    }
+
     public function getChildUsers(User $user)
     {
         $this->userPacks->toArray();
