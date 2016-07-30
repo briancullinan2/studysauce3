@@ -62,8 +62,12 @@ class StoreCest
 
     public function tryCreateProductListing(AcceptanceTester $I) {
         /** @var Pack $freePack */
-        $freePack = $I->grabFrom('StudySauceBundle:Pack', ['coupons' => null]);
         $I->seeAmOnPage('/packs');
+        if(!$I->seePageHas('TestPack')) {
+            $I->test('tryCreateTestPack');
+        }
+        $pack = $I->grabTextFrom('//div[contains(@class,"title") and contains(.,"TestPack")]');
+        $freePack = $I->grabFrom('StudySauceBundle:Pack', ['title' => $pack]);
         $coupon = new Coupon();
         $coupon->addPack($freePack);
         $coupon->setOptions(['ST' => ['price' => 0.0]]);
