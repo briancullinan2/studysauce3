@@ -67,7 +67,7 @@ class StoreCest
             $I->test('tryCreateTestPack');
         }
         $I->seeAmOnPage('/packs');
-        $pack = $I->grabTextFrom('//div[contains(@class,"title") and contains(.,"TestPack")]');
+        $pack = $I->grabTextFrom('//label[contains(.,"TestPack")]');
         $freePack = $I->grabFrom('StudySauceBundle:Pack', ['title' => $pack]);
         $coupon = new Coupon();
         $coupon->addPack($freePack);
