@@ -5,7 +5,9 @@ use Admin\Bundle\Controller\ValidationController;
 use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
 use Doctrine\ORM\EntityManager;
+use StudySauce\Bundle\Entity\Coupon;
 use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\User;
 use WebDriver;
@@ -52,6 +54,18 @@ class StoreCest
         $I->click('Place order');
         $I->wait(3);
         $I->see('Thank you');
+    }
+
+    public function tryCreateProductListing(AcceptanceTester $I) {
+        /** @var Pack $freePack */
+        $freePack = $I->grabFrom('StudySauceBundle:Pack', ['coupons' => null]);
+        $I->seeAmOnPage('/packs');
+        $coupon = new Coupon();
+        $coupon->addPack($freePack);
+        $coupon->setOptions(['ST' => ['price' => 0.0]]);
+        $coupon->setName('Study Sauce ' . $freePack->getTitle());
+        $I->persistEntity($coupon);
+        $I->flushToDatabase();
     }
 
 }

@@ -307,7 +307,12 @@ $(document).ready(function () {
 
         $(window).resize(function () {
             setTimeout(function () {
-                s.refresh();
+                try {
+                    s.refresh();
+                }
+                catch (e) {
+
+                }
                 if(typeof window.lastNode != 'undefined') {
                         tooltips.open(window.lastNode, config.node, window.lastNode[s.renderers[0].options.prefix + 'x'], window.lastNode[s.renderers[0].options.prefix + 'y']);
                 }

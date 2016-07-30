@@ -50,7 +50,7 @@ class PackCest
         $I->fillField('.pack-row input[name="title"]', 'TestPack' . $last);
         $I->click('Save');
         $I->wait(3);
-        $I->seeInField('input[name="name"]', 'TestGroup' . $last);
+        $I->seeInField('input[name="title"]', 'TestPack' . $last);
 
         // enter test cards
         $I->fillField('.card-row input[name="content"]', 'Prompt');

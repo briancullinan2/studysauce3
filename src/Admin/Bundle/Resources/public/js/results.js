@@ -119,7 +119,7 @@ window.views.__defaultEntities['ss_group'] = {
     users: $([]),
     groupPacks: $([]),
     invites: $([]),
-    getId: function () {return this.id;},
+    getId: function () {return this.id || 0;},
     getCreated: function () {return !(this.created) ? null : new Date(this.created);},
     getLogo: function () {return this.logo ? (typeof this.logo == 'string' ? applyEntityObj({table:'file', url: this.logo}) : applyEntityObj(this.logo)) : null;},
     getName: function () {return this.name;},
