@@ -98,7 +98,6 @@ class PacksController extends Controller
         // process pack settings
         list($newPack) = AdminController::standardSave($request, $this->container);
         if($newPack instanceof Pack) {
-            $newPack->setModified(new \DateTime());
             $up = $newPack->getUserPack($this->getUser());
             if(empty($up)) {
                 $up = new UserPack();
@@ -108,6 +107,10 @@ class PacksController extends Controller
                 $newPack->addUserPack($up);
                 $orm->persist($up);
             }
+            if(empty($newPack->getModified())) {
+                $newPack->setUser($this->getUser());
+            }
+            $newPack->setModified(new \DateTime());
             $orm->merge($newPack);
             $orm->flush();
         }
