@@ -54,10 +54,10 @@ class PackCest
         $I->click('Edit Pack');
         // enter test cards
         $I->click('a[href="#add-card"]');
-        $I->click('.card-row.empty:not(.removed) [name="content"]');
-        $I->pressKey('.card-row [name="content"]', 'Prompt');
-        $I->click('.card-row.empty:not(.removed) [name="correct"]');
-        $I->pressKey('.card-row [name="correct"]', 'Correct');
+        $I->click('.card-row[class*="new-id-"]:not(.removed) [name="content"]');
+        $I->pressKey('.card-row[class*="new-id-"]:not(.removed) [name="content"]', 'Prompt');
+        $I->click('.card-row[class*="new-id-"]:not(.removed) [name="correct"]');
+        $I->pressKey('.card-row[class*="new-id-"]:not(.removed) [name="correct"]', 'Correct');
         $I->click('Save');
         $I->wait(3);
     }
