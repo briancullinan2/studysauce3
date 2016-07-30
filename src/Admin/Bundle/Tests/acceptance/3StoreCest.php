@@ -46,6 +46,10 @@ class StoreCest
             $I->test('tryAdminLogin');
         }
         $I->seeAmOnPage('/store');
+        if(!$I->seePageHas('Free')) {
+            $I->test('tryCreateProductListing');
+        }
+        $I->seeAmOnPage('/store');
         $I->click('Free');
         $I->click('a[href*="/store/cart"]');
         $I->wait(3);

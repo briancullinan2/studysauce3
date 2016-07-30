@@ -53,8 +53,8 @@ class PackCest
         $I->seeInField('input[name="title"]', 'TestPack' . $last);
 
         // enter test cards
-        $I->fillField('.card-row input[name="content"]', 'Prompt');
-        $I->fillField('.card-row input[name="correct"]', 'Correct');
+        $I->fillField('.card-row [name="content"]', 'Prompt');
+        $I->fillField('.card-row [name="correct"]', 'Correct');
         $I->click('Save');
         $I->wait(3);
     }
