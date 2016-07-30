@@ -48,6 +48,7 @@ class PackCest
         $I->test('tryDeleteTestPack');
         $I->click('a[href*="packs/0"]');
         $I->fillField('.pack-row input[name="title"]', 'TestPack' . $last);
+        $I->wait(1);
         $I->click('Save');
         $I->wait(3);
         $I->seeInField('input[name="title"]', 'TestPack' . $last);
