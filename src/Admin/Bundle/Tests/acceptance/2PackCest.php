@@ -48,12 +48,13 @@ class PackCest
         $I->test('tryDeleteTestPack');
         $I->click('a[href*="packs/0"]');
         $I->fillField('.pack-row input[name="title"]', 'TestPack' . $last);
-        $I->wait(1);
+        $I->wait(3);
         $I->click('Save');
         $I->wait(3);
         $I->seeInField('input[name="title"]', 'TestPack' . $last);
-        $I->click('Edit pack');
+        $I->click('Edit Pack');
         // enter test cards
+        $I->click('a[href="#add-card"]');
         $I->fillField('.card-row [name="content"]', 'Prompt');
         $I->fillField('.card-row [name="correct"]', 'Correct');
         $I->click('Save');
