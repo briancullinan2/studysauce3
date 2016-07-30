@@ -55,7 +55,8 @@ class PackCest
         $I->click('Edit Pack');
         // enter test cards
         $I->click('a[href="#add-card"]');
-        $I->fillField('.card-row [name="content"]', 'Prompt');
+        $I->wait(1);
+        $I->fillField('.card-row .[name="content"]', 'Prompt');
         $I->fillField('.card-row [name="correct"]', 'Correct');
         $I->click('Save');
         $I->wait(3);
