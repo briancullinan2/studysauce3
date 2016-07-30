@@ -99,6 +99,13 @@ class PacksController extends Controller
         list($newPack) = AdminController::standardSave($request, $this->container);
         if($newPack instanceof Pack) {
             $newPack->setModified(new \DateTime());
+            $up = $newPack->getUserPack($this->getUser());
+            if(empty($up)) {
+                $up = new UserPack();
+                $up->setUser($this->getUser());
+                $up->setPack($newPack);
+                $orm->persist($up);
+            }
             $orm->merge($newPack);
             $orm->flush();
         }
