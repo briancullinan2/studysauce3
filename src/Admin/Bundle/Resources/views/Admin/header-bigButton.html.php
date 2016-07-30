@@ -39,9 +39,8 @@ $firstCard = array_shift($remaining);
     <a href="<?php print ($view['router']->generate('cards', ['card' => $firstCard])); ?>"></a>
     <label>Today&rsquo;s cards</label>
     <label><?php print ($total); ?> card<?php print ($total != 1 ? 's' : ''); ?></label>
+    <?php if($total == 0) { ?><h3>No packs due today.  Check out the store.</h3><?php } ?>
 </header>
-<?php
-if($total == 0) { ?><h3>No packs due today.  Check out the store.</h3><?php }
 
 
 
