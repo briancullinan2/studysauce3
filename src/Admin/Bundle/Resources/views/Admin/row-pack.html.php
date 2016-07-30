@@ -65,6 +65,7 @@ $row = $context->filter(implode('', ['.', $table , '-id-', $pack->getId()]));
 
 // skip rows that have zero retention
 /** @var UserPack $up */
+$user = $app->getUser();
 if(isset($request['user_pack-removed'])) {
     /** @var User $user */
     $user = $results['ss_user'][0];
