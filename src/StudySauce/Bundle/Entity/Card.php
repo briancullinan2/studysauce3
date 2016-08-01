@@ -214,7 +214,7 @@ class Card
     {
         $content = $this->content;
         $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
-        if (($hasUrl = preg_match('/https:\\/\\/.*/ig', $content, $matches)) > 0) {
+        if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
             $url = trim($matches[0]);
             $content = preg_replace('/\\s*\\n\\r?/i', '\\n', trim(str_replace($url, '', $content)));
         }

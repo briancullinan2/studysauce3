@@ -6,7 +6,7 @@ use StudySauce\Bundle\Entity\Card;
 $content = $card->getContent();
 $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
 $matches = (array)(new stdClass());
-if (($hasUrl = preg_match('/https:\\/\\/.*/ig', $content, $matches)) > 0) {
+if (($hasUrl = preg_match('/https:\\/\\/.*/i', $content, $matches)) > 0) {
     $url = trim($matches[0]);
     $isImage = substr($url, -4) == '.jpg' || substr($url, -4) == '.jpeg' || substr($url, -4) == '.gif' || substr($url, -4) == '.png';
     $isAudio = substr($url, -4) == '.mp3' || substr($url, -4) == '.m4a';

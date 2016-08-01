@@ -1244,7 +1244,7 @@ var preg_replace = function (needle, replacement, subject) {
 };
 var number_format = function (num, digits) { return num.toFixed(digits);};
 var preg_match = function (needle, subject, matches) {
-    var result = (new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0])).exec(subject);
+    var result = (new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g')).exec(subject);
     if(result == null) {
         return 0;
     }
