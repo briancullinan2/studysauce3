@@ -206,12 +206,19 @@ class Card
     /**
      * Set content
      *
-     * @param string $content
+     * @param $newContent
      * @return Card
+     * @internal param string $content
      */
-    public function setContent($content)
+    public function setContent($newContent)
     {
-        $this->content = $content;
+        $content = $this->content;
+        $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
+        if (($hasUrl = preg_match('/https:\\/\\/.*/ig', $content, $matches)) > 0) {
+            $url = trim($matches[0]);
+            $content = preg_replace('/\\s*\\n\\r?/i', '\\n', trim(str_replace($url, '', $content)));
+        }
+        $this->content = (!empty($url) ? ($url . '\n') : '') . $newContent;
 
         return $this;
     }
