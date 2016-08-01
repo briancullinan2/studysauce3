@@ -43,12 +43,12 @@ class Card
     /**
      * @ORM\Column(type="text", name="content")
      */
-    protected $content;
+    protected $content = '';
 
     /**
      * @ORM\Column(type="text", name="response_content", nullable=true)
      */
-    protected $responseContent;
+    protected $responseContent = '';
 
     /**
      * @ORM\Column(type="string", length=16, name="content_type")
