@@ -81,6 +81,10 @@
     text-align: center;
 }
 
+[id^="home"] header h3:not(.big-add) {
+    width:auto;
+}
+
 .user-shuffle header label:last-of-type {
     text-align: right;
 }
