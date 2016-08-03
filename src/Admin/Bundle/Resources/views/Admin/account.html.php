@@ -32,57 +32,45 @@ if($tab->length == 0) {
     <div class="panel-pane" id="account">
         <div class="pane-content">
             <form action="<?php print ($view['router']->generate('account_update')); ?>" method="post">
-
+                <div class="results">
                 <h2>Basic information</h2>
-                <div class="account-info read-only">
-                    <div class="first">
-                        <label class="input"><span>First name</span>
-                            <input name="first" type="text" placeholder="First name"
-                                   value="<?php print ($user->getFirst()); ?>">
-                        </label>
-                    </div>
-                    <div class="last">
-                        <label class="input"><span>Last name</span>
-                            <input name="last" type="text" placeholder="Last name"
-                                   value="<?php print ($user->getLast()); ?>">
-                        </label>
-                    </div>
-                    <div class="email">
-                        <label class="input"><span>E-mail address</span>
-                            <input name="email" type="text" placeholder="Email"
-                                   value="<?php print ($user->getEmail()); ?>" autocomplete="off">
-                        </label>
-                    </div>
-                </div>
-                <div class="password">
-                    <label class="input"><span>Current password</span>
-                        <input name="password" type="password" placeholder="Enter password" value="">
+                <div class="ss_user-row read-only">
+                    <label class="input first"><span>First name</span>
+                        <input name="first" type="text" placeholder="First name"
+                               value="<?php print ($user->getFirst()); ?>">
+                    </label>
+                    <label class="input last"><span>Last name</span>
+                        <input name="last" type="text" placeholder="Last name"
+                               value="<?php print ($user->getLast()); ?>">
+                    </label>
+                    <label class="input email"><span>E-mail address</span>
+                        <input name="email" type="text" placeholder="Email"
+                               value="<?php print ($user->getEmail()); ?>" autocomplete="off">
                     </label>
                 </div>
-                <div class="new-password">
-                    <label class="input"><span>New password</span>
-                        <input name="new-password" type="password" placeholder="New password" value="">
-                    </label>
-                </div>
-                <div class="confirm-password">
-                    <label class="input"><span>Confirm password</span>
-                        <input name="confirm-password" type="password" placeholder="Confirm password" value="">
-                    </label>
-                </div>
+                <label class="input pass"><span>Current password</span>
+                    <input name="pass" type="password" placeholder="Enter password" value="">
+                </label>
+                <label class="input new-password"><span>New password</span>
+                    <input name="new-password" type="password" placeholder="New password" value="">
+                </label>
+                <label class="input confirm-password"><span>Confirm password</span>
+                    <input name="confirm-password" type="password" placeholder="Confirm password" value="">
+                </label>
                 <div class="highlighted-link">
                     <div class="edit-icons">
                         <a href="#edit-account">Edit information</a>
                         <a href="#edit-password">Change password</a>
                         <a href="<?php print ($view['router']->generate('reset')); ?>">Forgot password</a>
                     </div>
-                    <div class="form-actions">
+                    <div class="form-actions invalid">
                         <div class="invalid-error">You must complete all fields before moving on.</div>
-                        <a href="#cancel-edit">Cancel</a>
+                        <a href="#cancel-edit" class="cancel-edit">Cancel</a>
                         <button type="submit" value="#save-account" class="more">Save</button>
                     </div>
                 </div>
                 <input type="hidden" name="csrf_token" value="<?php print ($csrf_token); ?>"/>
-
+                </div>
                 <h2>Child information</h2>
                 <?php
                 $request['count-invite'] = 0;

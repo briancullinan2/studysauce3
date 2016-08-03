@@ -807,7 +807,7 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var ups = user.getUserPacks();
+        var ups = user.getUserPacks().toArray();
         for(var up in ups) {
             if(ups.hasOwnProperty(up) && ups[up].getPack().getId() == packId) {
                 ups[up].retention[id][2] = !correct;
@@ -871,7 +871,7 @@ $(document).ready(function () {
         };
 
         var user = window.views.__globalVars.app.getUser();
-        var ups = user.getUserPacks();
+        var ups = user.getUserPacks().toArray();
         for(var up in ups) {
             if(ups.hasOwnProperty(up) && ups[up].getPack().getId() == packId) {
                 ups[up].retention[id][2] = !correct;

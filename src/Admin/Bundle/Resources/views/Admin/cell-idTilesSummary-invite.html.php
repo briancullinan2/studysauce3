@@ -25,15 +25,15 @@ if(!is_array($cart)) {
 ?>
 <div class="pack-icon">
     <div>
-    <label class="input first">
+    <label class="input childFirst">
         <span>Child&rsquo;s first name</span>
-        <input type="text" name="first" value="<?php print ($invite->getInvitee()->getFirst()); ?>" />
+        <input type="text" name="childFirst" value="<?php print ($invite->getInvitee()->getFirst()); ?>" />
     </label>
     </div>
     <div>
-    <label class="input last">
+    <label class="input childLast">
         <span>Child&rsquo;s last name</span>
-        <input type="text" name="last" value="<?php print ($invite->getInvitee()->getLast()); ?>" />
+        <input type="text" name="childLast" value="<?php print ($invite->getInvitee()->getLast()); ?>" />
     </label>
     </div>
     <?php
@@ -57,9 +57,9 @@ if(!is_array($cart)) {
         </div>
     <?php } ?>
     <label class="highlighted-link">
-        <a href="#edit-group" class="edit-icon">&nbsp;</a>
+        <a href="#edit-invite" class="edit-icon">&nbsp;</a>
         <a href="#cancel-edit">Cancel</a>
-        <button type="submit" value="#save-group" class="more">Save</button>
+        <button type="submit" value="#save-invite" class="more">Save</button>
     </label>
 </div>
 

@@ -26,7 +26,7 @@ class Coupon
     /**
      * @ORM\Column(type="string", length=4096, name="description")
      */
-    protected $description;
+    protected $description = '';
 
     /**
      * @ORM\ManyToOne(targetEntity="Group", inversedBy="coupons")
@@ -65,7 +65,7 @@ class Coupon
     /**
      * @ORM\Column(type="string", length=32, name="seed")
      */
-    protected $seed;
+    protected $seed = '';
 
     /**
      * @ORM\Column(type="datetime", name="created")

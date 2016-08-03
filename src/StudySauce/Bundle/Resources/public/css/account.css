@@ -115,19 +115,44 @@ a[href="#sign-in-with-email"]
     vertical-align: middle;
 }
 
+[id^="account"] .results .ss_user-row:hover:not(.selected):not(.edit) {
+    background: transparent;
+    border-color: transparent;
+}
+
+[id^="account"] .results .ss_user-row ~ .pass,
+[id^="account"] .results .ss_user-row.edit ~ .highlighted-link .edit-icons,
+[id^="account"] [value="#save-account"]
+{
+    display: none;
+}
+
+[id^="account"] .results .ss_user-row.edit ~ .highlighted-link [value="#save-account"],
+[id^="account"] .results .ss_user-row.edit ~ .highlighted-link [href="#cancel-edit"] {
+    display:inline;
+    visibility: visible;
+    opacity: 1;
+}
+
+[id^="account"] .results .ss_user-row.edit ~ .pass,
+[id^="account"] .results .ss_user-row > * {
+    display:block;
+    width:auto;
+}
+
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.parent span,
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.year span,
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label._code span,
-#account .social-login label span,
-#account .type label span,
-#account .password label span,
-#account .new-password label span,
-#account .confirm-password label span,
-#account .email label span,
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label span,
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label span,
-#account .first label span,
-#account .last label span
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.childLast span,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.childFirst span,
+#account .social-login span,
+#account .type span,
+#account .pass span,
+#account .new-password span,
+#account .confirm-password span,
+#account .email span,
+#account .first span,
+#account .last span
 {
     width:100%;
     display:inline-block;
@@ -139,15 +164,15 @@ a[href="#sign-in-with-email"]
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.parent select,
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.year select,
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label._code select,
-#account .social-login label input,
-#account .password label input,
-#account .new-password label input,
-#account .confirm-password label input,
-#account .email label input,
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label.last input,
-.tiles.summary [class*="-row"].invite-row > [class^="id"] label.first input,
-#account .first label input,
-#account .last label input
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.childLast input,
+.tiles.summary [class*="-row"].invite-row > [class^="id"] label.childFirst input,
+#account .social-login∂ input,
+#account .pass input,
+#account .new-password input,
+#account .confirm-password input,
+#account .email input,
+#account .first input,
+#account .last input
 {
     width:50%;
     display:inline-block;
@@ -178,7 +203,7 @@ a[href="#sign-in-with-email"]
 }
 
 [id^="register"] .email,
-[id^="register"] .password,
+[id^="register"] .pass,
 [id^="register"] .highlighted-link:last-child,
 [id^="register"] [class*="-row"] > * .parent,
 [id^="register"] [class*="-row"] > * .year,
@@ -200,7 +225,6 @@ a[href="#sign-in-with-email"]
     display:none;
 }
 
-#account .password,
 #account .new-password,
 #account .confirm-password
 {
@@ -220,11 +244,6 @@ a[href="#sign-in-with-email"]
     display:inline-block;
     margin-right:40px;
     text-align: center;
-}
-
-#account [value="#save-account"]
-{
-    display: none;
 }
 
 [id^="register"] .form-actions a[href*="/logout"],
@@ -293,13 +312,13 @@ a[href="#sign-in-with-email"]
         max-width: none;
     }
 
-    #account .social-login label span,
-    #account .password label span,
-    #account .new-password label span,
-    #account .confirm-password label span,
-    #account .email label span,
-    #account .first label span,
-    #account .last label span
+    #account .social-login span,
+    #account .pass span,
+    #account .new-password span,
+    #account .confirm-password span,
+    #account .email span,
+    #account .first span,
+    #account .last span
     {
         display:block;
         width:auto;
@@ -307,12 +326,12 @@ a[href="#sign-in-with-email"]
         margin: 0;
     }
 
-    #account .password label input,
-    #account .new-password label input,
-    #account .confirm-password label input,
-    #account .email label input,
-    #account .first label input,
-    #account .last label input
+    #account .pass input,
+    #account .new-password input,
+    #account .confirm-password input,
+    #account .email input,
+    #account .first input,
+    #account .last input
     {
         width:100%;
         margin: 0;

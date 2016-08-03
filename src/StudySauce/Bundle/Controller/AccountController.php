@@ -95,9 +95,9 @@ class AccountController extends Controller
             return new JsonResponse(true);
         }
 
-        $user->setFirst($request->get('first'));
-        $user->setLast($request->get('last'));
         if (!empty($request->get('email'))) {
+            $user->setFirst($request->get('first'));
+            $user->setLast($request->get('last'));
             // check password
             /** @var EncoderFactory $encoder_service */
             $encoder_service = $this->get('security.encoder_factory');
@@ -105,8 +105,8 @@ class AccountController extends Controller
             $encoder = $encoder_service->getEncoder($user);
             $encoded_pass = $encoder->encodePassword($request->get('pass'), $user->getSalt());
             if ($user->getPassword() == $encoded_pass) {
-                if (!empty($request->get('newPass'))) {
-                    $password = $encoder->encodePassword($request->get('newPass'), $user->getSalt());
+                if (!empty($request->get('new-password'))) {
+                    $password = $encoder->encodePassword($request->get('new-password'), $user->getSalt());
                     $user->setPassword($password);
                 }
                 $user->setEmail($request->get('email'));

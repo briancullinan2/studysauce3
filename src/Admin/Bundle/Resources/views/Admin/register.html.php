@@ -54,7 +54,7 @@ else {
                                             value="<?php print (isset($last) ? $last : ''); ?>"></label>
                 <label class="input email"><input type="text" name="email" placeholder="Email address"
                                             value="<?php print (isset($email) ? $email : ''); ?>"></label>
-                <label class="input password"><input type="password" name="password" placeholder="Password"
+                <label class="input pass"><input type="password" name="pass" placeholder="Password"
                                             value=""></label>
                 <input type="hidden" name="csrf_token" value="<?php print ($csrf_token); ?>"/>
                 <div class="form-actions highlighted-link invalid">

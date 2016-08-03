@@ -5,7 +5,7 @@ jQuery(document).ready(function() {
     function getHash()
     {
         var account = $(this);
-        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', 'new-password']]);
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'pass', 'csrf_token', 'new-password']]);
         var hash = '';
         for(var h in data) {
             if(data.hasOwnProperty(h)) {
@@ -17,12 +17,12 @@ jQuery(document).ready(function() {
 
     function accountFunc(evt) {
         var account = $(this);
-        var results = account.find('.results');
+        var results = account.closest('.results');
         var fields = ['first', 'last', 'email', 'password', 'csrf_token'];
         if(account.find('.new-password:visible').length > 0) {
             fields = $.merge(fields, ['new-password', 'confirm-password']);
         }
-        var data = gatherFields.apply(account, fields);
+        var data = gatherFields.apply(account, [fields]);
         standardValidation.apply(account, [data]);
         account.find('.invite-row.edit').each(function () {
             var account = $(this);
@@ -34,35 +34,29 @@ jQuery(document).ready(function() {
             }
             standardValidation.apply(account, [data]);
         });
+
     }
 
     body.on('show', '#account', function () {
         $(this).data('state', getHash());
     });
 
-    body.on('validate', '[id^="account"]', accountFunc);
+    body.on('validate', '[id^="account"] .results', accountFunc);
     body.on('change keyup keydown', '#account input, #account select, #account textarea', standardChangeHandler);
 
     body.on('click', '#account a[href="#edit-account"]', function (evt) {
         var account = jQuery('#account');
         evt.preventDefault();
-        account.find('.account-info').removeClass('read-only').addClass('edit');
-        account.find('.password').css('visibility', 'visible');
+        account.find('.ss_user-row').removeClass('read-only').addClass('edit');
         account.find('.new-password, .confirm-password').css('visibility', 'hidden');
-        account.find('.edit-icons').toggle();
-        account.find('[value="#save-account"]').show();
-        account.find('.social-login').hide();
-        accountFunc();
+        accountFunc.apply(account.find('.results'));
     });
 
     body.on('click', '#account a[href="#edit-password"]', function (evt) {
         var account = jQuery('#account');
         evt.preventDefault();
-        account.find('.password, .new-password, .confirm-password').css('visibility', 'visible');
-        account.find('.edit-icons').toggle();
-        account.find('[value="#save-account"]').show();
-        account.find('.social-login').hide();
-        accountFunc();
+        account.find('.new-password, .confirm-password').css('visibility', 'visible');
+        accountFunc.apply(account.find('.results'));
     });
 
     body.on('click', '#cancel-confirm a[href="#cancel-account"]', function (evt) {
@@ -113,66 +107,33 @@ jQuery(document).ready(function() {
     function submitAccount(evt)
     {
         evt.preventDefault();
-        var account = jQuery('#account');
-        if(account.find('.form-actions').is('.invalid')) {
-            if (account.is('.password-required') || account.is('.new-password-required') || account.is('.first-required') ||
-                account.is('.last-required') || account.is('.email-required') || account.is('.confirm-required')) {
-                account.addClass('invalid-only');
-                if(account.is('.password-required')) {
-                    account.find('.password input').focus();
-                }
-                else if(account.is('.new-password-required')) {
-                    account.find('.new-password input').focus();
-                }
-                else if(account.is('.confirm-required')) {
-                    account.find('.confirm-password input').focus();
-                }
-                else if(account.is('.first-required')) {
-                    account.find('.first-name input').focus();
-                }
-                else if(account.is('.last-required')) {
-                    account.find('.last-name input').focus();
-                }
-                else if(account.is('.email-required')) {
-                    account.find('.email input').focus();
-                }
-            }
+        var account = $(this).parents('.panel-pane');
+        var hash = getHash();
+        var data = gatherFields.apply($(this), [['first', 'last', 'email', 'pass', 'csrf_token', 'new-password', '_remember_me', 'confirm-password', '_code', 'childFirst', 'childLast']]);
+
+        if(account.find('.highlighted-link').is('.invalid')) {
+            account.addClass('invalid has-error');
+        }
+        else {
+            account.removeClass('invalid has-error');
+        }
+
+        // cancel if invalid
+        var saveButton = account.find('.highlighted-link [href^="#save-"], .highlighted-link [value^="#save-"]').first();
+        if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *')) {
+            gotoError.apply(this);
             return;
         }
-        account.find('.form-actions').removeClass('valid').addClass('invalid');
-        loadingAnimation($(this).find('[value="#save-account"]'));
-        var hash = getHash();
 
-        jQuery.ajax({
-            url: Routing.generate('account_update'),
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                first: account.find('.first-name input').val(),
-                last: account.find('.last-name input').val(),
-                email: account.find('.email input').val(),
-                pass: account.find('.password input').val(),
-                newPass: account.find('.new-password input').val(),
-                csrf_token: account.find('input[name="csrf_token"]').val()
-            },
-            success: function (data) {
-                account.find('.squiggle').stop().remove();
-                account.find('input[name="csrf_token"]').val(data.csrf_token);
-                account.data('state', hash);
-                if(typeof data.error != 'undefined') {
-                    account.find('.form-actions').prepend($('<span class="error">' + data.error + '</span>'));
-                }
-                account.find('.password input, .new-password input, .confirm-password input').val('');
-                account.find('.edit-icons').toggle();
-                account.find('[value="#save-account"]').hide();
-                account.find('.account-info').removeClass('edit').addClass('read-only');
-                account.find('.password, .new-password, .confirm-password').css('visibility', 'hidden');
-                account.find('.social-login').show();
-            },
-            error: function () {
-                account.find('.squiggle').stop().remove();
+        standardSave.apply($(this), [data, function () {
+            account.data('state', hash);
+            if(typeof data.error != 'undefined') {
+                account.find('.form-actions').prepend($('<span class="error">' + data.error + '</span>'));
             }
-        });
+            account.find('.ss_user-row, .invite-row').removeClass('edit').addClass('read-only');
+            account.find('.pass input, .new-password input, .confirm-password input').val('');
+            account.find('.new-password, .confirm-password').css('visibility', 'hidden');
+        }]);
     }
 
     body.on('submit', '#account form', submitAccount);

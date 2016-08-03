@@ -234,8 +234,8 @@
     margin-left: 0;
 }
 
-.tiles.summary [class*="-row"] > [class^="id"] img {
-    max-width: 10%;
+.tiles.summary [class*="-row"] > [class^="id"] i {
+    width: 10%;
     left: 0;
     display: inline-block;
     vertical-align: middle;

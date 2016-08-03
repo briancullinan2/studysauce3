@@ -627,7 +627,9 @@ $(document).ready(function () {
                 panel.css('position', '');
             } });
             panel.trigger('showing');
-            centerize.apply(panel.find('.centerized:visible'));
+            setTimeout(function () {
+                centerize.apply(panel.find('.centerized:visible'));
+            }, 20);
             // poll for panel visibility and fire events
             var triggerHide = setInterval(function () {
                 if (panels.is(':visible'))
@@ -637,6 +639,9 @@ $(document).ready(function () {
                 body.css('overflow', '');
                 setTimeout(function () {
                     panel.scrollintoview(DASHBOARD_MARGINS).trigger('show').removeClass('showing');
+                    setTimeout(function () {
+                        centerize.apply(panel.find('.centerized:visible'));
+                    }, 20);
                 }, 40);
                 clearInterval(triggerHide);
             }, 40);

@@ -645,14 +645,20 @@ $(document).ready(function () {
             data: data,
             success: function (data) {
                 saveButton.find('.squiggle').stop().remove();
+                if(typeof data.csrf_token != 'undefined') {
+                    subTab.find('input[name="csrf_token"]').val(data.csrf_token);
+                }
                 isLoading = false;
                 if(typeof callback == 'function') {
                     callback(data);
                 }
             },
-            error: function () {
+            error: function (data) {
                 isLoading = false;
                 saveButton.find('.squiggle').stop().remove();
+                if(typeof data.csrf_token != 'undefined') {
+                    subTab.find('input[name="csrf_token"]').val(data.csrf_token);
+                }
             }
         });
     }
@@ -730,7 +736,9 @@ $(document).ready(function () {
         resetHeader();
         var event = $.Event('resulted' + (typeof namespace == 'string' ? ('.' + namespace) : '.refresh'), {results: data});
         admin.trigger(event);
-        centerize.apply(admin.find('.centerized'));
+        setTimeout(function () {
+            centerize.apply(admin.find('.centerized'));
+        }, 20);
     }
     // make available to save functions that always lead back to index
     window.loadContent = loadContent;
@@ -765,7 +773,7 @@ $(document).ready(function () {
 
     body.on('mousedown', '.results [class*="-row"], table.results > tbody > tr', function (evt) {
         // cancel select toggle if target of click is also interactable
-        if (($(this).is('.selected') || $(evt.target).is('a'))
+        if ($(this).is('.selected')
             && $(evt.target).is('select, input, a, textarea, button, label.checkbox, label.radio, label.checkbox *, label.radio *, button *, .selectize-control, .selectize-control *')) {
             return;
         }
@@ -1008,7 +1016,7 @@ $(document).ready(function () {
     //body.on('mouseover click', '.results [class*="-row"]', resetHeader);
 
     body.on('loaded', '.panel-pane', function () {
-        $(this).find('.results:not(.loaded)').each(function () {
+        $(this).find('.results[data-request]:not(.loaded)').each(function () {
             var results = $(this);
             results.addClass('loaded');
             var request = results.data('request');

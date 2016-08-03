@@ -70,7 +70,6 @@ class StoreCest
         $pack = $I->grabTextFrom('//label[contains(.,"TestPack")]');
         $freePack = $I->grabFrom('StudySauceBundle:Pack', ['title' => $pack]);
         $coupon = new Coupon();
-        $coupon->setDescription('');
         $coupon->addPack($freePack);
         $coupon->setOptions(['ST' => ['price' => 0.0]]);
         $coupon->setName('Study Sauce ' . $freePack->getTitle());

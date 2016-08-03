@@ -102,8 +102,11 @@ class InviteListener implements EventSubscriberInterface
             }
             // redirect back to page with a fresh session
             /** @var TokenInterface $token */
-            elseif($request->get('_route') != 'account_create' && null !== ($token = $this->container->get('security.context')->getToken()) && is_object($user = $token->getUser()) &&
-                !$user->hasRole('ROLE_GUEST')) {
+            elseif(substr($request->get('_controller'), strlen('StudySauce\\Bundle\\Controllers\\LandingController')) == 'StudySauce\\Bundle\\Controllers\\LandingController'
+                && $request->get('_route') != 'account_create'
+                && null !== ($token = $this->container->get('security.context')->getToken())
+                && is_object($user = $token->getUser())
+                && !$user->hasRole('ROLE_GUEST')) {
                 // Already logged in as another user, logging user out.
                 $this->container->get('security.context')->setToken(null);
                 // Invalidating the session.

@@ -5,7 +5,7 @@ jQuery(document).ready(function() {
     function getHash()
     {
         var account = $(this);
-        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'pass', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
         var hash = '';
         for(var h in data) {
             if(data.hasOwnProperty(h)) {
@@ -22,7 +22,7 @@ jQuery(document).ready(function() {
 
     function accountFunc(evt) {
         var account = $(this).closest('.panel-pane');
-        var data = gatherFields.apply(account, [['first', 'last', 'email', 'password', '_code', 'childFirst', 'childLast', 'parent', 'year']]);
+        var data = gatherFields.apply(account, [['first', 'last', 'email', 'pass', '_code', 'childFirst', 'childLast', 'parent', 'year']]);
         if($(evt.target).is('.hasChild input, #register_child select')) {
             Cookies.set('hasChild', account.find('.hasChild input').is(':checked') ? 'true' : 'false');
             window.views.render.apply(account, [account.attr('id'), {context: account}]);
@@ -42,10 +42,10 @@ jQuery(document).ready(function() {
     });
 
     body.on('submit', '[id^="register"] form', function (evt) {
-        var account = $(this).parents('.panel-pane');
         evt.preventDefault();
+        var account = $(this).parents('.panel-pane');
         var hash = getHash.apply(this);
-        var data = gatherFields.apply($(this), [['first', 'last', 'email', 'password', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
+        var data = gatherFields.apply($(this), [['first', 'last', 'email', 'pass', 'csrf_token', '_code', '_remember_me', 'hasChild', 'childFirst', 'childLast']]);
         account.trigger('validate');
         if(account.find('.highlighted-link').is('.invalid')) {
             account.addClass('invalid has-error');

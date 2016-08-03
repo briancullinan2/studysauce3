@@ -55,8 +55,8 @@ class PacksController extends Controller
             $up = new UserPack();
             $up->setUser($user);
             $user->addUserPack($up);
-            $up->setPack($intro);
-            $intro->addUserPack($up);
+            $up->setPack($card->getPack());
+            $card->getPack()->addUserPack($up);
             $orm->persist($up);
             $userManager->updateUser($user);
         }

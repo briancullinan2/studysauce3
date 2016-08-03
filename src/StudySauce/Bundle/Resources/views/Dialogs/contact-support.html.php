@@ -8,12 +8,13 @@ $view->extend('AdminBundle:Admin:dialog.html.php');
 /** @var User $user */
 $user = $app->getUser();
 $isDemo = $user == 'anon.' || !is_object($user) || $user->hasRole('ROLE_GUEST') || $user->hasRole('ROLE_DEMO');
+if(!$isDemo) {
+    $user = $user->getParent();
+}
 
- $view['slots']->start('modal-header') ?>
-Contact us
-<?php $view['slots']->stop();
+$view['slots']->start('modal-header') ?>Contact us<?php $view['slots']->stop();
 
- $view['slots']->start('modal-body') ?>
+$view['slots']->start('modal-body') ?>
 <form action="<?php print $view['router']->generate('contact_send'); ?>" method="post">
     <p>If you have any questions at all, please contact us. &nbsp;We would love to hear from you! &nbsp;
         We want to help you to get the most out of your study time and your comments and feedback are important to us.</p>

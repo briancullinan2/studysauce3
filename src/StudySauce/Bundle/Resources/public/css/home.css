@@ -161,6 +161,7 @@
     background-size: cover;
     left: 10%;
     top: 50%;
+    padding-top:10px;
     margin-top: -10%;
 }
 
@@ -182,24 +183,36 @@
 
 @media all and (max-width: 700px) {
 
+
+    [id^="home"] {
+        height:auto;
+        min-height:100%;
+    }
+
     .user-shuffle {
-        top:50%;
+        position:static;
     }
 
     .user-shuffle .results {
         margin-left: 0;
-        margin-top: 0 !important;
+        margin-top: 100px !important;
+        top: 0 !important;
+        position:relative;
+        overflow:visible;
     }
 
     .user-shuffle header a[href^="/cards"] {
         position: absolute;
-        top: -100%;
+        bottom: 100%;
         text-align: center;
         left: 50%;
         margin-left: -20%;
         width: 40%;
         padding-bottom: 40%;
         margin-top: 20px;
+        top: auto;
+        margin-bottom: 40px;
+        height: auto;
     }
 
     .study-log {
@@ -207,9 +220,14 @@
     }
 
     [id^="home"] .pane-content {
-        top: 50px;
-        left: 5px;
-        right: 5px;
+        padding-top: 40%;
+        position: absolute;
+        min-height: 100%;
+        left: 0;
+        right: 0;
+        bottom: auto;
+        height: auto;
+        top: 0;
     }
 
     .study-mastery .pack-row .packMastery,

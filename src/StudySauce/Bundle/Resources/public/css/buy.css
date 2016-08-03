@@ -126,7 +126,7 @@
     width:70%;
 }
 
-[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] img {
+[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] i {
     left:20%;
 }
 
