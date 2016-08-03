@@ -250,6 +250,9 @@ class AdminController extends Controller
 
     private static function getWhereValue($search, $searchField, $field, $tableName)
     {
+        if($search == '_empty') {
+            return ['', '', ''];
+        }
         if (substr($search, 0, 1) == '!') {
             $search = substr($search, 1);
             if (is_bool($search) || $search === 'false' || $search === 'true') {
@@ -480,9 +483,6 @@ class AdminController extends Controller
                     $t = self::$defaultTables[explode('-', $t)[0]];
                 }
                 $tblList[$table] = $t;
-                if(!isset($searchRequest['cells'][$table])) {
-                    $searchRequest['cells'][$table] = array_keys($tblList[$table]);
-                }
             }
             $searchRequest['tables'] = $tblList;
 
@@ -502,6 +502,7 @@ class AdminController extends Controller
             $ext = implode('-', array_slice($tableParts, 1));
             $table = explode('-', $table)[0];
             $aliasedRequest = [];
+            $searchRequest['cells'][$table] = array_keys($searchRequest['tables'][$table]);
             if (strlen($ext) > 0) {
                 $ext = '-' . $ext;
                 $aliasLen = strlen($table) + strlen($ext);
@@ -511,6 +512,7 @@ class AdminController extends Controller
                     }
                 }
                 $aliasedRequest['tables'][$table] = $searchRequest['tables'][$table . $ext];
+                $searchRequest['cells'][$table] = array_keys($searchRequest['tables'][$table . $ext]);
             }
             $aliasedRequest = array_merge($searchRequest, $aliasedRequest);
             $vars['tables'][$table . $ext] = $aliasedRequest['tables'][$table];

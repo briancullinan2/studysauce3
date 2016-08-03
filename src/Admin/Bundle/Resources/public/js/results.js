@@ -439,7 +439,7 @@ $(document).ready(function () {
     function getDataRequest() {
         var admin = $(this).closest('.results');
         var request = admin.data('request');
-        var result = typeof request.requestKey == 'undefined' ? request : {requestKey: request.requestKey};
+        var result = typeof request.requestKey == 'undefined' ? request : {requestKey: request.requestKey, view: request.view};
         var dataTables = result['tables'];
         var tables = {};
         if (admin.find('.class-names').length > 0) {
@@ -1018,7 +1018,6 @@ $(document).ready(function () {
     body.on('loaded', '.panel-pane', function () {
         $(this).find('.results[data-request]:not(.loaded)').each(function () {
             var results = $(this);
-            results.addClass('loaded');
             var request = results.data('request');
             var resultsObj = window.setupRequest['setup' + request.requestKey]();
             results.data("results", resultsObj);

@@ -69,10 +69,10 @@ $view['slots']->start('body'); ?>
                         'read-only' => $isNew ? false : ['ss_group'],
                         'new' => $isNew,
                         // TODO: only search on joins when the prefix is correct?  instead of having to exclude these
-                        'parent-ss_group-deleted' => null,
-                        'subgroups-ss_group-deleted' => null,
-                        'parent-ss_group-id' => null,
-                        'subgroups-ss_group-id' => null,
+                        'parent-ss_group-deleted' => '_empty',
+                        'subgroups-ss_group-deleted' => '_empty',
+                        'parent-ss_group-id' => '_empty',
+                        'subgroups-ss_group-id' => '_empty',
                         'ss_group-id' => $entity->getId(),
                         'tables' => $tables,
                         'headers' => ['ss_group' => 'groupGroups'],
@@ -108,15 +108,13 @@ $view['slots']->start('body'); ?>
                             'headers' => ['ss_group' => 'newGroup'],
                             'footers' => ['ss_group' => 'newGroup']
                         ];
-
                     } else {
                         // TODO: check view setting
                         $tableViews = (array)(new stdClass());
                         $tableViews['Tiles'] = (array)(new stdClass());
-                        $tableViews['Tiles'] = [
-                            'tables' => $tiles,
-                            'classes' => ['tiles'],
-                        ];
+                        $tableViews['Tiles']['tables'] = $tiles;
+                        $tableViews['Tiles']['classes'] = ['tiles'];
+                        $tableViews['Tiles']['footers'] = ['ss_group' => 'newGroup'];
                         $tableViews['Membership'] = (array)(new stdClass());
                         $tableViews['Membership']['tables'] = (array)(new stdClass());
                         $tableViews['Membership']['tables']['file'] = AdminController::$defaultMiniTables['file'];
@@ -125,24 +123,25 @@ $view['slots']->start('body'); ?>
                         $tableViews['Membership']['tables']['ss_group-1'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'deleted'] /* search field but don't display a template */];
                         $tableViews['Membership']['tables']['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
                         $tableViews['Membership']['classes'] = ['last-right-expand'];
-                        $tableView = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
-                        $request = array_merge($tableView, [
-                            'ss_group-1headers' => ['ss_group' => 'subGroups'],
-                            'ss_group-1footers' => false,
-                            'ss_group-1ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
-                            'parent-ss_group-id' => !empty($entity->getId()) ? $entity->getId() : '0',
-                            'count-file' => -1,
-                            'count-ss_user' => -1,
-                            'count-pack' => -1,
-                            'new' => $isNew,
-                            'count-ss_group' => $isNew ? -1 : 0,
-                            'ss_group-deleted' => $entity->getDeleted(),
-                            'edit' => false,
-                            'read-only' => false,
-                            'headers' => false,
-                            'footers' => ['ss_group' => 'groupCount'],
-                            'views' => $tableViews
-                        ]);
+                        $tableViews['Membership']['footers'] = ['ss_group' => 'groupCount'];
+                        $request = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
+                        $request['ss_group-1headers'] = ['ss_group' => 'subGroups'];
+                        $request['ss_group-1footers'] = false;
+                        $request['ss_group-1ss_group-id'] = !empty($entity->getId()) ? $entity->getId() : '0';
+                        $request['parent-ss_group-id'] = !empty($entity->getId()) ? $entity->getId() : '0';
+                        $request['subgroups-ss_group-id'] = '_empty';
+                        $request['subgroups-ss_group-deleted'] = '_empty';
+                        $request['count-file'] = -1;
+                        $request['count-ss_user'] = -1;
+                        $request['count-pack'] = -1;
+                        $request['new'] = $isNew;
+                        $request['count-ss_group'] = $isNew ? -1 : 0;
+                        $request['ss_group-deleted'] = $entity->getDeleted();
+                        $request['edit'] = false;
+                        $request['read-only'] = false;
+                        $request['headers'] = false;
+                        $request['footers'] = ['ss_group' => 'groupCount'];
+                        $request['views'] = $tableViews;
                     }
                     if($tab->length == 0) {
                         print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));

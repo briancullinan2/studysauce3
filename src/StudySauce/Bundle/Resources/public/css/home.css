@@ -175,7 +175,8 @@
 }
 
 @media all and (min-width: 700px) {
-    .user-shuffle .results {
+    .user-shuffle .results header,
+    .user-shuffle .results .pack-row {
         font-size:140%;
         line-height: 140%;
     }

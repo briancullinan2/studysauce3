@@ -25,9 +25,12 @@ if($resultOutput->length == 0) {
     $resultOutput = $context->append('<div class="results"></div>')->find('.results');
 }
 $resultOutput->data('request', $request)->attr('data-request', json_encode($request))
-    ->addClass(isset($request['classes']) && is_array($request['classes'])
+    ->attr('class', implode(' ', ['results', isset($request['classes']) && is_array($request['classes'])
         ? implode(' ', $request['classes'])
-        : '');
+        : '']));
+if(!$isFresh) {
+    $resultOutput->addClass('loaded');
+}
 
 // update group listing with every results request
 //if(isset($resultsJSON)) {
@@ -59,7 +62,7 @@ else {
 //    print ($view->render('AdminBundle:Admin:header-search.html.php', array_merge($subVars, ['tables' => $tables])));
 //}
 
-if($app->getUser()->getEmailCanonical() == 'brian@studysauce.com') {
+if($app->getUser()->hasRole('ROLE_ADMIN')) {
     $view['slots']->start('view-settings');
     if(!empty($request['views'])) { ?><div class="views"><ul><?php
         foreach($request['views'] as $v => $extend) {

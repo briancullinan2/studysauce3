@@ -101,7 +101,7 @@ $view['slots']->start('body'); ?>
                         // search settings
                         'pack-id' => $isNew ? '0' : $entity->getId(),
                         'pack-status' => $entity->getDeleted() ? 'DELETED' : '!DELETED',
-                        'parent-ss_group-deleted' => null,
+                        'parent-ss_group-deleted' => '_empty',
                         'ss_group-deleted' => false,
                         'count-ss_group' => $isNew ? -1 : 0,
                         'count-pack' => $isNew ? -1 : 1,
@@ -170,7 +170,7 @@ $view['slots']->start('body'); ?>
                         $request = [
                             'tables' => $tiles,
                             'ss_user-id' => $user->getId(),
-                            'ss_group-deleted' => null,
+                            'ss_group-deleted' => '_empty',
                             'count-ss_group' => 0,
                             'count-pack' => -1,
                             'count-user_pack' => -1,

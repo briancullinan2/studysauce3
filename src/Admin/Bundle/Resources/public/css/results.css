@@ -560,15 +560,15 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
 
 .results > .views {
     position:fixed;
-    display:none;
-    opacity: .3;
+    left:-1000px;
+    opacity: .2;
     z-index: 1000;
     overflow: visible;
-    left:0;
     top:40px;
     min-height:42px;
     padding:0;
     margin:0;
+    transition: opacity ease-in-out .15s, left steps(1) 2s;
 }
 
 .results > .views ul {
@@ -579,16 +579,19 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     left:0;
     padding-top:17% !important;
     width:100px;
-    height:100%;
+    height:auto;
     top:0;
     bottom:0;
     overflow: hidden;
     text-align: left;
 }
 
-.results > .views:hover {
+.results > .views:hover,
+.results:hover > .views {
+    left:0;
     opacity: 1;
     z-index:1010;
+    transition: opacity ease-in-out .15s, left ease-in-out .15s;
 }
 
 .results > .views:hover ul {
@@ -600,10 +603,6 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     margin: 0;
     list-style: none;
     min-width: 100px;
-}
-
-.results:hover .views {
-    display:inline-block;
 }
 
 .results > .views li a {

@@ -99,9 +99,9 @@ foreach($invites as $i) {
 
         if($app->getRequest()->get('_format') != 'funnel') { ?>
             <div id="welcome-message">
-                <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN') && $user->getEmail() == 'brian@studysauce.com') { ?>
+                <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
                     <ul class="main-menu">
-                        <li><a href="https://testing.studysauce.com/"><span>&nbsp;</span>Testing</a></li>
+                        <li><a href="https://test.studysauce.com/"><span>&nbsp;</span>Testing</a></li>
                         <li><a href="https://staging.studysauce.com/"><span>&nbsp;</span>Staging</a></li>
                         <li><a href="https://cerebro.studysauce.com/"><span>&nbsp;</span>Cerebro</a></li>
                     </ul>
