@@ -512,7 +512,7 @@ class AdminController extends Controller
                     }
                 }
                 $aliasedRequest['tables'][$table] = $searchRequest['tables'][$table . $ext];
-                $searchRequest['cells'][$table] = array_keys($searchRequest['tables'][$table . $ext]);
+                $searchRequest['cells'][$table . $ext] = array_keys($searchRequest['tables'][$table . $ext]);
             }
             $aliasedRequest = array_merge($searchRequest, $aliasedRequest);
             $vars['tables'][$table . $ext] = $aliasedRequest['tables'][$table];
