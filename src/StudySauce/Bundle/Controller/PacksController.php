@@ -407,7 +407,10 @@ class PacksController extends Controller
         }
         else {
             $packs = array_values(array_filter($packs, function (Pack $p) use ($user, $currentUser, $request) {return in_array($user, $p->getChildUsers($currentUser));}));
-            $retention = array_values(array_map(function (Pack $p) use ($user, $changedPacks) {return ['id' => $p->getId(), 'retention' => $user->getUserPack($p)->getRetention(in_array($p->getId(), $changedPacks))];}, $packs));
+            $retention = array_values(array_map(function (Pack $p) use ($user, $changedPacks) {
+                $forceRefresh = in_array($p->getId(), $changedPacks);
+                return ['id' => $p->getId(), 'retention' => $user->getUserPack($p)->getRetention($forceRefresh)];
+            }, $packs));
         }
 
         $ids = array_map(function ($r) {

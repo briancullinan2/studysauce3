@@ -3,6 +3,8 @@ imports:
 
 parameters:
     defer_all_emails: "studymarketing@mailinator.com"
+    stripe_api_key: "sk_test_e6FayAX25zDIq2O17blocj2h"
+    stripe_public_key: "pk_test_th5VY2bxRUDSJZ1xCcpJ7CNB"
 
 
 doctrine:
