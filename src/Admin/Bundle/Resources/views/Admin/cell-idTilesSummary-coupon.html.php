@@ -106,7 +106,7 @@ foreach($coupon->getPacks()->toArray() as $p) {
         if(!empty($coupon->getOptions())) {
             foreach ($coupon->getOptions() as $o) {
                 if (empty($o['description'])) {
-                    $price = $o['price'] > 0 ? implode('', ['&#36;' , number_format($o['price'], 2)]) : 'FREE';
+                    $price = $o['price'] > 0 ? implode('', ['&#36;' , number_format($o['price'], 2)]) : 'Free';
                     if(!empty($request['inCartOnly'])) { ?>
                         <a href="#remove-coupon">Remove</a>&nbsp;&nbsp;&nbsp;<h3><strong><?php print ($price); ?></strong></h3>
                     <?php }
