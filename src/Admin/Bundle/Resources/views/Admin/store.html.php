@@ -100,7 +100,7 @@ if($tab->length == 0) {
                 $request['read-only'] = false;
                 $request['tables'] = (array)(new stdClass());
                 $request['tables']['file'] = ['id', 'url'];
-                $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs', 'options']];
+                $request['tables']['coupon'] = ['idTilesSummary' => ['id', 'name', 'description', 'packs', 'options', 'cardCount']];
                 $request['tables']['ss_group'] = ['id', 'name', 'users', 'deleted'];
                 $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                 $request['tables']['user_pack'] = ['pack', 'removed', 'downloaded'];

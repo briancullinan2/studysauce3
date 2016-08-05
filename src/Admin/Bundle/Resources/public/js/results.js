@@ -328,6 +328,8 @@ window.views.__defaultEntities['payment'] = {
 };
 window.views.__defaultEntities['coupon'] = {
     packs: $([]),
+    cardCount: 0,
+    getCardCount: function () {return this.cardCount},
     getId: function () {return this.id;},
     getName: function () {return this.name;},
     getOptions: function () {return this.options;},

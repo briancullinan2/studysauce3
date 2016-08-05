@@ -90,17 +90,7 @@ foreach($coupon->getPacks()->toArray() as $p) {
 
     /** @var User|Group $ss_group */
 
-    $cardCount = 0;
-    foreach($coupon->getPacks()->toArray() as $p) {
-        /** @var Pack $p */
-        foreach($p->getCards()->toArray() as $c) {
-            /** @var Card $c */
-            if(!$c->getDeleted()) {
-                $cardCount += 1;
-            }
-        }
-    }
-
+    $cardCount = $coupon->getCardCount();
     ?>
     <label class="highlighted-link"><?php
         if(!empty($coupon->getOptions())) {

@@ -124,7 +124,7 @@ $view['slots']->start('body'); ?>
                         $tableViews['Membership']['tables']['ss_group'] = ['0' => 'id', 'title' => ['logo', 'name', 'description'], 'expandMembers' => ['users', 'groupPacks', 'parent'], 'actions' => ['deleted'] /* search field but don't display a template */];
                         $tableViews['Membership']['classes'] = ['last-right-expand'];
                         $tableViews['Membership']['footers'] = ['ss_group' => 'groupCount'];
-                        $request = $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles'];
+                        $request = array_merge([], $tableViews[empty($app->getRequest()->get('view')) || $app->getRequest()->get('view') != 'Tiles' ? 'Membership' : 'Tiles']);
                         $request['ss_group-1headers'] = ['ss_group' => 'subGroups'];
                         $request['ss_group-1footers'] = false;
                         $request['ss_group-1ss_group-id'] = !empty($entity->getId()) ? $entity->getId() : '0';

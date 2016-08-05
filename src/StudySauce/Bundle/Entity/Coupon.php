@@ -91,6 +91,20 @@ class Coupon
         $this->created = new \DateTime();
     }
 
+    public function getCardCount() {
+        $cardCount = 0;
+        foreach($this->getPacks()->toArray() as $p) {
+            /** @var Pack $p */
+            foreach($p->getCards()->toArray() as $c) {
+                /** @var Card $c */
+                if(!$c->getDeleted()) {
+                    $cardCount += 1;
+                }
+            }
+        }
+        return $cardCount;
+    }
+
     public function getLogo()
     {
         if(!empty($this->getGroup()) && !empty($this->getGroup()->getLogo())) {
