@@ -205,6 +205,9 @@ class RedirectListener implements EventSubscriberInterface
                 'code' => $response->getStatusCode()];
             if(!empty($error = AccountController::getErrorForRequest($request))) {
                 $options['exception'] = $error->getMessage();
+                if(!empty($error->getPrevious())) {
+                    $options['exception'] .= '  ' . $error->getPrevious()->getMessage();
+                }
             }
             // repopulate the csrf token for login failures
             try {

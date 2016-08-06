@@ -61,6 +61,7 @@ class StoreCest
     }
 
     public function tryCreateProductListing(AcceptanceTester $I) {
+        $last = substr(md5(microtime()), -5);
         /** @var Pack $freePack */
         $I->seeAmOnPage('/packs');
         if(!$I->seePageHas('TestPack')) {
@@ -72,7 +73,8 @@ class StoreCest
         $coupon = new Coupon();
         $coupon->addPack($freePack);
         $coupon->setOptions(['ST' => ['price' => 0.0]]);
-        $coupon->setName('Study Sauce ' . $freePack->getTitle());
+        $coupon->setDescription('Study Sauce ' . $freePack->getTitle());
+        $coupon->setName('StudyTest' . $last);
         $I->persistEntity($coupon);
         $I->flushToDatabase();
     }

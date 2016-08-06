@@ -62,7 +62,7 @@ else {
                 $request['count-invite'] = 1;
                 $request['count-ss_user'] = -1;
                 $request['invite-1count-invite'] = 0;
-                $request['invite-1new'] = [];
+                $request['invite-1new'] = false;
                 $request['invite-1invite-properties'] = 's:13:"public_school";b:1;';
                 $request['invite-1ss_group-id'] = '!NULL';
                 $request['invite-1ss_group-deleted'] = '!1';
