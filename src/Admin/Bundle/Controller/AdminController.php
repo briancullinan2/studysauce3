@@ -1244,7 +1244,7 @@ var implode = function (sep, arr) {return (arr || []).join(sep);};
 var preg_replace = function (needle, replacement, subject) {
     return (subject || '').replace(new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g'), replacement);
 };
-var number_format = function (num, digits) { return num.toFixed(digits);};
+var number_format = function (num, digits) { return parseFloat(num).toFixed(digits);};
 var preg_match = function (needle, subject, matches) {
     var result = (new RegExp(needle.split('/').slice(1, -1).join('/'), needle.split('/').slice(-1)[0] + 'g')).exec(subject);
     if(result == null) {
