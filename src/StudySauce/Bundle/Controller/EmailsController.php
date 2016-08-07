@@ -277,7 +277,7 @@ class EmailsController extends Controller
      * @param $address
      * @return Response
      */
-    public function invoiceAction(User $user = null, Payment $payment, $address)
+    public function invoiceAction(User $user = null, Payment $payment)
     {
         /** @var $user User */
         if(empty($user))
@@ -292,7 +292,6 @@ class EmailsController extends Controller
             ->setTo($user->getEmail())
             ->setBody($this->renderView('StudySauceBundle:Emails:invoice.html.php', [
                         'user' => $user,
-                        'address' => $address,
                         'payment' => $payment,
                         'greeting' => 'Hello ' . $user->getFirst() . ' ' . $user->getLast() . ',',
                         'link' => '<a href="' . $codeUrl . '" style="color: #FF9900;">Go to Study Sauce</a>'

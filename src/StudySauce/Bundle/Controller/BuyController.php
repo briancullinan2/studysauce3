@@ -220,18 +220,23 @@ class BuyController extends Controller
 
         // Create the charge on Stripe's servers - this will charge the user's card
         if($price > 0) {
-            Stripe::setApiKey($this->container->getParameter('stripe_api_key'));
-            try {
-                $charge = Charge::create(array(
-                    "amount" => round($price * 100), // amount in cents, again
-                    "currency" => "usd",
-                    "source" => $request->get('purchase_token'),
-                    "description" => "Pack Bundle"
-                ));
+            if(is_numeric($request->get('purchase_token'))) {
                 $payment->setPayment($request->get('purchase_token'));
-            } catch(\Stripe\Error\Card $e) {
-                // The card has been declined
-                throw new BadRequestHttpException($e->getMessage(), $e);
+            }
+            else {
+                Stripe::setApiKey($this->container->getParameter('stripe_api_key'));
+                try {
+                    $charge = Charge::create(array(
+                        "amount" => round($price * 100), // amount in cents, again
+                        "currency" => "usd",
+                        "source" => $request->get('purchase_token'),
+                        "description" => "Pack Bundle"
+                    ));
+                    $payment->setPayment($request->get('purchase_token'));
+                } catch (\Stripe\Error\Card $e) {
+                    // The card has been declined
+                    throw new BadRequestHttpException($e->getMessage(), $e);
+                }
             }
         }
 
@@ -285,15 +290,9 @@ class BuyController extends Controller
         $cookie = new Cookie('cart', '');
         $response->headers->setCookie($cookie);
 
-        // send email receipt
-        $address = $request->get('street1') .
-            (empty(trim($request->get('street2'))) ? '' : ("<br />" . $request->get('street2'))) . '<br />' .
-            $request->get('city') . ' ' . $request->get('state') . '<br />' .
-            $request->get('zip');
-
         $emails = new EmailsController();
         $emails->setContainer($this->container);
-        $emails->invoiceAction($user, $payment, $address);
+        $emails->invoiceAction($user, $payment);
 
         $loginManager = $this->get('fos_user.security.login_manager');
         $loginManager->loginUser('main', $user, $response);
