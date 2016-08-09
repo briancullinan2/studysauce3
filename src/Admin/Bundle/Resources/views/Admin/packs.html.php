@@ -132,7 +132,7 @@ $view['slots']->start('body'); ?>
                     }
                     $tables = (array)(new stdClass());
                     $tables['pack'] = ['id' => ['id']];
-                    $tables['card'] = ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], '0' => ['pack'], 'actions' => ['deleted']];
+                    $tables['card'] = ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], '0' => ['pack'], 'actions' => ['deleted', 'remove']];
                     $tables['answer'] = ['id' => ['value', 'deleted', 'correct', 'content', 'id']];
                     $request = [
                         // view settings

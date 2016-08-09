@@ -129,6 +129,10 @@ class Card
         }
     }
 
+    public function setRemove($remove) {
+        $this->setDeleted($remove == 'true');
+    }
+
     public function setUpload($newUrl) {
         $content = $this->content;
         $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
