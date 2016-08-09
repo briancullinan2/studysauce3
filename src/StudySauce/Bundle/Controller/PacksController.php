@@ -178,7 +178,7 @@ class PacksController extends Controller
                     $searchRequest['count-card'] = 5;
                 }
                 $searchRequest['edit'] = false;
-                $searchRequest['pack-id'] = $newPack->getId();
+                $searchRequest['pack-id'] = $p->getId();
                 $searchRequest['requestKey'] = null;
             }
         }
