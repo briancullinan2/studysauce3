@@ -135,7 +135,7 @@ jQuery(document).ready(function($) {
         account.find('.coupon-row').each(function () {
             var couponData = gatherFields.apply(account, [['child', 'coupon']]);
             data.coupon += (data.coupon != '' ? ',' : '') + couponData.coupon;
-            data.child[couponData.child] = couponData.coupon;
+            data.child[couponData.coupon] = couponData.child;
         });
         standardSave.apply(this, [data, function () {
             Cookies.set('cart', '');
