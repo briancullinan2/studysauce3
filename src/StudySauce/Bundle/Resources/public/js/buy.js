@@ -150,6 +150,10 @@ jQuery(document).ready(function($) {
 
     }
 
+    body.on('show', '#thanks', function () {
+        $('<li><a href="' + Routing.generate('/packs') + '" class="active"><span>&nbsp;</span>Packs</a></li>').insertAfter($('.heading a[href*="/home"]').parent());
+    });
+
     body.on('validate', '[id^="checkout"]', checkoutFunc);
     body.on('change keyup keydown', '[id^="checkout"] input, [id^="checkout"] select, [id^="checkout"] textarea', standardChangeHandler);
 

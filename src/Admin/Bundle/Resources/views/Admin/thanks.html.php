@@ -28,7 +28,7 @@ if($tab->length == 0) {
         <div class="pane-content clearfix">
             <h1>Thank you for your purchase</h1>
 
-            <h2>We have added the new study packs to your account. Please feel free to contact us if you have any questions. Thank you.</h2>
+            <h2>We have added the new study material to your account. Please feel free to contact us if you have any questions. Thank you.</h2>
             <div class="highlighted-link">
                 <a href="<?php print ($view['router']->generate('home')); ?>" class="more">Go home</a>
                 <br />

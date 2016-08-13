@@ -95,7 +95,7 @@ AdminController::sortByFields($packs, ['title']);
             || $ss_group->getId() != $request['parent-ss_group-id'])) {
             print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
                 'tables' => ['pack' => AdminController::$defaultMiniTables['pack']],
-                'headers' => ['pack' => 'Study Packs'],
+                'headers' => ['pack' => 'Study material'],
                 'entities' => $packs,
                 'entityIds' => $packIds,
                 'fieldName' => 'ss_group[packs]']));

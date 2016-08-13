@@ -10,7 +10,7 @@ Thank you for signing <?php print (!empty($child) ? $child : ''); ?> up for Stud
 
 <?php if (!empty($group)) { ?>
 <p style="font-family: 'Ubuntu',Helvetica Neue,Arial,sans-serif; font-size: 16px; color: #555555; ">
-    We are working closely with <?php print (!empty($group) ? $group : ''); ?> to help <?php print (!empty($child) ? $child : 'your child'); ?> remember more of what is being learned.  <?php print (!empty($group) ? $group : ''); ?> will be adding new study packs over time as <?php print (!empty($child) ? $child : 'your child'); ?> covers more material.<br />
+    We are working closely with <?php print (!empty($group) ? $group : ''); ?> to help <?php print (!empty($child) ? $child : 'your child'); ?> remember more of what is being learned.  <?php print (!empty($group) ? $group : ''); ?> will be adding new study material over time as <?php print (!empty($child) ? $child : 'your child'); ?> covers more material.<br />
     <br />
 </p>
 <?php } ?>

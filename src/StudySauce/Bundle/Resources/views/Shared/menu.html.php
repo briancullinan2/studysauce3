@@ -61,7 +61,10 @@ if(!empty($token)) {
              ?>
             <li><h3></h3></li>
             <li><a href="<?php print ($view['router']->generate('register_child')); ?>"><span>&nbsp;</span>Add Child</a></li>
-            <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Account settings</a></li>
+            <?php
+            if ($user->getParent()->getId() == $user->getId()) { ?>
+                <li><a href="<?php print ($view['router']->generate('account')); ?>"><span>&nbsp;</span>Account settings</a></li>
+            <?php } ?>
             <li><a href="<?php print ($view['router']->generate('logout')); ?>"><span>&nbsp;</span>Logout</a></li>
         </ul>
     </nav>
