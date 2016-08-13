@@ -47,16 +47,20 @@ jQuery(document).ready(function() {
     body.on('click', '#account a[href="#edit-account"]', function (evt) {
         var account = jQuery('#account');
         evt.preventDefault();
-        account.find('.ss_user-row').removeClass('read-only').addClass('edit');
-        account.find('.new-password, .confirm-password').css('visibility', 'hidden');
+        account.find('.ss_user-row').removeClass('read-only edit-pass').addClass('edit');
         accountFunc.apply(account.find('.results'));
     });
 
     body.on('click', '#account a[href="#edit-password"]', function (evt) {
         var account = jQuery('#account');
         evt.preventDefault();
-        account.find('.new-password, .confirm-password').css('visibility', 'visible');
+        account.find('.ss_user-row').addClass('edit-pass');
         accountFunc.apply(account.find('.results'));
+    });
+
+    body.on('click', '#account a[href="#cancel-edit"]', function (evt) {
+        var account = jQuery('#account');
+        account.find('.ss_user-row').removeClass('edit-pass');
     });
 
     body.on('click', '#cancel-confirm a[href="#cancel-account"]', function (evt) {
@@ -130,9 +134,8 @@ jQuery(document).ready(function() {
             if(typeof data.error != 'undefined') {
                 account.find('.form-actions').prepend($('<span class="error">' + data.error + '</span>'));
             }
-            account.find('.ss_user-row, .invite-row').removeClass('edit').addClass('read-only');
+            account.find('.ss_user-row, .invite-row').removeClass('edit edit-pass').addClass('read-only');
             account.find('.pass input, .new-password input, .confirm-password input').val('');
-            account.find('.new-password, .confirm-password').css('visibility', 'hidden');
         }]);
     }
 

@@ -511,7 +511,7 @@ function gatherFields(fields, visibleOnly) {
         }
     }
     for(var i = 0; i < formFields.length; i++) {
-        if(fields.indexOf(formFields[i].name.split(/[-\[]/ig)[0]) > -1 &&
+        if((fields.indexOf(formFields[i].name) > -1 || fields.indexOf(formFields[i].name.split(/[-\[]/ig)[0]) > -1) &&
             (!visibleOnly || form.find(fieldMatch(fields[f])).filter(':visible').length > 0)) {
             assignSubKey(result, formFields[i].name, formFields[i].value);
         }

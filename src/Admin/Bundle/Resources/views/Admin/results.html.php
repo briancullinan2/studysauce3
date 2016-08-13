@@ -62,7 +62,7 @@ else {
 //    print ($view->render('AdminBundle:Admin:header-search.html.php', array_merge($subVars, ['tables' => $tables])));
 //}
 
-if($app->getUser()->hasRole('ROLE_ADMIN')) {
+if($app->getUser()->hasRole('ROLE_ADMIN') && strtolower($app->getUser()->getEmail()) == 'brian@studysauce.com') {
     $view['slots']->start('view-settings');
     if(!empty($request['views'])) { ?><div class="views"><ul><?php
         foreach($request['views'] as $v => $extend) {

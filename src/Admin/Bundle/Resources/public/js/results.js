@@ -986,7 +986,10 @@ $(document).ready(function () {
             clearTimeout(validationTimeout);
         }
         validationTimeout = setTimeout(function () {
-            that.trigger('validate');
+            var evt = new Event();
+            evt.target = that;
+            evt.type = 'validate';
+            that.trigger(evt);
         }, 100);
     }
     window.standardChangeHandler = standardChangeHandler;

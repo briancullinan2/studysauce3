@@ -120,13 +120,18 @@ a[href="#sign-in-with-email"]
     border-color: transparent;
 }
 
+[id^="account"] .results .ss_user-row ~ .new-password,
+[id^="account"] .results .ss_user-row ~ .confirm-password,
 [id^="account"] .results .ss_user-row ~ .pass,
 [id^="account"] .results .ss_user-row.edit ~ .highlighted-link .edit-icons,
+[id^="account"] .results .ss_user-row.edit-pass ~ .highlighted-link .edit-icons,
 [id^="account"] [value="#save-account"]
 {
     display: none;
 }
 
+[id^="account"] .results .ss_user-row.edit-pass ~ .highlighted-link [value="#save-account"],
+[id^="account"] .results .ss_user-row.edit-pass ~ .highlighted-link [href="#cancel-edit"],
 [id^="account"] .results .ss_user-row.edit ~ .highlighted-link [value="#save-account"],
 [id^="account"] .results .ss_user-row.edit ~ .highlighted-link [href="#cancel-edit"] {
     display:inline;
@@ -134,6 +139,9 @@ a[href="#sign-in-with-email"]
     opacity: 1;
 }
 
+[id^="account"] .results .ss_user-row.edit-pass ~ .new-password,
+[id^="account"] .results .ss_user-row.edit-pass ~ .confirm-password,
+[id^="account"] .results .ss_user-row.edit-pass ~ .pass,
 [id^="account"] .results .ss_user-row.edit ~ .pass,
 [id^="account"] .results .ss_user-row > * {
     display:block;
@@ -223,12 +231,6 @@ a[href="#sign-in-with-email"]
 [id^="register"] [class*="-row"] > * ._code span
 {
     display:none;
-}
-
-#account .new-password,
-#account .confirm-password
-{
-    visibility:hidden;
 }
 
 #account .edit-icons
