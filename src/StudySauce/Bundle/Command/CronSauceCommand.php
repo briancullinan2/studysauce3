@@ -143,7 +143,7 @@ EOF
         /** @var $orm EntityManager */
         $orm = $this->getContainer()->get('doctrine')->getManager();
 
-        $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
+        /*$users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
             ->select(['u', 'ups', 'inv', 'invu'])
             ->where('u.devices IS NOT NULL AND u.devices != \'\'')
             ->leftJoin('u.userPacks', 'ups')
@@ -151,6 +151,10 @@ EOF
             ->leftJoin('inv.user', 'invu')
             // don't send to child accounts unless they have set their own email address
             ->andWhere('invu.email IS NULL OR u.email LIKE concat(invu.email, \'_%\')')
+            ->setMaxResults(1)
+            ->getQuery()->getResult();*/
+        $users = $orm->getRepository('StudySauceBundle:User')->createQueryBuilder('u')
+            ->where('u.devices IS NOT NULL AND u.devices != \'\'')
             ->getQuery()->getResult();
 
         $emails = new EmailsController();

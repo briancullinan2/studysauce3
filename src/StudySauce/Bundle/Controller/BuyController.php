@@ -301,7 +301,7 @@ class BuyController extends Controller
 
     public function purchaseAction() {
         // TODO: response to web-hook
-        return new Response('');
+        return new Response('true');
     }
 
     /**

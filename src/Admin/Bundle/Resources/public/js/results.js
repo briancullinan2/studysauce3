@@ -491,7 +491,7 @@ $(document).ready(function () {
     window.addResultRow = addResultRow;
 
     function getTab(readonly) {
-        return $(this).closest('.panel-pane').find('.results');
+        return $(this).closest('.panel-pane').find('.results').filter('[data-request]');
     }
     window.getTab = getTab;
 
@@ -500,7 +500,7 @@ $(document).ready(function () {
         var field = $(this);
         var tab = getTab.apply(field);
         var tabId = getTabId.apply(tab);
-        var fieldTab = field.closest('.results').first();
+        var fieldTab = field.closest('.results[data-request]').first();
 
         var saveButton = fieldTab.find('.highlighted-link a[href^="#save-"]').first();
         if (saveButton.is('.read-only > *, [disabled], .invalid, .invalid > *') || isLoading) {
@@ -946,7 +946,7 @@ $(document).ready(function () {
     });
 
     // footer save
-    body.on('click', '.form-actions a[href^="#save-"], .form-actions [value^="save-"]', function (evt) {
+    body.on('click', '.form-actions a[href^="#save-"], .form-actions [value^="save-"], [class*="-row"] [value^="#save-"]', function (evt) {
         evt.preventDefault();
         var tab = getTab.apply(this);
         //if (autoSaveTimeout != null) {
