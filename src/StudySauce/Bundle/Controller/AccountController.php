@@ -74,6 +74,8 @@ class AccountController extends Controller
      */
     public function updateAction(Request $request)
     {
+        /** @var $orm EntityManager */
+        $orm = $this->get('doctrine')->getManager();
         /** @var $userManager UserManager */
         $userManager = $this->get('fos_user.user_manager');
         //** @var $orm EntityManager */
@@ -83,6 +85,7 @@ class AccountController extends Controller
         if (empty($user)) {
             throw new AccessDeniedHttpException('Not logged in');
         }
+        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
 
         // update notification token
         if(!empty($request->get('device'))) {
@@ -120,6 +123,19 @@ class AccountController extends Controller
             }
         }
 
+        if(!empty($request->get('childId'))) {
+            foreach($user->getInvites()->toArray() as $i) {
+                /** @var Invite $i */
+                if(!empty($i->getInvitee()) && $i->getInvitee()->getId() == intval($request->get('childId'))) {
+                    $i->getInvitee()->setFirst($request->get('childFirst'));
+                    $i->getInvitee()->setLast($request->get('childLast'));
+                    InviteListener::setInviteRelationship($orm, $request, $i->getInvitee());
+                    $userManager->updateUser($i->getInvitee());
+                }
+            }
+        }
+
+        return $this->forward('AdminBundle:Admin:results', $searchRequest);
         return new JsonResponse(['csrf_token' => $this->has('form.csrf_provider')
             ? $this->get('form.csrf_provider')->generateCsrfToken('account_update')
             : null]);

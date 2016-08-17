@@ -111,10 +111,10 @@ jQuery(document).ready(function() {
     function submitAccount(evt)
     {
         evt.preventDefault();
-        var account = $(this).parents('.panel-pane');
+        var account = $(this).closest('.panel-pane');
         var hash = getHash();
         var data = gatherFields.apply($(this), [['first', 'last', 'email', 'pass', 'csrf_token', 'new-password', '_remember_me', 'confirm-password', '_code', 'childFirst', 'childLast']]);
-
+        account.trigger('validate');
         if(account.find('.highlighted-link').is('.invalid')) {
             account.addClass('invalid has-error');
         }

@@ -978,15 +978,7 @@ class EmailsController extends Controller
 
         /** @var $orm EntityManager */
         if(is_object($properties)) {
-            if($properties instanceof HttpExceptionInterface) {
-                $subject = 'HTTP Error: ' . $properties->getStatusCode();
-            }
-            elseif ($properties instanceof \Exception) {
-                $subject = 'Error: ' . get_class($properties);
-            }
-            else {
-                $subject = 'Message Type: ' . get_class($properties);
-            }
+            $subject = 'Message Type: ' . get_class($properties);
         }
         elseif($this->get('request')->get('_controller') == 'StudySauceBundle:Plan:widget') {
             $subject = 'Study plan overlap: ' . $properties['student'];
@@ -995,15 +987,28 @@ class EmailsController extends Controller
             $subject = 'Message from ' . $this->get('request')->get('_controller');
         }
 
+        if(is_array($properties) && isset($properties['exception']->xdebug_message)) {
+            unset($properties['exception']->xdebug_message);
+            if(isset($properties['exception']->getPrevious()->xdebug_message)) {
+                unset($properties['exception']->getPrevious()->xdebug_message);
+            }
+        }
+        if($properties['exception'] instanceof HttpExceptionInterface) {
+            $subject = 'HTTP Error: ' . $properties['exception']->getStatusCode();
+        }
+        elseif ($properties['exception'] instanceof \Exception) {
+            $subject = 'Error: ' . get_class($properties['exception']);
+        }
+
         /** @var \Swift_Mime_SimpleMessage $message */
         $message = Swift_Message::newInstance()
-            ->setSubject($subject)
+            ->setSubject($subject . (!empty($user) ? (': ' . $user->getFirst() . ' ' . $user->getLast() . ' (' . $user->getEmail() . ')') : ''))
             ->setFrom(!empty($user) ? $user->getEmail() : 'guest@studysauce.com')
             ->setTo('brian@studysauce.com')
             ->setBody($this->renderView('StudySauceBundle:Emails:administrator.html.php', [
                         'link' => '&nbsp;',
                         'user' => $user,
-                        'properties' => self::dump($properties, $properties instanceof \Exception ? 3 : 2)
+                        'properties' => self::dump($properties, isset($properties['exception']) ? 4 : 2)
                     ]), 'text/html' );
         $headers = $message->getHeaders();
         $headers->addParameterizedHeader('X-SMTPAPI', preg_replace('/(.{1,72})(\s)/i', "\1\n   ", json_encode([

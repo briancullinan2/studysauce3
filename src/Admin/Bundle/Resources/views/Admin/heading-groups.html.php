@@ -1,4 +1,4 @@
-<label class="input">
+<label class="input select">
     <select name="ss_group-id">
         <option value="">Group</option>
         <option value="_ascending">Ascending (A-Z)</option>

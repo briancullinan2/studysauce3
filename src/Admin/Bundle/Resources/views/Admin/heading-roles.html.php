@@ -1,4 +1,4 @@
-<label class="input">
+<label class="input select">
     <select name="roles">
         <option value="">Role</option>
         <option value="_ascending">Ascending (A-Z)</option>

@@ -1070,6 +1070,36 @@ textarea
     opacity: 0;
 }
 
+
+.input.select {
+    position:relative;
+}
+
+.input.select select {
+    border-color:transparent;
+    background-color:transparent;
+}
+
+.input.select:before {
+    content: " ";
+    display:block;
+    position:absolute;
+    z-index: -1;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    border:1px solid #BBB;
+    background-color: #FFF;
+}
+
+.read-only.input.select:before,
+.read-only .input.select:before
+{
+    border-color:transparent;
+    background-color:transparent;
+}
+
 .player-wrapper {
     width: 100%;
     display: block;

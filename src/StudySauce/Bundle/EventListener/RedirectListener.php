@@ -99,7 +99,8 @@ class RedirectListener implements EventSubscriberInterface
             // try to notify admin
             $email = new EmailsController();
             $email->setContainer($this->container);
-            $email->administratorAction(null, $exception);
+            $token = $this->container->get('security.context')->getToken();
+            $email->administratorAction(null, ['user' => !empty($token) ? $token->getUser() : null, 'request' => $event->getRequest(), 'exception' => $exception]);
         }
         catch(\Exception $x)
         {

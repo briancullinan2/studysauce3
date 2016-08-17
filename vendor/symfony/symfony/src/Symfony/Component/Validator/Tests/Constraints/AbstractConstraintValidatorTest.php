@@ -24,8 +24,6 @@ use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @since 2.5.3
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCase
@@ -223,7 +221,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
             ->will($this->returnValue($validator));
         $validator->expects($this->at(2 * $i + 1))
             ->method('validate')
-            ->with($value, $this->logicalOr(null, array()), $group);
+            ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
     }
 
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)

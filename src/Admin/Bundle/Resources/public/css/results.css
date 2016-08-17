@@ -485,9 +485,21 @@ table.results.expandable > tbody > tr:nth-child(even):hover > td
     padding-right:30px;
 }
 
+[class*="-row"].invalid .invalid.select select,
+.invalid label.input.invalid.select select
+{
+    border-color: transparent;
+}
+
+[class*="-row"].invalid .invalid.select:before,
+.invalid label.input.invalid.select:before
+{
+    border-color:#CC2211;
+}
+
 [class*="-row"].invalid .invalid label,
 .invalid label.input.invalid {
-    position:relative;
+    position:relative !important;
 }
 
 [class*="-row"].invalid .invalid label:after,

@@ -294,6 +294,7 @@ window.views.__defaultEntities['ss_user'] = {
     groups: $([]),
     invites: $([]),
     invitees: $([]),
+    roles: [],
     getFirst: function () {return this.first;},
     getLast: function () {return this.last;},
     getId: function () {return this.id;},
@@ -591,7 +592,7 @@ $(document).ready(function () {
     window.resultsSave = resultsSave;
 
     function standardValidation(data) {
-        var account = $(this).closest('.panel-pane, .results');
+        var account = $(this).closest('.panel-pane, .results, [class*="-row"]');
         for(var d in data) {
             if(data.hasOwnProperty(d)) {
                 if(data[d] == '') {
@@ -610,15 +611,29 @@ $(document).ready(function () {
 
         var invalid;
         if ((invalid = account.find('label.invalid:has(input, select, textarea)')).length > 0) {
-            account.find('.form-actions').removeClass('valid').addClass('invalid');
+            $(this).closest('.panel-pane, .results').addClass('invalid');
+            if($(this).closest('[class*="-row"]').length > 0) {
+                $(this).closest('[class*="-row"]').removeClass('valid').addClass('invalid').find('.highlighted-link').removeClass('valid').addClass('invalid');
+            }
+            else {
+                $(this).closest('.panel-pane, .results').find('.highlighted-link').removeClass('valid').addClass('invalid');
+            }
+
             var description;
             if((description = account.find('.invalid-error')).length > 0) {
                 description.text('Invalid ' + invalid.first().find('input, select, textarea').attr('placeholder'));
             }
         }
         else {
-            account.removeClass('invalid has-error').find('.form-actions').removeClass('invalid').addClass('valid');
-            account.find('.form-actions .error').remove();
+            $(this).closest('.panel-pane, .results').removeClass('invalid has-error');
+            if($(this).closest('[class*="-row"]').length > 0) {
+                $(this).closest('[class*="-row"]').removeClass('invalid').addClass('valid').find('.highlighted-link').removeClass('invalid').addClass('valid');
+            }
+            else {
+                $(this).closest('.panel-pane, .results').find('.highlighted-link').removeClass('invalid').addClass('valid');
+            }
+
+            account.find('.highlighted-link .error').remove();
         }
     }
     window.standardValidation = standardValidation;

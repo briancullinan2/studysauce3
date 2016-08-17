@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 /** @var Pack $pack */
 $view['slots']->start('cell_status_pack'); ?>
     <div>
-        <label class="input status">
+        <label class="input select status">
             <select name="status">
                 <option value="UNPUBLISHED">Unpublished</option>
                 <option value="GROUP" data-confirm="#pack-publish">Published</option>

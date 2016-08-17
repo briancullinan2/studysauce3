@@ -19,13 +19,15 @@
 <p>Is that interesting?</p>
 
 <form action="/" method="post">
-    <input type="checkbox" name="interesting" value="1" checked="checked"/>
+    <label for="checkbox">Checked</label>
+    <input type="checkbox" name="interesting" value="1" id="checkbox" checked="checked"/>
     <input type="text" name="rus" value="Верно"/>
     <input type="submit"/>
 </form>
 
 <p>Текст на русском</p>
 <a href="/">Ссылочка</a>
+<a href="/">Franšízy - pobočky</a>
 
 <a href="/login" class="sign">Sign in!</a>
 

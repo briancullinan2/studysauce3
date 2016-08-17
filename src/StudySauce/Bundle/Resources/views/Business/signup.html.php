@@ -50,7 +50,7 @@ $view['slots']->start('body'); ?>
             <div class="zip">
                 <label class="input"><span>Postal code</span><input name="zip" type="text" value=""></label>
             </div>
-            <label class="select"><span>State/Province</span><select name="state">
+            <label class="input select"><span>State/Province</span><select name="state">
                     <option value="" selected="selected">- Select -</option>
                     <option value="Alabama">Alabama</option>
                     <option value="Alaska">Alaska</option>
@@ -118,7 +118,7 @@ $view['slots']->start('body'); ?>
                     <option value="Wisconsin">Wisconsin</option>
                     <option value="Wyoming">Wyoming</option>
                 </select></label>
-            <label class="select"><span>Country</span><select name="country">
+            <label class="input select"><span>Country</span><select name="country">
                     <option value="Canada">Canada</option>
                     <option value="United States" selected="selected">United States</option>
                 </select></label>
@@ -126,7 +126,7 @@ $view['slots']->start('body'); ?>
                 <label class="input"><span># of students</span><input name="students" type="text" value="<?php print $students; ?>"></label>
             </div>
             <div class="payment">
-                <label class="input"><span>Payment method</span><select>
+                <label class="input select"><span>Payment method</span><select>
                         <option value="">Preferred payment method</option>
                         <option>Credit card</option>
                         <option>Check</option>

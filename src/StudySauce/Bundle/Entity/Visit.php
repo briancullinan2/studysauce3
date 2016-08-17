@@ -53,7 +53,7 @@ class Visit
     protected $method;
 
     /**
-     * @ORM\Column(type="integer", length=12, name="ip")
+     * @ORM\Column(type="bigint", length=12, name="ip")
      */
     protected $ip;
 

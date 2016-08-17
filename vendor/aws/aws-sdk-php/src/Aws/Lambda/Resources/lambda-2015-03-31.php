@@ -1055,6 +1055,7 @@ return array (
                         'string',
                         'object',
                     ),
+                    'location' => 'json',
                 ),
                 'S3Bucket' => array(
                     'type' => 'string',

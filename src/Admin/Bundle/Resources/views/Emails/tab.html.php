@@ -50,7 +50,7 @@ $view['slots']->start('body'); ?>
                                 </label>
                                 <div></div>
                             </th>
-                            <th><label class="input"><span>Recipient: </span><br/>
+                            <th><label class="input select"><span>Recipient: </span><br/>
                                     <select name="recipient">
                                         <option>Recipient</option>
                                         <option>Ascending (A-Z)</option>
@@ -58,7 +58,7 @@ $view['slots']->start('body'); ?>
                                     </select>
                                 </label>
                             </th>
-                            <th><label><span>Status: </span><br/>
+                            <th><label class="input select"><span>Status: </span><br/>
                                     <select name="status">
                                         <option value="">Status</option>
                                         <option value="_ascending">Ascending (A-Z)</option>
@@ -67,7 +67,7 @@ $view['slots']->start('body'); ?>
                                             <option value="<?php print $c; ?>"><?php print str_replace('STATUS_', '', $n); ?></option>
                                         <?php } ?>
                                     </select></label></th>
-                            <th><label class="input"><span>Sender: </span><br/>
+                            <th><label class="input select"><span>Sender: </span><br/>
                                     <select name="sender">
                                         <option>Sender</option>
                                         <option>Ascending (A-Z)</option>
@@ -75,7 +75,7 @@ $view['slots']->start('body'); ?>
                                     </select>
                                 </label>
                             </th>
-                            <th><label class="input">
+                            <th><label class="input select">
                                     <span>Template: </span><br/>
                                     <select name="template">
                                         <option value="">Template</option>
@@ -238,7 +238,7 @@ $view['slots']->start('body'); ?>
                 </div>
                 <div id="send-email" class="tab-pane">
                     <div class="pane-top save-template">
-                        <label class="input"><span>Template</span>
+                        <label class="input select"><span>Template</span>
                             <select name="template">
                                 <option value="">Select email template</option>
                                 <?php foreach ($templates as $i => $email) { ?>

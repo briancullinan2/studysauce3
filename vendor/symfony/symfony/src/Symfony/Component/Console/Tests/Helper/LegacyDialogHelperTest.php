@@ -17,6 +17,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * @group legacy
@@ -193,7 +194,7 @@ class LegacyDialogHelperTest extends \PHPUnit_Framework_TestCase
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
             if (!in_array($color, array('white', 'black'))) {
-                throw new \InvalidArgumentException($error);
+                throw new InvalidArgumentException($error);
             }
 
             return $color;
@@ -246,11 +247,6 @@ class LegacyDialogHelperTest extends \PHPUnit_Framework_TestCase
         $output->setErrorOutput($stderr);
 
         return $output;
-    }
-
-    private function hasStderrSupport()
-    {
-        return false === $this->isRunningOS400();
     }
 
     private function hasSttyAvailable()

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -71,7 +70,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
                 $defId = $this->getDefinitionId($id = (string) $argument);
 
                 if ($defId !== $id) {
-                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict());
+                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict(false));
                 }
             }
         }
@@ -97,7 +96,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         $defId = $this->getDefinitionId($id = (string) $factory[0]);
 
         if ($defId !== $id) {
-            $factory[0] = new Reference($defId, $factory[0]->getInvalidBehavior(), $factory[0]->isStrict());
+            $factory[0] = new Reference($defId, $factory[0]->getInvalidBehavior(), $factory[0]->isStrict(false));
         }
 
         return $factory;

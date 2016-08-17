@@ -174,7 +174,7 @@ a[href="#sign-in-with-email"]
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label._code select,
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.childLast input,
 .tiles.summary [class*="-row"].invite-row > [class^="id"] label.childFirst input,
-#account .social-login∂ input,
+#account .social-login input,
 #account .pass input,
 #account .new-password input,
 #account .confirm-password input,
@@ -185,6 +185,11 @@ a[href="#sign-in-with-email"]
     width:50%;
     display:inline-block;
     margin:0 0 0 -5px;
+}
+
+
+.tiles.summary [class*="-row"].invite-row > [class^="id"] .input.select:before {
+    left:50%;
 }
 
 [id^="register"] .first,

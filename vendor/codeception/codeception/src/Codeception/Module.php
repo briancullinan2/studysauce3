@@ -1,6 +1,8 @@
 <?php
 namespace Codeception;
 
+use Codeception\Exception\ModuleException;
+use Codeception\Lib\Interfaces\RequiresPackage;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Util\Shared\Asserts;
 
@@ -92,6 +94,18 @@ abstract class Module
                 "Please, update the configuration and set all the required fields\n\n"
             );
         }
+        if ($this instanceof RequiresPackage) {
+            $errorMessage = '';
+            foreach ($this->_requires() as $className => $package) {
+                if (class_exists($className)) {
+                    continue;
+                }
+                $errorMessage .= "Class $className can't be loaded, please add $package to composer.json\n";
+            }
+            if ($errorMessage) {
+                throw new ModuleException($this, $errorMessage);
+            }
+        }
     }
 
     public function _getName()
@@ -141,17 +155,17 @@ abstract class Module
     }
 
     // HOOK: before scenario
-    public function _before(TestCase $test)
+    public function _before(TestInterface $test)
     {
     }
 
     // HOOK: after scenario
-    public function _after(TestCase $test)
+    public function _after(TestInterface $test)
     {
     }
 
     // HOOK: on fail
-    public function _failed(TestCase $test, $fail)
+    public function _failed(TestInterface $test, $fail)
     {
     }
 

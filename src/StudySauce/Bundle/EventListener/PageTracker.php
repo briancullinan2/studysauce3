@@ -32,6 +32,8 @@ class PageTracker implements EventSubscriberInterface
     /** @var ContainerInterface $container */
     private $container;
 
+    private $alreadyLogged = null;
+
     /**
      * @param ContainerInterface $container
      * @param EntityManager $orm
@@ -69,8 +71,13 @@ class PageTracker implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => ['onKernelRequest', -128]
+            KernelEvents::REQUEST => ['onKernelRequest', -127],
+            KernelEvents::EXCEPTION => ['onKernelException', -127]
         ];
+    }
+
+    public function onKernelException(GetResponseEvent $event) {
+        $this->logEvents($event, true);
     }
 
     /**
@@ -78,13 +85,21 @@ class PageTracker implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
+        $this->logEvents($event);
+    }
+
+    public function logEvents(GetResponseEvent $event, $error = false) {
+        $request = $event->getRequest();
+        if($this->alreadyLogged == $request) {
+            return;
+        }
         // only do this for actual request, no sub requests
         if ($event->isMasterRequest()) {
-            $request = $event->getRequest();
+            $this->alreadyLogged = $request;
             $path = $request->getPathInfo();
             $visit = new Visit();
             $visit->setPath($path);
-            $visit->setHash('');
+            $visit->setHash($error ? '#error' : '');
             $visit->setMethod($request->getMethod());
             $visit->setIp(ip2long($request->server->get('REMOTE_ADDR')));
             if($this->session->isStarted())
@@ -94,7 +109,7 @@ class PageTracker implements EventSubscriberInterface
             $token = $this->context->getToken();
 
             /** @var User $user */
-            $user = $token->getUser();
+            $user = !empty($token) ? $token->getUser() : null;
 
             $query = $request->query->all();
             if(isset($query['__visits'])) {
@@ -107,7 +122,7 @@ class PageTracker implements EventSubscriberInterface
                 if (!empty($id)) {
                     $visit->setSession($id);
                 }
-                if ($user != 'anon.') {
+                if (!empty($user) && $user != 'anon.') {
                     $visit->setUser($user);
                     $user->addVisit($visit);
                     $user->setLastVisit(new \DateTime());
@@ -138,7 +153,7 @@ class PageTracker implements EventSubscriberInterface
                     if (!empty($id)) {
                         $prev->setSession($id);
                     }
-                    if ($user != 'anon.') {
+                    if (!empty($user) && $user != 'anon.') {
                         $prev->setUser($user);
                         $user->addVisit($prev);
                     }
@@ -152,7 +167,7 @@ class PageTracker implements EventSubscriberInterface
                 $ctrl->visitAction($request);
             }
             $this->orm->flush();
-       }
+        }
     }
 
     /**
@@ -163,7 +178,7 @@ class PageTracker implements EventSubscriberInterface
      * Will return false if no valid querystring found
      *
      * @param $qry String
-     * @return Array
+     * @return array
      */
     private static function queryToArray($qry)
     {

@@ -50,7 +50,7 @@ $view['slots']->start('body'); ?>
                         <label class="input email">
                             <input type="text" placeholder="Email"/>
                         </label>
-                        <label class="input group">
+                        <label class="input select group">
                             <select>
                                 <option value="">Group</option>
                                 <?php foreach ($groups as $group) {
@@ -89,7 +89,7 @@ $view['slots']->start('body'); ?>
                         <label class="input email">
                             <input type="text" placeholder="Email" value="<?php print $g->getEmail(); ?>"/>
                         </label>
-                        <label class="input group">
+                        <label class="input select group">
                             <select>
                                 <option value="">None</option>
                                 <?php foreach ($groups as $group) {

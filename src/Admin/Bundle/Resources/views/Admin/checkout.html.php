@@ -53,7 +53,7 @@ if ($tab->length == 0) {
                     <label class="input street2"><input name="street2" type="text" value=""></label>
                     <label class="input city"><span>City</span><input name="city" type="text" value=""></label>
                     <label class="input zip"><span>Postal code</span><input name="zip" type="text" value=""></label>
-                    <label class="input state"><span>State/Province</span><select name="state">
+                    <label class="input select state"><span>State/Province</span><select name="state">
                             <option value="" selected="selected">- Select state -</option>
                             <option value="Alabama">Alabama</option>
                             <option value="Alaska">Alaska</option>
@@ -121,7 +121,7 @@ if ($tab->length == 0) {
                             <option value="Wisconsin">Wisconsin</option>
                             <option value="Wyoming">Wyoming</option>
                         </select></label>
-                    <label class="input country"><span>Country</span><select name="country">
+                    <label class="input select country"><span>Country</span><select name="country">
                             <option value="Canada">Canada</option>
                             <option value="United States" selected="selected">United States</option>
                         </select></label>
@@ -168,7 +168,7 @@ if ($tab->length == 0) {
                                  src="<?php print ($view->escape($view['assets']->getUrl('bundles/studysauce/images/disc.gif'))); ?>"/>
                         </span>
                     </label>
-                    <label class="input month"><span>Expiration date</span>
+                    <label class="input select month"><span>Expiration date</span>
                         <select name="month">
                             <option value="" selected="selected">- Select month -</option>
                             <option value="01">01 - January</option>
@@ -184,7 +184,7 @@ if ($tab->length == 0) {
                             <option value="11">11 - November</option>
                             <option value="12">12 - December</option>
                         </select></label>
-                    <label class="input year"><span>Expiration year</span>
+                    <label class="input select year"><span>Expiration year</span>
                         <select name="year">
                             <option value="" selected="selected">- Select year -</option>
                             <?php

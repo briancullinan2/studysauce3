@@ -323,7 +323,7 @@ class PacksController extends Controller
 
     // TODO: use standard save API
 
-    public function responsesAction(Request $request, User $user)
+    public function responsesAction(Request $request, User $user = null)
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();

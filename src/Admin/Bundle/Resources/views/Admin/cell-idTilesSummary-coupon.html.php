@@ -30,7 +30,7 @@ foreach($coupon->getPacks()->toArray() as $p) {
 ?>
 <div class="pack-icon"><?php
     if(!empty($request['inCartOnly'])) { ?>
-        <label class="input child">
+        <label class="input select child">
             <select name="child">
                 <option value="">- Select student -</option>
                 <option value="<?php print ($user->getId()); ?>" <?php print ($alreadyHas ? 'disabled="disabled"' : ''); ?>>

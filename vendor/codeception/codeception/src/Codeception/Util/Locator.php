@@ -24,7 +24,8 @@ class Locator
      * ?>
      * ```
      *
-     * This will search for `Title` text in either `h1`, `h2`, or `h3` tag. You can also combine CSS selector with XPath locator:
+     * This will search for `Title` text in either `h1`, `h2`, or `h3` tag.
+     * You can also combine CSS selector with XPath locator:
      *
      * ```php
      * <?php
@@ -99,7 +100,14 @@ class Locator
     }
 
     /**
-     * Matches option by text
+     * Matches option by text:
+     *
+     * ```php
+     * <?php
+     * use Codeception\Util\Locator;
+     *
+     * $I->seeElement(Locator::option('Male'), '#select-gender');
+     * ```
      *
      * @param $value
      *
@@ -126,6 +134,13 @@ class Locator
     /**
      * Finds element by it's attribute(s)
      *
+     * ```php
+     * <?php
+     * use \Codeception\Util\Locator;
+     *
+     * $I->seeElement(Locator::find('img', ['title' => 'diagram']));
+     * ```
+     *
      * @static
      *
      * @param $element
@@ -147,6 +162,15 @@ class Locator
     }
 
     /**
+     * Checks that provided string is CSS selector
+     *
+     * ```php
+     * <?php
+     * Locator::isCSS('#user .hello') => true
+     * Locator::isCSS('body') => true
+     * Locator::isCSS('//body/p/user') => false
+     * ```
+     *
      * @param $selector
      * @return bool
      */
@@ -163,6 +187,13 @@ class Locator
     /**
      * Checks that locator is an XPath
      *
+     * ```php
+     * <?php
+     * Locator::isCSS('#user .hello') => false
+     * Locator::isCSS('body') => false
+     * Locator::isCSS('//body/p/user') => true
+     * ```
+     *
      * @param $locator
      * @return bool
      */
@@ -175,7 +206,8 @@ class Locator
 
     /**
      * Checks that string and CSS selector for element by ID
-     *
+     * @param $id
+     * @return bool
      */
     public static function isID($id)
     {
@@ -187,6 +219,9 @@ class Locator
      * Either CSS or XPath locator can be passed, however they will be converted to XPath.
      *
      * ```php
+     * <?php
+     * use Codeception\Util\Locator;
+     *
      * Locator::contains('label', 'Name'); // label containing name
      * Locator::contains('div[@contenteditable=true]', 'hello world');
      * ```
@@ -201,23 +236,102 @@ class Locator
         return sprintf('%s[%s]', self::toXPath($element), "contains(., $text)");
     }
 
+    /**
+     * Locates element at position.
+     * Either CSS or XPath locator can be passed as locator,
+     * position is an integer. If a negative value is provided, counting starts from the last element.
+     * First element has index 1
+     *
+     * ```php
+     * <?php
+     * use Codeception\Util\Locator;
+     *
+     * Locator::elementAt('//table/tr', 2); // second row
+     * Locator::elementAt('//table/tr', -1); // last row
+     * Locator::elementAt('table#grind>tr', -2); // previous than last row
+     * ```
+     *
+     * @param $element CSS or XPath locator
+     * @param $position xpath index
+     * @return mixed
+     */
+    public static function elementAt($element, $position)
+    {
+        if (is_int($position) && $position < 0) {
+            $position++; // -1 points to the last element
+            $position = 'last()-'.abs($position);
+        }
+        if ($position === 0) {
+            throw new \InvalidArgumentException(
+                '0 is not valid element position. XPath expects first element to have index 1'
+            );
+        }
+        return sprintf('(%s)[position()=%s]', self::toXPath($element), $position);
+    }
+
+    /**
+     * Locates first element of group elements.
+     * Either CSS or XPath locator can be passed as locator,
+     * Equal to `Locator::elementAt($locator, 1)`
+     *
+     * ```php
+     * <?php
+     * use Codeception\Util\Locator;
+     *
+     * Locator::firstElement('//table/tr');
+     * ```
+     *
+     * @param $element
+     * @return mixed
+     */
+    public static function firstElement($element)
+    {
+        return self::elementAt($element, 1);
+    }
+
+    /**
+     * Locates last element of group elements.
+     * Either CSS or XPath locator can be passed as locator,
+     * Equal to `Locator::elementAt($locator, -1)`
+     *
+     * ```php
+     * <?php
+     * use Codeception\Util\Locator;
+     *
+     * Locator::lastElement('//table/tr');
+     * ```
+     *
+     * @param $element
+     * @return mixed
+     */
+    public static function lastElement($element)
+    {
+        return self::elementAt($element, 'last()');
+    }
+
+    /**
+     * Transforms strict locator, \Facebook\WebDriver\WebDriverBy into a string represenation
+     *
+     * @param $selector
+     * @return string
+     */
     public static function humanReadableString($selector)
     {
-       if (is_string($selector)) {
-          return "'$selector'";
-       }
-       if (is_array($selector)) {
-          $type = strtolower(key($selector));
-          $locator = $selector[$type];
-          return "$type '$locator'";
-       }
-       if (class_exists('\Facebook\WebDriver\WebDriverBy')) {
-          if ($selector instanceof \Facebook\WebDriver\WebDriverBy) {
-             $type = $selector->getMechanism();
-             $locator = $selector->getValue();
-             return "$type '$locator'";
-          }
-       }
-       throw new \InvalidArgumentException("Unrecognized selector");
+        if (is_string($selector)) {
+            return "'$selector'";
+        }
+        if (is_array($selector)) {
+            $type = strtolower(key($selector));
+            $locator = $selector[$type];
+            return "$type '$locator'";
+        }
+        if (class_exists('\Facebook\WebDriver\WebDriverBy')) {
+            if ($selector instanceof \Facebook\WebDriver\WebDriverBy) {
+                $type = $selector->getMechanism();
+                $locator = $selector->getValue();
+                return "$type '$locator'";
+            }
+        }
+        throw new \InvalidArgumentException("Unrecognized selector");
     }
 }

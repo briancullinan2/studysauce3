@@ -13,6 +13,9 @@ namespace Symfony\Component\Finder\Tests\Shell;
 
 use Symfony\Component\Finder\Shell\Command;
 
+/**
+ * @group legacy
+ */
 class CommandTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreate()
@@ -148,7 +151,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertNotEmpty($result);
-        $this->assertRegexp('/PHP|HipHop/', $result[0]);
+        $this->assertRegExp('/PHP|HipHop/', $result[0]);
     }
 
     public function testCastToString()

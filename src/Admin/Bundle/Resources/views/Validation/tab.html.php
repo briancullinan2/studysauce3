@@ -57,7 +57,7 @@ $view['slots']->start('body'); ?>
                             4444</code>
                     </small>
                 </label>
-                <label class="input browser-setting"><span>Browser</span>
+                <label class="input select browser-setting"><span>Browser</span>
                     <select>
                         <option
                             value="phantomjs" <?php print ($acceptance['modules']['config']['WebDriver']['browser'] == 'phantomjs' ? 'selected="selected"' : ''); ?>>

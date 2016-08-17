@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'phpDocumentor' => array($vendorDir . '/phpdocumentor/reflection-docblock/src'),
     'WhiteOctober\\SwiftMailerDBBundle' => array($vendorDir . '/whiteoctober/swiftmailerdbbundle'),
     'Twig_Extensions_' => array($vendorDir . '/twig/extensions/lib'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
@@ -35,6 +34,7 @@ return array(
     'Doctrine\\Common\\Collections\\' => array($vendorDir . '/doctrine/collections/lib'),
     'Doctrine\\Common\\Annotations\\' => array($vendorDir . '/doctrine/annotations/lib'),
     'Buzz' => array($vendorDir . '/kriswallsmith/buzz/lib'),
+    'Behat\\Gherkin' => array($vendorDir . '/behat/gherkin/src'),
     'Aws' => array($vendorDir . '/aws/aws-sdk-php/src'),
     'Assetic' => array($vendorDir . '/kriswallsmith/assetic/src'),
     '' => array($baseDir . '/src'),

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use StudySauce\Bundle\Entity\Invite;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
@@ -122,14 +122,10 @@ class SwitchUserListener implements ListenerInterface
         }
 
         if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
-            throw new AccessDeniedException(sprintf('Cannot switch to use because you to not have "%s" role.', $this->role));
+            throw new AccessDeniedException();
         }
 
         $username = $request->get($this->usernameParameter);
-
-        if(!$token->getUser()->getInvites()->exists(function ($_, Invite $i) use ($username) {return !empty($i->getInvitee()) && $i->getInvitee()->getUsername() == $username;})) {
-            throw new AccessDeniedException('Cannot switch to child user');
-        }
 
         if (null !== $this->logger) {
             $this->logger->info('Attempting to switch to user.', array('username' => $username));
@@ -166,7 +162,7 @@ class SwitchUserListener implements ListenerInterface
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 
-        if (null !== $this->dispatcher) {
+        if (null !== $this->dispatcher && $original->getUser() instanceof UserInterface) {
             $user = $this->provider->refreshUser($original->getUser());
             $switchEvent = new SwitchUserEvent($request, $user);
             $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);

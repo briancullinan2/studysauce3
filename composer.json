@@ -8,7 +8,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": "2.7.*",
+        "symfony/symfony": "2.8.*",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "twig/extensions": "~1.0",
@@ -28,7 +28,8 @@
         "evernote/evernote-cloud-sdk-php": "dev-master",
         "google/apiclient": "~1.1",
         "friendsofsymfony/jsrouting-bundle": "^1.6",
-        "wa72/htmlpagedom": "^1.2"
+        "wa72/htmlpagedom": "^1.2",
+        "stripe/stripe-php": "*"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"

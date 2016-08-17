@@ -73,6 +73,23 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseScalarWithNonEscapedBlackslashShouldThrowException()
+    {
+        $this->assertSame('Foo\Var', Inline::parse('"Foo\Var"'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseScalarWithNonEscapedBlackslashAtTheEndShouldThrowException()
+    {
+        Inline::parse('"Foo\\"');
+    }
+
+    /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testParseScalarWithIncorrectlyQuotedStringShouldThrowException()
@@ -171,6 +188,54 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     public function testParseUnquotedAsteriskFollowedByAComment()
     {
         Inline::parse('{ foo: * #foo }');
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getReservedIndicators
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
+    {
+        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+    }
+
+    public function getReservedIndicators()
+    {
+        return array(array('@'), array('`'));
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getScalarIndicators
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
+    {
+        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+    }
+
+    public function getScalarIndicators()
+    {
+        return array(array('|'), array('>'));
+    }
+
+    /**
+     * @dataProvider getDataForIsHash
+     */
+    public function testIsHash($array, $expected)
+    {
+        $this->assertSame($expected, Inline::isHash($array));
+    }
+
+    public function getDataForIsHash()
+    {
+        return array(
+            array(array(), false),
+            array(array(1, 2, 3), false),
+            array(array(2 => 1, 1 => 2, 0 => 3), true),
+            array(array('foo' => 1, 'bar' => 2), true),
+        );
     }
 
     public function getTestsForParse()
@@ -379,6 +444,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('[foo, { bar: foo, foo: [foo, { bar: foo }] }, [foo, { bar: foo }]]', array('foo', array('bar' => 'foo', 'foo' => array('foo', array('bar' => 'foo'))), array('foo', array('bar' => 'foo')))),
 
             array('[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', array('foo', '@foo.baz', array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, '@service_container')),
+
+            array('{ foo: { bar: { 1: 2, baz: 3 } } }', array('foo' => array('bar' => array(1 => 2, 'baz' => 3)))),
         );
     }
 }

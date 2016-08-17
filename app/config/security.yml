@@ -24,7 +24,6 @@ security:
             form_login:
                 username_parameter: "email"
                 password_parameter: "pass"
-                intention: "login"
                 csrf_parameter: "csrf_token"
                 provider: fos_userbundle
                 csrf_provider: security.csrf.token_manager
