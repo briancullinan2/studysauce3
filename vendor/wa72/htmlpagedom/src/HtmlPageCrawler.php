@@ -1,8 +1,6 @@
 <?php
 namespace Wa72\HtmlPageDom;
 
-use DOMElement;
-use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -13,7 +11,6 @@ use Symfony\Component\DomCrawler\Crawler;
  * @author Christoph Singer
  * @license MIT
  *
- * @property int length
  */
 class HtmlPageCrawler extends Crawler
 {
@@ -174,16 +171,6 @@ class HtmlPageCrawler extends Crawler
         }
     }
 
-    public function data($name) {
-
-        if(count(func_get_args()) < 2) {
-            return $this->getAttribute(json_decode('data-' . $name));
-        }
-        else {
-            return $this->setAttribute('data-' . $name, json_encode(func_get_args()[1]));
-        }
-    }
-
     /**
      * Sets an attribute on each element
      *
@@ -268,17 +255,6 @@ class HtmlPageCrawler extends Crawler
         $this->add($newnodes);
     }
 
-
-    public function __get($name) {
-        switch($name) {
-            case 'count':
-            case 'length':
-                return count($this);
-        }
-        throw new \Exception('Not implemented!');
-    }
-
-
     /**
      * Get one CSS style property of the first element or set it for all elements in the list
      *
@@ -335,13 +311,6 @@ class HtmlPageCrawler extends Crawler
             }
         }
         return $this;
-    }
-
-    /**
-     * @return HtmlPageCrawler
-     */
-    public function last() {
-        return parent::last();
     }
 
     /**
@@ -713,25 +682,18 @@ class HtmlPageCrawler extends Crawler
             $text = '';
             foreach ($this as $node) {
                 /** @var \DOMNode $node */
-                $text .= htmlspecialchars_decode($node->nodeValue, ENT_QUOTES);
+                $text .= $node->nodeValue;
             }
             return $text;
         } else {
             foreach ($this as $node) {
                 /** @var \DOMNode $node */
-                $node->nodeValue = htmlspecialchars($text, ENT_QUOTES);
+                $node->nodeValue = $text;
             }
             return $this;
         }
     }
 
-    /**
-     * @param int $int
-     * @return HtmlPageCrawler
-     */
-    public function eq($int) {
-        return parent::eq($int);
-    }
 
     /**
      * Add or remove one or more classes from each element in the set of matched elements, depending the class’s presence.
@@ -755,42 +717,6 @@ class HtmlPageCrawler extends Crawler
             }
         }
         return $this;
-    }
-
-    /**
-     * @return HtmlPageCrawler|static
-     */
-    public function parents() {
-        $result = parent::parents();
-
-        if(count(func_get_args()) > 0) {
-            return $result->filter(func_get_args()[0]);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return HtmlPageCrawler $this
-     */
-    public function show() {
-        $this->css('display', 'block');
-        return $this;
-    }
-
-    /**
-     * @return HtmlPageCrawler $this
-     */
-    public function hide() {
-        $this->css('display', 'none');
-        return $this;
-    }
-
-    /**
-     * @return \DOMElement
-     */
-    public function parent() {
-        return $this->getNode(0)->parentNode;
     }
 
     /**
@@ -990,7 +916,6 @@ class HtmlPageCrawler extends Crawler
 
     /**
      * Filters the list of nodes with a CSS selector.
-     * TODO descendant or self?
      *
      * @param string $selector
      * @return HtmlPageCrawler
@@ -999,82 +924,6 @@ class HtmlPageCrawler extends Crawler
     {
         return parent::filter($selector);
     }
-
-    /**
-     * @return HtmlPageCrawler
-     */
-    public function children()
-    {
-        if (!count($this)) {
-            return new static([], $this->uri);
-        }
-        // TODO: something with selector
-        $result = parent::children();
-
-        if(count(func_get_args()) > 0) {
-            return $result->filter(func_get_args()[0]);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $selector Get the descendants of each element in the current set of matched elements, filtered by a selector, or element.
-     * @return static
-     */
-    public function find($selector) {
-        return parent::filter($selector);
-        //$filter = CssSelector::toXPath($selector);
-        //return parent::filterXPath(str_replace('descendant-or-self::', 'descendant::', $filter));
-    }
-
-    /**
-     * @return null|string
-     */
-    public function val() {
-        if($this->length == 0) {
-            return null;
-        }
-        if (count(func_get_args()) == 0) {
-            if ($this->is('select')) {
-                $selected = $this->find('option[selected=selected]');
-                if ($selected->is('[value]'))
-                    return $selected->attr('value');
-                else
-                    return $selected->text();
-            } else if ($this->is('textarea'))
-                return $this->html();
-            else
-                return $this->attr('value');
-        }
-        else {
-            $value = func_get_args()[0];
-            if ($this->is('select')) {
-                $selected = $this->find('option');
-                foreach($selected as $o) {
-                    /** @var DOMElement $o */
-                    if ($o->getAttribute('value') == $value) {
-                        $o->setAttribute('selected', 'selected');
-                    }
-                    else {
-                        $o->removeAttribute('selected');
-                    }
-                }
-            } else if ($this->is('textarea'))
-                return $this->html($value);
-            else
-                return $this->attr('value', $value);
-        }
-    }
-
-    /**
-     * @param $selector
-     * @return bool
-     */
-    public function is($selector) {
-        return $this->filter($selector)->length > 0;
-    }
-
 
     /**
      * Filters the list of nodes with an XPath expression.
@@ -1185,7 +1034,6 @@ class HtmlPageCrawler extends Crawler
      * @param null|\DOMNodeList|array|\DOMNode|Crawler $node A node
      *
      * @api
-     * @return $this|void
      */
     public function add($node)
     {
@@ -1196,8 +1044,6 @@ class HtmlPageCrawler extends Crawler
         } else {
             parent::add($node);
         }
-
-        return $this;
     }
 
     /**

@@ -280,6 +280,7 @@ EOSH;
         $I->fillField('textarea', $bash);
         $I->click('Add Storage');
         $I->wait(1);
+        $I->fillField('[name="size"]', 25);
         $I->click('Tag Instance');
         $I->wait(1);
         $I->click('Configure Security Group');

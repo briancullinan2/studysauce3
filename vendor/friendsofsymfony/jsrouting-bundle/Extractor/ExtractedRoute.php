@@ -17,15 +17,13 @@ class ExtractedRoute
     private $defaults;
     private $requirements;
     private $hosttokens;
-    private $regexpr;
 
-    public function __construct(array $tokens, array $defaults, array $requirements, array $hosttokens = array(), $regexpr)
+    public function __construct(array $tokens, array $defaults, array $requirements, array $hosttokens = array())
     {
         $this->tokens = $tokens;
         $this->defaults = $defaults;
         $this->requirements = $requirements;
         $this->hosttokens = $hosttokens;
-        $this->regexpr = $regexpr;
     }
 
     public function getTokens()
@@ -46,9 +44,5 @@ class ExtractedRoute
     public function getHosttokens()
     {
         return $this->hosttokens;
-    }
-
-    public function getRegexpr() {
-        return $this->regexpr;
     }
 }

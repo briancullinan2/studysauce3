@@ -209,7 +209,7 @@ EOCSS;
                 }
             } ?>
 
-            <?php foreach(array_keys(\Admin\Bundle\Controller\AdminController::$defaultTables) as $table => $t) { ?>
+            <?php foreach(array_keys(\Admin\Bundle\Controller\AdminController::$defaultTables) as $table) { ?>
             .results.has-<?php print $table; ?>-error .<?php print $table; ?>-error,
             .showing-<?php print $table; ?> header > .<?php print $table; ?> {
                 display: inline-block;

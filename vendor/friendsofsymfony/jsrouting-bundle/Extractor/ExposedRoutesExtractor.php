@@ -73,8 +73,7 @@ class ExposedRoutesExtractor implements ExposedRoutesExtractorInterface
                 $compiledRoute->getTokens(),
                 $defaults,
                 $requirements,
-                $hostTokens,
-                $compiledRoute->getRegex()
+                $hostTokens
             );
         }
 

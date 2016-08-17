@@ -22,9 +22,8 @@ use Codeception\Subscriber\Bootstrap;
 use Codeception\Subscriber\ErrorHandler;
 use Codeception\Subscriber\Module;
 use Codeception\SuiteManager;
-use Codeception\TestCase;
-use Codeception\TestCase\Cest;
-use Codeception\Lib\TestLoader;
+use Codeception\Test\Cest;
+use Codeception\Test\Loader;
 use Codeception\Util\Locator;
 use Doctrine\ORM\Query;
 use PHP_Timer;
@@ -72,7 +71,7 @@ class ValidationController extends Controller
         ];
         foreach (self::$config['suites'] as $suite) {
             self::$config[$suite] = Configuration::suiteSettings($suite, Configuration::config());
-            $testLoader = new TestLoader(self::$config[$suite]['path']);
+            $testLoader = new Loader(['path' => self::$config[$suite]['path']]);
             $testLoader->loadTests();
             self::$config['tests'][$suite] = $testLoader->getTests();
             self::$config['tests'][$suite] = array_combine(array_map(function (Cest $t) { return $t->getName();}, self::$config['tests'][$suite]), self::$config['tests'][$suite]);
