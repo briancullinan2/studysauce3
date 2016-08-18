@@ -151,7 +151,9 @@ jQuery(document).ready(function($) {
     }
 
     body.on('show', '#thanks', function () {
-        $('<li><a href="' + Routing.generate('/packs') + '" class="active"><span>&nbsp;</span>Packs</a></li>').insertAfter($('.heading a[href*="/home"]').parent());
+        if(!window.views.__globalVars.app.getUser().hasRole('ROLE_GUEST')) {
+            $('<li><a href="' + Routing.generate('packs') + '" class="active"><span>&nbsp;</span>Packs</a></li>').insertAfter($('.heading a[href*="/home"]').parent());
+        }
     });
 
     body.on('validate', '[id^="checkout"]', checkoutFunc);
