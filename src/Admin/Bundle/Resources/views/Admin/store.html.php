@@ -108,7 +108,7 @@ if($tab->length == 0) {
                 $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
                 $request['classes'] = ['tiles', 'summary'];
                 $request['headers'] = ['coupon' => 'store'];
-                $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['coupon' => true] : false;
+                $request['footers'] = false;
             }
             else {
                 $request['count-file'] = -1;
@@ -129,7 +129,7 @@ if($tab->length == 0) {
                 $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
                 $request['classes'] = ['tiles', 'summary'];
                 $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
-                $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
+                $request['footers'] = false;
             }
             if ($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));

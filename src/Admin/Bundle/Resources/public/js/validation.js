@@ -313,8 +313,8 @@ $(document).ready(function () {
                 catch (e) {
 
                 }
-                if(typeof window.lastNode != 'undefined') {
-                        tooltips.open(window.lastNode, config.node, window.lastNode[s.renderers[0].options.prefix + 'x'], window.lastNode[s.renderers[0].options.prefix + 'y']);
+                if(typeof window.lastNode != 'undefined' && typeof s.renderers != 'undefined') {
+                    tooltips.open(window.lastNode, config.node, window.lastNode[s.renderers[0].options.prefix + 'x'], window.lastNode[s.renderers[0].options.prefix + 'y']);
                 }
             }, 13);
         });
