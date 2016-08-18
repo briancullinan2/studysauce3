@@ -4,6 +4,7 @@ namespace StudySauce\Bundle\DependencyInjection;
 use DOMElement;
 use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
+use Wa72\HtmlPageDom\Helpers;
 
 /**
  * Extends \Symfony\Component\DomCrawler\Crawler by adding tree manipulation functions
