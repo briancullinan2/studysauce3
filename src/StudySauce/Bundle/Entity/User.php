@@ -310,6 +310,7 @@ class User extends BaseUser implements EncoderAwareInterface
      */
     public function __construct()
     {
+        parent::__construct();
         $this->schedules = new ArrayCollection();
         $this->visits = new ArrayCollection();
         $this->files = new ArrayCollection();
@@ -320,7 +321,6 @@ class User extends BaseUser implements EncoderAwareInterface
         $this->invitees = new ArrayCollection();
         $this->userPacks = new ArrayCollection();
         $this->authored = new ArrayCollection();
-        parent::__construct();
     }
 
     /**

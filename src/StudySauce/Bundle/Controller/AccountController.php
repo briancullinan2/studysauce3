@@ -454,17 +454,25 @@ class AccountController extends Controller
         if(!empty($request->get('email'))) {
             $user = $userManager->createUser();
             $user->setUsername($request->get('email'));
+            $user->setEmail($request->get('email'));
+            $userManager->updateCanonicalFields($user);
+            $user->addRole('ROLE_USER');
+            $user->setFirst($request->get('first'));
+            $user->setLast($request->get('last'));
+            $user->setPassword('');
+            $userManager->updateUser($user);
+
+            // change the password
             $encoder_service = $this->get('security.encoder_factory');
             /** @var $encoder PasswordEncoderInterface */
             $encoder = $encoder_service->getEncoder($user);
             $password = $encoder->encodePassword($request->get('pass'), $user->getSalt());
             $user->setPassword($password);
-            $user->setEmail($request->get('email'));
-            $userManager->updateCanonicalFields($user);
-            $user->addRole('ROLE_USER');
+
+            $user->setConfirmationToken(null);
+            $user->setPasswordRequestedAt(null);
             $user->setEnabled(true);
-            $user->setFirst($request->get('first'));
-            $user->setLast($request->get('last'));
+            $userManager->updateUser($user);
 
             // assign invite code to use only if there is no child information supplied
             if(empty($request->get('childFirst')) || empty($request->get('childLast'))) {

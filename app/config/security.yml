@@ -28,6 +28,7 @@ security:
                 provider: fos_userbundle
                 csrf_provider: security.csrf.token_manager
                 remember_me: true
+                intention: "login"
                 failure_path: "/login"
                 login_path: "/login"
                 check_path: "/authenticate"
