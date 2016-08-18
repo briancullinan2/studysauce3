@@ -5,7 +5,7 @@ namespace  {
     use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
     use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
     use Wa72\HtmlPageDom\HtmlPage;
-    use Wa72\HtmlPageDom\HtmlPageCrawler;
+    use StudySauce\Bundle\DependencyInjection\HtmlPageCrawler;
 
     if (!function_exists('jQuery')) {
         /**
