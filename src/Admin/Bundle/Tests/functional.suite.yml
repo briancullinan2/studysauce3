@@ -6,4 +6,4 @@
 
 class_name: FunctionalTester
 modules:
-    enabled: [Filesystem, FunctionalHelper, Symfony2, Asserts]
+    enabled: [Filesystem, Symfony2, Asserts]

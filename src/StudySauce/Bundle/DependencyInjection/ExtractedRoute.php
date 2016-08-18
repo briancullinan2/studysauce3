@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace FOS\JsRoutingBundle\Extractor;
+namespace StudySauce\Bundle\DependencyInjection;
 
 class ExtractedRoute
 {

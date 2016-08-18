@@ -189,37 +189,37 @@ fos.Router.prototype.generate = function(name, opt_params, absolute) {
         if ('variable' === token[0]) {
             var hasDefault = route.defaults.hasOwnProperty(token[3]);
             if (false === optional || !hasDefault || (params.hasOwnProperty(token[3]) && params[token[3]] != route.defaults[token[3]])) {
-                    var value;
+                var value;
 
-                    if (params.hasOwnProperty(token[3])) {
-                        value = params[token[3]];
-                        delete unusedParams[token[3]];
-                    } else if (hasDefault) {
-                        value = route.defaults[token[3]];
-                    } else if (optional) {
-                        return;
-                    } else {
-                        throw new Error('The route "' + name + '" requires the parameter "' + token[3] + '".');
-                    }
-
-                    var empty = true === value || false === value || '' === value;
-
-                    if (!empty || !optional) {
-                        var encodedValue = encodeURIComponent(value).replace(/%2F/g, '/');
-
-                        if ('null' === encodedValue && null === value) {
-                            encodedValue = '';
-                        }
-
-                        url = token[1] + encodedValue + url;
-                    }
-
-                    optional = false;
-                } else if (hasDefault) {
+                if (params.hasOwnProperty(token[3])) {
+                    value = params[token[3]];
                     delete unusedParams[token[3]];
+                } else if (hasDefault) {
+                    value = route.defaults[token[3]];
+                } else if (optional) {
+                    return;
+                } else {
+                    throw new Error('The route "' + name + '" requires the parameter "' + token[3] + '".');
                 }
 
-                return;
+                var empty = true === value || false === value || '' === value;
+
+                if (!empty || !optional) {
+                    var encodedValue = encodeURIComponent(value).replace(/%2F/g, '/');
+
+                    if ('null' === encodedValue && null === value) {
+                        encodedValue = '';
+                    }
+
+                    url = token[1] + encodedValue + url;
+                }
+
+                optional = false;
+            } else if (hasDefault) {
+                delete unusedParams[token[3]];
+            }
+
+            return;
         }
 
         throw new Error('The token type "' + token[0] + '" is not supported.');

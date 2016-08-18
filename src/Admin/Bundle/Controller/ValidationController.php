@@ -8,6 +8,7 @@ use Codeception\Event\StepEvent;
 use Codeception\Event\TestEvent;
 use Codeception\Events;
 use Codeception\Exception\ElementNotFound;
+use Codeception\Exception\MalformedLocatorException;
 use Codeception\Exception\TestRuntime;
 use Codeception\Module\Doctrine2;
 use Codeception\Module\Symfony2;
@@ -26,6 +27,9 @@ use Codeception\Test\Cest;
 use Codeception\Test\Loader;
 use Codeception\Util\Locator;
 use Doctrine\ORM\Query;
+use Facebook\WebDriver\Exception\InvalidElementStateException;
+use Facebook\WebDriver\Exception\InvalidSelectorException;
+use Facebook\WebDriver\WebDriverBy;
 use PHP_Timer;
 use PHPUnit_Framework_TestFailure;
 use PHPUnit_Util_Test;
@@ -297,51 +301,74 @@ class ValidationController extends Controller
         }
     }
 
-    protected function match(RemoteWebDriver $page, $selector)
+    protected function match($page, $selector, $throwMalformed = true)
     {
-        $nodes = array();
         if (is_array($selector)) {
-            return $page->findElements($this->getStrictLocator($selector));
+            try {
+                return $page->findElements($this->getStrictLocator($selector));
+            } catch (InvalidSelectorException $e) {
+                throw new MalformedLocatorException(key($selector) . ' => ' . reset($selector), "Strict locator");
+            } catch (InvalidElementStateException $e) {
+                if ($this->isPhantom() and $e->getResults()['status'] == 12) {
+                    throw new MalformedLocatorException(
+                        key($selector) . ' => ' . reset($selector),
+                        "Strict locator ".$e->getCode()
+                    );
+                }
+            }
         }
-        if ($selector instanceof \WebDriverBy) {
-            return $page->findElements($selector);
+        if ($selector instanceof WebDriverBy) {
+            try {
+                return $page->findElements($selector);
+            } catch (InvalidSelectorException $e) {
+                throw new MalformedLocatorException(
+                    sprintf(
+                        "WebDriverBy::%s('%s')",
+                        $selector->getMechanism(),
+                        $selector->getValue()
+                    ),
+                    'WebDriver'
+                );
+            }
         }
-
-        if (Locator::isID($selector)) {
-            $nodes = $page->findElements(\WebDriverBy::id(substr($selector, 1)));
+        $isValidLocator = false;
+        $nodes = [];
+        try {
+            if (Locator::isID($selector)) {
+                $isValidLocator = true;
+                $nodes = $page->findElements(WebDriverBy::id(substr($selector, 1)));
+            }
+            if (empty($nodes) and Locator::isCSS($selector)) {
+                $isValidLocator = true;
+                $nodes = $page->findElements(WebDriverBy::cssSelector($selector));
+            }
+            if (empty($nodes) and Locator::isXPath($selector)) {
+                $isValidLocator = true;
+                $nodes = $page->findElements(WebDriverBy::xpath($selector));
+            }
+        } catch (InvalidSelectorException $e) {
+            throw new MalformedLocatorException($selector);
         }
-        if (!empty($nodes)) {
-            return $nodes;
+        if (!$isValidLocator and $throwMalformed) {
+            throw new MalformedLocatorException($selector);
         }
-        if (Locator::isCSS($selector)) {
-            $nodes = $page->findElements(\WebDriverBy::cssSelector($selector));
-        }
-        if (!empty($nodes)) {
-            return $nodes;
-        }
-        if (Locator::isXPath($selector)) {
-            $nodes = $page->findElements(\WebDriverBy::xpath($selector));
-        } else {
-            codecept_debug("XPath `$selector` is malformed!");
-        }
-
         return $nodes;
     }
 
-    protected function findClickable(RemoteWebDriver $page, $link)
+    protected function findClickable($page, $link)
     {
-        if (is_array($link) or ($link instanceof \WebDriverBy)) {
-            $els = $this->match($page, $link);
-            if (count($els)) {
-                return reset($els);
-            }
-            throw new ElementNotFound($link, 'CSS or XPath');
+        if (is_array($link) or ($link instanceof WebDriverBy)) {
+            return $this->matchFirstOrFail($page, $link);
         }
 
         // try to match by CSS or XPath
-        $els = $this->match($page, $link);
-        if (!empty($els)) {
-            return reset($els);
+        try {
+            $els = $this->match($page, $link, false);
+            if (!empty($els)) {
+                return reset($els);
+            }
+        } catch (MalformedLocatorException $e) {
+            //ignore exception, link could still match on of the things below
         }
 
         $locator = Crawler::xpathLiteral(trim($link));
@@ -354,7 +381,7 @@ class ValidationController extends Controller
             ".//input[./@type = 'submit' or ./@type = 'image' or ./@type = 'button'][normalize-space(@value)=$locator]"
         );
 
-        $els = $page->findElements(\WebDriverBy::xpath($xpath));
+        $els = $page->findElements(WebDriverBy::xpath($xpath));
         if (count($els)) {
             return reset($els);
         }
@@ -369,7 +396,7 @@ class ValidationController extends Controller
             ".//button[./@name = $locator]"
         );
 
-        $els = $page->findElements(\WebDriverBy::xpath($xpath));
+        $els = $page->findElements(WebDriverBy::xpath($xpath));
         if (count($els)) {
             return reset($els);
         }
@@ -447,14 +474,15 @@ class ValidationController extends Controller
                             ) . '</strong> ' . str_replace(
                                 '"',
                                 '',
-                                $x->getStep()->getArguments(true)
+                                $x->getStep()->getArgumentsAsString()
                             ) . ' seconds</span>';
                     } elseif ($x->getStep()->getAction() == 'click') {
                         $ss = 'TestClick' . substr(md5(microtime()), -5);
                         /** @var WebDriver $driver */
                         $driver = $this->suiteManager->getModuleContainer()->getModule('WebDriver');
                         /** @var \RemoteWebElement $ele */
-                        $ele = $this->findClickable($driver->webDriver, trim($x->getStep()->getArguments()[0], '"'));
+                        $args = trim($x->getStep()->getArgumentsAsString(), '"');
+                        $ele = $this->findClickable($driver->webDriver, $args);
                         if (!empty($ele) && $ele->getSize()->getWidth() > 0 && $ele->getSize()->getHeight() > 0) {
                             $driver->webDriver->executeScript('if(typeof $ != \'undefined\' && typeof DASHBOARD_MARGINS != \'undefined\') { $(arguments[0]).scrollintoview(DASHBOARD_MARGINS); } else { arguments[0].scrollIntoView(true); }', [$ele]);
                             $driver->wait(1);
@@ -479,19 +507,19 @@ class ValidationController extends Controller
                                 $ss . '.png">' . str_replace(
                                     '"',
                                     '',
-                                    $x->getStep()->getArguments(true)
+                                    $x->getStep()->getArgumentsAsString()
                                 ) . ' <img style="max-width:300px;" src="/bundles/admin/results/debug/' . $ss . '.png" /></a></span>';
                         } else {
                             $steps[$x->getTest()->getName()] .= '<span class="step">I <strong>' . $x->getStep(
                                 )->getAction() . '</strong> ' . str_replace(
                                     '"',
                                     '',
-                                    $x->getStep()->getArguments(true)
+                                    $x->getStep()->getArgumentsAsString()
                                 ) . '</span>';
                         }
                     } else {
                         $steps[$x->getTest()->getName()] .= '<span class="step">I <strong>' . $x->getStep()->getAction(
-                            ) . '</strong> ' . str_replace('"', '', $x->getStep()->getArguments(true)) . '</span>';
+                            ) . '</strong> ' . str_replace('"', '', $x->getStep()->getArgumentsAsString()) . '</span>';
                     }
                 }
             );
@@ -547,10 +575,8 @@ class ValidationController extends Controller
                             'if(typeof window.jsErrors != \'undefined\') { return (function () {var tmpErrors = window.jsErrors; window.jsErrors = []; return tmpErrors || [];})() };'
                         );
                         try {
-                            $x->getTest()->assertEmpty(
-                                $jsErrors,
-                                'Javascript errors: ' . (is_array($jsErrors) ? implode($jsErrors) : $jsErrors)
-                            );
+                            /** @var Cest $test */
+                            assert(empty($jsErrors), 'Javascript errors: ' . (is_array($jsErrors) ? implode($jsErrors) : $jsErrors));
                         } catch (\PHPUnit_Framework_AssertionFailedError $e) {
                             $x->getTest()->getTestResultObject()->addFailure($x->getTest(), $e, PHP_Timer::stop());
                         }

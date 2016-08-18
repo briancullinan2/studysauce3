@@ -27,6 +27,7 @@ class InstallationCest
      */
     public function _after(AcceptanceTester $I)
     {
+
     }
 
     // tests

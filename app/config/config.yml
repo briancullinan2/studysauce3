@@ -6,6 +6,7 @@ imports:
 parameters:
     authorize_test_mode: true
     defer_all_emails: "studymarketing@mailinator.com"
+    fos_js_routing.extractor.class: StudySauce\Bundle\DependencyInjection\ExposedRoutesExtractor
 
 services:
     pdo:

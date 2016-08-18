@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace FOS\JsRoutingBundle\Extractor;
+namespace StudySauce\Bundle\DependencyInjection;
 
+use FOS\JsRoutingBundle\Extractor\ExposedRoutesExtractorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
-use JMS\I18nRoutingBundle\Router\I18nLoader;
 
 /**
  * @author      William DURAND <william.durand1@gmail.com>
