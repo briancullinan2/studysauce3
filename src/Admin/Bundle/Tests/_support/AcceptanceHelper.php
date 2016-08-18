@@ -1,12 +1,13 @@
 <?php
-namespace Admin\Bundle\Tests\Codeception\Module;
+namespace Admin\Bundle\Tests;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
 
 use Codeception\Module\WebDriver;
+use Codeception\Test\Cest;
 use Codeception\TestCase;
-use Codeception\TestCase\Cest;
+use Codeception\TestInterface;
 use Doctrine\ORM\EntityManager;
 use PHPUnit_Framework_TestResult;
 use PHPUnit_Framework_TestSuite;
@@ -24,7 +25,7 @@ class AcceptanceHelper extends \Codeception\Module
     /**
      * @param TestCase $test
      */
-    public function _before(TestCase $test)
+    public function _before(TestInterface $test)
     {
         $this->result = $test->getTestResultObject();
     }

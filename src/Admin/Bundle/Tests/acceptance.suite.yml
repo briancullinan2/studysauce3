@@ -12,6 +12,7 @@ modules:
         - Symfony2
         - Filesystem
         - Asserts
+        - Admin\Bundle\Tests\AcceptanceHelper
         - Doctrine2:
             cleanup: false
             depends: Symfony2

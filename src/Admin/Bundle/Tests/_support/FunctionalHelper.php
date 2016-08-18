@@ -1,11 +1,11 @@
 <?php
-namespace Admin\Bundle\Tests\Codeception\Module;
+namespace Admin\Bundle\Tests;
 
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
 
 use Admin\Bundle\Controller\EmailsController;
-use Codeception\TestCase\Cest;
+use Codeception\Test\Cest;
 use PHPUnit_Framework_TestResult;
 use PHPUnit_Framework_TestSuite;
 use Symfony\Component\DependencyInjection\ContainerInterface;

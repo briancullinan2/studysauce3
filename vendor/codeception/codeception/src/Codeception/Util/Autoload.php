@@ -87,7 +87,7 @@ class Autoload
 
     public static function load($class)
     {
-        // the current namespace prefix
+       // the current namespace prefix
         $prefix = $class;
 
         // work backwards through the namespace names of the fully-qualified class name to find a mapped file name
@@ -135,6 +135,7 @@ class Autoload
      */
     protected static function loadMappedFile($prefix, $relative_class)
     {
+
         if (!isset(self::$map[$prefix])) {
             return false;
         }

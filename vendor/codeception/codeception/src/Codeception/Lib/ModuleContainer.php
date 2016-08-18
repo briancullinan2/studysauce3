@@ -218,10 +218,10 @@ class ModuleContainer
      */
     private function getModuleClass($moduleName)
     {
+
         if ($this->isHelper($moduleName)) {
             return $moduleName;
         }
-
         return self::MODULE_NAMESPACE . $moduleName;
     }
 
