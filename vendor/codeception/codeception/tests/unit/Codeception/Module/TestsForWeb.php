@@ -1432,7 +1432,7 @@ abstract class TestsForWeb extends \Codeception\TestCase\Test
     public function testSwitchToIframe()
     {
         $this->module->amOnPage('/iframe');
-        $this->module->switchToIframe('content');
+        $this->module->switchToIFrame('content');
         $this->module->see('Is that interesting?');
         $this->module->click('Ссылочка');
     }

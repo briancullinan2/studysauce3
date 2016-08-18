@@ -263,6 +263,7 @@ $update
 
 # install firefox on AMI Linux
 mkdir /home/public/
+cd /home/public/
 curl -X GET -o RPM-GPG-KEY-lambda-epll https://lambda-linux.io/RPM-GPG-KEY-lambda-epll
 sudo rpm --import RPM-GPG-KEY-lambda-epll
 curl -X GET -o epll-release-2016.03-1.1.ll1.noarch.rpm https://lambda-linux.io/epll-release-2016.03-1.1.ll1.noarch.rpm

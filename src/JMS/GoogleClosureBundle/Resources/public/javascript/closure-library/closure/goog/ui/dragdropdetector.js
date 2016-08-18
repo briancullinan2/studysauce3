@@ -412,7 +412,7 @@ goog.ui.DragDropDetector.prototype.switchToInput_ = function(e) {
  * @param {goog.events.BrowserEvent} e The event that caused this function call.
  * @private
  */
-goog.ui.DragDropDetector.prototype.switchToIframe_ = function(e) {
+goog.ui.DragDropDetector.prototype.switchToIFrame_ = function(e) {
   // This is only called on IE.
   if (this.isCoveringScreen_) {
     goog.style.showElement(this.textInput_, false);
@@ -438,7 +438,7 @@ goog.ui.DragDropDetector.prototype.handleNewDrag_ = function(e) {
   }
 
   // Things that aren't links can be placed in the contentEditable iframe.
-  this.switchToIframe_(e);
+  this.switchToIFrame_(e);
 
   // No need to return true since for events return true is the same as no
   // return.

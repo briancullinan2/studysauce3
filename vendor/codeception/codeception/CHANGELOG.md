@@ -292,7 +292,7 @@
 * [WebDriver] seeNumberOfElements should only count visible elements #2303. By @sascha-egerer
 * [PhpBrowser][Frameworks] Verbose output for all HTTP requests. By @Naktibalda
 * [PhpBrowser][Frameworks] Throw `Codeception\Exception\ExternalUrlException` when framework module tries to open an external URL #2328. By @Naktibalda
-* [PhpBrowser][Frameworks] Added `switchToIframe` method. By @Naktibalda
+* [PhpBrowser][Frameworks] Added `switchToIFrame` method. By @Naktibalda
 * [Dbh] module deprecated
 
 #### 2.1.2

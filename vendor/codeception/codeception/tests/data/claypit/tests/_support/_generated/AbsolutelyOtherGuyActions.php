@@ -2163,14 +2163,14 @@ trait AbsolutelyOtherGuyActions
      * ``` php
      * <?php
      * # switch to iframe
-     * $I->switchToIframe("another_frame");
+     * $I->switchToIFrame("another_frame");
      * ```
      *
      * @param string $name
-     * @see \Codeception\Lib\InnerBrowser::switchToIframe()
+     * @see \Codeception\Lib\InnerBrowser::switchToIFrame()
      */
-    public function switchToIframe($name) {
-        return $this->getScenario()->runStep(new \Codeception\Step\Action('switchToIframe', func_get_args()));
+    public function switchToIFrame($name) {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('switchToIFrame', func_get_args()));
     }
 
  

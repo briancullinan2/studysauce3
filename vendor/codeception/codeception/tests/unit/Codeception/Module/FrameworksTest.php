@@ -41,7 +41,7 @@ class FrameworksTest extends TestsForWeb
     public function testMoveBackOneStep()
     {
         $this->module->amOnPage('/iframe');
-        $this->module->switchToIframe('content');
+        $this->module->switchToIFrame('content');
         $this->module->seeCurrentUrlEquals('/info');
         $this->module->click('Ссылочка');
         $this->module->seeCurrentUrlEquals('/');
@@ -54,7 +54,7 @@ class FrameworksTest extends TestsForWeb
     public function testMoveBackTwoSteps()
     {
         $this->module->amOnPage('/iframe');
-        $this->module->switchToIframe('content');
+        $this->module->switchToIFrame('content');
         $this->module->seeCurrentUrlEquals('/info');
         $this->module->click('Ссылочка');
         $this->module->seeCurrentUrlEquals('/');
@@ -65,7 +65,7 @@ class FrameworksTest extends TestsForWeb
     public function testMoveBackThrowsExceptionIfNumberOfStepsIsInvalid()
     {
         $this->module->amOnPage('/iframe');
-        $this->module->switchToIframe('content');
+        $this->module->switchToIFrame('content');
         $this->module->seeCurrentUrlEquals('/info');
         $this->module->click('Ссылочка');
         $this->module->seeCurrentUrlEquals('/');

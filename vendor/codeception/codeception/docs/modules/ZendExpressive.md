@@ -1213,7 +1213,7 @@ $I->submitForm('#my-form', [
  * `param` $button
 
 
-### switchToIframe
+### switchToIFrame
  
 Switch to iframe or frame on the page.
 
@@ -1225,7 +1225,7 @@ Example:
 ``` php
 <?php
 # switch to iframe
-$I->switchToIframe("another_frame");
+$I->switchToIFrame("another_frame");
 ```
 
  * `param string` $name

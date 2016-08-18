@@ -1621,13 +1621,13 @@ class InnerBrowser extends Module implements Web, PageSourceSaver, ElementLocato
      * ``` php
      * <?php
      * # switch to iframe
-     * $I->switchToIframe("another_frame");
+     * $I->switchToIFrame("another_frame");
      * ```
      *
      * @param string $name
      */
 
-    public function switchToIframe($name)
+    public function switchToIFrame($name)
     {
         $iframe = $this->match("iframe[name=$name]")->first();
         if (!count($iframe)) {
