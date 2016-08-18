@@ -41,8 +41,6 @@ class AcceptanceHelper extends \Codeception\Module
         foreach($suite->tests() as $t)
         {
             /** @var Cest $t */
-            $t->setBackupStaticAttributes(false);
-            $t->setBackupGlobals(false);
             if($t->getName() == $methodName) {
                 $t->run($this->result);
                 break;
