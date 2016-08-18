@@ -25,7 +25,7 @@ if(!is_array($cart)) {
 ?>
 <div class="pack-icon">
     <div>
-        <input type="hidden" name="childId" value="<?php print $invite->getInvitee()->getId(); ?>" />
+        <input type="hidden" name="childId" value="<?php print ($invite->getInvitee()->getId()); ?>" />
     <label class="input childFirst">
         <span>Child&rsquo;s first name</span>
         <input type="text" name="childFirst" value="<?php print ($invite->getInvitee()->getFirst()); ?>" />
