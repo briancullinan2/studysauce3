@@ -18,7 +18,50 @@ $(document).ready(function () {
             setTimeout(function () {
                 var clipText = text.val();
                 text.remove();
-                rowImport.apply(tab, [clipText]);
+                var imported = false;
+                var isObj = false;
+                if(clipText[0] == '{' && clipText[clipText.length-1] == '}') {
+                    try {
+                        var obj = JSON.parse(clipText);
+                        if(typeof obj.title != 'undefined' && typeof obj.cards != 'undefined') {
+                            isObj = true;
+                            jsonImport.apply(tab, [obj]);
+                            imported = true;
+                        }
+                    }
+                    catch (e) {
+                        if(isObj) {}
+                        throw e;
+                    }
+                }
+                if(!imported) {
+                    rowImport.apply(tab, [clipText]);
+                }
+            }, 100);
+        }
+    });
+
+    key('⌘+c, ctrl+c, command+c', function () {
+        var tab = $('[id*="packs-"]:visible');
+        if (tab.length > 0) {
+
+            // get the clipboard text
+            var text = $('<textarea></textarea>')
+                .css('position', 'fixed')
+                .css('top', 0)
+                .css('left', -10000)
+                .css('opacity', '0')
+                .css('height', 1)
+                .css('width', 1).appendTo(tab).focus();
+
+            var pack = tab.find('.pack-edit .results').data('results')['pack'][0];
+            pack.cards = tab.find('.card-list .results').data('results')['card'];
+            var currentView = JSON.stringify(pack);
+            text.val(currentView);
+            text.selectRange(0, currentView.length);
+
+            setTimeout(function () {
+                text.remove();
             }, 100);
         }
     });
@@ -32,6 +75,66 @@ $(document).ready(function () {
             tab.find('.card-row .preview-card:not([class*="type-"]), .card-row .preview-card.preview-answer[class*="type-"]').trigger('click');
         }
     });
+
+    function jsonImport(json) {
+        var results = $(this).find('.card-list .results'),
+            request = results.data('request'),
+            last = null;
+
+        var newRows = $([]);
+        for(var c in json['cards']) {
+            if(!json['cards'].hasOwnProperty(c)) {
+                return;
+            }
+            (function (card) {
+                setTimeout(function () {
+                    var rowHtml = $(window.views.render('row-card', {
+                        card: applyEntityObj(card),
+                        table: 'card',
+                        tableId: 'card',
+                        tables: request.tables,
+                        request: request,
+                        results: []
+                    }))
+                        .removeClass('read-only').addClass('edit');
+
+                    // list under currently focused row
+                    if (last != null) {
+                        last = rowHtml.insertAfter(last.last());
+                    }
+                    else {
+                        last = rowHtml.insertAfter(results.find('> header.card'));
+                    }
+                    resizeTextAreas.apply(last);
+                    last.addClass('changed');
+                    last.trigger('validate');
+                    newRows = newRows.add(last);
+                }, 20);
+            })(json['cards'][c]);
+        }
+
+        var packResults = $(this).find('.pack-edit .results');
+        var packRequest = packResults.data('request');
+        var rowHtml = $(window.views.render('row-pack', {
+            pack: applyEntityObj(json),
+            table: 'pack',
+            tableId: 'pack',
+            tables: packRequest.tables,
+            request: packRequest,
+            results: []
+        }))
+            .removeClass('read-only').addClass('edit');
+        packResults.find('.pack-row').replaceWith(rowHtml);
+
+        // remove empties
+        results.find('.card-row.empty:not(.removed), .card-row.empty:not(.removed) + .expandable:not([class*="-row"])').remove();
+
+        if(results.find('.card-row:not(.removed)').length == 0) {
+            for(var n = 0; n < 5; n++) {
+                addResultRow.apply(results, ['card']);
+            }
+        }
+    }
 
     function rowImport(clipText) {
         var results = $(this).find('.card-list .results'),
@@ -113,9 +216,9 @@ $(document).ready(function () {
         }
 
         // remove empties
-        results.find('.card-row.empty, .card-row.empty + .expandable:not([class*="-row"])').remove();
+        results.find('.card-row.empty:not(.removed), .card-row.empty:not(.removed) + .expandable:not([class*="-row"])').remove();
 
-        if(clipRows.length == 0) {
+        if(results.find('.card-row:not(.removed)').length == 0) {
             for(var n = 0; n < 5; n++) {
                 addResultRow.apply(results, ['card']);
             }
@@ -336,7 +439,7 @@ $(document).ready(function () {
         var results = $(this);
         var tab = results.closest('.panel-pane');
         autoSaveTimeout = null;
-        if (tab.is('#packs-pack0') && typeof evt['results']['results']['pack'][0] != 'undefined') {
+        if (tab.is('#packs-pack0') && typeof evt['results'] && typeof evt['results']['results']['pack'][0] != 'undefined') {
             window.views.render.apply(tab, ['packs', {entity: evt['results']['results']['pack'][0]}]);
             results.data('request', $.extend(results.data('request'), {requestKey: evt['results'].requestKey})); // replace key because template clears it
             var id = getTabId.apply(results);

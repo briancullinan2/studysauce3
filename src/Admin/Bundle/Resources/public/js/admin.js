@@ -56,21 +56,7 @@ $(document).ready(function () {
             text.selectRange(0, currentView.length);
 
             setTimeout(function () {
-                var clipText = text.val(), i;
                 text.remove();
-
-                // split into rows
-                var clipRows = clipText.split(/\n/ig);
-
-                // split rows into columns
-                for (i=0; i<clipRows.length; i++) {
-                    clipRows[i] = clipRows[i].split(/\t|\s\s\s\s+/ig);
-                }
-
-                // write out in a table
-                for (i=0; i<clipRows.length; i++) {
-
-                }
             }, 100);
         }
     });

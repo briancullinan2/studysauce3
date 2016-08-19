@@ -141,6 +141,10 @@
     vertical-align: top;
 }
 
+#validation .browser-setting.select:before {
+    top:1.4em;
+}
+
 #validation .suite-actions
 {
     width: 150px;

@@ -200,6 +200,10 @@
     vertical-align: middle;
 }
 
+[id^="packs-"] .card-row .input.type.select:before {
+    right:100px;
+}
+
 [id^="packs-"] .selectize-control.multi .selectize-input {
     height:auto;
     max-height:6em;

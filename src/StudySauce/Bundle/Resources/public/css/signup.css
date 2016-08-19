@@ -41,6 +41,10 @@
     display:inline-block;
 }
 
+#signup label.select:before {
+    left:30%;
+}
+
 #signup label input,
 #signup label select
 {
@@ -152,6 +156,12 @@
         display:block;
         width: 100%;
         margin: 0;
+    }
+
+
+    #signup label.select:before {
+        left:0;
+        top:1.4em;
     }
 
     #signup .form-actions
