@@ -60,7 +60,7 @@ jQuery(document).ready(function() {
 
     body.on('click', '#account a[href="#cancel-edit"]', function (evt) {
         var account = jQuery('#account');
-        account.find('.ss_user-row').removeClass('edit-pass');
+        account.find('.ss_user-row').removeClass('edit edit-pass');
     });
 
     body.on('click', '#cancel-confirm a[href="#cancel-account"]', function (evt) {
