@@ -43,10 +43,10 @@ class ActivityController extends Controller
         /** @var QueryBuilder $entities */
         $entities = $orm->getRepository('StudySauceBundle:Visit')->createQueryBuilder('v')
             ->distinct()
-            ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval'])
+            ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval, MIN(v.id) as id'])
             ->leftJoin('v.user', 'u')
             ->leftJoin('u.groups', 'g')
-            ->where('v.created > :start AND v.created < :end' . (!empty($request->get('not')) ? (' AND v.id NOT IN (' . $request->get('not') . ')') : ''))
+            ->where('v.created > :start AND v.created < :end' . (!empty($request->get('not')) ? (' AND id NOT IN (' . $request->get('not') . ')') : ''))
             ->andWhere('v.path != \'/cron\'')
             ->groupBy('v.user,v.path,time_interval');
         if(!empty($request->get('search'))) {
@@ -88,7 +88,8 @@ class ActivityController extends Controller
         /** @var array $entities */
 
         $visits = array_map(function ($a) {
-            $v = array_shift($a);
+            /** @var Visit $v */
+            $v = $a[0];
             return [
                 'id' => $v->getId(),
                 'start' => $v->getCreated()->format('r'),
