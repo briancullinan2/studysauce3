@@ -43,10 +43,10 @@ class ActivityController extends Controller
         /** @var QueryBuilder $entities */
         $entities = $orm->getRepository('StudySauceBundle:Visit')->createQueryBuilder('v')
             ->distinct()
-            ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval'])
+            ->select(['v', 'u', 'SUBSTRING(v.created, 1, 13) AS time_interval'])
             ->leftJoin('v.user', 'u')
             ->leftJoin('u.groups', 'g')
-            ->having('v.created > :start AND v.created < :end')
+            ->where('v.created > :start AND v.created < :end')
             ->andWhere('v.path != \'/cron\'')
             ->groupBy('time_interval,v.path,v.user');
         if(!empty($request->get('search'))) {
