@@ -48,7 +48,7 @@ class ActivityController extends Controller
             ->leftJoin('u.groups', 'g')
             ->where('v.created > :start AND v.created < :end')
             ->andWhere('v.path != \'/cron\'')
-            ->groupBy('time_interval,v.path,v.user');
+            ->groupBy('time_interval,v.user,v.path');
         if(!empty($request->get('search'))) {
             if($request->get('search') == 'New session') {
                 $entities = $entities->andWhere('v.session IS NULL');
