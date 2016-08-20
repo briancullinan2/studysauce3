@@ -43,10 +43,10 @@ class ActivityController extends Controller
         /** @var QueryBuilder $entities */
         $entities = $orm->getRepository('StudySauceBundle:Visit')->createQueryBuilder('v')
             ->distinct()
-            ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval, MIN(v.id) as id'])
+            ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval'])
             ->leftJoin('v.user', 'u')
             ->leftJoin('u.groups', 'g')
-            ->where('v.created > :start AND v.created < :end' . (!empty($request->get('not')) ? (' AND MIN(v.id) NOT IN (' . $request->get('not') . ')') : ''))
+            ->where('v.created > :start AND v.created < :end')
             ->andWhere('v.path != \'/cron\'')
             ->groupBy('v.user,v.path,time_interval');
         if(!empty($request->get('search'))) {
@@ -77,14 +77,18 @@ class ActivityController extends Controller
                 $entities = $entities->andWhere('u.email LIKE \'%' . $request->get('search') . '%\' OR u.first LIKE \'%' . $request->get('search') . '%\' OR u.last LIKE \'%' . $request->get('search') . '%\' OR g.name LIKE \'%' . $request->get('search') . '%\' OR g.description LIKE \'%' . $request->get('search') . '%\'');
             }
         }
+        if(!empty($request->get('not'))) {
+            $entities = $entities
+                ->having('v.id NOT IN (' . $request->get('not') . ')');
+        }
         $entities = $entities
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->orderBy('v.created', 'DESC')
             ->setFirstResult(0)
             ->setMaxResults(100)
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
+        $entities = $entities->getResult();
         /** @var array $entities */
 
         $visits = array_map(function ($a) {
