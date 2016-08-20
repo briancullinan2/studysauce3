@@ -79,7 +79,7 @@ class ActivityController extends Controller
         }
         if(!empty($request->get('not'))) {
             $entities = $entities
-                ->having('v.id NOT IN (' . $request->get('not') . ')');
+                ->having('MIN(v.id) NOT IN (' . $request->get('not') . ')');
         }
         $entities = $entities
             ->setParameter('start', $start)
