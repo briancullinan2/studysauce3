@@ -68,6 +68,10 @@ class LandingController extends Controller
         return new JsonResponse(true);
     }
 
+    public function courseAction(Request $request) {
+        return $this->redirect('https://course.studysauce.com' . $this->generateUrl($request->get('_route'), $request->query->all()));
+    }
+
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */

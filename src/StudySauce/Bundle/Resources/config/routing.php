@@ -461,4 +461,30 @@ $collection->add(
         ['_format' => DASHBOARD_VIEWS, 'group' => '0']
     )
 );
+
+
+// TODO: remove old links?
+
+$collection->add(
+    'torchandlaurel_welcome',
+    new Route('/torchandlaurel/{_code}',
+        ['_controller' => 'StudySauceBundle:Landing:course','_code' => ''])
+);
+
+$collection->add(
+    'torchandlaurelparents_welcome',
+    new Route('/torchandlaurelparents/{_code}',
+        ['_controller' => 'StudySauceBundle:Landing:course','_code' => ''])
+);
+
+$collection->add(
+    'torchandlaurel_register',
+    new Route(
+        '/torchandlaurelregister',
+        ['_controller' => 'StudySauceBundle:Landing:course', '_format' => 'funnel'],
+        ['_format' => 'funnel']
+    )
+);
+
+
 return $collection;

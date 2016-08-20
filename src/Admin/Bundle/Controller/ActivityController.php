@@ -43,11 +43,12 @@ class ActivityController extends Controller
         /** @var QueryBuilder $entities */
         $entities = $orm->getRepository('StudySauceBundle:Visit')->createQueryBuilder('v')
             ->distinct()
-            ->select(['v', 'u'])
+            ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval'])
             ->leftJoin('v.user', 'u')
             ->leftJoin('u.groups', 'g')
             ->where('v.created > :start AND v.created < :end' . (!empty($request->get('not')) ? (' AND v.id NOT IN (' . $request->get('not') . ')') : ''))
-            ->andWhere('u.roles NOT LIKE \'%s:10:"ROLE_ADMIN"%\' AND v.path != \'/cron\'');
+            ->andWhere('v.path != \'/cron\'')
+            ->groupBy('v.user,v.path,time_interval');
         if(!empty($request->get('search'))) {
             if($request->get('search') == 'New session') {
                 $entities = $entities->andWhere('v.session IS NULL');
@@ -65,7 +66,7 @@ class ActivityController extends Controller
                     ->setParameter('path', $request->get('search') . '%');
             }
             elseif(strpos($request->get('search'), '@') !== false) {
-                $entities = $entities->andWhere('OR u.email LIKE :email')
+                $entities = $entities->andWhere('u.email LIKE :email')
                     ->setParameter('email', '%' . $request->get('search') . '%');
             }
             elseif(is_numeric($request->get('search'))) {
@@ -86,7 +87,8 @@ class ActivityController extends Controller
             ->getResult();
         /** @var array $entities */
 
-        $visits = array_map(function (Visit $v) {
+        $visits = array_map(function ($a) {
+            $v = array_shift($a);
             return [
                 'id' => $v->getId(),
                 'start' => $v->getCreated()->format('r'),
