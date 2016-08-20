@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="visit",indexes={
  *     @ORM\Index(name="session_idx", columns={"session_id", "user_id"}),
  *     @ORM\Index(name="path_idx", columns={"path", "session_id", "user_id"})})
+ *     @ORM\Index(name="created_idx", columns={"path", "user_id", "created"})})
  * @ORM\HasLifecycleCallbacks()
  */
 class Visit

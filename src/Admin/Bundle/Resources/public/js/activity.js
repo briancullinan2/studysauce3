@@ -11,7 +11,7 @@ $(document).ready(function () {
     });
 
     body.on('show', '#activity', function () {
-        timelineInterval = setInterval(updateTimeline, 500);
+        timelineInterval = setInterval(updateTimeline, 5000);
         if($(this).is('.loaded'))
             return;
         $(this).addClass('loaded');
