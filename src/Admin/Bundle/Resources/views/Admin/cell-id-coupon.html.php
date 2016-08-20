@@ -11,5 +11,5 @@ $time = method_exists($coupon, 'getModified') && !empty($coupon->getModified()) 
 <?php if (empty($coupon->getLogo())) { ?>
         <img width="300" height="100" src="<?php print ($view->escape($view['assets']->getUrl('bundles/studysauce/images/upload_image.png'))); ?>" class="default centerized" alt="Upload"/>
     <?php
-} else { ?><img height="50" src="<?php print ($coupon->getLogo()); ?>" /><?php } ?>
+} else { ?><img height="50" src="<?php print ($coupon->getLogo()); ?>" class="centerized" /><?php } ?>
 </i>

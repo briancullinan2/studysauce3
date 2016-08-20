@@ -10,5 +10,5 @@ $time = method_exists($pack, 'getModified') && !empty($pack->getModified()) ? $p
 <?php if (empty($pack->getLogo())) { ?>
         <img width="300" height="100" src="<?php print ($view->escape($view['assets']->getUrl('bundles/studysauce/images/upload_image.png'))); ?>" class="default centerized" alt="Upload"/>
     <?php
-} else { ?><img height="50" src="<?php print ($pack->getLogo()); ?>" /><?php } ?>
+} else { ?><img height="50" src="<?php print ($pack->getLogo()); ?>" class="centerized" /><?php } ?>
 </i>

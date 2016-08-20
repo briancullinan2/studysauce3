@@ -46,7 +46,7 @@ class ActivityController extends Controller
             ->select(['v', 'u', 'SUBSTRING(v.created, 0, 13) AS time_interval'])
             ->leftJoin('v.user', 'u')
             ->leftJoin('u.groups', 'g')
-            ->where('v.created > :start AND v.created < :end')
+            ->having('v.created > :start AND v.created < :end')
             ->andWhere('v.path != \'/cron\'')
             ->groupBy('time_interval,v.path,v.user');
         if(!empty($request->get('search'))) {
@@ -79,7 +79,7 @@ class ActivityController extends Controller
         }
         if(!empty($request->get('not'))) {
             $entities = $entities
-                ->having('MIN(v.id) NOT IN (' . $request->get('not') . ')');
+                ->andHaving('MIN(v.id) NOT IN (' . $request->get('not') . ')');
         }
         $entities = $entities
             ->setParameter('start', $start)
