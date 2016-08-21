@@ -58,7 +58,8 @@ class BuyController extends Controller
             $service = $this->get('security.authentication.rememberme.services.persistent.main');
             $service->autoLogin($request);
         }
-        else if (empty($this->getUser()) || $this->getUser()->hasRole('ROLE_GUEST')) {
+
+        if (empty($this->getUser()) || $this->getUser()->hasRole('ROLE_GUEST')) {
             throw new AccessDeniedHttpException();
         }
 

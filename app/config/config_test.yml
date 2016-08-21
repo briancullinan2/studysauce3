@@ -6,7 +6,6 @@ parameters:
     stripe_api_key: "sk_test_e6FayAX25zDIq2O17blocj2h"
     stripe_public_key: "pk_test_th5VY2bxRUDSJZ1xCcpJ7CNB"
 
-
 doctrine:
     dbal:
         driver:   "pdo_mysql"
@@ -24,3 +23,16 @@ services:
             - itekIO^#(1234
         calls:
             - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
+
+monolog:
+    handlers:
+        main:
+            type:         stream
+            action_level: debug
+            handler:      nested
+        nested:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+        console:
+            type:  console
