@@ -127,6 +127,7 @@ $(document).ready(function () {
         }))
             .removeClass('read-only').addClass('edit');
         packResults.find('.pack-row').replaceWith(rowHtml);
+        rowHtml.addClass('changed');
 
         // remove empties
         results.find('.card-row.empty:not(.removed), .card-row.empty:not(.removed) + .expandable:not([class*="-row"])').remove();
