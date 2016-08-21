@@ -202,6 +202,7 @@
 
 [id^="packs-"] .card-row .input.type.select:before {
     right:100px;
+    left:40px;
 }
 
 [id^="packs-"] .selectize-control.multi .selectize-input {

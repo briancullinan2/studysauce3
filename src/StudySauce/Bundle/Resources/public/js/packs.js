@@ -88,6 +88,7 @@ $(document).ready(function () {
             }
             (function (card) {
                 setTimeout(function () {
+                    delete card.id;
                     var rowHtml = $(window.views.render('row-card', {
                         card: applyEntityObj(card),
                         table: 'card',
@@ -115,6 +116,7 @@ $(document).ready(function () {
 
         var packResults = $(this).find('.pack-edit .results');
         var packRequest = packResults.data('request');
+        delete json.id;
         var rowHtml = $(window.views.render('row-pack', {
             pack: applyEntityObj(json),
             table: 'pack',
