@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 
 
 /**
@@ -48,6 +49,15 @@ class BuyController extends Controller
     }
 
     public function cartAction(Request $request) {
+        $coupon = $this->getCoupon($request);
+
+        if($request->get('pay')) {
+            $request->cookies->set('REMEMBERME', $request->get('pay'));
+            /** @var AbstractRememberMeServices $service */
+            $service = $this->get('security.authentication.rememberme.services.persistent.main');
+            $service->autoLogin($request);
+        }
+
         if(empty($request->cookies->get('cart'))) {
             return $this->redirect($this->generateUrl('store'));
         }
@@ -232,7 +242,7 @@ class BuyController extends Controller
                         "source" => $request->get('purchase_token'),
                         "description" => "Pack Bundle"
                     ));
-                    $payment->setPayment($request->get('purchase_token'));
+                    $payment->setPayment($charge->id);
                 } catch (\Stripe\Error\Card $e) {
                     // The card has been declined
                     throw new BadRequestHttpException($e->getMessage(), $e);

@@ -281,7 +281,7 @@ $(document).ready(function () {
         show: true
     });
 
-    if(!body.is('.landing-home')) {
+    if(!body.is('.landing-home') && window.location.pathname != '/cart') {
         var appUrl = 'studysauce://' + window.location.hostname + window.location.search;
 
         var appDialog = $('#gettheapp').modal({show: true});
