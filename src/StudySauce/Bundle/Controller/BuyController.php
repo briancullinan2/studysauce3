@@ -53,10 +53,9 @@ class BuyController extends Controller
         $coupon = $this->getCoupon($request);
 
         if($request->get('pay')) {
-            $request->cookies->set('REMEMBERME', $request->get('pay'));
             /** @var AbstractRememberMeServices $service */
             $service = $this->get('security.authentication.rememberme.services.persistent.main');
-            $service->autoLogin($request);
+            $service->autoLogin(new Request([], [], [], [new Cookie('REMEMBERME', $request->get('pay'))]));
         }
 
         if (empty($this->getUser()) || $this->getUser()->hasRole('ROLE_GUEST')) {
