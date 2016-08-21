@@ -55,7 +55,11 @@ class BuyController extends Controller
         if($request->get('pay')) {
             /** @var AbstractRememberMeServices $service */
             $service = $this->get('security.authentication.rememberme.services.persistent.main');
-            $service->autoLogin(new Request([], [], [], ['REMEMBERME' => $request->get('pay')]));
+            $token = $service->autoLogin(new Request([], [], [], ['REMEMBERME' => $request->get('pay')]));
+            $context = $this->get('security.context');
+            $context->setToken($token);
+            $session = $request->getSession();
+            $session->set('_security_main', serialize($token));
         }
 
         if (empty($this->getUser()) || $this->getUser()->hasRole('ROLE_GUEST')) {
