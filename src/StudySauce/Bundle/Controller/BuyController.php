@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -56,6 +57,9 @@ class BuyController extends Controller
             /** @var AbstractRememberMeServices $service */
             $service = $this->get('security.authentication.rememberme.services.persistent.main');
             $service->autoLogin($request);
+        }
+        else if (empty($this->getUser()) || $this->getUser()->hasRole('ROLE_GUEST')) {
+            throw new AccessDeniedHttpException();
         }
 
         if(empty($request->cookies->get('cart'))) {

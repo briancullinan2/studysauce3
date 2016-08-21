@@ -78,6 +78,7 @@ security:
         - { path: ^/thanks,                 roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/cron,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/purchase,               roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
+        - { path: ^/cart,                   roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         # landing pages
         - { path: ^/js/routing,             roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
         - { path: ^/command/template,       roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER] }
