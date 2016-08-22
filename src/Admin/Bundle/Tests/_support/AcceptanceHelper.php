@@ -85,6 +85,13 @@ class AcceptanceHelper extends \Codeception\Module
         return $qb;
     }
 
+    public function removeEntity($entity) {
+        /** @var EntityManager $em */
+        $em = $this->getModule('Doctrine2')->em;
+        $em->remove($entity);
+        $em->flush();
+    }
+
     function seePageHas($element)
     {
         try {

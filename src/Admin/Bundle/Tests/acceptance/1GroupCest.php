@@ -5,6 +5,7 @@ use Admin\Bundle\Controller\ValidationController;
 use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
 use Doctrine\ORM\EntityManager;
+use StudySauce\Bundle\Entity\Group;
 use StudySauce\Bundle\Entity\Invite;
 use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\User;
@@ -60,9 +61,21 @@ class GroupCest
     public function tryDeleteTestGroup(AcceptanceTester $I) {
         $I->wantTo('Delete the existing test groups');
         //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
-        $I->seeAmOnPage('/groups');
-        $I->click('Groups');
-
+        $i = 0;
+        while($i < 20) {
+            $I->seeAmOnPage('/groups');
+            $I->click('Groups');
+            $test = $I->grabTextFrom('//a[contains(.,"TestGroup")]');
+            /** @var Group $testGroup */
+            $testGroup = $I->grabFrom('StudySauceBundle:Group', ['name' => $test]);
+            if (!empty($testGroup)) {
+                $testGroup->setDeleted(true);
+                $I->flushToDatabase();
+            } else {
+                break;
+            }
+            $i++;
+        }
     }
 
 }
