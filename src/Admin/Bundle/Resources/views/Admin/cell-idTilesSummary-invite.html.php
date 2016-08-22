@@ -39,16 +39,24 @@ if(!is_array($cart)) {
     </div>
     <?php
     $atLeastOne = false;
-    foreach($invite->getInvitee()->getGroups()->toArray() as $g) {
+    $groups = $invite->getInvitee()->getGroups()->toArray();
+    foreach($groups as $g) {
         /** @var Group $g */
-        foreach($results['invite-1'] as $publicInvite) {
-            /** @var Invite $publicInvite */
-            if($publicInvite->getGroup()->getId() == $g->getId()) {
-                $atLeastOne = true; ?>
-            <div>
-                <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'invite' => $publicInvite, 'invites' => $results['invite-1']])); ?>
-            </div>
-            <?php
+        if(empty($inviteId = $invite->getInvitee()->getProperty('last_group_id')) || $g->getId() == $inviteId) {
+            foreach ($results['invite-1'] as $publicInvite) {
+                /** @var Invite $publicInvite */
+                if ($publicInvite->getGroup()->getId() == $g->getId()) {
+                    $atLeastOne = true; ?>
+                    <div>
+                        <?php print ($view->render('AdminBundle:Admin:register-child-group.html.php', ['context' => $context, 'invite' => $publicInvite, 'invites' => $results['invite-1']])); ?>
+                    </div>
+                    <?php
+                    break;
+                }
+            }
+
+            if($atLeastOne) {
+                break;
             }
         }
     }

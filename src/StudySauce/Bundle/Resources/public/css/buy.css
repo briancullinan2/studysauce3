@@ -120,6 +120,10 @@
     padding-right:20px;
 }
 
+[id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label.child:before {
+    right: 20px;
+}
+
 [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label:last-of-type {
     padding-right:15%;
     margin-left: 30%;

@@ -42,7 +42,7 @@ class AdminController extends Controller
     /** @var array $defaultTables A list of all available fields, firewall */
     public static $defaultTables = [ // database table and field firewall
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
-        'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted', 'invites', 'invitees']],
+        'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted', 'invites', 'invitees', 'properties']],
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
         'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'ownerId'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user', 'cardCount'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted', 'remove']],

@@ -123,13 +123,13 @@ class AccountController extends Controller
             }
         }
 
-        if(!empty($request->get('childId'))) {
+        if(!empty($request->get('invite'))) {
             foreach($user->getInvites()->toArray() as $i) {
                 /** @var Invite $i */
-                if(!empty($i->getInvitee()) && $i->getInvitee()->getId() == intval($request->get('childId'))) {
-                    $i->getInvitee()->setFirst($request->get('childFirst'));
-                    $i->getInvitee()->setLast($request->get('childLast'));
-                    InviteListener::setInviteRelationship($orm, $request, $i->getInvitee());
+                if(!empty($i->getInvitee()) && $i->getInvitee()->getId() == intval($request->get('invite')['childId'])) {
+                    $i->getInvitee()->setFirst($request->get('invite')['childFirst']);
+                    $i->getInvitee()->setLast($request->get('invite')['childLast']);
+                    InviteListener::setInviteRelationship($orm, new Request($request->get('invite')), $i->getInvitee());
                     $userManager->updateUser($i->getInvitee());
                 }
             }

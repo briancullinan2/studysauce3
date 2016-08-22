@@ -20,13 +20,17 @@ $token = $this->container->get('security.token_storage')->getToken();
 if(!empty($token)) {
     foreach ($token->getRoles() as $role) {
         if ($role instanceof SwitchUserRole) {
-            $parentToken = $role->getSource();
+            $parentUser = $role->getSource()->getUser();
         }
     }
 
-    if (!empty($parentToken) && !empty($parentToken->getUser())) {
+    if(empty($parentUser) && $user->getParent() != $user)
+    {
+        $parentUser = $user->getParent();
+    }
+
+    if (!empty($parentUser)) {
         /** @var User $parentUser */
-        $parentUser = $parentToken->getUser();
         foreach ($user->getInvitees()->toArray() as $p) {
             /** @var Invite $p */
             if ($parentUser->getUsername() == $p->getUser()->getUsername()) {

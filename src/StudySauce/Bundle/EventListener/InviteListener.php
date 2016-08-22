@@ -178,8 +178,11 @@ class InviteListener implements EventSubscriberInterface
                     $invite->setInvitee($user);
                     $user->addInvitee($invite);
                 }
-                if(!empty($invite->getGroup()) && !$user->hasGroup($invite->getGroup()->getName())) {
-                    $user->addGroup($invite->getGroup());
+                if(!empty($invite->getGroup())) {
+                    if(!$user->hasGroup($invite->getGroup()->getName())) {
+                        $user->addGroup($invite->getGroup());
+                    }
+                    $user->setProperty('last_group_id', $invite->getGroup()->getId());
                 }
                 if(!empty($invite->getPack()) && empty($user->getUserPacks()->filter(function (UserPack $x) use ($invite) {return $x->getPack() == $invite->getPack();})->first())) {
                     $up = new UserPack();
@@ -196,8 +199,10 @@ class InviteListener implements EventSubscriberInterface
         if(!empty($request->getSession()) && !empty($request->getSession()->get('organization'))) {
             /** @var Group $group */
             $group = $orm->getRepository('StudySauceBundle:Group')->findOneBy(['name' => $request->getSession()->get('organization')]);
-            if(!$user->hasGroup($group->getName()))
+            if(!$user->hasGroup($group->getName())) {
                 $user->addGroup($group);
+            }
+            $user->setProperty('last_group_id', $group->getId());
         }
 
         return isset($invite) ? $invite : null;

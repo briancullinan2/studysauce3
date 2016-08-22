@@ -13,6 +13,8 @@ namespace StudySauce\Bundle\Security;
 
 use FOS\UserBundle\Security\EmailUserProvider;
 use FOS\UserBundle\Security\LoginManager;
+use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\User;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -149,8 +151,6 @@ class SwitchListener extends SwitchUserListener
             throw new AccessDeniedException();
         }
 
-        // TODO: decide based on connected users
-
         $username = $request->get($this->usernameParameter);
 
         if (null !== $this->logger) {
@@ -158,6 +158,15 @@ class SwitchListener extends SwitchUserListener
         }
 
         $user = $this->provider->loadUserByUsername($username);
+
+        // decide based on connected users
+        /** @var User $originalUser */
+        $originalUser = $this->provider->loadUserByUsername($token->getUser()->getUsername());
+        if(false == ($originalUser->hasRole('ROLE_ADMIN') || $originalUser->getInvites()->exists(function ($_, Invite $i) use ($user) {return $i->getInvitee() == $user;})
+            || $originalUser->getParent() == $user)) {
+            throw new AccessDeniedException();
+        }
+
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
