@@ -64,6 +64,10 @@ class GroupCest
         $i = 0;
         while($i < 20) {
             $I->seeAmOnPage('/groups');
+            if($I->seePageHas('Access denied.')) {
+                $I->test('tryAdminLogin');
+            }
+            $I->seeAmOnPage('/groups');
             $I->click('Groups');
             $test = $I->grabTextFrom('//a[contains(.,"TestGroup")]');
             /** @var Group $testGroup */

@@ -111,7 +111,7 @@ class ValidationController extends Controller
         self::setupThis($this->container);
 
         foreach(scandir(codecept_log_dir()) as $file) {
-            $fpath = codecept_log_dir() . DIRECTORY_SEPARATOR . $file;
+            $fpath = codecept_log_dir() . $file;
             $ftime = filectime($fpath);
             if($file != $request->get('result'))
                 continue;
@@ -142,7 +142,7 @@ class ValidationController extends Controller
         $deployIncludes = self::getIncludedTests(self::$config['tests']['acceptance']['tryDeploy']);
         $since = date_sub(new \DateTime(), new \DateInterval('P1D'));
         foreach(scandir(codecept_log_dir()) as $file) {
-            $fpath = codecept_log_dir() . DIRECTORY_SEPARATOR . $file;
+            $fpath = codecept_log_dir() . $file;
             $ftime = filemtime($fpath);
             if($ftime < $since->getTimestamp() ||
                 substr($file, 0, strlen('TestResults-')) != 'TestResults-')
@@ -178,6 +178,8 @@ class ValidationController extends Controller
                 }
 
                 $nodes[] = [
+                    'filename' => $t->getFileName(),
+                    'class' => $t->getTestClass(),
                     'id' => $id,
                     'label' => preg_replace('/[A-Z]/', " $0", substr($id, 3)),
                     'x' => floor($count / 20) * 10,
