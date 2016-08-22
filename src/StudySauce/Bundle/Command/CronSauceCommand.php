@@ -374,16 +374,17 @@ EOF
                 $nextTest = $n['id'];
             }
             $currentLog = 0;
-            if(empty($n['results']) || ($currentLog = max(array_map(function ($r) {
-                return date_timestamp_get(new \DateTime($r['created']));
-            }, $n['results']))) < $lastLog || $currentLog < filemtime($n['filename'])) {
+            if(empty($n['results'])
+                || (($currentLog = max(array_map(function ($r) { return date_timestamp_get(new \DateTime($r['created'])); }, $n['results']))) < $lastLog
+                    && $currentLog < date_timestamp_get(date_time_set(new \DateTime(), 4, 0, 0)))
+                || $currentLog < filemtime($n['filename'])) {
                 $lastLog = $currentLog;
                 $nextTest = $n['id'];
                 $nextSuite = $n['suite'];
             }
         }
 
-        if($lastLog > date_timestamp_get(date_time_set(new \DateTime(), 4, 0, 0))) {
+        if(empty($nextTest)) {
             print 'Nothing more to test.
 ';
             return;
