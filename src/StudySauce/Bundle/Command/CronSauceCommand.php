@@ -382,6 +382,7 @@ EOF
                 $nextTest = $n['id'];
                 $nextSuite = $n['suite'];
             }
+            print "$currentLog - " . filemtime($n['filename']) . "\n";
         }
 
         if(empty($nextTest)) {
