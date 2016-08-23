@@ -78,7 +78,7 @@ class PackCest
             }
             $I->seeAmOnPage('/packs');
             $I->click('Packs');
-            if(!$I->seePageHas('//a[contains(.,"TestPack")]')) {
+            if(!$I->seePageHas('TestPack')) {
                 break;
             }
             $test = $I->grabTextFrom('//a[contains(.,"TestPack")]');
