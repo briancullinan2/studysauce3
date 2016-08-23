@@ -45,13 +45,14 @@ class StoreCest
         if($I->seePageHas('Access denied.')) {
             $I->test('tryAdminLogin');
         }
+        $I->test('tryDeleteProductListing');
         $I->seeAmOnPage('/store');
         if(!$I->seePageHas('Free')) {
             $I->test('tryCreateProductListing');
         }
         $I->seeAmOnPage('/store');
         $I->click('Free');
-        $I->click('a[href*="/store/cart"]');
+        $I->click('a[href*="/cart"]');
         $I->wait(3);
         $value = $I->grabAttributeFrom('.coupon-row select option:not([value=""]):not([disabled])', 'value');
         $I->selectOption('.coupon-row select', $value);
@@ -77,6 +78,35 @@ class StoreCest
         $coupon->setName('StudyTest' . $last);
         $I->persistEntity($coupon);
         $I->flushToDatabase();
+    }
+
+    public function tryDeleteProductListing(AcceptanceTester $I) {
+        $I->wantTo('Delete the existing test packs');
+        //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
+        $i = 0;
+        while($i < 20) {
+            $I->seeAmOnPage('/store');
+            if($I->seePageHas('Access denied.')) {
+                $I->test('tryAdminLogin');
+            }
+            $I->seeAmOnPage('/store');
+            $I->click('Store');
+            if(!$I->seePageHas('TestPack')) {
+                break;
+            }
+            $test = $I->grabTextFrom('//span[contains(.,"TestPack")]');
+            /** @var Pack $testGroup */
+            $testGroup = $I->grabFrom('StudySauceBundle:Coupon', ['description' => $test]);
+            if (!empty($testGroup)) {
+                $testGroup->setDeleted(true);
+                $I->mergeEntity($testGroup);
+                $I->flushToDatabase();
+                $I->seeAmOnPage('/home');
+            } else {
+                break;
+            }
+            $i++;
+        }
     }
 
 }
