@@ -81,7 +81,7 @@ class PackCest
             if(!$I->seePageHas('TestPack')) {
                 break;
             }
-            $test = $I->grabTextFrom('//a/span[contains(.,"TestPack")]');
+            $test = $I->grabTextFrom('//span[contains(.,"TestPack")]');
             /** @var Pack $testGroup */
             $testGroup = $I->grabFrom('StudySauceBundle:Pack', ['title' => $test]);
             if (!empty($testGroup)) {
