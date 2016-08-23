@@ -69,10 +69,10 @@ class GroupCest
             }
             $I->seeAmOnPage('/groups');
             $I->click('Groups');
-            if(!$I->seePageHas('//a[contains(.,"TestGroup")]')) {
+            if(!$I->seePageHas('TestGroup')) {
                 break;
             }
-            $test = $I->grabTextFrom('//a[contains(.,"TestGroup")]');
+            $test = $I->grabTextFrom('//a/span[contains(.,"TestGroup")]');
             /** @var Group $testGroup */
             $testGroup = $I->grabFrom('StudySauceBundle:Group', ['name' => $test]);
             if (!empty($testGroup)) {
