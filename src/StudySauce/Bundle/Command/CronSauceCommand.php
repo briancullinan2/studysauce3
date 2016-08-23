@@ -370,11 +370,9 @@ EOF
         $nextSuite = '';
         $lastLog = time();
         foreach($nodes as $i => $n) {
-            if($nextTest == null) {
-                $nextTest = $n['id'];
-            }
             $currentLog = 0;
-            if(empty($n['results'])
+            if($nextTest == null
+                || empty($n['results'])
                 || (($currentLog = max(array_map(function ($r) { return date_timestamp_get(new \DateTime($r['created'])); }, $n['results']))) < $lastLog
                     && $currentLog < date_timestamp_get(date_time_set(new \DateTime(), 4, 0, 0)))
                 || $currentLog < filemtime($n['filename'])) {

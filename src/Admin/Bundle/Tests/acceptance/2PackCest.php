@@ -6,6 +6,7 @@ use Admin\Bundle\Tests\Codeception\Module\AcceptanceHelper;
 use Codeception\Module\Doctrine2;
 use Doctrine\ORM\EntityManager;
 use StudySauce\Bundle\Entity\Invite;
+use StudySauce\Bundle\Entity\Pack;
 use StudySauce\Bundle\Entity\Response;
 use StudySauce\Bundle\Entity\User;
 use WebDriver;
@@ -69,9 +70,30 @@ class PackCest
     public function tryDeleteTestPack(AcceptanceTester $I) {
         $I->wantTo('Delete the existing test packs');
         //$row = $I->grabAttributeFrom('input[name="groupName"]', 'class');
-        $I->seeAmOnPage('/packs');
-        $I->click('Packs');
-
+        $i = 0;
+        while($i < 20) {
+            $I->seeAmOnPage('/packs');
+            if($I->seePageHas('Access denied.')) {
+                $I->test('tryAdminLogin');
+            }
+            $I->seeAmOnPage('/packs');
+            $I->click('Packs');
+            if(!$I->seePageHas('//a[contains(.,"TestPack")]')) {
+                break;
+            }
+            $test = $I->grabTextFrom('//a[contains(.,"TestPack")]');
+            /** @var Pack $testGroup */
+            $testGroup = $I->grabFrom('StudySauceBundle:Pack', ['title' => $test]);
+            if (!empty($testGroup)) {
+                $testGroup->setDeleted(true);
+                $I->mergeEntity($testGroup);
+                $I->flushToDatabase();
+                $I->seeAmOnPage('/home');
+            } else {
+                break;
+            }
+            $i++;
+        }
     }
 
 }
