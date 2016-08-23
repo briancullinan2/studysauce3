@@ -76,7 +76,7 @@ class GroupCest
                 $testGroup->setDeleted(true);
                 $I->mergeEntity($testGroup);
                 $I->flushToDatabase();
-                $I->seeAmOnPage('/');
+                $I->seeAmOnPage('/home');
             } else {
                 break;
             }
