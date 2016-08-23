@@ -94,9 +94,10 @@ class StoreCest
             if(!$I->seePageHas('TestPack')) {
                 break;
             }
-            $test = $I->grabTextFrom('//span[contains(.,"TestPack")]');
+            $test = $I->grabAttributeFrom('//div[contains(@class,"coupon-row") and contains(.,"TestPack")]', 'class');
+            preg_match('/coupon-id-([0-9]*)/i', $test, $matches);
             /** @var Coupon $testGroup */
-            $testGroup = $I->grabFrom('StudySauceBundle:Coupon', ['description' => $test]);
+            $testGroup = $I->grabFrom('StudySauceBundle:Coupon', ['id' => intval($matches[1])]);
             if (!empty($testGroup)) {
                 $testGroup->setDeleted(true);
                 $I->mergeEntity($testGroup);
