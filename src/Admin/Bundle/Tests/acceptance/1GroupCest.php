@@ -74,6 +74,7 @@ class GroupCest
             $testGroup = $I->grabFrom('StudySauceBundle:Group', ['name' => $test]);
             if (!empty($testGroup)) {
                 $testGroup->setDeleted(true);
+                $I->persistEntity($testGroup);
                 $I->flushToDatabase();
             } else {
                 break;
