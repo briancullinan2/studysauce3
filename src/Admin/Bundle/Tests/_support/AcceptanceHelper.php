@@ -85,6 +85,23 @@ class AcceptanceHelper extends \Codeception\Module
         return $qb;
     }
 
+    public function mergeEntity($obj, $values = [])
+    {
+        /** @var EntityManager $em */
+        $em = $this->getModule('Doctrine2')->em;
+        if ($values) {
+            $reflectedObj = new \ReflectionClass($obj);
+            foreach ($values as $key => $val) {
+                $property = $reflectedObj->getProperty($key);
+                $property->setAccessible(true);
+                $property->setValue($obj, $val);
+            }
+        }
+
+        $em->merge($obj);
+        $em->flush();
+    }
+
     public function removeEntity($entity) {
         /** @var EntityManager $em */
         $em = $this->getModule('Doctrine2')->em;
