@@ -97,6 +97,7 @@ if($tab->length == 0) {
                 $request['count-ss_group'] = -1;
                 $request['count-ss_user'] = 1;
                 $request['count-user_pack'] = -1;
+                $request['coupon-deleted'] = '!1';
                 $request['read-only'] = false;
                 $request['tables'] = (array)(new stdClass());
                 $request['tables']['file'] = ['id', 'url'];
@@ -118,6 +119,7 @@ if($tab->length == 0) {
                 $request['count-ss_group'] = -1;
                 $request['count-ss_user'] = 1;
                 $request['count-user_pack'] = -1;
+                $request['coupon-deleted'] = '!1';
                 $request['read-only'] = false;
                 $request['tables'] = (array)(new stdClass());
                 $request['tables']['file'] = ['id', 'url'];

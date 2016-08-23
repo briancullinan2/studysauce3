@@ -95,11 +95,11 @@ class StoreCest
                 break;
             }
             $test = $I->grabTextFrom('//span[contains(.,"TestPack")]');
-            /** @var Pack $testGroup */
+            /** @var Coupon $testGroup */
             $testGroup = $I->grabFrom('StudySauceBundle:Coupon', ['description' => $test]);
             if (!empty($testGroup)) {
                 $testGroup->setDeleted(true);
-                $I->removeEntity($testGroup);
+                $I->mergeEntity($testGroup);
                 $I->flushToDatabase();
                 $I->seeAmOnPage('/home');
             } else {
