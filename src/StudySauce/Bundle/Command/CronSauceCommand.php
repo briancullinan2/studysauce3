@@ -384,7 +384,7 @@ EOF
             }
         }
 
-        if(empty($nextTest)) {
+        if(empty($nextTest) || empty($nextSuite)) {
             print 'Nothing more to test.
 ';
             return;

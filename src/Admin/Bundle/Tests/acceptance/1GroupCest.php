@@ -69,18 +69,19 @@ class GroupCest
             }
             $I->seeAmOnPage('/groups');
             $I->click('Groups');
-            if($I->seePageHas('//a[contains(.,"TestGroup")]')) {
-                $test = $I->grabTextFrom('//a[contains(.,"TestGroup")]');
-                /** @var Group $testGroup */
-                $testGroup = $I->grabFrom('StudySauceBundle:Group', ['name' => $test]);
-                if (!empty($testGroup)) {
-                    $testGroup->setDeleted(true);
-                    $I->mergeEntity($testGroup);
-                    $I->flushToDatabase();
-                    $I->seeAmOnPage('/home');
-                } else {
-                    break;
-                }
+            if(!$I->seePageHas('//a[contains(.,"TestGroup")]')) {
+                break;
+            }
+            $test = $I->grabTextFrom('//a[contains(.,"TestGroup")]');
+            /** @var Group $testGroup */
+            $testGroup = $I->grabFrom('StudySauceBundle:Group', ['name' => $test]);
+            if (!empty($testGroup)) {
+                $testGroup->setDeleted(true);
+                $I->mergeEntity($testGroup);
+                $I->flushToDatabase();
+                $I->seeAmOnPage('/home');
+            } else {
+                break;
             }
             $i++;
         }
