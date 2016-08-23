@@ -99,7 +99,7 @@ class StoreCest
             $testGroup = $I->grabFrom('StudySauceBundle:Coupon', ['description' => $test]);
             if (!empty($testGroup)) {
                 $testGroup->setDeleted(true);
-                $I->mergeEntity($testGroup);
+                $I->removeEntity($testGroup);
                 $I->flushToDatabase();
                 $I->seeAmOnPage('/home');
             } else {
