@@ -45,9 +45,9 @@ class GroupCest
         if($I->seePageHas('Access denied.')) {
             $I->test('tryAdminLogin');
         }
+        $I->test('tryDeleteTestGroup');
         $I->seeAmOnPage('/groups');
         $I->click('Groups');
-        $I->test('tryDeleteTestGroup');
         $I->click('a[href*="groups/0"]');
         $I->fillField('.ss_group-row input[name="name"]', 'TestGroup' . $last);
         $I->click('Save');

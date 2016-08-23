@@ -45,8 +45,9 @@ class PackCest
         if($I->seePageHas('Access denied.')) {
             $I->test('tryAdminLogin');
         }
-        $I->seeAmOnPage('/packs');
         $I->test('tryDeleteTestPack');
+        $I->seeAmOnPage('/packs');
+        $I->click('Packs');
         $I->click('a[href*="packs/0"]');
         $I->fillField('.pack-row input[name="title"]', 'TestPack' . $last);
         $I->wait(1);
