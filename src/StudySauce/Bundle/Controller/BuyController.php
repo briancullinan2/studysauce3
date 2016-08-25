@@ -278,7 +278,7 @@ class BuyController extends Controller
         foreach($coupon as $c) {
             $assignee = $user;
             // set pack for selected user
-            if(isset($request->get('child')[$c->getName()])) {
+            if(isset($request->get('child')[$c->getName()]) && $request->get('child')[$c->getName()] != $user->getId()) {
                 foreach ($invites as $invite) {
                     /** @var Invite $invite */
                     if(!empty($invite->getInvitee()) && $invite->getInvitee()->getId() == $request->get('child')[$c->getName()]) {
