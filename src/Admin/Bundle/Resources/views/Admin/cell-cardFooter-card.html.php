@@ -14,7 +14,6 @@ $row = !empty($context) ? $context : jQuery($this);
 $appUser = $app->getUser();
 
 $total = [];
-$remaining = [];
 $index = 1;
 if(isset($results['user_pack'][0])) {
     $retention = [$results['user_pack'][0]];
@@ -64,7 +63,7 @@ else {
                     }
                 }
                 if(!$hasUp) {
-                    $appUser->userPacks = array_merge($appUser->getUserPacks()->toArray(), [$up]);
+                    $allUserPacks = array_merge($allUserPacks, [$up]);
                 }
                 $appUser->userPacks = $allUserPacks;
             }
@@ -74,13 +73,15 @@ else {
 }
 jQuery('.header')->data('user', $appUser);
 
-$retentionObj = [];
 foreach($retention as $up) {
     /** @var UserPack $up */
-    if($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED') {
+    if($up->getPack()->getStatus() == 'DELETED' || ($up->getPack()->getStatus() == 'UNPUBLISHED' && $up->getPack()->getOwnerId() != $appUser->getId())) {
         continue;
     }
-    $retentionObj[count($retentionObj)] = AdminController::toFirewalledEntityArray($up, $request['tables'], 1);
+    if($up->getPack()->getStatus() != 'PUBLIC' && (empty($up) || $up->getRemoved())) {
+        continue;
+    }
+
     foreach($up->getRetention() as $id => $r) {
         if($isSummary || empty($r[3]) || new Date($retentionDate) < new Date($r[3]) || $r[2]) {
             $total[count($total)] = $id;
@@ -91,14 +92,9 @@ foreach($retention as $up) {
         if(!empty($r[3]) && new Date($r[3]) > new Date($retentionDate)) {
             $index += 1;
         }
-        else if ($isSummary || $r[2]) {
-            $remaining[count($remaining)] = $id;
-        }
     }
 }
 
 $row->append(implode('', ['<div class="preview-count">', $index, ' of ', count($total), '</div>']));
-$row->find('.preview-count')->attr('data-remaining', json_encode($remaining))->data('remaining', $remaining);
-$row->find('.preview-count')->attr('data-retention', json_encode($retentionObj))->data('retention', $retentionObj);
 
 print ($row->html());

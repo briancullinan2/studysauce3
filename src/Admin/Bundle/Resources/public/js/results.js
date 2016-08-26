@@ -157,6 +157,7 @@ window.views.__defaultEntities['pack'] = {
     cards: $([]),
     properties: {},
     cardCount: 0,
+    firstCard: null,
     getOwnerId: function () {return this.ownerId || 0;},
     getCardCount: function () {return this.cardCount;},
     getDeleted: function () {return this.status == 'DELETED';},
@@ -179,6 +180,7 @@ window.views.__defaultEntities['pack'] = {
         }
         return $(users);
     },
+    getFirstCard: function () {return this.firstCard != null ? applyEntityObj(this.firstCard) : null;},
     getCards: function () {
         return $($(this.cards).toArray().map(function (c) {return applyEntityObj(c)}));
     },

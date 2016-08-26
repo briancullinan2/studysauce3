@@ -15,8 +15,8 @@ $user = $app->getUser();
 $request = $app->getRequest();
 
 // get next summary process card
-$retention = $results['ss_user'][0]->getUserPacks()->toArray();
-$card = 0;
+$retention = $user->getUserPacks()->toArray();
+$card = !empty($pack->getFirstCard()) ? $pack->getFirstCard()->getId() : 0;
 foreach($retention as $up) {
     /** @var UserPack $up */
     if ($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getId() != $pack->getId()) {

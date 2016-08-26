@@ -17,7 +17,6 @@ $total = 0;
 $wrong = 0;
 $cardId = 0;
 $retention = [$user_pack];
-$remaining = [];
 
 $isSummary = $httpRequest->cookies->get('retention_summary') == 'true';
 if($isSummary) {
@@ -36,7 +35,6 @@ else {
     }
 }
 
-$retentionObj = [];
 foreach($retention as $up) {
     /** @var UserPack $up */
     if ($up->getRemoved() || $up->getPack()->getStatus() == 'DELETED' || $up->getPack()->getStatus() == 'UNPUBLISHED') {
@@ -54,15 +52,14 @@ foreach($retention as $up) {
     if(!$hasUp) {
         $appUser = $app->getUser();
         $appUser->userPacks = array_merge($app->getUser()->getUserPacks()->toArray(), [$up]);
+        jQuery('.header')->data('user', $appUser);
     }
-    $retentionObj[count($retentionObj)] = AdminController::toFirewalledEntityArray($up, $request['tables'], 1);
     foreach ($up->getRetention() as $id => $r) {
         if (new Date($r[3]) > new Date($httpRequest->cookies->get('retention'))) {
             $total += 1;
             if ($r[2]) {
                 $wrong += 1;
                 $cardId = $id;
-                $remaining[count($remaining)] = $id;
             }
         }
     }
@@ -88,8 +85,5 @@ else { ?>
 $view['slots']->stop();
 
 $row->append($view['slots']->get('card-results-page'));
-
-$row->find('h1')->attr('data-remaining', json_encode($remaining))->data('remaining', $remaining);
-$row->find('h1')->attr('data-retention', json_encode($retentionObj))->data('retention', $retentionObj);
 
 print ($row->html());

@@ -539,12 +539,7 @@ $(document).ready(function () {
         var results = tab.find('.results');
         var request = results.data('request');
 
-        // TODO: call recalculate on template
-        if(!tab.is('.loaded')) {
-            tab.addClass('loaded');
-            updateUserRetention.apply(this);
-        }
-
+        // call recalculate on template
         var footer = tab.find('.results .cardResult');
         var user = window.views.__globalVars.app.getUser();
         footer.find('*').remove();
@@ -558,6 +553,18 @@ $(document).ready(function () {
 
     });
 
+    body.on('loaded', '[id^="cards-card"], [id^="cards-answer"]', function () {
+        var tab = $(this);
+        var results = tab.find('.results');
+        var request = results.data('request');
+        // change the request to only load single user_pack
+        tab.addClass('loaded');
+        delete request['requestKey'];
+        request['tables']['ss_user'] = ['id'];
+        delete request['skipRetention'];
+        tab.find('.results').data('request', request);
+    });
+
     // turn on study mode to hide extra menus
     body.on('showing', '[id^="cards-card"], [id^="cards-answer"]', function () {
         body.addClass('study-mode');
@@ -565,16 +572,6 @@ $(document).ready(function () {
         var tab = $(this);
         var results = tab.find('.results');
         var request = results.data('request');
-
-        // change the request to only load single user_pack
-        if(!tab.is('.loaded')) {
-            tab.addClass('loaded');
-            delete request['requestKey'];
-            request['tables']['ss_user'] = ['id'];
-            delete request['skipRetention'];
-            tab.find('.results').data('request', request);
-            updateUserRetention.apply(this);
-        }
 
         // update the card count at the bottom
         var footer = tab.find('.preview-footer');
@@ -599,7 +596,7 @@ $(document).ready(function () {
         // load the next card in the sequence
         if(tab.closest('.panel-pane').find('.card-row').length > 0) {
             var packId = Cookies.get('retention_shuffle') == 'true' ? null : tab.closest('.panel-pane').data('card').pack.id;
-            loadOneExtra.apply(this, [tab.find('[data-remaining]').data('remaining'), packId, getRowId.apply(tab.find('.card-row'))]);
+            loadOneExtra.apply(this, [packId, getRowId.apply(tab.find('.card-row'))]);
         }
 
     });
@@ -619,12 +616,7 @@ $(document).ready(function () {
     body.on('show', '#home', function () {
         Cookies.set('retention', moment(new Date()).formatPHP('r'), { expires: 7 });
         body.addClass('clear-header');
-        if(!$(this).is('.loaded')) {
-            $(this).addClass('loaded');
-        }
-        else {
-            loadResults.apply($(this).find('.results'));
-        }
+        loadResults.apply($(this).find('.results'));
         if (document.cancelFullScreen) {
             document.cancelFullScreen();
         } else if (document.mozCancelFullScreen) {
@@ -632,7 +624,6 @@ $(document).ready(function () {
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
         }
-        updateUserRetention.apply(this);
     });
 
     body.on('hiding', '#home', function () {
@@ -687,7 +678,6 @@ $(document).ready(function () {
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('[href="#right"]');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
         var response = {
             pack: packId,
             correct : correct,
@@ -714,7 +704,7 @@ $(document).ready(function () {
             $(this).stop().css({left: 0});
             doFlash(correct);
         });
-        pickNextCard(data, packId, id);
+        pickNextCard(packId, id);
 
         $.ajax({
             url: Routing.generate('responses', {user:$('.header').data('user').id}),
@@ -746,7 +736,42 @@ $(document).ready(function () {
         return retention[Math.floor(rng() * retention.length)];
     }
 
-    function loadOneExtra(retention, packId, newId) {
+    function getRetention(packId, cardId) {
+        var isSummary = Cookies.get('retention_summary') == 'true';
+        var retentionDate = isSummary ? Cookies.get('retention_' + packId) : Cookies.get('retention');
+        var retention = [];
+        var user = window.views.__globalVars.app.getUser();
+        var userPacks = user.getUserPacks().toArray();
+        for(var up in userPacks) {
+            /** @var UserPack $up */
+            if(!userPacks.hasOwnProperty(up) || userPacks[up].getRemoved() || userPacks[up].getPack().getStatus() == 'DELETED'
+                || (userPacks[up].getPack().getStatus() == 'UNPUBLISHED' && userPacks[up].getPack().getOwnerId() != user.getId())) {
+                continue;
+            }
+            if(isSummary && userPacks[up].pack.id != packId) {
+                continue;
+            }
+            var pack = userPacks[up].getRetention();
+            for(var id in pack) {
+                if(!pack.hasOwnProperty(id)) {
+                    continue;
+                }
+                var r = pack[id];
+                if(['', id].join('') == ['', cardId].join('')) {
+                    continue;
+                }
+                if(r[3] != null && new Date(r[3]) > new Date(retentionDate)) {
+
+                }
+                else if (isSummary || r[2]) {
+                    retention[retention.length] = id;
+                }
+            }
+        }
+        return retention;
+    }
+
+    function loadOneExtra(packId, newId) {
         // pick card based on last time hitting home page, same retention rules as in the app
         var retentionDate;
         if(Cookies.get('retention_summary') == 'true') {
@@ -761,6 +786,7 @@ $(document).ready(function () {
                 Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
             }
         }
+        var retention = getRetention(packId, newId);
 
         // pick card based on last time hitting home page, same retention rules as in the app
         var nextId = getRandomCard(retention, retentionDate, newId);
@@ -770,7 +796,7 @@ $(document).ready(function () {
         }
     }
 
-    function pickNextCard(retention, packId, cardId) {
+    function pickNextCard(packId, cardId) {
         var retentionDate;
         if(Cookies.get('retention_summary') == 'true') {
             retentionDate = Cookies.get('retention_' + packId);
@@ -784,6 +810,7 @@ $(document).ready(function () {
                 Cookies.set('retention', retentionDate = moment(new Date()).formatPHP('r'), { expires: 7 });
             }
         }
+        var retention = getRetention(packId, cardId);
 
         // TODO: created results tab without callback
         var newId = getRandomCard(retention, retentionDate, cardId);
@@ -815,48 +842,15 @@ $(document).ready(function () {
 
     body.on('show', '[id^="cards"]', setupProgress);
 
-    body.on('resulted.refresh', '[id^="cards"] .results, [id^="home"] .results', function () {
-        updateUserRetention.apply(this);
-    });
-
-    body.on('loaded', '[id^="home"] .results', function () {
-        updateUserRetention.apply(this);
-    });
-
     body.on('resulted.refresh', '[id^="cards"] .results', function () {
         $('#jquery_jplayer').jPlayer('option', 'cssSelectorAncestor', '.preview-play:visible');
         var that = $(this).closest('.panel-pane');
         setupProgress.apply(that);
         if($(this).is('[id^="cards-card"], [id^="cards-answer"]')) {
             var packId = Cookies.get('retention_shuffle') == 'true' ? null : that.data('card').pack.id;
-            loadOneExtra.apply(this, [$(this).find('[data-remaining]').data('remaining'), packId, getRowId.apply($(this).find('.card-row'))]);
+            loadOneExtra.apply(this, [packId, getRowId.apply($(this).find('.card-row'))]);
         }
     });
-
-    function updateUserRetention() {
-        // update global list of packs
-        var user = window.views.__globalVars.app.getUser();
-        var ups = user.getUserPacks().toArray();
-        var newRetention = $(this).find('[data-retention]').data('retention');
-        var hasUserPack = false;
-        for(var n in newRetention) {
-            if(newRetention.hasOwnProperty(n)) {
-                for(var u in ups) {
-                    if(ups.hasOwnProperty(u)) {
-                        if(ups[u].pack.id == newRetention[n].pack.id) {
-                            hasUserPack = true;
-                            ups[u].retention = newRetention[n].retention;
-                            break;
-                        }
-                    }
-                }
-                if(!hasUserPack) {
-                    user.userPacks = $.merge(user.userPacks, [newRetention[n]]);
-                }
-            }
-        }
-        $('.header').data('user', user);
-    }
 
     var jPlayer = $('#jquery_jplayer');
     jPlayer.bind($.jPlayer.event.timeupdate, function (evt) {
@@ -888,8 +882,7 @@ $(document).ready(function () {
 
         var packId = Cookies.get('retention_shuffle') == 'true' ? null : $(this).parents('.panel-pane').data('card').pack.id;
         var id = getRowId.apply($(this).parents('.card-row'));
-        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
-        pickNextCard(data, packId, id);
+        pickNextCard(packId, id);
     });
 
     body.on('click', '[id^="cards"] .card-row .type-mc .preview-response, [id^="cards"] .card-row .type-tf a[href="#true"], [id^="cards"] .card-row .type-tf a[href="#false"]', function (evt) {
@@ -903,7 +896,6 @@ $(document).ready(function () {
         var id = getRowId.apply($(this).parents('.card-row'));
         var correct = $(this).is('.correct');
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
         var response = {
             pack: packId,
             correct : correct,
@@ -935,7 +927,7 @@ $(document).ready(function () {
             activateMenu(Routing.generate('cards_answers', {answer: id}));
         }
         else {
-            pickNextCard(data, packId, id);
+            pickNextCard(packId, id);
         }
 
         // save response
@@ -966,7 +958,6 @@ $(document).ready(function () {
         // check answer
         var correct = (new RegExp(input.data('correct'), 'i')).exec(input.val()) != null;
         var packId = $(this).parents('.panel-pane').data('card').pack.id;
-        var data = $(this).parents('.panel-pane').find('[data-remaining]').data('remaining');
         var response = {
             pack: packId,
             correct : correct,
@@ -1000,7 +991,7 @@ $(document).ready(function () {
             activateMenu(Routing.generate('cards_answers', {answer: id}));
         }
         else {
-            pickNextCard(data, packId, id);
+            pickNextCard(packId, id);
         }
 
         // save response

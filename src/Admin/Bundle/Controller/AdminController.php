@@ -44,7 +44,7 @@ class AdminController extends Controller
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted', 'invites', 'invitees', 'properties']],
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
-        'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'ownerId'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user', 'cardCount'], 'properties', 'actions'],
+        'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'ownerId'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user', 'cardCount', 'firstCard'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted', 'remove']],
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created', 'invitee', 'user'], 'actions' => ['deleted', 'group', 'properties']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
@@ -675,7 +675,10 @@ class AdminController extends Controller
                         $obj[$f] = self::toFirewalledEntityArray($value, $levels - 1 == 0 ? [$joinTable => $tables[$joinTable]] : $tables, $levels - 1);
                     }
                 }
-            } else {
+            } else if (is_object($value) && !empty($value) && ($joinTable = self::getJoinTable($value)) !== false) {
+                $obj[$f] = self::toFirewalledEntityArray($value, $levels - 1 == 0 ? [$joinTable => $tables[$joinTable]] : $tables, $levels - 1);;
+            }
+            else {
                 $obj[$f] = $value;
             }
         }
@@ -1264,7 +1267,7 @@ var print = function (s) { window.views.__output += s };
 var strtolower = function(s) { return (s || '').toLocaleLowerCase(); };
 var empty = function(s) {
     if(typeof s == 'undefined' || ('' + s).trim() == ''
-        || s === false || s === 'false' || s == null
+        || s === false || s === 'false' || s == null || s === 0
         || (typeof s == 'object' && s.constructor == Array && s.length == 0)) {
         return true;
     }

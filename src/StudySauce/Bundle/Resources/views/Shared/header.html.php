@@ -36,8 +36,8 @@ $home = \StudySauce\Bundle\Controller\HomeController::getUserRedirect($user, $th
 $tables = [
     'ss_user' => ['id', 'first', 'last', 'email', 'roles', 'userPacks'],
     'invite' => ['first', 'last', 'invitee', 'email'],
-    'user_pack' => ['pack'],
-    'pack' => ['id']
+    'user_pack' => ['pack', 'removed'],
+    'pack' => ['id', 'status', 'firstCard', 'cartCount', 'ownerId']
 ];
 $userJson = !empty($user) ? AdminController::toFirewalledEntityArray($user, $tables, 2) : (array)(new stdClass());
 
@@ -52,8 +52,8 @@ foreach($invites as $i) {
 $tables = [
     'ss_user' => ['id', 'first', 'last', 'email', 'roles', 'invites', 'userPacks'],
     'invite' => ['first', 'last', 'user', 'email', 'invitee'],
-    'user_pack' => ['pack'],
-    'pack' => ['id']
+    'user_pack' => ['pack', 'removed'],
+    'pack' => ['id', 'status', 'firstCard', 'cartCount', 'ownerId']
 ];
 $inviteesJson = [];
 $invites = !empty($user) ? $user->getInvitees()->toArray() : [];

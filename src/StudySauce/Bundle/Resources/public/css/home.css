@@ -184,10 +184,10 @@
 
 @media all and (max-width: 700px) {
 
-
     [id^="home"] {
         height:auto;
         min-height:100%;
+        position: static;
     }
 
     .user-shuffle {
@@ -222,13 +222,15 @@
 
     [id^="home"] .pane-content {
         padding-top: 40%;
-        position: absolute;
+        position: static;
         min-height: 100%;
         left: 0;
         right: 0;
         bottom: auto;
         height: auto;
         top: 0;
+        margin-bottom: -70px;
+        padding-bottom: 70px;
     }
 
     .study-mastery .pack-row .packMastery,

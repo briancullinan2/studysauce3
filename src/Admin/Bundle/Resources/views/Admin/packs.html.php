@@ -209,6 +209,7 @@ $view['slots']->start('body'); ?>
                     $request['count-file'] = -1;
                     $request['count-pack'] = 0;
                     $request['count-ss_group'] = -1;
+                    $request['count-card'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
                     $request['notInGroup'] = true;
@@ -221,7 +222,8 @@ $view['slots']->start('body'); ?>
                     $request['tables']['ss_group'] = ['id', 'name', 'deleted'];
                     $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                     $request['tables']['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
-                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'cardCount', 'ownerId'], 'actionsEdit' => ['status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'cardCount', 'ownerId', 'firstCard'], 'actionsEdit' => ['status']];
+                    $request['tables']['card'] = ['id'];
                     $request['classes'] = ['tiles', 'summary'];
                     $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                     $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
@@ -230,6 +232,7 @@ $view['slots']->start('body'); ?>
                     $request['count-file'] = -1;
                     $request['count-pack'] = 0;
                     $request['count-ss_group'] = -1;
+                    $request['count-card'] = -1;
                     $request['count-ss_user'] = 1;
                     $request['count-user_pack'] = -1;
                     $request['read-only'] = false;
@@ -242,7 +245,8 @@ $view['slots']->start('body'); ?>
                     $request['tables']['ss_group'] = ['id', 'name', 'deleted'];
                     $request['tables']['ss_user'] = ['id' => ['id', 'first', 'last', 'userPacks']];
                     $request['tables']['user_pack'] = ['pack', 'removed', 'retention', 'downloaded'];
-                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'cardCount', 'ownerId'], 'actionsEdit' => ['status']];
+                    $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo', 'cardCount', 'ownerId', 'firstCard'], 'actionsEdit' => ['status']];
+                    $request['tables']['card'] = ['id'];
                     $request['classes'] = ['tiles', 'summary'];
                     $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
                     $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;

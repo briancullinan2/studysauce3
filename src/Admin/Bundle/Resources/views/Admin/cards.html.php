@@ -49,7 +49,7 @@ $view['slots']->start('body'); ?>
             $tables = (array)(new stdClass());
             $tables['card'] = ['card' => ['id', 'answers', 'correct', 'content', 'responseType', 'responseContent']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
-            $tables['pack'] = ['id', 'status', 'cards'];
+            $tables['pack'] = ['id', 'status', 'ownerId', 'cardCount'];
             $tables['user_pack'] = ['id' => ['pack', 'retention', 'removed', 'user']];
             $tables['ss_user'] = ['id'];
             if($httpRequest->get('_format') == 'index' && !$isSummary && $httpRequest->cookies->get('retention_shuffle') == 'true') {
@@ -94,7 +94,7 @@ $view['slots']->start('body'); ?>
             $tables = (array)(new stdClass());
             $tables['card'] = ['cardAnswer' => ['id', 'answers', 'correct', 'content', 'responseType', 'responseContent']];
             $tables['answer'] = ['id', 'value', 'card', 'deleted', 'correct', 'content'];
-            $tables['pack'] = ['id', 'status'];
+            $tables['pack'] = ['id', 'status', 'ownerId', 'cardCount'];
             $tables['user_pack'] = ['id' => ['pack', 'retention', 'removed', 'user']];
             $tables['ss_user'] = ['id'];
             if($httpRequest->get('_format') == 'index' && !$isSummary && $httpRequest->cookies->get('retention_shuffle') == 'true') {

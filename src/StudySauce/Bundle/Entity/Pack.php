@@ -262,6 +262,14 @@ class Pack
     }
 
     /**
+     * @return Card
+     */
+    public function getFirstCard() {
+        $first = $this->cards->matching(Criteria::create()->where(Criteria::expr()->neq('deleted', true)))->first();
+        return !empty($first) ? $first : null;
+    }
+
+    /**
      * @param User $u
      * @return UserPack|null
      */

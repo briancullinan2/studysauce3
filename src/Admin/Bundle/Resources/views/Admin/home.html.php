@@ -31,7 +31,8 @@ $view['slots']->start('body'); ?>
             <?php
             $tables = (array)(new stdClass());
             $tables['ss_user'] = ['id' => ['id', 'userPacks']];
-            $tables['pack'] = ['titleNew' => ['id', 'title', 'status', 'cardCount']];
+            $tables['pack'] = ['titleNew' => ['id', 'title', 'status', 'cardCount', 'firstCard', 'ownerId']];
+            $tables['card'] = ['id'];
             $tables['user_pack'] = ['pack', 'removed', 'retention'];
             $request = [
                 'tables' => $tables,
@@ -40,10 +41,11 @@ $view['slots']->start('body'); ?>
                 'userPacks-user_pack-removed' => '_empty',
                 'ss_user-id' => $id,
                 'headers' => ['ss_user' => 'bigButton'],
-                'count-pack' => 0,
                 'read-only' => false,
                 'classes' => ['centerized'],
+                'count-pack' => 0,
                 'count-ss_user' => 1,
+                'count-card' => -1,
                 'count-user_pack' => -1,
                 'footers' => false
             ];

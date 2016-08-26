@@ -13,7 +13,7 @@
     vertical-align: top;
     margin-bottom:0;
     border-radius: 0;
-    background: #000;
+    background: #424242;
     cursor: pointer;
 }
 
@@ -302,6 +302,10 @@
 
 @media all and (max-width: 700px)
 {
+    .clear-header .header-wrapper
+    {
+        background: #424242;
+    }
 
     #welcome-message .input
     {
