@@ -31,6 +31,23 @@ $container->loadFromExtension('assetic', [
                 'output' => 'bundles/studysauce/css/*.css',
             ],
         ],
+        'sigma' => [
+            'inputs' => [
+                '@AdminBundle/Resources/public/js/sigma.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.layout.forceAtlas2.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.layout.forceLink.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.layout.fruchtermanReingold.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.renderers.halo.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.renderers.linkurious.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.renderers.parallelEdges.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.parsers.json.min.js',
+                '@AdminBundle/Resources/public/js/plugins/sigma.plugins.tooltips.min.js'
+            ],
+            'filters' => [],
+            'options' => [
+                'output' => 'bundles/admin/js/*.js',
+            ],
+        ],
         'funnel' => [
             'inputs' => [
                 '@StudySauceBundle/Resources/public/js/moment.min.js',

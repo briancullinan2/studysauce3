@@ -396,12 +396,45 @@
     [id^="store"] .tiles.summary .coupon-row [class^="id"] .highlighted-link
     {
         position:static;
-        margin-top:30px;
+        margin-top:10px;
         display:block;
+        text-align: right;
     }
 
     .tiles.summary [class*="-row"] > [class^="id"] label {
         white-space: normal;
+    }
+
+    [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label.child
+    {
+        display:block;
+        width:auto;
+        margin:0;
+        padding:0;
+    }
+
+    [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label {
+        margin-top:10px;
+    }
+
+    [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] i {
+        height:auto;
+        left:0;
+        top:25px;
+    }
+
+    [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label.child:before {
+        right:0;
+    }
+
+    [id^="store_cart"] .tiles.summary [class*="-row"] > [class^="id"] label:last-of-type
+    {
+        padding:0;
+        margin:0;
+    }
+
+    .tiles.summary [class*="-row"] > [class^="id"]:before {
+        display:none;
     }
 }
 

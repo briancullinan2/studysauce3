@@ -10,30 +10,15 @@ $user = $app->getUser();
 $view->extend('StudySauceBundle:Shared:dashboard.html.php');
 
 $view['slots']->start('stylesheets');
-foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/validation.css'],[],['output' => 'bundles/admin/css/*.css']) as $url): ?>
+foreach ($view['assetic']->stylesheets(['@AdminBundle/Resources/public/css/validation.css'],[],['output' => 'bundles/admin/css/*.css']) as $url) { ?>
     <link type="text/css" rel="stylesheet" href="<?php echo $view->escape($url) ?>"/>
-<?php endforeach;
+<?php }
 $view['slots']->stop();
 
 $view['slots']->start('javascripts');
-foreach ($view['assetic']->javascripts(
-    [
-        '@AdminBundle/Resources/public/js/validation.js',
-        '@AdminBundle/Resources/public/js/sigma.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.layout.forceAtlas2.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.layout.forceLink.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.layout.fruchtermanReingold.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.renderers.halo.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.renderers.linkurious.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.renderers.parallelEdges.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.parsers.json.min.js',
-        '@AdminBundle/Resources/public/js/plugins/sigma.plugins.tooltips.min.js',
-    ],
-    [],
-    ['output' => 'bundles/admin/js/*.js']
-) as $url): ?>
+foreach ($view['assetic']->javascripts(['@sigma', '@AdminBundle/Resources/public/js/validation.js'],[],['output' => 'bundles/admin/js/*.js']) as $url) { ?>
     <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-<?php endforeach;
+<?php }
 $view['slots']->stop();
 
 $view['slots']->start('body'); ?>

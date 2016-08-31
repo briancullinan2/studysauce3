@@ -16,8 +16,10 @@ if($preview->length == 0) {
 $type = $card->getResponseType();
 $content = $card->getContent();
 $content = preg_replace('/\\\\n(\\\\r)?/i', "\n", $content);
+$content = preg_replace('/\\n(\\r)?/i', "\n<br />", $content);
 $correct = !empty($card->getCorrect()) ? $card->getCorrect()->getContent() : $card->getResponseContent();
 $correct = preg_replace('/\\\\n(\\\\r)?/i', "\n", $correct);
+$correct = preg_replace('/\\n(\\r)?/i', "\n<br />", $correct);
 /** @var Answer[] $answers */
 $answersUnique = [];
 foreach($card->getAnswers()->toArray() as $answer) {

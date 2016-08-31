@@ -100,7 +100,7 @@ class ActivityController extends Controller
                 'content' => '<div data-id="' . $v->getId() . '">' .
                     '<a target="_blank" href="https://' . $_SERVER['HTTP_HOST']
                         . $v->getPath() . '"><strong>' . $v->getMethod() . '</strong><span> ' . $v->getPath() . '</span></a><br />' .
-                    (!empty($v->getQuery()) ? ('<a href="#search-' . (!empty($v->getUser()) ? $v->getUser()->getId() : '') . '"><strong>Query:</strong><span> ' . implode('<strong> &amp; </strong>', array_map(function ($v, $k) {return $k . '=' . $v;}, $v->getQuery(), array_keys($v->getQuery()))) . '</span></a><br />') : '') .
+                    (!empty($v->getQuery()) ? ('<a href="#search-' . (!empty($v->getUser()) ? $v->getUser()->getId() : '') . '"><strong>Query:</strong><span> ' . implode('<strong> &amp; </strong>', EmailsController::dump($v->getQuery(), 3)) . '</span></a><br />') : '') .
                     '<a href="#search-' . (!empty($v->getUser()) ? $v->getUser()->getEmail() : 'Guest') . '"><strong>User:</strong><span> ' . (!empty($v->getUser()) ? $v->getUser()->getEmail() : 'Guest') . '</span></a><br />' .
                     '<a href="#search-' . (!empty($v->getSession()) ? $v->getSession() : 'New session') . '"><strong>Session Id:</strong><span> ' . (!empty($v->getSession()) ? $v->getSession() : 'New session') . '</span></a><br />' .
                     '<a href="#search-' . long2ip($v->getIp()) . '"><strong>IP:</strong><span> ' . long2ip($v->getIp()) . '</span></a><br />' .

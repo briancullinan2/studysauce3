@@ -29,6 +29,7 @@ use Codeception\Util\Locator;
 use Doctrine\ORM\Query;
 use Facebook\WebDriver\Exception\InvalidElementStateException;
 use Facebook\WebDriver\Exception\InvalidSelectorException;
+use Facebook\WebDriver\Firefox\FirefoxProfile;
 use Facebook\WebDriver\WebDriverBy;
 use PHP_Timer;
 use PHPUnit_Framework_TestFailure;
@@ -448,6 +449,7 @@ class ValidationController extends Controller
             }
 
 
+
             /** @var EventDispatcher self::$dispatcher */
             self::$dispatcher = new EventDispatcher();
             $result = new \PHPUnit_Framework_TestResult;
@@ -673,6 +675,19 @@ class ValidationController extends Controller
             $this->suiteManager->getSuite()->setBackupGlobals(false);
             $this->suiteManager->getSuite()->setBackupStaticAttributes(false);
             $this->suiteManager->loadTests(null);
+            /** @var WebDriver $webdriver */
+            $webdriver = $this->suiteManager->getSuite()->getModules()['WebDriver'];
+            if (!empty($request->get('profile')) || true) {
+                //static::$settings['modules']['config']['WebDriver']['firefox_profile']
+                $profile = new FirefoxProfile();
+                $profile->setPreference('devtools.responsiveUI.presets', json_encode([[
+                    'key' => '480x800',
+                    'name' => 'Google Nexus one',
+                    'width' => 480,
+                    'height' => 800
+                ]]));
+                $webdriver->_reconfigure(['capabilities' => ['firefox_profile' => $profile]]);
+            }
             session_write_close(); // allow symfony to respond to other requests while tests are running
             $this->suiteManager->run($runner, $result, $options);
         }
