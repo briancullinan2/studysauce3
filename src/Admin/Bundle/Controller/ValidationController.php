@@ -447,7 +447,16 @@ class ValidationController extends Controller
             if (!empty($request->get('url'))) {
                 static::$settings['modules']['config']['WebDriver']['url'] = $request->get('url');
             }
-
+            if (!empty($request->get('profile')) || true) {
+                $profile = new FirefoxProfile();
+                $profile->setPreference('devtools.responsiveUI.presets', json_encode([[
+                    'key' => '480x800',
+                    'name' => 'Google Nexus one',
+                    'width' => 480,
+                    'height' => 800
+                ]]));
+                static::$settings['modules']['config']['WebDriver']['capabilities']['firefox_profile'] = $profile->encode();
+            }
 
 
             /** @var EventDispatcher self::$dispatcher */
@@ -662,6 +671,8 @@ class ValidationController extends Controller
             }
 
             $this->suiteManager = new SuiteManager(self::$dispatcher, $suite, static::$settings);
+            /** @var WebDriver $webdriver */
+            $webdriver = $this->suiteManager->getSuite()->getModules()['WebDriver'];
             $this->suiteManager->initialize();
             // add Symfony2 module back in without initializing, setting the correct kernel for the current instance
             static::$settings['modules']['enabled'][] = 'Symfony2';
@@ -675,19 +686,7 @@ class ValidationController extends Controller
             $this->suiteManager->getSuite()->setBackupGlobals(false);
             $this->suiteManager->getSuite()->setBackupStaticAttributes(false);
             $this->suiteManager->loadTests(null);
-            /** @var WebDriver $webdriver */
-            $webdriver = $this->suiteManager->getSuite()->getModules()['WebDriver'];
-            if (!empty($request->get('profile')) || true) {
-                //static::$settings['modules']['config']['WebDriver']['firefox_profile']
-                $profile = new FirefoxProfile();
-                $profile->setPreference('devtools.responsiveUI.presets', json_encode([[
-                    'key' => '480x800',
-                    'name' => 'Google Nexus one',
-                    'width' => 480,
-                    'height' => 800
-                ]]));
-                $webdriver->_reconfigure(['capabilities' => ['firefox_profile' => $profile]]);
-            }
+
             session_write_close(); // allow symfony to respond to other requests while tests are running
             $this->suiteManager->run($runner, $result, $options);
         }
