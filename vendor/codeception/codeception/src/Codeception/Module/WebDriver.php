@@ -336,7 +336,7 @@ class WebDriver extends CodeceptionModule implements
         }
 
         $firefox_profile = $this->config['capabilities']['firefox_profile'];
-        if (file_exists($firefox_profile) === false) {
+        if (file_exists($firefox_profile) !== false) {
             $this->capabilities['firefox_profile'] = file_get_contents($firefox_profile);
             //throw new ModuleConfigException(
             //    __CLASS__,
