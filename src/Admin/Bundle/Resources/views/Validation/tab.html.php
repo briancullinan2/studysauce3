@@ -85,6 +85,10 @@ $view['slots']->start('body'); ?>
                             Standard (1280x1024)
                         </option>
                         <option
+                            value="480x800" <?php print ($acceptance['modules']['config']['WebDriver']['window_size'] == '480x800' ? 'selected="selected"' : ''); ?>>
+                            Mobile Portrait (480x800)
+                        </option>
+                        <option
                             value="800x480" <?php print ($acceptance['modules']['config']['WebDriver']['window_size'] == '800x480' ? 'selected="selected"' : ''); ?>>
                             Mobile Landscape (800x480)
                         </option>
