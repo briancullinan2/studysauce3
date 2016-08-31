@@ -20,7 +20,8 @@ $(document).ready(function () {
                 host: validation.find('.host-setting input').val().trim(),
                 browser: validation.find('.browser-setting select').val().trim(),
                 wait: validation.find('.wait-setting input').val().trim(),
-                url: validation.find('.url-setting input').val().trim()
+                url: validation.find('.url-setting input').val().trim(),
+                window_size: validation.find('.window_size select').val().trim()
             },
             success: function (response) {
                 // TODO: update labels with new test results times
@@ -96,7 +97,8 @@ $(document).ready(function () {
                 host: validation.find('.host-setting input').val().trim(),
                 browser: validation.find('.browser-setting select').val().trim(),
                 wait: validation.find('.wait-setting input').val().trim(),
-                url: validation.find('.url-setting input').val().trim()
+                url: validation.find('.url-setting input').val().trim(),
+                window_size: validation.find('.window_size select').val().trim()
             },
             success: function (response) {
                 var content = $(response),

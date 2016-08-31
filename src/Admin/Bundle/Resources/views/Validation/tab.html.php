@@ -79,7 +79,7 @@ $view['slots']->start('body'); ?>
                     </small>
                 </label>
                 <label class="input window_size"><span>Window Size</span>
-                    <select>
+                    <select name="window_size">
                         <option
                             value="1280x1024" <?php print ($acceptance['modules']['config']['WebDriver']['window_size'] == '1280x1024' ? 'selected="selected"' : ''); ?>>
                             Standard (1280x1024)
