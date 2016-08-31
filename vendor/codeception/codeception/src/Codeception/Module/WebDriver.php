@@ -337,13 +337,16 @@ class WebDriver extends CodeceptionModule implements
 
         $firefox_profile = $this->config['capabilities']['firefox_profile'];
         if (file_exists($firefox_profile) === false) {
-            throw new ModuleConfigException(
-                __CLASS__,
-                "Firefox profile does not exist under given path " . $firefox_profile
-            );
+            $this->capabilities['firefox_profile'] = file_get_contents($firefox_profile);
+            //throw new ModuleConfigException(
+            //    __CLASS__,
+            //    "Firefox profile does not exist under given path " . $firefox_profile
+            //);
         }
-        // Set firefox profile as capability
-        $this->capabilities['firefox_profile'] = file_get_contents($firefox_profile);
+        else {
+            // Set firefox profile as capability
+            $this->capabilities['firefox_profile'] = $firefox_profile;
+        }
     }
 
     protected function initialWindowSize()
