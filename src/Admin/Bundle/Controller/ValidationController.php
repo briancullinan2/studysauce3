@@ -447,15 +447,15 @@ class ValidationController extends Controller
             if (!empty($request->get('url'))) {
                 static::$settings['modules']['config']['WebDriver']['url'] = $request->get('url');
             }
-            if (!empty($request->get('profile'))) {
-                $profile = new FirefoxProfile();
-                $profile->setPreference('devtools.responsiveUI.presets', json_encode([[
-                    'key' => '480x800',
-                    'name' => 'Google Nexus one',
-                    'width' => 480,
-                    'height' => 800
-                ]]));
-                static::$settings['modules']['config']['WebDriver']['capabilities']['firefox_profile'] = $profile->encode();
+            if (!empty($request->get('window_size'))) {
+                //$profile = new FirefoxProfile();
+                //$profile->setPreference('devtools.responsiveUI.presets', json_encode([[
+                //    'key' => '480x800',
+                //    'name' => 'Google Nexus one',
+                //    'width' => 480,
+                //    'height' => 800
+                //]]));
+                static::$settings['modules']['config']['WebDriver']['window_size'] = $request->get('window_size');
             }
 
 

@@ -69,8 +69,7 @@ $view['slots']->start('body'); ?>
                                $acceptance['modules']['config']['WebDriver']['wait']
                            ); ?>"/>
                     <small>Number of seconds between each step. Some steps require additional wait which will be shown
-                        in
-                        the results.
+                        in the results.
                     </small>
                 </label>
                 <label class="input url-setting"><span>StudySauce URL</span>
@@ -78,6 +77,19 @@ $view['slots']->start('body'); ?>
                     <small>Path to StudySauce instance to test (e.g. https://staging.studysauce.com or
                         https://test.studysauce.com). WARNING: database changes will occur on the selected instance.
                     </small>
+                </label>
+                <label class="input window_size"><span>Window Size</span>
+                    <select>
+                        <option
+                            value="1280x1024" <?php print ($acceptance['modules']['config']['WebDriver']['window_size'] == '1280x1024' ? 'selected="selected"' : ''); ?>>
+                            Standard (1280x1024)
+                        </option>
+                        <option
+                            value="800x480" <?php print ($acceptance['modules']['config']['WebDriver']['window_size'] == '800x480' ? 'selected="selected"' : ''); ?>>
+                            Mobile Landscape (800x480)
+                        </option>
+                    </select>
+                    <small></small>
                 </label>
             </div>
             <div id="sigma-container"></div>
