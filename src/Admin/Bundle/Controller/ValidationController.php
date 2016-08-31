@@ -447,7 +447,7 @@ class ValidationController extends Controller
             if (!empty($request->get('url'))) {
                 static::$settings['modules']['config']['WebDriver']['url'] = $request->get('url');
             }
-            if (!empty($request->get('profile')) || true) {
+            if (!empty($request->get('profile'))) {
                 $profile = new FirefoxProfile();
                 $profile->setPreference('devtools.responsiveUI.presets', json_encode([[
                     'key' => '480x800',
