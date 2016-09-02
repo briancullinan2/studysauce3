@@ -1073,6 +1073,7 @@ textarea
 
 .input.select {
     position:relative;
+    z-index: 1;
 }
 
 .input.select select {
