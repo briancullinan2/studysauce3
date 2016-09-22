@@ -762,6 +762,7 @@ class Pack
     public function addUserPack(\StudySauce\Bundle\Entity\UserPack $userPack)
     {
         $this->userPacks[] = $userPack;
+        $userPack->getUser()->addUserPack($userPack);
         $userPack->setRemoved(false);
         return $this;
     }

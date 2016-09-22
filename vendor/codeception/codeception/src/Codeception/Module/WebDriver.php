@@ -2038,7 +2038,7 @@ class WebDriver extends CodeceptionModule implements
      *
      * @param string|null $name
      */
-    public function switchToIFrame($name = null)
+    public function switchToIframe($name = null)
     {
         if (is_null($name)) {
             $this->webDriver->switchTo()->defaultContent();

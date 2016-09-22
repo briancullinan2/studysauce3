@@ -359,16 +359,6 @@ EOSH;
     }
 
     /**
-     * @depends tryLandingPages
-     * @depends tryBillMyParents
-     * @depends tryDetailedNotes
-     * @depends tryGuestCheckout
-     * @depends tryDetailedPlan
-     * @depends tryGuestCheckout
-     * @depends tryFreeCourse
-     * @depends tryAllCourse2
-     * @depends tryAllCourse3
-     * @depends tryAllEmails
      * @param AcceptanceTester $I
      */
     public function tryPushToProduction(AcceptanceTester $I)
