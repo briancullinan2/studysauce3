@@ -40,12 +40,17 @@ if(isset($request['ss_group-id']) && !empty($group = $request['ss_group-id'])) {
 }
 else if (isset($results['ss_group'])) {
     // displaying the list of users not in subgroups which are displayed right below this row
+    $groupNames = [];
+    foreach($results['ss_group'] as $g) {
+        /** @var Group $g */
+        $groupNames[count($groupNames)] = $g->getName();
+    }
     $groupUsers = [];
     foreach($users as $u) {
         $include = false;
         foreach($u->getGroups()->toArray() as $g) {
             /** @var Group $g */
-            if(!in_array($g, $results['ss_group'])) {
+            if(!in_array($g->getName(), $groupNames)) {
                 $include = true;
                 break;
             }
