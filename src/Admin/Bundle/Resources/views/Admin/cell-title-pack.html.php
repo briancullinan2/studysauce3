@@ -14,7 +14,7 @@ if (isset($request['pack-id']) && $pack->getId() == $request['pack-id']) {
     $userCount = 0;
     foreach($pack->getUsers()->toArray() as $u) {
         /** @var User $u */
-        if (!empty($up = $u->getUserPack($pack))) {
+        if (!empty($up = $pack->getUserPack($u))) {
             $userCount += !empty($up->getDownloaded()) ? 1 : 0;
         }
     }
