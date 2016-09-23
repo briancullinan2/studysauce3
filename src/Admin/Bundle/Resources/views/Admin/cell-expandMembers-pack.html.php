@@ -47,11 +47,11 @@ else if (isset($results['ss_group'])) {
     }
     $groupUsers = [];
     foreach($users as $u) {
-        $include = false;
+        $include = true;
         foreach($u->getGroups()->toArray() as $g) {
             /** @var Group $g */
-            if(!in_array($g->getName(), $groupNames)) {
-                $include = true;
+            if(in_array($g->getName(), $groupNames)) {
+                $include = false;
                 break;
             }
         }
