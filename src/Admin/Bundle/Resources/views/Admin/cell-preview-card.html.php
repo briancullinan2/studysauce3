@@ -155,12 +155,12 @@ else {
     $preview->find('[type="text"]')->val('Type your answer');
 }
 
-$preview->find('.preview-content div')->text($content);
+$preview->find('.preview-content div')->html($content);
 
 for ($ai = 0; $ai < count($answersUnique); $ai++) {
-    $preview->find('.preview-response')->eq($ai)->find('div')->text($answersUnique[$ai]);
+    $preview->find('.preview-response')->eq($ai)->find('div')->html($answersUnique[$ai]);
 }
 
-$preview->find('.preview-answer .preview-inner .preview-content div')->text($correct);
+$preview->find('.preview-answer .preview-inner .preview-content div')->html($correct);
 
 print ($row->html());

@@ -94,8 +94,8 @@ if($isImage && isset($url)) {
         ->replaceWith(implode('', ['<img src="', $url, '" />']));
 }
 
-$row->find('.preview-content div')->text($content);
+$row->find('.preview-content div')->html($content);
 
-$row->find('.preview-answer .preview-inner .preview-content div')->text($correct);
+$row->find('.preview-answer .preview-inner .preview-content div')->html($correct);
 
 print ($row->html());

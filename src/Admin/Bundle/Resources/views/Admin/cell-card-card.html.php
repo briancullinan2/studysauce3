@@ -123,7 +123,7 @@ else {
     $row->find('[type="text"]')->attr('placeholder', 'Type your answer');
 }
 
-$row->find('.preview-content div')->text($content);
+$row->find('.preview-content div')->html($content);
 
 $answersUnique = [];
 foreach($card->getAnswers()->toArray() as $answer) {
@@ -131,7 +131,7 @@ foreach($card->getAnswers()->toArray() as $answer) {
     if (!$answer->getDeleted() && !in_array($answer->getContent(), $answersUnique)) {
         $resp = $row->find('.preview-response')->eq(count($answersUnique));
         $resp->attr('href', implode('', ['#', $answer->getValue()]));
-        $resp->find('div')->text($answer->getContent());
+        $resp->find('div')->html($answer->getContent());
         $resp->addClass(implode('', ['answer-id-', $answer->getId()]));
         if($answer->getCorrect()) {
             $resp->addClass('correct');
