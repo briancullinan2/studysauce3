@@ -53,7 +53,8 @@ $view['slots']->start('modal-body'); ?>
                     <?php print ($view->render('AdminBundle:Admin:cell-collection.html.php', [
                         'context' => $entityField->length > 0
                             ? $entityField->parents('.tab-pane')
-                            : jQuery('<div/>'), 'tables' => $tmpTables,
+                            : jQuery('<div/>'), 
+                        'tables' => $tmpTables,
                         'entities' => $entities,
                         'entityIds' => $entityIds,
                         'inline' => true])); ?>

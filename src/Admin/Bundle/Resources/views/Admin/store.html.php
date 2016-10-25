@@ -109,7 +109,7 @@ if($tab->length == 0) {
                 $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
                 $request['classes'] = ['tiles', 'summary'];
                 $request['headers'] = ['coupon' => 'store'];
-                $request['footers'] = false;
+                $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['coupon' => 'coupon'] : false;
             }
             else {
                 $request['count-file'] = -1;
@@ -131,14 +131,16 @@ if($tab->length == 0) {
                 $request['tables']['pack'] = ['idTilesSummary' => ['created', 'id', 'title', 'logo'], 'actions' => ['cards', 'status']];
                 $request['classes'] = ['tiles', 'summary'];
                 $request['headers'] = $user->hasRole('ROLE_ADMIN') ? ['pack' => 'newPack'] : false;
-                $request['footers'] = false;
+                $request['footers'] = $user->hasRole('ROLE_ADMIN') ? ['coupon' => 'coupon'] : false;
             }
             if ($tab->length == 0) {
                 print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request)));
             } ?>
         </div>
     </div>
-    <?php $view['slots']->stop(); ?>
+    <?php
+    print ($view->render('AdminBundle:Admin:create-coupon.html.php', ['id' => 'create-coupon']));
+    $view['slots']->stop(); ?>
 
     <?php $view['slots']->start('sincludes');
     $view['slots']->stop();

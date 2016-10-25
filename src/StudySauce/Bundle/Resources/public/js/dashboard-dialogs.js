@@ -445,6 +445,8 @@ $(document).ready(function () {
     });
     */
 
+    // data-toggle="modal" on option brings up dialog for confirmation
+
     body.on('click', 'a[data-confirm][data-toggle="modal"]', function (evt) {
         evt.preventDefault();
         var that = $(this);
@@ -474,5 +476,33 @@ $(document).ready(function () {
 
         $('#general-dialog').find('.modal-body').html(that.data('confirm'));
     });
+
+    var alreadySetting = false;
+    body.on('change', '#create-coupon input[name="packs"]', function () {
+        if (alreadySetting) {
+            return;
+        }
+        alreadySetting = true;
+        var that = $(this);
+        var value = that.val();
+        var newItem = that[0].selectize.options[value];
+        //var table = value.split('-')[0];
+        //var id = parseInt(value.split('-')[1]);
+        that[0].selectize.setValue('', true);
+        that.blur();
+
+        var row = window.views.render('cell_collectionRow', {
+            context: $('<div/>'),
+            entity: newItem,
+            tables: that.data('tables')
+        });
+
+        // TODO: add below search field same way entity dialog does?
+        $(row).insertAfter($('#create-coupon').find('.entity-search header'));
+
+        alreadySetting = false;
+        debugger;
+    });
+
 
 });

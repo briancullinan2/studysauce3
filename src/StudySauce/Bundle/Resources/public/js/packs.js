@@ -497,7 +497,6 @@ $(document).ready(function () {
     body.on('show', '.panel-pane[id^="packs-"]', setupPackEditor);
 
     // TODO: generalize and move this to dashboard using some sort of property binding API, data-target, data-toggle for selects toggles class of closest matching target?
-    // TODO: data-toggle="modal" on option brings up dialog for confirmation
 
     body.on('change change.confirm', '[id^="packs-"] .status select', function (evt) {
         var row = $(this).parents('.pack-row');

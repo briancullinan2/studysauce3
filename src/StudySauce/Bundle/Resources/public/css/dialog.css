@@ -186,6 +186,15 @@
     vertical-align: middle;
 }
 
+#create-coupon .entity-search .checkbox i
+{
+    display:none;
+}
+
+#create-coupon .checkbox.another {
+    float:left;
+}
+
 #partner-advice-1 .dialog-tracker li:first-child,
 #partner-advice-2 .dialog-tracker li:nth-child(2),
 #partner-advice-3 .dialog-tracker li:nth-child(3),

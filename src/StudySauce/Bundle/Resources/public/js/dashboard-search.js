@@ -107,6 +107,7 @@ $(document).ready(function () {
     var body = $('body');
 
     var alreadySetting = false;
+    // TODO: copy this to dialogs and modify for the #create-bundle dialog
     body.on('change', '.header input[name="search"]', function () {
         if(alreadySetting) {
             return;
