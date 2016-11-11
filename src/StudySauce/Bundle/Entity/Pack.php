@@ -824,6 +824,8 @@ class Pack
     {
         $this->coupons[] = $coupon;
 
+        $coupon->addPack($this);
+        
         return $this;
     }
 

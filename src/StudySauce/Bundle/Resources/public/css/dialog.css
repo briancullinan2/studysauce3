@@ -191,8 +191,17 @@
     display:none;
 }
 
+#create-coupon .entity-search .checkbox i[name*="[remove]"]
+{
+    display:none;
+}
+
 #create-coupon .checkbox.another {
     float:left;
+}
+
+#create-coupon .modal-content {
+    height: auto !important;
 }
 
 #partner-advice-1 .dialog-tracker li:first-child,

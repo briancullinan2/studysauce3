@@ -44,12 +44,12 @@ class AdminController extends Controller
         // TODO: simplify this maybe by specifying 'ss_user' => 'name' => 'authored,userPacks.pack'
         'ss_user' => ['id' => ['id'], 'name' => ['first', 'last', 'email', 'lastVisit'], 'groups', 'packs' => ['authored', 'userPacks'], 'roles', 'actions' => ['deleted', 'invites', 'invitees', 'properties']],
         'ss_group' => ['id' => ['id'], 'name' => ['name', 'logo'], 'parent' => ['parent', 'subgroups'], 'invites', 'packs' => ['packs', 'groupPacks', 'users'], 'actions' => ['deleted']],
-        'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'ownerId'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user', 'cardCount', 'firstCard'], 'properties', 'actions'],
+        'pack' => ['id' => ['id'], 'name' => ['title', 'logo', 'ownerId'], 'status', ['cards', 'group', 'groups', 'user', 'users', 'userPacks', 'userPacks.user', 'cardCount', 'firstCard', 'coupons'], 'properties', 'actions'],
         'card' => ['id' => ['id'], 'name' => ['type', 'upload', 'content'], 'correct' => ['correct', 'answers', 'responseContent', 'responseType'], ['pack'], 'actions' => ['deleted', 'remove']],
         'invite' => ['id' => ['code'], 'name' => ['first', 'last', 'email', 'created', 'invitee', 'user'], 'actions' => ['deleted', 'group', 'properties']],
         'user_pack' => ['id' => ['user', 'pack'], 'removed', 'downloaded', 'retention'],
         'file' => ['id' => ['url']],
-        'coupon' => ['id' => ['id', 'name', 'description', 'packs', 'options', 'cardCount', 'deleted']],
+        'coupon' => ['id' => ['id'], 'name' => ['name', 'description', 'packs', 'options', 'cardCount', 'deleted']],
         'answer' => ['id' => ['value', 'card'], 'deleted', 'correct', 'content', 'id'],
         'payment' => ['id' => ['created', 'id'], 'user', 'coupons']
         // TODO: this really generalized template

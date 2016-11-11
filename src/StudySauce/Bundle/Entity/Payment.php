@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -86,6 +87,13 @@ class Payment
         $this->created = new \DateTime();
     }
 
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->coupons = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -348,13 +356,6 @@ class Payment
     public function getPack()
     {
         return $this->pack;
-    }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->coupons = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**

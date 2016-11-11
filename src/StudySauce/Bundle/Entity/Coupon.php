@@ -2,6 +2,7 @@
 
 namespace StudySauce\Bundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -119,6 +120,17 @@ class Coupon
         return null;
     }
 
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->payments = new ArrayCollection();
+        $this->packs = new ArrayCollection();
+    }
+
+
     /**
      * Get id
      *
@@ -161,6 +173,15 @@ class Coupon
     public function setDescription($description)
     {
         $this->description = $description;
+
+        if(empty($this->name)) {
+            $words = preg_split('/[\s,_-]+/', $this->description);
+            $acronym = '';
+            foreach ($words as $w) {
+                $acronym .= $w[0];
+            }
+            $this->setName(strtoupper($acronym) . date('YmdHis'));
+        }
 
         return $this;
     }
@@ -335,13 +356,6 @@ class Coupon
     {
         return $this->group;
     }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     /**
      * Set options
@@ -351,7 +365,19 @@ class Coupon
      */
     public function setOptions($options)
     {
-        $this->options = $options;
+        if(is_string($options))
+        {
+            try {
+                $this->options = unserialize($options);
+            }
+            catch (\Exception $e) {
+
+            }
+        }
+        else
+        {
+            $this->options = $options;
+        }
 
         return $this;
     }
@@ -431,6 +457,16 @@ class Coupon
     public function getPacks()
     {
         return $this->packs;
+    }
+
+    /**
+     * @param $packs
+     */
+    public function setPacks($packs)
+    {
+        foreach($packs as $p) {
+            $this->packs->add($p);
+        }
     }
 
 }

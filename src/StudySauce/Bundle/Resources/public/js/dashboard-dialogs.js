@@ -491,18 +491,57 @@ $(document).ready(function () {
         that[0].selectize.setValue('', true);
         that.blur();
 
-        var row = window.views.render('cell_collectionRow', {
-            context: $('<div/>'),
+        var newRow = $('<div class="pack-row" />');
+        window.views.render('cell_collectionRow', {
+            context: newRow,
             entity: newItem,
             tables: that.data('tables')
         });
 
         // TODO: add below search field same way entity dialog does?
-        $(row).insertAfter($('#create-coupon').find('.entity-search header'));
+        $(newRow).insertAfter($('#create-coupon').find('.entity-search header'));
 
         alreadySetting = false;
-        debugger;
     });
 
+    body.on('submit', '#create-coupon form', function (evt) {
+        evt.preventDefault();
+        var that = $(this);
+        var results = $('#store').find('.results').first();
+        var request = getDataRequest.apply(results);
+        var dialog = $('#create-coupon');
+        var data = gatherFields.apply(that, [['description', 'options']]);
+        var obj = {tables: {coupon: ['description', 'options']}};
+        assignSubKey(obj, 'coupon', data);
+        obj.requestKey = request.requestKey;
+        standardSave.apply(that, [obj, function (result) {
+            // TODO: finish setting up new coupon by adding packs
+            var coupon = result.results.coupon.pop();
+            var packList = [];
+            var obj = {};
+            that.find('.entity-search .pack-row').each(function () {
+                var row = $(this);
+                var packs = gatherFields.apply(row, [['pack']]);
+                var pack = null;
+                for(var p in packs.pack)
+                {
+                    if(packs.pack.hasOwnProperty(p))
+                    {
+                        pack = packs.pack[p];
+                        break;
+                    }
+                }
+                pack.coupons = {id: coupon.id};
+                packList[packList.length] = pack;
+            });
+            obj.pack = packList;
+            obj.tables = {pack: ['coupons']};
+            obj.requestKey = request.requestKey;
+            standardSave.apply(that, [obj, function () {
+                loadResults.apply(results);
+                dialog.modal('hide');
+            }]);
+        }]);
+    });
 
 });
