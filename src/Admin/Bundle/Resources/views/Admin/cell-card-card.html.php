@@ -113,7 +113,7 @@ if($isImage && isset($url)) {
 if(($isImage || $isAudio) && isset($url)) {
     // TODO: if type-sa?
     if(!empty($content)) {
-        $row->find('[type="text"]')->attr('placeholder', $content);
+        $row->find('[type="text"]')->attr('placeholder', str_replace('<br />', '', $content));
     }
     else {
         $row->find('[type="text"]')->attr('placeholder', 'Type your answer');
