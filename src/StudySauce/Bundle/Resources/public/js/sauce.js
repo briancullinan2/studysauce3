@@ -252,7 +252,7 @@ function centerize() {
         var relativeParent = $(this).parents().filter(function () {return (/relative|absolute|fixed/i).test($(this).css('position'));}).first();
         var relativeHeight = relativeParent.outerHeight();
         if(relativeParent.length == 0) {
-            relativeParent = parent();
+            relativeParent = $(this).parent();
             relativeHeight = relativeParent.height();
         }
         else {
