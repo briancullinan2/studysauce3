@@ -1,4 +1,5 @@
 imports:
+    - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: assets_version.php }
     - { resource: "@StudySauceBundle/Resources/config/assets.php" }
@@ -9,20 +10,9 @@ parameters:
     fos_js_routing.extractor.class: StudySauce\Bundle\DependencyInjection\ExposedRoutesExtractor
 
 services:
-    pdo:
-        class: Doctrine\DBAL\Driver\PDOConnection
-        arguments:
-            - "sqlite:%kernel.root_dir%/data.sqlite"
-            - root
-            - ~
-        calls:
-            - [setAttribute, [3, 2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
+
     cache:
         class: Doctrine\Common\Cache\ApcCache
-
-    session.handler.pdo:
-        class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
-        arguments: ["@pdo", {db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time, db_lifetime_col: session_lifetime}]
 
     my_user_provider:
         class: StudySauce\Bundle\Security\UserProvider

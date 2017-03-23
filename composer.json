@@ -7,7 +7,7 @@
         "psr-0": { "": "src/", "SymfonyStandard": "app/" }
     },
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=5.5.0",
         "symfony/symfony": "2.8.*",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
@@ -30,7 +30,6 @@
         "wa72/htmlpagedom": "^1.2",
         "stripe/stripe-php": "*",
         "ext-mbstring": "*",
-        "ext-mcrypt" : "*",
         "ext-curl" : "*"
     },
     "require-dev": {
@@ -64,7 +63,10 @@
         "symfony-app-dir": "app",
         "symfony-web-dir": "web",
         "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
+            "file": "app/config/parameters.yml",
+            "env-map": {
+                "database_host": "SYMFONY__DATABASE__HOST"
+            }
         },
         "branch-alias": {
             "dev-master": "2.7-dev"

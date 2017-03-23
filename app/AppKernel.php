@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/ApcApcuCompat.php';
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
