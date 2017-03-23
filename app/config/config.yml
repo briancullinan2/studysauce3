@@ -157,6 +157,9 @@ swiftmailer:
     spool: { type: db }
 
 fos_user:
+    from_email:
+        address:        "admin@studysauce.com"
+        sender_name:    "Study Sauce"
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: StudySauce\Bundle\Entity\User

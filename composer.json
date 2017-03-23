@@ -7,7 +7,7 @@
         "psr-0": { "": "src/", "SymfonyStandard": "app/" }
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=7.0.0",
         "symfony/symfony": "2.8.*",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
@@ -21,7 +21,6 @@
         "friendsofsymfony/user-bundle": "~2.0@dev",
         "hwi/oauth-bundle": "0.3.*",
         "kriswallsmith/buzz": "~0.13",
-        "authorizenet/authorizenet": "~1.8",
         "aws/aws-sdk-php": "2.*",
         "whiteoctober/swiftmailerdbbundle": "~1.0",
         "codeception/codeception": "*",
@@ -29,7 +28,10 @@
         "google/apiclient": "~1.1",
         "friendsofsymfony/jsrouting-bundle": "^1.6",
         "wa72/htmlpagedom": "^1.2",
-        "stripe/stripe-php": "*"
+        "stripe/stripe-php": "*",
+        "ext-mbstring": "*",
+        "ext-mcrypt" : "*",
+        "ext-curl" : "*"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3"
