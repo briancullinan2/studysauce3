@@ -31,7 +31,8 @@ if (isset($_SERVER) &&
     }
     elseif(preg_match('/www\.studysauce\.com/', $_SERVER['HTTP_HOST'])
         || preg_match('/cerebro\.studysauce\.com/', $_SERVER['HTTP_HOST'])
-        || preg_match('/^studysauce\.com/', $_SERVER['HTTP_HOST'])) {
+        || preg_match('/^studysauce\.com/', $_SERVER['HTTP_HOST'])
+        || preg_match('/^herokuapp/', $_SERVER['HTTP_HOST'])) {
         $kernel = new AppKernel('prod', false);
     }
 }
