@@ -35,6 +35,3 @@ monolog:
         console:
             type:  console
 
-jms_google_closure:
-    plovr:
-        jar_path: %kernel.root_dir%/../vendor/plovr/plovr.jar
