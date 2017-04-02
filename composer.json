@@ -33,8 +33,7 @@
         "ext-curl" : "*"
     },
     "require-dev": {
-        "heroku/heroku-buildpack-php": "*",
-        "sensio/generator-bundle": "~2.3"
+        "heroku/heroku-buildpack-php": "*"
     },
     "scripts": {
         "post-root-package-install": [
