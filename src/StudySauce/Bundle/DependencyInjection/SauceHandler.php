@@ -29,7 +29,7 @@ class SauceHandler extends ScriptHandler
         $options = self::getOptions($event);
         $webDir = $options['symfony-web-dir'];
         $appDir = $options['symfony-app-dir'];
-        $arguments = array('--no-warmup');
+        $arguments = array('--no-warmup', '--env=prod');
 
         if ($options['assetic-dump-force']) {
             $arguments[] = '--force';
