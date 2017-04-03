@@ -17,7 +17,7 @@ class SauceHandler extends ScriptHandler
             'symfony-web-dir' => 'web',
             'symfony-assets-install' => 'hard',
             'assetic-dump-asset-root' => null,
-            'assetic-dump-force' => false
+            'assetic-dump-force' => true
         ), $event->getComposer()->getPackage()->getExtra());
         $options['symfony-assets-install'] = getenv('SYMFONY_ASSETS_INSTALL') ?: $options['symfony-assets-install'];
         $options['process-timeout'] = $event->getComposer()->getConfig()->get('process-timeout');
