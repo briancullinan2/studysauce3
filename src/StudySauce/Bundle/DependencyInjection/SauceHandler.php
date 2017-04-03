@@ -29,21 +29,21 @@ class SauceHandler extends ScriptHandler
         $options = self::getOptions($event);
         $webDir = $options['symfony-web-dir'];
         $appDir = $options['symfony-app-dir'];
-        $arguments = array();
+        $arguments = array('--no-warmup');
 
         if ($options['assetic-dump-force']) {
             $arguments[] = '--force';
         }
 
         if ($options['assetic-dump-asset-root'] !== null) {
-            $arguments = escapeshellarg($options['assetic-dump-asset-root']);
+            $arguments[] = escapeshellarg($options['assetic-dump-asset-root']);
         }
         if (!is_dir($webDir)) {
             echo 'The symfony-app-dir (' . $webDir . ') specified in composer.json was not found in ' . getcwd() . ', can not install assets.' . PHP_EOL;
             return;
         }
 
-        static::executeCommand($event, $appDir, 'assetic:dump' . implode(' ', $arguments));
+        static::executeCommand($event, $appDir, 'assetic:dump ' . implode(' ', $arguments));
     }
 
     protected static function executeCommand(Event $event, $consoleDir, $cmd, $timeout = 300)
