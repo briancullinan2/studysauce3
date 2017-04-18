@@ -36,7 +36,8 @@
     "suggest": {
         "ext-mbstring": "*",
         "ext-curl" : "*",
-        "ext-apcu": "*"
+        "ext-apcu": "*",
+        "ext-intl": "*"
     },
     "scripts": {
         "post-root-package-install": [
