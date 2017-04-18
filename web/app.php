@@ -25,14 +25,16 @@ if (isset($_SERVER) &&
         $kernel = new AppKernel('test', true);
     }
     elseif(preg_match('/staging\.studysauce\.com/', $_SERVER['HTTP_HOST'])
-        || preg_match('/localhost/', $_SERVER['HTTP_HOST'])) {
+        || preg_match('/localhost/', $_SERVER['HTTP_HOST'])
+        || preg_match('/herokuapp/', $_SERVER['HTTP_HOST'])
+    ) {
         Symfony\Component\Debug\Debug::enable();
         $kernel = new AppKernel('dev', true);
     }
     elseif(preg_match('/www\.studysauce\.com/', $_SERVER['HTTP_HOST'])
         || preg_match('/cerebro\.studysauce\.com/', $_SERVER['HTTP_HOST'])
         || preg_match('/^studysauce\.com/', $_SERVER['HTTP_HOST'])
-        || preg_match('/herokuapp/', $_SERVER['HTTP_HOST'])) {
+    ) {
         $kernel = new AppKernel('prod', false);
     }
 }
