@@ -29,9 +29,9 @@
         "friendsofsymfony/jsrouting-bundle": "^1.6",
         "wa72/htmlpagedom": "^1.2",
         "stripe/stripe-php": "*",
-        "ext-mbstring": "*",
-        "ext-curl" : "*",
-        "ext-apcu": "*"
+        "mbstring": "*",
+        "curl" : "*",
+        "apcu": "*"
     },
     "require-dev": {
         "heroku/heroku-buildpack-php": "*"
