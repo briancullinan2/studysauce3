@@ -31,7 +31,7 @@ RUN mkdir -p $APACHE_RUN_DIR $APACHE_LOCK_DIR $APACHE_LOG_DIR
 #    chmod a+x /var/www/studysauce3/cron.sh && \
 run echo "127.0.0.1  studysauce.com" >> /etc/hosts && \
     echo "127.0.0.1  test.studysauce.com" >> /etc/hosts && \
-    echo "<Directory \"/var/www/html\">AllowOverride All</Directory>" >> /etc/apache2/apache.conf
+    echo "<Directory \"/var/www/web\">AllowOverride All</Directory>" >> /etc/apache2/apache2.conf
 
 ADD . /var/www/
 RUN rm -R /var/www/html

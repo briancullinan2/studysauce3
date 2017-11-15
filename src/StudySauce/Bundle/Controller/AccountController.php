@@ -459,15 +459,15 @@ class AccountController extends Controller
             $user->addRole('ROLE_USER');
             $user->setFirst($request->get('first'));
             $user->setLast($request->get('last'));
-            $user->setPassword('');
+            $user->setPlainPassword($request->get('pass'));
             $userManager->updateUser($user);
 
             // change the password
-            $encoder_service = $this->get('security.encoder_factory');
+            //$encoder_service = $this->get('security.encoder_factory');
             /** @var $encoder PasswordEncoderInterface */
-            $encoder = $encoder_service->getEncoder($user);
-            $password = $encoder->encodePassword($request->get('pass'), $user->getSalt());
-            $user->setPassword($password);
+            //$encoder = $encoder_service->getEncoder($user);
+            //$password = $encoder->encodePassword(, $user->getSalt());
+            //$user->setPassword($password);
 
             $user->setConfirmationToken(null);
             $user->setPasswordRequestedAt(null);

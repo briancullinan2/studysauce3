@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 /**
  * Class PartnerController
@@ -461,7 +462,7 @@ class AdminController extends Controller
         if (!empty($key = $request->get('requestKey'))) {
             $cacheRequest = $this->get('cache')->fetch($key);
             if (empty($cacheRequest)) {
-                throw new NotFoundHttpException('Could not find request key');
+                throw new UnsupportedMediaTypeHttpException('Could not find request key');
             } else {
                 $searchRequest = unserialize($cacheRequest);
             }
