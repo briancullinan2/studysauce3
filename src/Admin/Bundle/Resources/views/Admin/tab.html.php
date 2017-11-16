@@ -39,8 +39,14 @@ $view['slots']->start('body'); ?>
         <div class="pane-content">
             <?php
             $request = (array)(new stdClass());
+            $request['count-ss_user'] = 50;
+            $request['count-ss_group'] = 0;
             $request['tables'] = (array)(new stdClass());
-            $request['ss_user'] = ['0' => 'id', 'title' => ['first', 'last', 'email']];
+            $request['tables']['ss_user'] = ['id' => ['lastVisit', 'id'], 'title' => ['first', 'last', 'email'], 'membership' => ['groups', 'roles', 'properties'], '10' => 'actions'];
+            $request['tables']['ss_group'] = ['id' => ['id', 'name']];
+            $request['classes'] = [];
+            $request['headers'] = false;
+            $request['footers'] = false;
             print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request))); ?>
         </div>
     </div>

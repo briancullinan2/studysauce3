@@ -29,9 +29,9 @@ RUN mkdir -p $APACHE_RUN_DIR $APACHE_LOCK_DIR $APACHE_LOG_DIR
 # add cron to run every minute
 #RUN echo "* * * * * root /var/www/studysauce3/cron.sh" >> /etc/crontab && \
 #    chmod a+x /var/www/studysauce3/cron.sh && \
-run echo "127.0.0.1  studysauce.com" >> /etc/hosts && \
+RUN echo "127.0.0.1  studysauce.com" >> /etc/hosts && \
     echo "127.0.0.1  test.studysauce.com" >> /etc/hosts && \
-    echo "<Directory \"/var/www/web\">AllowOverride All</Directory>" >> /etc/apache2/apache2.conf
+    echo "<Directory \"/var/www/web\">\nAllowOverride All\n</Directory>" >> /etc/apache2/apache2.conf
 
 ADD . /var/www/
 RUN rm -R /var/www/html
@@ -40,8 +40,8 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ADD slim-apache.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www
-RUN composer update --root-reqs
-RUN php app/console assetic:dump --env=dev --no-warmup
+RUN composer install
+RUN php app/console assetic:dump --env=dev
 RUN chown www-data:www-data -R app/cache/ && \
     chown www-data:www-data -R app/logs/ && \
     chown www-data:www-data -R src/Admin/Bundle/Tests && \

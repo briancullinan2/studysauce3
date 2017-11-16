@@ -317,6 +317,8 @@ window.views.__defaultEntities['ss_user'] = {
             }
         }
     },
+    getProperties: function () {return this.properties;},
+    getRoles: function () {return this.roles;},
     getInvites: function () {return $($(this.invites).toArray().map(function (up) {return applyEntityObj(up);}));},
     getInvitees: function () {return $($(this.invitees).toArray().map(function (up) {return applyEntityObj(up);}));},
     getLastVisit: function () {return !(this.lastVisit) ? null : new Date(this.lastVisit);},

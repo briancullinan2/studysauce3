@@ -5,22 +5,23 @@ parameters:
     defer_all_emails: "studymarketing@mailinator.com"
     stripe_api_key: "sk_test_e6FayAX25zDIq2O17blocj2h"
     stripe_public_key: "pk_test_th5VY2bxRUDSJZ1xCcpJ7CNB"
+    database_host: "studysaucedb"
 
 doctrine:
     dbal:
         server_version:       5.6
         driver:   "pdo_mysql"
         host:     "%database_host%"
-        dbname:   "heroku_cb7d2d0196b54c6"
-        user:     "b9e5a2b2b0eb8f"
-        password: "72ced352"
+        dbname:   "studysauce3"
+        user:     "study2"
+        password: "itekIO^#(1234"
 
 services:
     session.handler.pdo:
             class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
             arguments:
-                - "mysql:host=%database_host%;port=3306;dbname=heroku_cb7d2d0196b54c6;server_version=5.6"
-                - {db_username: "b9e5a2b2b0eb8f", db_password: "72ced352", db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time, db_lifetime_col: session_lifetime}
+                - "mysql:host=%database_host%;port=3306;dbname=studysauce3;server_version=5.6"
+                - {db_username: "study2", db_password: "itekIO^#(1234", db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time, db_lifetime_col: session_lifetime}
 
 monolog:
     handlers:
