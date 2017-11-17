@@ -40,10 +40,10 @@ $view['slots']->start('body'); ?>
             <?php
             $request = (array)(new stdClass());
             $request['count-ss_user'] = 50;
-            $request['count-ss_group'] = 0;
+            $request['count-ss_group'] = -1;
             $request['tables'] = (array)(new stdClass());
             $request['tables']['ss_user'] = ['id' => ['lastVisit', 'id'], 'title' => ['first', 'last', 'email'], 'membership' => ['groups', 'roles', 'properties'], '10' => 'actions'];
-            $request['tables']['ss_group'] = ['id' => ['id', 'name']];
+            $request['tables']['ss_group'] = ['id', 'name'];
             $request['classes'] = [];
             $request['headers'] = false;
             $request['footers'] = false;

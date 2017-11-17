@@ -17,6 +17,3 @@ foreach($ss_user->getRoles() as $r) {
     }
     ?>
 </div>
-<div>
-<?php print(json_encode($ss_user->getProperties())); ?>
-</div>

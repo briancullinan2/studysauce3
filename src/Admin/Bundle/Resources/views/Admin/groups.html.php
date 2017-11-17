@@ -134,9 +134,9 @@ $view['slots']->start('body'); ?>
                         $request['count-file'] = -1;
                         $request['count-ss_user'] = -1;
                         $request['count-pack'] = -1;
-                        $request['new'] = $isNew;
                         $request['count-ss_group'] = $isNew ? -1 : 0;
                         $request['ss_group-deleted'] = $entity->getDeleted();
+                        $request['new'] = $isNew;
                         $request['edit'] = false;
                         $request['read-only'] = false;
                         $request['headers'] = false;
