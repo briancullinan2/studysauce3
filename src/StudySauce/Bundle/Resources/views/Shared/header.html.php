@@ -85,8 +85,9 @@ foreach($invites as $i) {
                     <?php } ?>
                     <li><a href="<?php print $view['router']->generate('store'); ?>"><span>&nbsp;</span>Store</a></li>
                     <?php if (!empty($user) && $user->hasRole('ROLE_ADMIN')) { ?>
-                    <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>
-                    <li><a href="<?php print $view['router']->generate('activity'); ?>"><span>&nbsp;</span>Activity</a></li>
+                        <li><a href="<?php print $view['router']->generate('validation'); ?>"><span>&nbsp;</span>Validation</a></li>
+                        <li><a href="<?php print $view['router']->generate('activity'); ?>"><span>&nbsp;</span>Activity</a></li>
+                        <li><a href="<?php print $view['router']->generate('command'); ?>"><span>&nbsp;</span>Users</a></li>
                     <?php } ?>
                     <?php /*
                     <li><a href="<?php print $view['router']->generate('command'); ?>"><span>&nbsp;</span>Users</a></li>
