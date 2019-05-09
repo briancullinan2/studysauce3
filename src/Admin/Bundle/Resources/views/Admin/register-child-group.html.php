@@ -115,7 +115,6 @@ else {
     <select name="parent" placeholder="School system">
         <option value="">- Select child&rsquo;s school system -</option>
         <?php print ($groupStr); ?>
-        <option value="_">Other</option>
     </select></label>
 <label class="input select year"><span>Grade</span>
     <select name="year" placeholder="School year">

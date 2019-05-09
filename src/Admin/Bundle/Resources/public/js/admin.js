@@ -138,18 +138,15 @@ $(document).ready(function () {
         var data = {};
         var row = $(this).parents('.ss_user-row');
         data['users'] = [];
-        //admin.find('.ss_user-row.edit:not(.invalid)').each(function () {
-        //    var row = $(this);
-            row.removeClass('edit').addClass('read-only');
-            data['users'][data['users'].length] = {
-                groups : row.find('input[name="groups"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                roles : row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
-                firstName : row.find('input[name="first"]').val().trim(),
-                lastName : row.find('input[name="last"]').val().trim(),
-                email : row.find('input[name="email"]').val().trim(),
-                userId : (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1]
-            };
-        //});
+        row.removeClass('edit').addClass('read-only');
+        data['users'][data['users'].length] = {
+            groups : row.find('input[name="groups"]:checked').map(function () {return $(this).val();}).toArray().join(','),
+            roles : row.find('input[name="roles"]:checked').map(function () {return $(this).val();}).toArray().join(','),
+            firstName : row.find('input[name="first"]').val().trim(),
+            lastName : row.find('input[name="last"]').val().trim(),
+            email : row.find('input[name="email"]').val().trim(),
+            userId : (/user-id-([0-9]+)(\s|$)/ig).exec(row.attr('class'))[1]
+        };
         $.ajax({
             url: Routing.generate('save_user'),
             type: 'POST',

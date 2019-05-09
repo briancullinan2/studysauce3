@@ -37,6 +37,7 @@ foreach ($view['assetic']->javascripts(['@AdminBundle/Resources/public/js/admin.
 $view['slots']->start('body'); ?>
     <div class="panel-pane" id="command">
         <div class="pane-content">
+            <form action="<?php print ($view['router']->generate('save_user')); ?>" class="user-edit">
             <?php
             $request = (array)(new stdClass());
             $request['count-ss_user'] = 50;
@@ -48,6 +49,7 @@ $view['slots']->start('body'); ?>
             $request['headers'] = false;
             $request['footers'] = false;
             print ($view['actions']->render(new ControllerReference('AdminBundle:Admin:results', $request))); ?>
+            </form>
         </div>
     </div>
 <?php $view['slots']->stop();
