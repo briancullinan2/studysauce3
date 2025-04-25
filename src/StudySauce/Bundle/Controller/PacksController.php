@@ -93,7 +93,7 @@ class PacksController extends Controller
         /** @var $orm EntityManager */
         $orm = $this->get('doctrine')->getManager();
 
-        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+        $searchRequest = unserialize($request->getSession()->get($request->get('requestKey')) ?: 'a:0:{};');
 
         // process pack settings
         list($newPack) = AdminController::standardSave($request, $this->container);

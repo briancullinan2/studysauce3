@@ -12,7 +12,7 @@ parameters:
 services:
 
     cache:
-        class: Doctrine\Common\Cache\ApcCache
+        class: Doctrine\Common\Cache\ArrayCache
 
     my_user_provider:
         class: StudySauce\Bundle\Security\UserProvider
@@ -130,9 +130,9 @@ doctrine:
         # e.g. database_path: "%kernel.root_dir%/data/data.db3"
         # path:     "%database_path%"
     orm:
-        metadata_cache_driver: apc
-        result_cache_driver: apc
-        query_cache_driver: apc
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
         auto_generate_proxy_classes: "%kernel.debug%"
         auto_mapping: true
         mappings:

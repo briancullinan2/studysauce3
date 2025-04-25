@@ -14,3 +14,5 @@ Thumbs.db
 /app/cache/test
 vendor
 app/cache
+vendor_old
+**/.DS_Store

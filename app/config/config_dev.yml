@@ -10,17 +10,21 @@ parameters:
 doctrine:
     dbal:
         server_version:       5.6
-        driver:   "pdo_mysql"
+        driver:   "pdo_sqlite"
         host:     "%database_host%"
         dbname:   "studysauce3"
         user:     "study2"
         password: "itekIO^#(1234"
 
 services:
+    cache.app:
+        class: Symfony\Component\Cache\Adapter\NullAdapter
+    cache.system:
+        class: Symfony\Component\Cache\Adapter\NullAdapter
     session.handler.pdo:
             class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
             arguments:
-                - "mysql:host=%database_host%;port=3306;dbname=studysauce3;server_version=5.6"
+                - "sqlite:///%kernel.root_dir%/session.sqlite"
                 - {db_username: "study2", db_password: "itekIO^#(1234", db_table: session, db_id_col: session_id, db_data_col: session_value, db_time_col: session_time, db_lifetime_col: session_lifetime}
 
 monolog:

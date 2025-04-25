@@ -80,7 +80,7 @@ class RedirectListener implements EventSubscriberInterface
     {
         // provide the better way to display a enhanced error page only in prod environment, if you want
         $exception = $event->getException();
-
+        error_log($exception);
 
         // try and reset the entity manager
         try {
@@ -97,10 +97,10 @@ class RedirectListener implements EventSubscriberInterface
         try
         {
             // try to notify admin
-            $email = new EmailsController();
-            $email->setContainer($this->container);
-            $token = $this->container->get('security.context')->getToken();
-            $email->administratorAction(null, ['user' => !empty($token) ? $token->getUser() : null, 'request' => $event->getRequest(), 'exception' => $exception]);
+            //$email = new EmailsController();
+            //$email->setContainer($this->container);
+            //$token = $this->container->get('security.context')->getToken();
+            //$email->administratorAction(null, ['user' => !empty($token) ? $token->getUser() : null, 'request' => $event->getRequest(), 'exception' => $exception]);
         }
         catch(\Exception $x)
         {
@@ -213,15 +213,15 @@ class RedirectListener implements EventSubscriberInterface
             // repopulate the csrf token for login failures
             try {
                 $route = $router->match($parts['path'])['_route'];
+                $csrfToken = $this->container->has('form.csrf_provider')
+                ? $this->container->get('form.csrf_provider')->generateCsrfToken($route)
+                : null;
+                $options['csrf_token'] = $csrfToken;
+                $response->setContent(json_encode($options));
             }
             catch (\Exception $e) {
                 $donothing = "";
             }
-            $csrfToken = $this->container->has('form.csrf_provider')
-                ? $this->container->get('form.csrf_provider')->generateCsrfToken($route)
-                : null;
-            $options['csrf_token'] = $csrfToken;
-            $response->setContent(json_encode($options));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }

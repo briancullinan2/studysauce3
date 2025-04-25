@@ -460,7 +460,7 @@ class AdminController extends Controller
 
         // default entities to show
         if (!empty($key = $request->get('requestKey'))) {
-            $cacheRequest = $this->get('cache')->fetch($key);
+            $cacheRequest = $request->getSession()->get($key);
             if (empty($cacheRequest)) {
                 throw new UnsupportedMediaTypeHttpException('Could not find request key');
             } else {
@@ -592,7 +592,7 @@ class AdminController extends Controller
         $vars['results']['allGroups'] = $orm->getRepository('StudySauceBundle:Group')->findAll();
         $serialized = serialize($searchRequest);
         $searchRequest['requestKey'] = md5($serialized);
-        $this->get('cache')->save($searchRequest['requestKey'], $serialized);
+        $request->getSession()->set($searchRequest['requestKey'], $serialized);
         $vars['request'] = $searchRequest;
 
         // if request is json, merge the table fields plus a list of all the groups the user has access to
@@ -694,7 +694,7 @@ class AdminController extends Controller
             return $this->redirect($url);
         }
 
-        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+        $searchRequest = unserialize($request->getSession()->get($request->get('requestKey')) ?: 'a:0:{};');
         return $this->forward('AdminBundle:Admin:results', $searchRequest);
     }
 
@@ -711,7 +711,7 @@ class AdminController extends Controller
         self::setUpClasses($orm);
 
         if(!empty($request->get('requestKey'))) {
-            $searchRequest = unserialize($container->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+            $searchRequest = unserialize($request->getSession()->get($request->get('requestKey')) ?: 'a:0:{};');
             $tables = $searchRequest['tables'];
         }
         if(!empty($request->get('tables'))) {
@@ -984,7 +984,9 @@ class AdminController extends Controller
         /** @var Group $g */
         list($g) = self::standardSave($request, $this->container);
 
-        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+        $session = $request->getSession();
+
+        $searchRequest = unserialize($session->get($request->get('requestKey')) ?: 'a:0:{};');
 
         if (!empty($request->get('ss_group')) && is_array($request->get('ss_group'))) {
             if(isset($request->get('ss_group')['deleted']) && $request->get('ss_group')['deleted'] == '1') {

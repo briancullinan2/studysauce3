@@ -18,8 +18,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 /**
  * @ORM\Entity
  * @ORM\Table(name="ss_user",uniqueConstraints={
- *     @ORM\UniqueConstraint(name="email_idx", columns={"email"}),
- *     @ORM\UniqueConstraint(name="username_idx", columns={"username"})})
+ *     @ORM\UniqueConstraint(name="email_idx", columns={"email"})})
  * @ORM\HasLifecycleCallbacks()
  * @ORM\NamedNativeQueries({
  *      @ORM\NamedNativeQuery(

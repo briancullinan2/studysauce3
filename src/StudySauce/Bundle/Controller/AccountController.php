@@ -85,7 +85,7 @@ class AccountController extends Controller
         if (empty($user)) {
             throw new AccessDeniedHttpException('Not logged in');
         }
-        $searchRequest = unserialize($this->get('cache')->fetch($request->get('requestKey')) ?: 'a:0:{};');
+        $searchRequest = unserialize($request->getSession()->get($request->get('requestKey')) ?: 'a:0:{};');
 
         // update notification token
         if(!empty($request->get('device'))) {
@@ -511,7 +511,7 @@ class AccountController extends Controller
             $loginManager->logInUser('main', $user, $response);
         }
 
-        if ($email) {
+        if (false && $email) {
             // send welcome email
             $emails = new EmailsController();
             $emails->setContainer($this->container);
